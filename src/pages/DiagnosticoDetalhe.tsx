@@ -866,7 +866,7 @@ const DiagnosticoDetalhe = () => {
                 {tx('Dados oficiais atualizados após o último cálculo')}
               </p>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Novos valores de fontes oficiais (IBGE, CADASTUR, STN, MTur) chegaram para este município. Recalcule para incorporá-los.
+                {tx("Novos valores de fontes oficiais (IBGE, CADASTUR, STN, MTur) chegaram para este município. Recalcule para incorporá-los.")}
               </p>
             </div>
           </div>
@@ -886,7 +886,7 @@ const DiagnosticoDetalhe = () => {
                 {statusLabels[assessment.status as keyof typeof statusLabels]}
               </Badge>
               <span className="text-sm text-muted-foreground">
-                Versão do algoritmo: {assessment.algo_version}
+                {tx("Versão do algoritmo: {{v0}}", { v0: assessment.algo_version })}
               </span>
             </div>
 
@@ -971,7 +971,7 @@ const DiagnosticoDetalhe = () => {
                   <SelectValue placeholder={tx('Todas as unidades (marca)')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__all__">Todas as unidades (marca)</SelectItem>
+                  <SelectItem value="__all__">{tx("Todas as unidades (marca)")}</SelectItem>
                   {brandRollup.units.map((u) => (
                     <SelectItem key={u.id} value={u.id}>
                       {u.unit_name}
@@ -995,8 +995,7 @@ const DiagnosticoDetalhe = () => {
               <AlertTitle>{tx('Modo Prescrição ativo')}</AlertTitle>
               <AlertDescription>
                 {tx("Exibindo apenas indicadores em")} <strong>{tx('Atenção')}</strong> ou <strong>{tx('Crítico')}</strong> (score ≤ 66%).
-                Afeta as abas <strong>{tx('Indicadores')}</strong>, <strong>{tx('Gargalos')}</strong> e <strong>{tx('Tratamento')}</strong>.
-                As demais abas (Radiografia, Normalização, Projeto, Comentários, Linhagem) não são filtradas.
+                Afeta as abas <strong>{tx('Indicadores')}</strong>, <strong>{tx('Gargalos')}</strong> e <strong>{tx('Tratamento')}</strong>{tx(". As demais abas (Radiografia, Normalização, Projeto, Comentários, Linhagem) não são filtradas.")}
               </AlertDescription>
             </Alert>
           )}
@@ -1105,23 +1104,23 @@ const DiagnosticoDetalhe = () => {
                   apresenta como <strong>{tx('ponto crítico')}</strong> o pilar{' '}
                   <strong className="text-severity-critical">
                     {criticalPillar?.pillar === 'RA'
-                      ? 'Relações Ambientais (IRA)'
+                      ? tx('Relações Ambientais (IRA)')
                       : criticalPillar?.pillar === 'OE'
-                      ? 'Organização Estrutural (IOE)'
-                      : 'Ações Operacionais (IAO)'}
+                      ? tx('Organização Estrutural (IOE)')
+                      : tx('Ações Operacionais (IAO)')}
                   </strong>{' '}
                   com score de{' '}
                   <strong>{Math.round((criticalPillar?.score || 0) * 100)}%</strong>.
                 </p>
                 <p>
-                  {tx("Foram identificados")} <strong>{issues.length} gargalos</strong>{' '}
+                  {tx("Foram identificados")} <strong>{tx("{{v0}} gargalos", { v0: issues.length })}</strong>{' '}
                   principais, dos quais{' '}
                   <strong>
                     {issues.filter((i) => i.severity === 'CRITICO').length} são
                     críticos
                   </strong>
                   . O sistema recomenda{' '}
-                  <strong>{recommendations.length} cursos de capacitação</strong>{' '}
+                  <strong>{tx("{{v0}} cursos de capacitação", { v0: recommendations.length })}</strong>{' '}
                   {tx('para endereçar os problemas identificados.')}
                 </p>
               </div>
@@ -1219,8 +1218,7 @@ const DiagnosticoDetalhe = () => {
                 <Target className="h-4 w-4" />
                 <AlertTitle>{tx('Modo Prescrição ativo')}</AlertTitle>
                 <AlertDescription>
-                  Exibindo apenas indicadores em Atenção ou Crítico
-                  ({displayedIndicatorScores.length} de {indicatorScores.length}).
+                  {tx("Exibindo apenas indicadores em Atenção ou Crítico ({{v0}} de {{v1}}).", { v0: displayedIndicatorScores.length, v1: indicatorScores.length })}
                 </AlertDescription>
               </Alert>
             )}
@@ -1332,9 +1330,7 @@ const DiagnosticoDetalhe = () => {
             {assessment.destination_id && <RevenueIntelligenceGate title={tx('O Geomarketing')}><GeomarketingPanel destinationId={assessment.destination_id} /></RevenueIntelligenceGate>}
           </TabsContent>
         </Tabs>
-        ))
-        : (
-        /* Pre-calculation state */
+        {tx(")) : ( /* Pre-calculation state */")}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-card rounded-xl border p-8 text-center">
             <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -1342,13 +1338,13 @@ const DiagnosticoDetalhe = () => {
             </div>
             <h3 className="text-lg font-display font-semibold mb-2">
               {assessment.status === 'DRAFT'
-                ? 'Preencha os dados para calcular'
-                : 'Dados prontos para cálculo'}
+                ? tx('Preencha os dados para calcular')
+                : tx('Dados prontos para cálculo')}
             </h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-6">
               {assessment.status === 'DRAFT'
-                ? 'Complete o preenchimento dos indicadores via formulário ou importe um arquivo CSV com os dados.'
-                : 'Todos os dados foram preenchidos. Clique no botão abaixo para calcular os índices e gerar o diagnóstico.'}
+                ? tx('Complete o preenchimento dos indicadores via formulário ou importe um arquivo CSV com os dados.')
+                : tx('Todos os dados foram preenchidos. Clique no botão abaixo para calcular os índices e gerar o diagnóstico.')}
             </p>
           <div className="flex gap-3 justify-center">
             {assessment.status === 'DRAFT' && (

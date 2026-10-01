@@ -55,9 +55,9 @@ export function IntegratedTerritorialView({
   if (!data?.matched) {
     const reasonText =
       data?.reason === 'no_ibge'
-        ? 'Este empreendimento não tem código IBGE cadastrado — não é possível localizar o município de referência.'
+        ? tx('Este empreendimento não tem código IBGE cadastrado — não é possível localizar o município de referência.')
         : data?.reason === 'no_assessment'
-        ? 'Ainda não há nenhum diagnóstico Territorial cadastrado para o município deste empreendimento.'
+        ? tx('Ainda não há nenhum diagnóstico Territorial cadastrado para o município deste empreendimento.')
         : 'Existe diagnóstico Territorial para o município, mas ele ainda não foi calculado.';
     return (
       <Alert>
@@ -66,9 +66,7 @@ export function IntegratedTerritorialView({
         <AlertDescription className="space-y-2">
           <p>{reasonText}</p>
           <p className="text-sm text-muted-foreground">
-            A Visão Integrada cruza o desempenho do empreendimento com o diagnóstico
-            Territorial do município, ajudando a separar gargalos internos de causas
-            externas (infra pública, segurança, conectividade, sazonalidade do destino).
+            {tx("A Visão Integrada cruza o desempenho do empreendimento com o diagnóstico Territorial do município, ajudando a separar gargalos internos de causas externas (infra pública, segurança, conectividade, sazonalidade do destino).")}
           </p>
         </AlertDescription>
       </Alert>
@@ -126,8 +124,7 @@ export function IntegratedTerritorialView({
         <CardHeader>
           <CardTitle className="text-base">{tx('Comparação por Pilar')}</CardTitle>
           <CardDescription>
-            Score do empreendimento vs. score do município no mesmo pilar sistêmico (RA/OE/AO).
-            Δ positivo indica que o empreendimento está acima do entorno.
+            {tx("Score do empreendimento vs. score do município no mesmo pilar sistêmico (RA/OE/AO). Δ positivo indica que o empreendimento está acima do entorno.")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -223,9 +220,7 @@ export function IntegratedTerritorialView({
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription className="text-xs">
-          A Visão Integrada é informativa e não altera o cálculo do diagnóstico Empresarial.
-          Use-a para contextualizar gargalos, justificar planos de ação cruzados (interno +
-          territorial) e priorizar projetos junto à governança do destino.
+          {tx("A Visão Integrada é informativa e não altera o cálculo do diagnóstico Empresarial. Use-a para contextualizar gargalos, justificar planos de ação cruzados (interno + territorial) e priorizar projetos junto à governança do destino.")}
         </AlertDescription>
       </Alert>
     </div>

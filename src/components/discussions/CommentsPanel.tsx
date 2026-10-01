@@ -197,7 +197,7 @@ export function CommentsPanel({ entityType, entityId, orgId, title, description 
               <span className="text-xs text-muted-foreground">
                 {mentionedIds.length > 0
                   ? `${mentionedIds.length} menção(ões) — serão notificadas`
-                  : 'Use @ para mencionar membros da organização'}
+                  : tx('Use @ para mencionar membros da organização')}
               </span>
               <Button onClick={submit} disabled={!body.trim() || create.isPending} size="sm">
                 {create.isPending ? (

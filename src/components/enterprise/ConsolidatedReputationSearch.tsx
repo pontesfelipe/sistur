@@ -61,7 +61,7 @@ export function ConsolidatedReputationSearch({ businessName, location, onAutoFil
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Consolidar Reputação Multi-OTA'}
+        {loading ? 'Analisando...' : tx('Consolidar Reputação Multi-OTA')}
       </Button>
 
       {analysis && (

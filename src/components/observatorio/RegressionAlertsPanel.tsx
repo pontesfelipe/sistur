@@ -95,7 +95,7 @@ export function RegressionAlertsPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
           <AlertTriangle className="h-5 w-5" />
-          Alertas de regressão ({alerts.length})
+          {tx("Alertas de regressão ({{v0}})", { v0: alerts.length })}
         </CardTitle>
         <CardDescription>
           {tx("Variações superiores a 10% em relação ao período anterior. Alertas críticos sinalizam quedas acima de 25%.")}
@@ -118,7 +118,7 @@ export function RegressionAlertsPanel() {
                   <Badge variant={a.severity === "critical" ? "destructive" : "secondary"}>
                     {a.severity === "critical" ? "Crítico" : "Atenção"}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">Período: {period}</span>
+                  <span className="text-xs text-muted-foreground">{tx("Período: {{v0}}", { v0: period })}</span>
                   <span className="text-xs text-muted-foreground">
                     · {format(new Date(a.created_at), "dd 'de' MMM", { locale: getDateLocale() })}
                   </span>

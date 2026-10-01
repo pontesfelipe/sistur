@@ -75,7 +75,7 @@ export default function PendingApproval() {
             </p>
             {profile?.system_access && (
               <p className="text-sm text-muted-foreground">
-                <strong>{tx('Acesso Solicitado:')}</strong> SISTUR {profile.system_access}
+                <strong>{tx('Acesso Solicitado:')}</strong> {tx("SISTUR {{v0}}", { v0: profile.system_access })}
               </p>
             )}
           </div>

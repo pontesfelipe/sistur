@@ -115,9 +115,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
               {tx('Modo Prescrição')}
             </h3>
             <p className="text-sm text-muted-foreground">
-              Visão focada apenas em indicadores que disparam ações corretivas
-              (status Atenção ou Crítico) com cursos prescritos automaticamente
-              pelo motor SISTUR EDU.
+              {tx("Visão focada apenas em indicadores que disparam ações corretivas (status Atenção ou Crítico) com cursos prescritos automaticamente pelo motor SISTUR EDU.")}
             </p>
           </div>
         </div>
@@ -150,8 +148,8 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
             {coverage >= 100
-              ? 'Cobertura total atingida'
-              : 'Indicadores sem curso correspondente no catálogo'}
+              ? tx('Cobertura total atingida')
+              : tx('Indicadores sem curso correspondente no catálogo')}
           </CardContent>
         </Card>
       </div>

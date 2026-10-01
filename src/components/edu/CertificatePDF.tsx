@@ -394,7 +394,7 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                 </div>
                 <div style={{ fontSize: '11px', color: '#64748b', textAlign: 'right' }}>
                   <div>ID: {certificateId}</div>
-                  <div>Verificação: {verificationCode}</div>
+                  <div>{tx("Verificação: {{v0}}", { v0: verificationCode })}</div>
                 </div>
               </div>
 
@@ -441,7 +441,7 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                   conforme registro no Sistema Integrado de Suporte para Turismo em Regiões (SISTUR).
                 </p>
                 <p style={{ fontSize: '10px', color: '#94a3b8', maxWidth: '500px', lineHeight: 1.4 }}>
-                  Certificado emitido em conformidade com o Art. 32 da LDB (Lei nº 9.394/96) e Resolução CNE/CES nº 1/2001 para cursos de extensão e capacitação profissional.
+                  {tx("Certificado emitido em conformidade com o Art. 32 da LDB (Lei nº 9.394/96) e Resolução CNE/CES nº 1/2001 para cursos de extensão e capacitação profissional.")}
                 </p>
               </div>
 

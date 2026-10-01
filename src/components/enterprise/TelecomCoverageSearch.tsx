@@ -47,8 +47,8 @@ export function TelecomCoverageSearch({ destinationId, onAutoFill, onAnalysisCap
       const { data, error } = await supabase.functions.invoke('search-telecom-coverage', { body: { destinationId } });
       if (error) throw error;
       if (data?.no_data) {
-        setNoDataReason(data.reason ?? 'Sem dados disponíveis');
-        throw new NoDataError(data.reason ?? 'Sem dados disponíveis');
+        setNoDataReason(data.reason ?? tx('Sem dados disponíveis'));
+        throw new NoDataError(data.reason ?? tx('Sem dados disponíveis'));
       }
       if (!data?.analysis) throw new Error('Sem dados retornados');
       const a: Analysis = data.analysis;
@@ -71,7 +71,7 @@ export function TelecomCoverageSearch({ destinationId, onAutoFill, onAnalysisCap
     <div className="space-y-4">
       <Button onClick={() => { void run().catch(() => {}); }} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Consultando Anatel...' : 'Analisar Conectividade Telecom'}
+        {loading ? tx('Consultando Anatel...') : tx('Analisar Conectividade Telecom')}
       </Button>
 
       {noDataReason && !analysis && (

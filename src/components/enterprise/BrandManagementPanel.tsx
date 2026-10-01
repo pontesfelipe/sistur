@@ -187,7 +187,7 @@ export function BrandManagementPanel() {
         <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) resetForm(); }}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editing ? 'Editar marca' : 'Nova marca / rede'}</DialogTitle>
+              <DialogTitle>{editing ? tx('Editar marca') : tx('Nova marca / rede')}</DialogTitle>
               <DialogDescription>
                 {tx("Defina os dados da marca. As unidades em cada município são vinculadas via o diagnóstico empresarial.")}
               </DialogDescription>
@@ -238,7 +238,7 @@ export function BrandManagementPanel() {
                 {(createBrand.isPending || updateBrand.isPending) && (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 )}
-                {editing ? 'Salvar' : 'Criar marca'}
+                {editing ? 'Salvar' : tx('Criar marca')}
               </Button>
             </DialogFooter>
           </DialogContent>

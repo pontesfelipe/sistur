@@ -48,7 +48,7 @@ const workflowSteps: WorkflowStep[] = [
         "Vinculação à organização responsável",
         "Identificação da UF"
       ],
-      example: "Ex: Porto de Galinhas (PE) - IBGE 2607901"
+      example: tx("Ex: Porto de Galinhas (PE) - IBGE 2607901")
     }
   },
   {
@@ -85,7 +85,7 @@ const workflowSteps: WorkflowStep[] = [
         "Justificativa para ajustes manuais",
         "Congelamento (snapshot) dos dados validados"
       ],
-      example: "Ex: Valor 45.2% confirmado pelo analista"
+      example: tx("Ex: Valor 45.2% confirmado pelo analista")
     }
   },
   {
@@ -106,7 +106,7 @@ const workflowSteps: WorkflowStep[] = [
         "Regra 5: Marketing bloqueado se RA ou AO críticos",
         "Regra 6: Interdependência setorial identificada"
       ],
-      example: "Ex: RA crítico → EDU_OE bloqueado, marketing bloqueado"
+      example: tx("Ex: RA crítico → EDU_OE bloqueado, marketing bloqueado")
     }
   },
   {
@@ -125,7 +125,7 @@ const workflowSteps: WorkflowStep[] = [
         "Interpretação territorial atribuída",
         "Alertas IGMA gerados automaticamente"
       ],
-      example: "Ex: Score 52% → Status ATENÇÃO"
+      example: tx("Ex: Score 52% → Status ATENÇÃO")
     }
   },
   {
@@ -234,7 +234,7 @@ export function InteractiveWorkflowDiagram() {
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <Badge variant="outline">{tx("Valor Bruto")}</Badge>
               <span className="text-muted-foreground">→</span>
-              <Badge variant="outline">Normalização (0-1)</Badge>
+              <Badge variant="outline">{tx("Normalização (0-1)")}</Badge>
               <span className="text-muted-foreground">→</span>
               <Badge variant="outline">{tx("Score × Peso")}</Badge>
               <span className="text-muted-foreground">→</span>
@@ -248,7 +248,7 @@ export function InteractiveWorkflowDiagram() {
 
         {/* Status Thresholds */}
         <div>
-          <p className="font-semibold text-sm mb-3">Limiares de Status (Não Negociáveis)</p>
+          <p className="font-semibold text-sm mb-3">{tx("Limiares de Status (Não Negociáveis)")}</p>
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 text-center">
               <p className="font-bold text-green-600">≥ 0.67</p>
@@ -274,7 +274,7 @@ export function InteractiveWorkflowDiagram() {
             <div className="border rounded-lg p-4 space-y-2">
               <div className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-green-500" />
-                <p className="font-semibold">Prescrições (SISTUR EDU)</p>
+                <p className="font-semibold">{tx("Prescrições (SISTUR EDU)")}</p>
               </div>
               <div className="bg-muted/30 rounded p-2 text-xs font-mono">
                 {tx("Indicador + Pilar + Status + Interpretação → Curso")}

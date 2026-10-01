@@ -80,7 +80,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
             </div>
             <div>
               <CardTitle className="text-lg">{tx("Reputação Competitiva")}</CardTitle>
-              <CardDescription>{destinationName} — histórico de reviews e benchmarking</CardDescription>
+              <CardDescription>{tx("{{v0}} — histórico de reviews e benchmarking", { v0: destinationName })}</CardDescription>
             </div>
           </div>
           {onClose && (
@@ -113,7 +113,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
                     {s.rating != null ? Number(s.rating).toFixed(2) : '—'}
                   </div>
                   {s.review_volume != null && (
-                    <div className="text-xs text-muted-foreground">{s.review_volume} reviews</div>
+                    <div className="text-xs text-muted-foreground">{tx("{{v0}} reviews", { v0: s.review_volume })}</div>
                   )}
                   {s.response_rate != null && (
                     <div className="text-xs">{tx("Resposta:")} <span className="font-semibold">{Number(s.response_rate).toFixed(0)}%</span></div>
@@ -153,7 +153,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Notas em escala 0–10. Para fontes que usam 0–5 (TripAdvisor, Google), multiplique por 2 antes de inserir.
+                {tx("Notas em escala 0–10. Para fontes que usam 0–5 (TripAdvisor, Google), multiplique por 2 antes de inserir.")}
               </p>
             </div>
           </TabsContent>
@@ -162,7 +162,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
           <TabsContent value="concorrentes" className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-lg border p-3 bg-muted/30">
-                <div className="text-xs text-muted-foreground">Sua nota (último snapshot)</div>
+                <div className="text-xs text-muted-foreground">{tx("Sua nota (último snapshot)")}</div>
                 <div className="text-2xl font-bold flex items-center gap-1">
                   <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
                   {ownRating > 0 ? ownRating.toFixed(2) : '—'}
@@ -171,10 +171,10 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
               <div className="rounded-lg border p-3 bg-muted/30">
                 <div className="text-xs text-muted-foreground">{tx("Média dos concorrentes")}</div>
                 <div className="text-2xl font-bold">{avgCompetitorRating > 0 ? avgCompetitorRating.toFixed(2) : '—'}</div>
-                <div className="text-xs text-muted-foreground mt-1">{competitors.length} capturados</div>
+                <div className="text-xs text-muted-foreground mt-1">{tx("{{v0}} capturados", { v0: competitors.length })}</div>
               </div>
               <div className="rounded-lg border p-3 bg-muted/30">
-                <div className="text-xs text-muted-foreground">Gap competitivo (ENT_COMP_GAP)</div>
+                <div className="text-xs text-muted-foreground">{tx("Gap competitivo (ENT_COMP_GAP)")}</div>
                 <div className={`text-2xl font-bold ${compGap > 0 ? 'text-emerald-600' : compGap < 0 ? 'text-red-600' : ''}`}>
                   {compGap !== 0 ? (compGap > 0 ? '+' : '') + compGap.toFixed(2) : '—'}
                 </div>

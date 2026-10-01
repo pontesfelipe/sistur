@@ -476,7 +476,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
         )}
         <div className="flex gap-2">
           <Textarea
-            placeholder={replyingTo ? `Responder a ${replyingTo.authorName}...` : "Escreva sua resposta..."}
+            placeholder={replyingTo ? `Responder a ${replyingTo.authorName}...` : tx("Escreva sua resposta...")}
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             className="min-h-[80px]"
@@ -498,7 +498,7 @@ export function PostDetail({ post, replies, onBack, onEdit }: PostDetailProps) {
       {/* Replies */}
       <div className="space-y-3">
         <h3 className="font-semibold text-lg">
-          Respostas ({replies.length})
+          {tx("Respostas ({{v0}})", { v0: replies.length })}
         </h3>
 
         {replies.length === 0 ? (

@@ -102,7 +102,7 @@ function derive(pricing: any, demand: any, events: any): Analysis {
     recommendations,
     sources,
     summary: pattern === 'sem_dados'
-      ? 'Sazonalidade não pôde ser calculada — fontes upstream ausentes.'
+      ? tx('Sazonalidade não pôde ser calculada — fontes upstream ausentes.')
       : `Sazonalidade ${pattern} (amplitude ${amplitude}%). Picos: ${peak_months.join(', ') || '—'}. Baixas: ${low_months.join(', ') || '—'}.`,
   };
 }
@@ -143,7 +143,7 @@ export function TariffSeasonalitySearch({ pricingData, demandData, eventsData, o
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Derivando...' : 'Derivar Sazonalidade Tarifária'}
+        {loading ? 'Derivando...' : tx('Derivar Sazonalidade Tarifária')}
       </Button>
 
       {analysis && (

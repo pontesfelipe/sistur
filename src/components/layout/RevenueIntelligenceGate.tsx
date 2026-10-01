@@ -14,7 +14,7 @@ export function RevenueIntelligenceGate({ title, children }: { title: string; ch
   return (
     <div className="rounded-lg border border-dashed p-6 text-center space-y-3">
       <Lock className="h-6 w-6 mx-auto text-muted-foreground" />
-      <p className="font-medium">{title} faz parte dos planos Pro e Enterprise</p>
+      <p className="font-medium">{tx("{{v0}} faz parte dos planos Pro e Enterprise", { v0: title })}</p>
       <p className="text-sm text-muted-foreground">{tx("Faça o upgrade para usar esta ferramenta.")}</p>
       <Button asChild size="sm"><Link to="/assinatura">{tx("Ver planos")}</Link></Button>
     </div>

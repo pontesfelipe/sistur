@@ -594,8 +594,8 @@ export function AdminTrainingsPanel() {
             </DialogTitle>
             <DialogDescription>
               {editingTraining 
-                ? 'Atualize os dados do treinamento' 
-                : 'Preencha os dados para criar um novo treinamento'}
+                ? tx('Atualize os dados do treinamento') 
+                : tx('Preencha os dados para criar um novo treinamento')}
             </DialogDescription>
           </DialogHeader>
 
@@ -689,7 +689,7 @@ export function AdminTrainingsPanel() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="duration">Duração (minutos)</Label>
+                <Label htmlFor="duration">{tx("Duração (minutos)")}</Label>
                 <Input
                   id="duration"
                   type="number"
@@ -842,7 +842,7 @@ export function AdminTrainingsPanel() {
         <Dialog open={isAccessDialogOpen} onOpenChange={setIsAccessDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Gerenciar Acesso: {accessTraining.title}</DialogTitle>
+              <DialogTitle>{tx("Gerenciar Acesso: {{v0}}", { v0: accessTraining.title })}</DialogTitle>
               <DialogDescription>
                 {tx('Configure quem pode acessar este treinamento')}
               </DialogDescription>

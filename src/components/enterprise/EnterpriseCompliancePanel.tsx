@@ -113,11 +113,10 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-primary" /> Conformidade Legal — {destinationName}
+          <ShieldCheck className="h-5 w-5 text-primary" /> {tx("Conformidade Legal — {{v0}}", { v0: destinationName })}
         </CardTitle>
         <CardDescription>
-          Checklist de licenças e documentos obrigatórios (CADASTUR, Alvará, AVCB, Sanitário, LGPD).
-          Itens vencidos ou pendentes alimentam o indicador ENT_COMPLIANCE_RATE no diagnóstico.
+          {tx("Checklist de licenças e documentos obrigatórios (CADASTUR, Alvará, AVCB, Sanitário, LGPD). Itens vencidos ou pendentes alimentam o indicador ENT_COMPLIANCE_RATE no diagnóstico.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

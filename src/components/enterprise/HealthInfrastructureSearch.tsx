@@ -49,8 +49,8 @@ export function HealthInfrastructureSearch({ destinationId, onAutoFill, onAnalys
       const { data, error } = await supabase.functions.invoke('search-health-infrastructure', { body: { destinationId } });
       if (error) throw error;
       if (data?.no_data) {
-        setNoDataReason(data.reason ?? 'Sem dados disponíveis');
-        throw new NoDataError(data.reason ?? 'Sem dados disponíveis');
+        setNoDataReason(data.reason ?? tx('Sem dados disponíveis'));
+        throw new NoDataError(data.reason ?? tx('Sem dados disponíveis'));
       }
       if (!data?.analysis) throw new Error('Sem dados retornados');
       const a: Analysis = data.analysis;
@@ -73,7 +73,7 @@ export function HealthInfrastructureSearch({ destinationId, onAutoFill, onAnalys
     <div className="space-y-4">
       <Button onClick={() => { void run().catch(() => {}); }} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Consultando DATASUS...' : 'Analisar Infraestrutura de Saúde'}
+        {loading ? tx('Consultando DATASUS...') : tx('Analisar Infraestrutura de Saúde')}
       </Button>
 
       {noDataReason && !analysis && (

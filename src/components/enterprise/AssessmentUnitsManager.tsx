@@ -110,7 +110,7 @@ export function AssessmentUnitsManager({
               <Button variant="outline" className="justify-between flex-1 font-normal">
                 <span className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  Adicionar unidade (município)
+                  {tx("Adicionar unidade (município)")}
                 </span>
                 <ChevronsUpDown className="h-4 w-4 opacity-50" />
               </Button>
@@ -121,8 +121,8 @@ export function AssessmentUnitsManager({
                 <CommandList>
                   <CommandEmpty>
                     {available.length === 0
-                      ? 'Todos os destinos disponíveis já foram adicionados.'
-                      : 'Nenhum município encontrado.'}
+                      ? tx('Todos os destinos disponíveis já foram adicionados.')
+                      : tx('Nenhum município encontrado.')}
                   </CommandEmpty>
                   <CommandGroup>
                     {available.map((d) => (

@@ -147,7 +147,7 @@ export function IndicatorDistributionReport() {
           </p>
         </div>
         <Badge variant="outline" className="ml-auto text-lg px-3 py-1">
-          {indicators.length} indicadores
+          {tx("{{v0}} indicadores", { v0: indicators.length })}
         </Badge>
       </div>
 
@@ -341,7 +341,7 @@ export function IndicatorDistributionReport() {
                             <Icon className="h-4 w-4" style={{ color: scopeConfig[scope].color }} />
                             <div>
                               <div className="font-medium">{tx(scopeConfig[scope].label)}</div>
-                              <div className="text-xs text-muted-foreground">({scopeTotal} total)</div>
+                              <div className="text-xs text-muted-foreground">{tx("({{v0}} total)", { v0: scopeTotal })}</div>
                             </div>
                           </div>
                         </TableCell>

@@ -140,13 +140,13 @@ export function CreateClassroomEventDialog() {
               </Select>
             </div>
             <div>
-              <Label>Alarme (antes)</Label>
+              <Label>{tx("Alarme (antes)")}</Label>
               <Select value={String(alarm)} onValueChange={v => setAlarm(Number(v))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {ALARMS.map(a => (
                     <SelectItem key={a} value={String(a)}>
-                      {a === 0 ? 'No horário' : a < 60 ? `${a} min` : a === 1440 ? '1 dia' : `${a/60} h`}
+                      {a === 0 ? tx('No horário') : a < 60 ? `${a} min` : a === 1440 ? '1 dia' : `${a/60} h`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -161,11 +161,11 @@ export function CreateClassroomEventDialog() {
               <Input type="time" value={time} onChange={e => setTime(e.target.value)} />
             </div>
             <div>
-              <Label>Fim (data)</Label>
+              <Label>{tx("Fim (data)")}</Label>
               <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
             </div>
             <div>
-              <Label>Fim (hora)</Label>
+              <Label>{tx("Fim (hora)")}</Label>
               <Input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
             </div>
             <div className="col-span-2">
@@ -173,7 +173,7 @@ export function CreateClassroomEventDialog() {
               <Input value={location} onChange={e => setLocation(e.target.value)} placeholder={tx('Sala 12 ou online')} />
             </div>
             <div className="col-span-2">
-              <Label>Link (opcional)</Label>
+              <Label>{tx("Link (opcional)")}</Label>
               <Input value={link} onChange={e => setLink(e.target.value)} placeholder="https://meet..." />
             </div>
             <div className="col-span-2">

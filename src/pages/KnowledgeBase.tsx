@@ -200,7 +200,7 @@ function FileCard({ file, destinations }: { file: KBFile; destinations: any[] })
               <AlertDialogHeader>
                 <AlertDialogTitle>{tx("Remover arquivo?")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  O arquivo "{file.file_name}" será removido da base de conhecimento.
+                  {tx("O arquivo \"{{v0}}\" será removido da base de conhecimento.", { v0: file.file_name })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -328,7 +328,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
                 <div className="flex flex-col items-center gap-1 text-muted-foreground">
                   <Upload className="h-6 w-6" />
                   <span className="text-sm">{tx("Clique para selecionar")}</span>
-                  <span className="text-xs">PDF, DOCX, XLSX, CSV, TXT (máx. 20MB)</span>
+                  <span className="text-xs">{tx("PDF, DOCX, XLSX, CSV, TXT (máx. 20MB)")}</span>
                 </div>
               )}
             </Button>
@@ -376,7 +376,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
               <SelectValue placeholder={tx("Destino")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="global">Global (toda organização)</SelectItem>
+              <SelectItem value="global">{tx("Global (toda organização)")}</SelectItem>
               {(destinations as any[]).map((d: any) => <SelectItem key={d.id} value={d.id}>{d.name}{d.uf ? ` — ${d.uf}` : ''}</SelectItem>)}
             </SelectContent>
           </Select>

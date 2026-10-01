@@ -298,9 +298,9 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Editar Destino' : 'Novo Destino'}</DialogTitle>
+          <DialogTitle>{isEditing ? tx('Editar Destino') : tx('Novo Destino')}</DialogTitle>
           <DialogDescription>
-            {isEditing ? 'Atualize as informações do destino turístico.' : 'Digite o nome do município para buscar automaticamente no IBGE.'}
+            {isEditing ? tx('Atualize as informações do destino turístico.') : tx('Digite o nome do município para buscar automaticamente no IBGE.')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -351,7 +351,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
                   {selectedIBGE && (
                     <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
                       <CheckCircle2 className="h-3 w-3" />
-                      Município encontrado no IBGE (código: {selectedIBGE.ibge_code})
+                      {tx("Município encontrado no IBGE (código: {{v0}})", { v0: selectedIBGE.ibge_code })}
                     </p>
                   )}
                   {searchError && !selectedIBGE && (
@@ -370,7 +370,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
               name="uf"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Estado (UF)</FormLabel>
+                  <FormLabel>{tx("Estado (UF)")}</FormLabel>
                   <Select 
                     onValueChange={(value) => {
                       form.setValue('uf', value, {
@@ -434,7 +434,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
                 name="latitude"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Latitude (opcional)</FormLabel>
+                    <FormLabel>{tx("Latitude (opcional)")}</FormLabel>
                     <FormControl>
                       <Input type="number" step="any" placeholder="-21.1261" {...field} />
                     </FormControl>
@@ -448,7 +448,7 @@ export function DestinationFormDialog({ open, onOpenChange, onSubmit, destinatio
                 name="longitude"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Longitude (opcional)</FormLabel>
+                    <FormLabel>{tx("Longitude (opcional)")}</FormLabel>
                     <FormControl>
                       <Input type="number" step="any" placeholder="-56.4836" {...field} />
                     </FormControl>

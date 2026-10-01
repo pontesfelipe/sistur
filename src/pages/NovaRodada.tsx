@@ -386,8 +386,8 @@ export default function NovaRodada() {
 
   return (
     <AppLayout 
-      title={resumeAssessmentId ? "Retomar Diagnóstico" : "Nova Rodada de Diagnóstico"} 
-      subtitle={resumeAssessmentId ? "Continue de onde você parou" : "Siga o fluxo para criar uma nova avaliação"}
+      title={resumeAssessmentId ? tx("Retomar Diagnóstico") : tx("Nova Rodada de Diagnóstico")} 
+      subtitle={resumeAssessmentId ? tx("Continue de onde você parou") : tx("Siga o fluxo para criar uma nova avaliação")}
     >
       {/* Resume Banner */}
       {resumeAssessmentId && resumeAssessment && (() => {
@@ -395,7 +395,7 @@ export default function NovaRodada() {
         const statusLabel = status === 'CALCULATED'
           ? 'Calculado'
           : status === 'DATA_READY'
-            ? 'Dados Prontos'
+            ? tx('Dados Prontos')
             : 'Rascunho';
         const statusVariant: 'calculated' | 'ready' | 'draft' = status === 'CALCULATED'
           ? 'calculated'
@@ -403,9 +403,9 @@ export default function NovaRodada() {
             ? 'ready'
             : 'draft';
         const heading = status === 'CALCULATED'
-          ? 'Revisitando diagnóstico concluído'
+          ? tx('Revisitando diagnóstico concluído')
           : status === 'DATA_READY'
-            ? 'Retomando diagnóstico com dados prontos'
+            ? tx('Retomando diagnóstico com dados prontos')
             : 'Retomando diagnóstico em rascunho';
         return (
           <div className="mb-6 p-4 rounded-lg border bg-primary/5 border-primary/20">
@@ -479,7 +479,7 @@ export default function NovaRodada() {
       {/* Mobile vertical stepper */}
       <div className="mb-6 md:hidden">
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-medium text-muted-foreground">Etapa {currentStep} de {WORKFLOW_STEPS.length}</span>
+          <span className="text-xs font-medium text-muted-foreground">{tx("Etapa {{v0}} de {{v1}}", { v0: currentStep, v1: WORKFLOW_STEPS.length })}</span>
           <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-primary rounded-full transition-all duration-500"

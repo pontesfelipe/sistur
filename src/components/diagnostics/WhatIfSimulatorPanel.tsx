@@ -123,7 +123,7 @@ export function WhatIfSimulatorPanel({ indicatorScores, pillarScores }: Props) {
                 </div>
                 {severity && baseSeverity && severity !== baseSeverity && (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Mudaria de {SEVERITY_INFO[baseSeverity].label} para {SEVERITY_INFO[severity].label}.
+                    {tx("Mudaria de {{v0}} para {{v1}}.", { v0: SEVERITY_INFO[baseSeverity].label, v1: SEVERITY_INFO[severity].label })}
                   </p>
                 )}
               </div>
@@ -154,7 +154,7 @@ export function WhatIfSimulatorPanel({ indicatorScores, pillarScores }: Props) {
                     </Badge>
                     <span className="font-semibold tabular-nums">{value}%</span>
                     {value !== base && (
-                      <span className="text-xs text-muted-foreground">(atual {base}%)</span>
+                      <span className="text-xs text-muted-foreground">{tx("(atual {{v0}}%)", { v0: base })}</span>
                     )}
                   </span>
                 </div>

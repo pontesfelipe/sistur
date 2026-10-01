@@ -240,7 +240,7 @@ export function IndicatorFormDialog({
 
             {/* Weight */}
             <div className="space-y-2">
-              <Label htmlFor="weight">Peso (%)</Label>
+              <Label htmlFor="weight">{tx("Peso (%)")}</Label>
               <Input
                 id="weight"
                 type="number"

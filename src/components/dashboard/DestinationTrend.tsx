@@ -280,7 +280,7 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
             </ChartContainer>
 
             <p className="text-xs text-muted-foreground text-center mt-2">
-              Total de {trendData.totalCycles} ciclo(s) de diagnóstico
+              {tx("Total de {{v0}} ciclo(s) de diagnóstico", { v0: trendData.totalCycles })}
             </p>
           </>
         ) : trendData && trendData.chartData.length === 1 ? (

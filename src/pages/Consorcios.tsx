@@ -51,7 +51,7 @@ function CreateConsortiumDialog() {
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={tx("Ex: Consórcio Vale Histórico")} />
           </div>
           <div>
-            <Label>Descrição (opcional)</Label>
+            <Label>{tx("Descrição (opcional)")}</Label>
             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={tx("Vocação, abrangência geográfica, objetivos...")} />
           </div>
         </div>

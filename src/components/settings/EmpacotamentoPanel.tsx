@@ -70,7 +70,7 @@ export function EmpacotamentoPanel() {
           <CardHeader>
             <CardTitle>{tx("Módulos contratados")}</CardTitle>
             <CardDescription>
-              Por padrão, todos os módulos ficam habilitados. Desabilite para criar pacotes customizados (ex: ICP A apenas com Diagnóstico).
+              {tx("Por padrão, todos os módulos ficam habilitados. Desabilite para criar pacotes customizados (ex: ICP A apenas com Diagnóstico).")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">

@@ -75,9 +75,7 @@ export function TrackExamsPanel({ trackId, canManage }: TrackExamsPanelProps) {
                     <AlertDialogHeader>
                       <AlertDialogTitle>{tx("Regenerar provas da trilha?")}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Os rulesets atuais serão substituídos pela configuração padrão (20 questões,
-                        70% nota mínima, 60 min, 2 tentativas). Tentativas já realizadas pelos alunos
-                        permanecem registradas.
+                        {tx("Os rulesets atuais serão substituídos pela configuração padrão (20 questões, 70% nota mínima, 60 min, 2 tentativas). Tentativas já realizadas pelos alunos permanecem registradas.")}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

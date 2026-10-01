@@ -170,7 +170,7 @@ function PlanCard({
                 window.location.href = `/planos?contato=${encodeURIComponent(p.code)}&plano=${encodeURIComponent(p.name)}`;
               }}
             >
-              {tx(p.quote_only ? 'Falar com o time' : canCheckout ? 'Assinar agora' : 'Quero contratar')}
+              {tx(p.quote_only ? tx('Falar com o time') : canCheckout ? tx('Assinar agora') : tx('Quero contratar'))}
             </Button>
           )
         )}

@@ -43,7 +43,7 @@ export function EduReport({ metrics, profileScores, dominantProfile, turn, unloc
         <div className="flex items-center gap-2 mb-1">
           <span className="text-2xl">{tendency.emoji}</span>
           <div>
-            <p className="text-sm font-bold text-blue-800 dark:text-blue-200">Tendência: {tendency.label}</p>
+            <p className="text-sm font-bold text-blue-800 dark:text-blue-200">{tx("Tendência: {{v0}}", { v0: tendency.label })}</p>
             <p className="text-[10px] text-blue-600 dark:text-blue-300">{tx(tendency.description)}</p>
           </div>
         </div>

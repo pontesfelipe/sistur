@@ -47,8 +47,8 @@ export function UrbanAccessibilitySearch({ destinationId, onAutoFill, onAnalysis
       const { data, error } = await supabase.functions.invoke('search-urban-accessibility', { body: { destinationId } });
       if (error) throw error;
       if (data?.no_data) {
-        setNoDataReason(data.reason ?? 'Sem dados disponíveis');
-        throw new NoDataError(data.reason ?? 'Sem dados disponíveis');
+        setNoDataReason(data.reason ?? tx('Sem dados disponíveis'));
+        throw new NoDataError(data.reason ?? tx('Sem dados disponíveis'));
       }
       if (!data?.analysis) throw new Error('Sem dados retornados');
       const a: Analysis = data.analysis;
@@ -71,7 +71,7 @@ export function UrbanAccessibilitySearch({ destinationId, onAutoFill, onAnalysis
     <div className="space-y-4">
       <Button onClick={() => { void run().catch(() => {}); }} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Pesquisando evidências...' : 'Analisar Acessibilidade Urbana'}
+        {loading ? tx('Pesquisando evidências...') : tx('Analisar Acessibilidade Urbana')}
       </Button>
 
       {noDataReason && !analysis && (
@@ -104,7 +104,7 @@ export function UrbanAccessibilitySearch({ destinationId, onAutoFill, onAnalysis
                 <div key={i} className="p-2 rounded border bg-card">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-medium capitalize">{e.keyword}</span>
-                    <Badge variant="outline" className="text-[10px]">{e.hits} hits</Badge>
+                    <Badge variant="outline" className="text-[10px]">{tx("{{v0}} hits", { v0: e.hits })}</Badge>
                   </div>
                   <div className="mt-1 space-y-0.5">
                     {e.samples.map((s, j) => (

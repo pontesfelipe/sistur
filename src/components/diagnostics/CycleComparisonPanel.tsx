@@ -30,8 +30,7 @@ const deltaPts = (a?: number | null, b?: number | null) =>
 
 function DeltaBadge({ value }: { value: number | null }) {
   if (value === null) return <span className="text-muted-foreground">—</span>;
-  if (value > 0)
-    return (
+  if (value > {tx("0) return (")}
       <span className="inline-flex items-center gap-1 text-severity-good">
         <ArrowUp className="h-3 w-3" />+{value} pp
       </span>
@@ -191,7 +190,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Rodada A (base)</p>
+              <p className="text-xs text-muted-foreground mb-1">{tx("Rodada A (base)")}</p>
               <Select value={effectiveA} onValueChange={setAId}>
                 <SelectTrigger>
                   <SelectValue placeholder={tx('Selecione')} />
@@ -206,7 +205,7 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
               </Select>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Rodada B (comparação)</p>
+              <p className="text-xs text-muted-foreground mb-1">{tx("Rodada B (comparação)")}</p>
               <Select value={effectiveB} onValueChange={setBId}>
                 <SelectTrigger>
                   <SelectValue placeholder={tx('Selecione')} />
@@ -251,9 +250,9 @@ export function CycleComparisonPanel({ assessmentId, destinationId, destinationN
               </div>
 
               <div className="flex flex-wrap items-center gap-3 text-sm">
-                <span className="text-severity-good">{counts.improved} melhoraram</span>
-                <span className="text-severity-critical">{counts.worsened} regrediram</span>
-                <span className="text-muted-foreground">{counts.stable} estáveis</span>
+                <span className="text-severity-good">{tx("{{v0}} melhoraram", { v0: counts.improved })}</span>
+                <span className="text-severity-critical">{tx("{{v0}} regrediram", { v0: counts.worsened })}</span>
+                <span className="text-muted-foreground">{tx("{{v0}} estáveis", { v0: counts.stable })}</span>
                 <Button variant="outline" size="sm" className="ml-auto" onClick={handleExportCSV}>
                   <Download className="mr-2 h-4 w-4" />
                   {tx('Exportar CSV')}

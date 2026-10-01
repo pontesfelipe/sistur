@@ -117,7 +117,7 @@ export function GamificationAdminDashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><Target className="h-5 w-5" /> Missões diárias concluídas (últimos 7 dias)</CardTitle>
+          <CardTitle className="flex items-center gap-2"><Target className="h-5 w-5" /> {tx("Missões diárias concluídas (últimos 7 dias)")}</CardTitle>
           <CardDescription>{tx('Conclusões agregadas de todos os alunos.')}</CardDescription>
         </CardHeader>
         <CardContent style={{ height: 240 }}>

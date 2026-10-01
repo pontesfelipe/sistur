@@ -81,7 +81,7 @@ function AssignmentRow({ a }: { a: StudentAssignment }) {
             {a.assignment_type === 'exam' && (
               <span className="text-xs text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                {a.attempts_made} tentativa(s)
+                {tx("{{v0}} tentativa(s)", { v0: a.attempts_made })}
               </span>
             )}
             {a.last_attempt_result === 'passed' && (

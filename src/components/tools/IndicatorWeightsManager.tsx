@@ -221,7 +221,7 @@ export function IndicatorWeightsManager() {
                 <div className={`text-lg font-bold ${valid ? 'text-emerald-600' : 'text-amber-600'}`}>
                   {(t.sum * 100).toFixed(2)}%
                 </div>
-                <div className="text-[10px] text-muted-foreground">{t.count} indicadores</div>
+                <div className="text-[10px] text-muted-foreground">{tx("{{v0}} indicadores", { v0: t.count })}</div>
               </button>
             );
           })}
@@ -244,7 +244,7 @@ export function IndicatorWeightsManager() {
                       {(currentTotal * 100).toFixed(2)}%
                     </span>
                     {' • '}
-                    {dirtyCount > 0 && <span className="text-primary">{dirtyCount} alterado(s)</span>}
+                    {dirtyCount > 0 && <span className="text-primary">{tx("{{v0}} alterado(s)", { v0: dirtyCount })}</span>}
                   </p>
                 </div>
                 <div className="flex gap-2 flex-wrap">
@@ -274,7 +274,7 @@ export function IndicatorWeightsManager() {
                       <TableHead className="w-[120px]">{tx("Código")}</TableHead>
                       <TableHead>{tx("Indicador")}</TableHead>
                       <TableHead className="w-[140px]">{tx("Tema")}</TableHead>
-                      <TableHead className="w-[140px] text-right">Peso (%)</TableHead>
+                      <TableHead className="w-[140px] text-right">{tx("Peso (%)")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

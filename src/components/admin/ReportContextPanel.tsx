@@ -49,7 +49,7 @@ export function ReportContextPanel() {
       supabase.from("report_context_profiles").select("*").order("org_id", { ascending: true, nullsFirst: true }).order("scope"),
       isAdmin
         ? supabase.from("orgs").select("id, name").order("name")
-        : Promise.resolve({ data: profile?.org_id ? [{ id: profile.org_id, name: "Minha organização" }] : [], error: null } as any),
+        : Promise.resolve({ data: profile?.org_id ? [{ id: profile.org_id, name: tx("Minha organização") }] : [], error: null } as any),
     ]);
     if (profilesRes.error) toast.error(tx("Erro ao carregar contextos"), { description: profilesRes.error.message });
     else setItems(profilesRes.data as any);
@@ -135,8 +135,7 @@ export function ReportContextPanel() {
           {tx("Camada de Contexto do Relatório")}
         </CardTitle>
         <CardDescription>
-          {tx("Define a")} <strong>{tx("persona, audiência, tom e prioridades editoriais")}</strong> que o agente de IA aplica em TODO relatório gerado.
-          O contexto da organização (quando existir) prevalece sobre o contexto global. É usado junto com a camada semântica, a estrutura canônica e os dados do diagnóstico.
+          {tx("Define a")} <strong>{tx("persona, audiência, tom e prioridades editoriais")}</strong> {tx("que o agente de IA aplica em TODO relatório gerado. O contexto da organização (quando existir) prevalece sobre o contexto global. É usado junto com a camada semântica, a estrutura canônica e os dados do diagnóstico.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -194,7 +193,7 @@ export function ReportContextPanel() {
               <div>
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-medium text-muted-foreground">
-                    Contexto (persona, audiência, tom, foco, prioridades, restrições)
+                    {tx("Contexto (persona, audiência, tom, foco, prioridades, restrições)")}
                   </label>
                   <Button
                     size="sm"
@@ -276,7 +275,7 @@ function CreateContextRow({
         </Select>
       </div>
       <Button onClick={() => onCreate(orgId || null, scope)} disabled={!orgId || dup}>
-        <Plus className="h-4 w-4 mr-1" /> {dup ? "Já existe" : "Criar contexto"}
+        <Plus className="h-4 w-4 mr-1" /> {dup ? tx("Já existe") : tx("Criar contexto")}
       </Button>
     </div>
   );

@@ -84,7 +84,7 @@ export function NotificationsDropdown() {
         <DropdownMenuLabel className="flex items-center justify-between">
           <span>{tx("Notificações")}</span>
           {unreadCount > 0 && (
-            <span className="text-xs text-muted-foreground">{unreadCount} novas</span>
+            <span className="text-xs text-muted-foreground">{tx("{{v0}} novas", { v0: unreadCount })}</span>
           )}
         </DropdownMenuLabel>
         

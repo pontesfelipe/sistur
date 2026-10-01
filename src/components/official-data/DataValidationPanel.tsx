@@ -328,7 +328,7 @@ export function DataValidationPanel({
         <div>
           <h3 className="text-lg font-semibold">{tx("Validação de Dados Oficiais")}</h3>
           <p className="text-sm text-muted-foreground">
-            {destinationName} • Código IBGE: {ibgeCode}
+            {tx("{{v0}} • Código IBGE: {{v1}}", { v0: destinationName, v1: ibgeCode })}
           </p>
         </div>
         <div className="flex gap-2">
@@ -342,7 +342,7 @@ export function DataValidationPanel({
             ) : (
               <RefreshCw className="h-4 w-4 mr-2" />
             )}
-            {values.length === 0 ? 'Buscar Dados' : 'Atualizar'}
+            {values.length === 0 ? tx('Buscar Dados') : 'Atualizar'}
           </Button>
           <Button
             onClick={handleValidateSelected}
@@ -481,13 +481,10 @@ export function DataValidationPanel({
             <span className="text-2xl shrink-0">💧</span>
             <div className="space-y-1">
               <p className="text-sm font-medium">
-                Índice de Qualidade da Água (IQA / ANA) — sem dados disponíveis
+                {tx("Índice de Qualidade da Água (IQA / ANA) — sem dados disponíveis")}
               </p>
               <p className="text-xs text-muted-foreground">
-                A ANA não possui estações de monitoramento de qualidade da água num raio de 50 km
-                deste município. O campo permanecerá disponível para preenchimento manual na próxima
-                etapa, caso você tenha acesso a fontes locais (vigilância sanitária, secretaria de
-                meio ambiente ou estudos de bacia hidrográfica).
+                {tx("A ANA não possui estações de monitoramento de qualidade da água num raio de 50 km deste município. O campo permanecerá disponível para preenchimento manual na próxima etapa, caso você tenha acesso a fontes locais (vigilância sanitária, secretaria de meio ambiente ou estudos de bacia hidrográfica).")}
               </p>
             </div>
           </CardContent>

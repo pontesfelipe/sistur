@@ -210,7 +210,7 @@ export function ExamBuilderPanel() {
                       </TableCell>
                       <TableCell>{ruleset.question_count}</TableCell>
                       <TableCell>{Number(ruleset.min_score_pct)}%</TableCell>
-                      <TableCell>{ruleset.time_limit_minutes} min</TableCell>
+                      <TableCell>{tx("{{v0}} min", { v0: ruleset.time_limit_minutes })}</TableCell>
                       <TableCell>{ruleset.max_attempts}</TableCell>
                     </TableRow>
                   ))}
@@ -316,7 +316,7 @@ export function ExamBuilderPanel() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <ClipboardList className="h-4 w-4 text-primary" />
-                  Nova prova ({selectedQuestions.length})
+                  {tx("Nova prova ({{v0}})", { v0: selectedQuestions.length })}
                 </CardTitle>
                 {selectedQuestions.length > 0 && (
                   <Button variant="ghost" size="sm" onClick={clearSelection}>
@@ -454,7 +454,7 @@ export function ExamBuilderPanel() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="min_score">Nota mínima (%)</Label>
+                <Label htmlFor="min_score">{tx("Nota mínima (%)")}</Label>
                 <Input
                   id="min_score"
                   type="number"
@@ -470,7 +470,7 @@ export function ExamBuilderPanel() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="time_limit">Tempo (minutos)</Label>
+                <Label htmlFor="time_limit">{tx("Tempo (minutos)")}</Label>
                 <Input
                   id="time_limit"
                   type="number"
@@ -491,7 +491,7 @@ export function ExamBuilderPanel() {
               <CardContent className="py-3">
                 <div className="flex items-center gap-2 text-sm">
                   <BookOpen className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{selectedQuestions.length} questões</span>
+                  <span className="font-medium">{tx("{{v0}} questões", { v0: selectedQuestions.length })}</span>
                   <span className="text-muted-foreground">{tx("serão usadas nesta prova")}</span>
                 </div>
               </CardContent>

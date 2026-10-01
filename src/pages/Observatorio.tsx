@@ -240,7 +240,7 @@ export default function Observatorio() {
             <span>{tx("Observatório do destino")}</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight truncate">
-            {currentDestination ? `${currentDestination.name}${currentDestination.uf ? " / " + currentDestination.uf : ""}` : "Destino não vinculado"}
+            {currentDestination ? `${currentDestination.name}${currentDestination.uf ? " / " + currentDestination.uf : ""}` : tx("Destino não vinculado")}
           </h1>
           <p className="text-muted-foreground mt-1 max-w-2xl">
             {tx("Painel contínuo deste destino — séries de fluxo, ocupação, eventos, receita e empregos. Distinto do diagnóstico cíclico: aqui acompanha-se o que está acontecendo agora.")}
@@ -298,9 +298,7 @@ export default function Observatorio() {
         <CardContent className="py-3 flex items-start gap-3 text-sm text-muted-foreground">
           <Info className="h-4 w-4 mt-0.5 shrink-0" />
           <p>
-            {tx("O Observatório é o")} <strong>{tx("monitor permanente")}</strong> deste destino: alimenta-se de fontes oficiais
-            (Cadastur, ANAC, CAGED, IGMA) e de registros manuais. Complementa o Diagnóstico (que avalia capacidade
-            estrutural em ciclos) acompanhando os <strong>{tx("resultados operacionais contínuos")}</strong>.
+            {tx("O Observatório é o")} <strong>{tx("monitor permanente")}</strong> {tx("deste destino: alimenta-se de fontes oficiais (Cadastur, ANAC, CAGED, IGMA) e de registros manuais. Complementa o Diagnóstico (que avalia capacidade estrutural em ciclos) acompanhando os")} <strong>{tx("resultados operacionais contínuos")}</strong>.
           </p>
         </CardContent>
       </Card>
@@ -471,7 +469,7 @@ export default function Observatorio() {
             <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin" /></div>
           ) : events.length === 0 ? (
             <Card><CardContent className="py-12 text-center text-muted-foreground">
-              Nenhum evento cadastrado para {year}.
+              {tx("Nenhum evento cadastrado para {{v0}}.", { v0: year })}
             </CardContent></Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -538,7 +536,7 @@ export default function Observatorio() {
                 </div>
               </div>
               <div>
-                <Label>Fonte (opcional)</Label>
+                <Label>{tx("Fonte (opcional)")}</Label>
                 <Input placeholder={tx("ex: CAGED, IBGE, levantamento próprio")} value={measureSource} onChange={(e) => setMeasureSource(e.target.value)} />
               </div>
             </div>

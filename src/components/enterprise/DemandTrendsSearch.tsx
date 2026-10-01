@@ -64,7 +64,7 @@ export function DemandTrendsSearch({ businessName, location, onAutoFill, onAnaly
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Analisar Demanda & Tendências'}
+        {loading ? 'Analisando...' : tx('Analisar Demanda & Tendências')}
       </Button>
 
       {analysis && (
@@ -80,7 +80,7 @@ export function DemandTrendsSearch({ businessName, location, onAutoFill, onAnaly
             </div>
             <div className="p-3 rounded-lg border bg-card space-y-1 text-xs">
               <div className="flex justify-between"><span className="text-muted-foreground">{tx("Resultados")}</span><span className="font-bold">{analysis.total_results}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Transacionais (OTA)</span><span className="font-bold">{analysis.transactional_hits}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{tx("Transacionais (OTA)")}</span><span className="font-bold">{analysis.transactional_hits}</span></div>
               <div className="flex justify-between pt-1 border-t"><span className="text-muted-foreground">{tx("Editoriais")}</span><span className="font-bold">{analysis.editorial_hits}</span></div>
             </div>
           </div>

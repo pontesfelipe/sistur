@@ -89,14 +89,14 @@ export function BadgesAdminPanel() {
       }
     },
     onSuccess: () => {
-      toast.success(editing ? 'Badge atualizada' : 'Badge criada');
+      toast.success(editing ? tx('Badge atualizada') : tx('Badge criada'));
       qc.invalidateQueries({ queryKey: ['admin-badges'] });
       qc.invalidateQueries({ queryKey: ['edu-badges'] });
       setOpen(false);
       setEditing(null);
       setDraft(empty());
     },
-    onError: (e: any) => toast.error(e.message ?? 'Erro ao salvar badge'),
+    onError: (e: any) => toast.error(e.message ?? tx('Erro ao salvar badge')),
   });
 
   const remove = useMutation({
@@ -110,7 +110,7 @@ export function BadgesAdminPanel() {
       qc.invalidateQueries({ queryKey: ['edu-badges'] });
       setConfirmDelete(null);
     },
-    onError: (e: any) => toast.error(e.message ?? 'Erro ao remover'),
+    onError: (e: any) => toast.error(e.message ?? tx('Erro ao remover')),
   });
 
   const openCreate = () => {
@@ -142,7 +142,7 @@ export function BadgesAdminPanel() {
             {tx('Catálogo de Badges')}
           </h3>
           <p className="text-sm text-muted-foreground">
-            Crie e gerencie badges concedidas aos alunos. Use códigos estáveis (ex: <code>{tx("first_course")}</code>).
+            {tx("Crie e gerencie badges concedidas aos alunos. Use códigos estáveis (ex:")} <code>{tx("first_course")}</code>).
           </p>
         </div>
         <Button onClick={openCreate}>
@@ -218,7 +218,7 @@ export function BadgesAdminPanel() {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <Label>Código (estável, snake_case)</Label>
+              <Label>{tx("Código (estável, snake_case)")}</Label>
               <Input
                 value={draft.code}
                 disabled={!!editing}
@@ -239,7 +239,7 @@ export function BadgesAdminPanel() {
               />
             </div>
             <div>
-              <Label>Critério (texto livre)</Label>
+              <Label>{tx("Critério (texto livre)")}</Label>
               <Input
                 value={draft.criteria ?? ''}
                 onChange={(e) => setDraft({ ...draft, criteria: e.target.value })}
@@ -295,8 +295,7 @@ export function BadgesAdminPanel() {
           <AlertDialogHeader>
             <AlertDialogTitle>{tx("Remover badge?")}</AlertDialogTitle>
             <AlertDialogDescription>
-              A badge "{confirmDelete?.title}" será excluída. Alunos que já a ganharam
-              perderão a referência.
+              {tx("A badge \"{{v0}}\" será excluída. Alunos que já a ganharam perderão a referência.", { v0: confirmDelete?.title })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

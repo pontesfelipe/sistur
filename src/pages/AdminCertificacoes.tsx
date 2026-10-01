@@ -138,7 +138,7 @@ export default function AdminCertificacoes() {
               <CardContent className="text-xs text-muted-foreground space-y-1">
                 <div>{tx('Geral mín:')} <strong>{l.min_overall_score}%</strong></div>
                 <div>{tx('RA/OE/AO mín:')} <strong>{l.min_ra_score}% / {l.min_oe_score}% / {l.min_ao_score}%</strong></div>
-                <div>{tx('Validade:')} <strong>{l.validity_months} meses</strong></div>
+                <div>{tx('Validade:')} <strong>{tx("{{v0}} meses", { v0: l.validity_months })}</strong></div>
               </CardContent>
             </Card>
           ))}
@@ -147,7 +147,7 @@ export default function AdminCertificacoes() {
         <Card>
           <CardHeader>
             <CardTitle>{tx('Certificados emitidos')}</CardTitle>
-            <CardDescription>{certs.length} no total</CardDescription>
+            <CardDescription>{tx("{{v0}} no total", { v0: certs.length })}</CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -256,7 +256,7 @@ export default function AdminCertificacoes() {
             </div>
 
             <div>
-              <Label>Observações (opcional)</Label>
+              <Label>{tx("Observações (opcional)")}</Label>
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
             </div>
           </div>

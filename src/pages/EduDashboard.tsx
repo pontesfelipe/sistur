@@ -88,7 +88,7 @@ const EduDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <Zap className="h-5 w-5 text-primary" />
-                <Badge variant="secondary" className="text-xs">Nível {level}</Badge>
+                <Badge variant="secondary" className="text-xs">{tx("Nível {{v0}}", { v0: level })}</Badge>
               </div>
               <p className="text-2xl font-display font-bold">{totalXP}</p>
               <p className="text-xs text-muted-foreground">{tx('XP Total')}</p>
@@ -192,7 +192,7 @@ const EduDashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Bell className="h-4 w-4 text-blue-500" />
-                Notificações ({unreadCount})
+                {tx("Notificações ({{v0}})", { v0: unreadCount })}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -339,9 +339,9 @@ const EduDashboard = () => {
                 <Clock className="h-5 w-5 text-green-500" />
               </div>
               <div>
-                <p className="font-medium">{totalHoursStudied}h de estudo acumuladas</p>
+                <p className="font-medium">{tx("{{v0}}h de estudo acumuladas", { v0: totalHoursStudied })}</p>
                 <p className="text-sm text-muted-foreground">
-                  {completedTrainings} treinamentos concluídos
+                  {tx("{{v0}} treinamentos concluídos", { v0: completedTrainings })}
                 </p>
               </div>
             </CardContent>

@@ -60,7 +60,7 @@ export function SocialMediaSearch({ businessName, location, onAutoFill, onAnalys
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Analisar Presença em Redes Sociais'}
+        {loading ? 'Analisando...' : tx('Analisar Presença em Redes Sociais')}
       </Button>
 
       {analysis && (
@@ -76,7 +76,7 @@ export function SocialMediaSearch({ businessName, location, onAutoFill, onAnalys
             </div>
             <div className="p-3 rounded-lg border bg-card text-xs space-y-1">
               <div className="flex justify-between"><span className="text-muted-foreground">{tx("Plataformas ativas")}</span><span className="font-bold">{analysis.active_platforms.length}</span></div>
-              <div className="flex justify-between pt-1 border-t"><span className="text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" />Seguidores (est.)</span><span className="font-bold">{analysis.total_followers_estimated.toLocaleString('pt-BR')}</span></div>
+              <div className="flex justify-between pt-1 border-t"><span className="text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" />{tx("Seguidores (est.)")}</span><span className="font-bold">{analysis.total_followers_estimated.toLocaleString('pt-BR')}</span></div>
             </div>
           </div>
 

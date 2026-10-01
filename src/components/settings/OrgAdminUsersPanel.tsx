@@ -198,7 +198,7 @@ export function OrgAdminUsersPanel() {
       });
       if (response.error) throw new Error(response.error.message);
       if (response.data?.error) throw new Error(response.data.error);
-      toast.success(blocked ? 'Usuário bloqueado' : 'Usuário desbloqueado');
+      toast.success(blocked ? tx('Usuário bloqueado') : tx('Usuário desbloqueado'));
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao alterar status');

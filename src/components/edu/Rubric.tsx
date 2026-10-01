@@ -125,7 +125,7 @@ export function RubricEditor({
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs">Descritores por nível (do menor para o maior)</Label>
+              <Label className="text-xs">{tx("Descritores por nível (do menor para o maior)")}</Label>
               {(c.descriptors || []).map((d, di) => (
                 <div key={di} className="flex gap-2 items-start">
                   <Badge variant="outline" className="mt-2 shrink-0">N{di}</Badge>
@@ -180,7 +180,7 @@ export function RubricDisplay({
           <div key={ci}>
             <div className="flex items-center justify-between text-sm">
               <strong>{c.name || `Critério ${ci + 1}`}</strong>
-              <Badge variant="outline">{c.max_points} pts</Badge>
+              <Badge variant="outline">{tx("{{v0}} pts", { v0: c.max_points })}</Badge>
             </div>
             {(c.descriptors || []).length > 0 && (
               <ol className="mt-1 space-y-0.5 text-xs text-muted-foreground list-decimal pl-5">

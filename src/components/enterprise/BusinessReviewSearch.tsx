@@ -408,15 +408,15 @@ export function BusinessReviewSearch({ onAutoFill, onProfileAutoFill, onAnalysis
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="gap-1">
                 <Globe className="h-3 w-3" />
-                Google: {result.searchResults.google} resultado(s)
+                {tx("Google: {{v0}} resultado(s)", { v0: result.searchResults.google })}
               </Badge>
               <Badge variant="outline" className="gap-1">
                 <Globe className="h-3 w-3" />
-                TripAdvisor: {result.searchResults.tripAdvisor} resultado(s)
+                {tx("TripAdvisor: {{v0}} resultado(s)", { v0: result.searchResults.tripAdvisor })}
               </Badge>
               <Badge variant="outline" className="gap-1">
                 <Globe className="h-3 w-3" />
-                Outros: {result.searchResults.general} resultado(s)
+                {tx("Outros: {{v0}} resultado(s)", { v0: result.searchResults.general })}
               </Badge>
             </div>
 

@@ -476,7 +476,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-amber-600" />
-              Divergência encontrada ({divergences.length})
+              {tx("Divergência encontrada ({{v0}})", { v0: divergences.length })}
             </CardTitle>
             <CardDescription>
               {tx("Seu valor foi preservado. Compare com o que foi encontrado online e escolha qual manter.")}
@@ -638,7 +638,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                               {!isIgnored && isAutoFilled && (
                                 <Badge variant="outline" className="text-xs border-primary/50 text-primary gap-1">
                                   <Sparkles className="h-3 w-3" />
-                                  Pré-preenchido (Reviews)
+                                  {tx("Pré-preenchido (Reviews)")}
                                 </Badge>
                               )}
                               {!isIgnored && benchmarkStatus === 'good' && (
@@ -687,7 +687,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                 {referenceDate && (
                                   <Badge variant="outline" className="text-[10px] font-normal gap-1">
                                     <Calendar className="h-3 w-3" />
-                                    Ref: {referenceDate}
+                                    {tx("Ref: {{v0}}", { v0: referenceDate })}
                                   </Badge>
                                 )}
                                 {observation && (
@@ -775,7 +775,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  {isIgnored ? 'Reativar indicador' : 'Ignorar (não será considerado no cálculo)'}
+                                  {isIgnored ? tx('Reativar indicador') : tx('Ignorar (não será considerado no cálculo)')}
                                 </TooltipContent>
                               </Tooltip>
                             </div>
@@ -805,7 +805,7 @@ export function EnterpriseDataEntryPanel({ assessmentId, tier, onComplete, initi
               {progress.percent >= 50 ? (
                 <>
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  Dados suficientes para cálculo do diagnóstico ({progress.filled}/{progress.total} preenchidos)
+                  {tx("Dados suficientes para cálculo do diagnóstico ({{v0}}/{{v1}} preenchidos)", { v0: progress.filled, v1: progress.total })}
                 </>
               ) : (
                 <>

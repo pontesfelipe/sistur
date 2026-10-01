@@ -61,7 +61,7 @@ export function PublicComplaintsSearch({ businessName, location, onAutoFill, onA
         </p>
         <Button onClick={run} disabled={loading || !businessName} size="sm">
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-          {loading ? 'Buscando...' : 'Buscar Reclamações'}
+          {loading ? 'Buscando...' : tx('Buscar Reclamações')}
         </Button>
       </div>
 
@@ -84,8 +84,8 @@ export function PublicComplaintsSearch({ businessName, location, onAutoFill, onA
               <>
                 <div className="flex flex-wrap gap-1.5">
                   {a.reclame_aqui.reputation_category && <Badge variant="outline" className="text-[10px]">{a.reclame_aqui.reputation_category}</Badge>}
-                  {a.reclame_aqui.solved_pct != null && <Badge variant="outline" className="text-[10px]">{a.reclame_aqui.solved_pct}% solucionadas</Badge>}
-                  {a.reclame_aqui.consumer_rating != null && <Badge variant="outline" className="text-[10px]">Índice {a.reclame_aqui.consumer_rating}</Badge>}
+                  {a.reclame_aqui.solved_pct != null && <Badge variant="outline" className="text-[10px]">{tx("{{v0}}% solucionadas", { v0: a.reclame_aqui.solved_pct })}</Badge>}
+                  {a.reclame_aqui.consumer_rating != null && <Badge variant="outline" className="text-[10px]">{tx("Índice {{v0}}", { v0: a.reclame_aqui.consumer_rating })}</Badge>}
                 </div>
                 {a.reclame_aqui.url && (
                   <a href={a.reclame_aqui.url} target="_blank" rel="noreferrer" className="text-xs text-primary inline-flex items-center gap-1 hover:underline">

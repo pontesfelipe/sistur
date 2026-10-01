@@ -91,7 +91,7 @@ export function IssuesView({ issues }: IssuesViewProps) {
               {moderateCount > 0 && `, ${moderateCount} moderados`}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {filteredIssues.length} de {issues.length} gargalos exibidos
+              {tx("{{v0}} de {{v1}} gargalos exibidos", { v0: filteredIssues.length, v1: issues.length })}
             </p>
           </div>
         </div>
@@ -169,8 +169,8 @@ export function IssuesView({ issues }: IssuesViewProps) {
       ) : (
         <div className="text-center py-8 text-muted-foreground">
           {issues.length === 0 
-            ? 'Nenhum gargalo identificado.' 
-            : 'Nenhum gargalo encontrado com os filtros selecionados.'}
+            ? tx('Nenhum gargalo identificado.') 
+            : tx('Nenhum gargalo encontrado com os filtros selecionados.')}
         </div>
       )}
 
@@ -187,7 +187,7 @@ export function IssuesView({ issues }: IssuesViewProps) {
               </SelectTrigger>
               <SelectContent>
                 {ITEMS_PER_PAGE_OPTIONS.map(opt => (
-                  <SelectItem key={opt} value={String(opt)}>{opt}/pág</SelectItem>
+                  <SelectItem key={opt} value={String(opt)}>{tx("{{v0}}/pág", { v0: opt })}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

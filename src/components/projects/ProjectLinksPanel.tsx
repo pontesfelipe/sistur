@@ -139,7 +139,7 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
               </Select>
             </div>
             <div>
-              <Label>Item ({options.length} disponíveis)</Label>
+              <Label>{tx("Item ({{v0}} disponíveis)", { v0: options.length })}</Label>
               <Select value={externalId} onValueChange={setExternalId}>
                 <SelectTrigger><SelectValue placeholder={tx('Selecione...')} /></SelectTrigger>
                 <SelectContent>
@@ -152,7 +152,7 @@ export function ProjectLinksPanel({ projectId }: { projectId: string }) {
               </Select>
             </div>
             <div>
-              <Label>Notas (opcional)</Label>
+              <Label>{tx("Notas (opcional)")}</Label>
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={tx('Por que este item se relaciona ao projeto?')} />
             </div>
           </div>

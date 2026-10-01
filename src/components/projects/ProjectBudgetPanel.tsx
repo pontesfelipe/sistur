@@ -90,8 +90,8 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="outline" className="text-xs">{l.category}</Badge>
                         <Badge variant="secondary" className="text-xs">{statusLabel}</Badge>
-                        {phase && <span className="text-xs text-muted-foreground">Fase: {phase.name}</span>}
-                        {l.funding_source && <span className="text-xs text-muted-foreground">Fonte: {l.funding_source}</span>}
+                        {phase && <span className="text-xs text-muted-foreground">{tx("Fase: {{v0}}", { v0: phase.name })}</span>}
+                        {l.funding_source && <span className="text-xs text-muted-foreground">{tx("Fonte: {{v0}}", { v0: l.funding_source })}</span>}
                       </div>
                       <p className="font-medium text-sm mt-1 truncate">{tx(l.description)}</p>
                     </div>
@@ -113,7 +113,7 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
 
       <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
         <DialogContent className="max-w-xl">
-          <DialogHeader><DialogTitle>{editing?.id ? "Editar linha" : "Nova linha de orçamento"}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editing?.id ? tx("Editar linha") : tx("Nova linha de orçamento")}</DialogTitle></DialogHeader>
           {editing && (
             <div className="space-y-3">
               <div>
@@ -148,7 +148,7 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label>Fase (opcional)</Label>
+                  <Label>{tx("Fase (opcional)")}</Label>
                   <Select value={editing.phase_id ?? "_none"} onValueChange={(v) => setEditing({ ...editing, phase_id: v === "_none" ? null : v })}>
                     <SelectTrigger><SelectValue placeholder={tx('Sem fase')} /></SelectTrigger>
                     <SelectContent>
@@ -187,7 +187,7 @@ function ProjectRoiCard({ projectId, investment }: { projectId: string; investme
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Retorno do investimento (ROI)</CardTitle>
+        <CardTitle className="text-base">{tx("Retorno do investimento (ROI)")}</CardTitle>
         <CardDescription>Investimento considerado: {brl(investment)}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-4 items-end">
@@ -196,7 +196,7 @@ function ProjectRoiCard({ projectId, investment }: { projectId: string; investme
           <Input type="number" value={annual || ""} onChange={(e) => { const v = Number(e.target.value); setAnnual(v); localStorage.setItem(key, String(v)); }} />
         </div>
         <div className="space-y-1">
-          <Label>Horizonte (anos)</Label>
+          <Label>{tx("Horizonte (anos)")}</Label>
           <Input type="number" min={1} max={10} value={years} onChange={(e) => setYears(Math.max(1, Number(e.target.value)))} />
         </div>
         <div><p className="text-xs text-muted-foreground">{tx("ROI")}</p><p className="text-2xl font-semibold">{roi == null ? "—" : `${Math.round(roi)}%`}</p></div>

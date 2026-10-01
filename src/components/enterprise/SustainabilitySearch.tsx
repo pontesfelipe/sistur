@@ -66,7 +66,7 @@ export function SustainabilitySearch({ businessName, location, websiteUrl, onAut
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Analisar Sustentabilidade & Acessibilidade'}
+        {loading ? 'Analisando...' : tx('Analisar Sustentabilidade & Acessibilidade')}
       </Button>
 
       {analysis && (

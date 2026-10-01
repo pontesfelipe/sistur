@@ -250,12 +250,12 @@ export function OrganizationManagement() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingOrg ? 'Editar Organização' : 'Nova Organização'}
+                  {editingOrg ? tx('Editar Organização') : tx('Nova Organização')}
                 </DialogTitle>
                 <DialogDescription>
                   {editingOrg 
-                    ? 'Atualize os dados da organização' 
-                    : 'Preencha os dados para criar uma nova organização'}
+                    ? tx('Atualize os dados da organização') 
+                    : tx('Preencha os dados para criar uma nova organização')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
@@ -308,7 +308,7 @@ export function OrganizationManagement() {
                           {tx("Acesso Empresarial")}
                         </Label>
                         <p className="text-xs text-muted-foreground">
-                          Diagnósticos hoteleiros com indicadores de performance (RevPAR, NPS, etc).
+                          {tx("Diagnósticos hoteleiros com indicadores de performance (RevPAR, NPS, etc).")}
                         </p>
                       </div>
                     </div>
@@ -387,7 +387,7 @@ export function OrganizationManagement() {
             {filteredOrgs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                  {searchQuery ? 'Nenhuma organização encontrada' : 'Nenhuma organização cadastrada'}
+                  {searchQuery ? tx('Nenhuma organização encontrada') : tx('Nenhuma organização cadastrada')}
                 </TableCell>
               </TableRow>
             ) : (

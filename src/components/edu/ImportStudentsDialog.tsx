@@ -65,7 +65,7 @@ function parseCSV(text: string): ParsedStudent[] {
       email: email.toLowerCase(),
       name,
       valid,
-      error: !valid ? 'E-mail inválido' : undefined,
+      error: !valid ? tx('E-mail inválido') : undefined,
     };
   }).filter(s => s.email);
 }
@@ -197,9 +197,9 @@ export function ImportStudentsDialog({ classroomId, open, onClose, onImported }:
           {students.length > 0 && (
             <>
               <div className="flex items-center gap-2 text-sm">
-                <Badge variant="default">{validCount} válidos</Badge>
+                <Badge variant="default">{tx("{{v0}} válidos", { v0: validCount })}</Badge>
                 {invalidCount > 0 && (
-                  <Badge variant="destructive">{invalidCount} inválidos</Badge>
+                  <Badge variant="destructive">{tx("{{v0}} inválidos", { v0: invalidCount })}</Badge>
                 )}
               </div>
 
@@ -242,9 +242,9 @@ export function ImportStudentsDialog({ classroomId, open, onClose, onImported }:
             <Card className="bg-muted/50">
               <CardContent className="p-3 text-sm">
                 <p className="font-medium">{tx('Resultado da Importação')}</p>
-                <p className="text-green-600">{results.success} importados com sucesso</p>
+                <p className="text-green-600">{tx("{{v0}} importados com sucesso", { v0: results.success })}</p>
                 {results.errors > 0 && (
-                  <p className="text-destructive">{results.errors} erros</p>
+                  <p className="text-destructive">{tx("{{v0}} erros", { v0: results.errors })}</p>
                 )}
               </CardContent>
             </Card>

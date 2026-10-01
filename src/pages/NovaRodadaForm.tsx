@@ -66,7 +66,7 @@ function DestinationCombobox({
               ? `${selected.name}${selected.uf ? ` - ${selected.uf}` : ''}${
                   selected.ibge_code ? ` (IBGE: ${selected.ibge_code})` : ''
                 }`
-              : 'Selecione ou pesquise um destino'}
+              : tx('Selecione ou pesquise um destino')}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -249,7 +249,7 @@ export function NovaRodadaForm({
             return (
               <>
                 <Icon className="h-5 w-5 text-primary" />
-                Passo {currentStep}: {step?.title}
+                {tx("Passo {{v0}}: {{v1}}", { v0: currentStep, v1: step?.title })}
               </>
             );
           })()}
@@ -342,8 +342,8 @@ export function NovaRodadaForm({
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">
                 {hasEnterpriseAccess 
-                  ? 'Defina quem poderá visualizar este diagnóstico.'
-                  : 'Defina quem poderá visualizar e editar este destino e diagnóstico. Isso afetará a visibilidade para outros membros da sua organização.'
+                  ? tx('Defina quem poderá visualizar este diagnóstico.')
+                  : tx('Defina quem poderá visualizar e editar este destino e diagnóstico. Isso afetará a visibilidade para outros membros da sua organização.')
                 }
               </p>
             </div>
@@ -390,7 +390,7 @@ export function NovaRodadaForm({
                 <div className="flex-1">
                   <Label htmlFor="personal" className="flex items-center gap-2 cursor-pointer font-medium">
                     <User className="h-5 w-5 text-primary" />
-                    Apenas para mim (Pessoal)
+                    {tx("Apenas para mim (Pessoal)")}
                   </Label>
                   <p className="text-sm text-muted-foreground mt-1">
                     {tx("Somente você terá acesso a este diagnóstico.")}
@@ -534,7 +534,7 @@ export function NovaRodadaForm({
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Período início (opcional)</Label>
+                <Label>{tx("Período início (opcional)")}</Label>
                 <Input
                   type="date"
                   value={periodStart}
@@ -542,7 +542,7 @@ export function NovaRodadaForm({
                 />
               </div>
               <div className="space-y-2">
-                <Label>Período fim (opcional)</Label>
+                <Label>{tx("Período fim (opcional)")}</Label>
                 <Input
                   type="date"
                   value={periodEnd}
@@ -631,9 +631,7 @@ export function NovaRodadaForm({
                         </Badge>
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Adiciona 9 indicadores complementares baseados em Tasso, Silva & Nascimento (2024):
-                        acessibilidade NBR 9050, comparecimento eleitoral, qualificação PNQT, conectividade 5G/Wi-Fi,
-                        promoção digital, Big Data turístico, TBC, inclusão na gestão e sensibilização.
+                        {tx("Adiciona 9 indicadores complementares baseados em Tasso, Silva & Nascimento (2024): acessibilidade NBR 9050, comparecimento eleitoral, qualificação PNQT, conectividade 5G/Wi-Fi, promoção digital, Big Data turístico, TBC, inclusão na gestão e sensibilização.")}
                       </p>
                     </div>
                     <Switch
@@ -687,7 +685,7 @@ export function NovaRodadaForm({
               <ul className="text-sm text-muted-foreground space-y-2">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-severity-good" />
-                  Alterar valores pré-preenchidos automaticamente (clique no campo para editar)
+                  {tx("Alterar valores pré-preenchidos automaticamente (clique no campo para editar)")}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-severity-good" />
@@ -707,7 +705,7 @@ export function NovaRodadaForm({
               <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
                 <p className="text-sm text-green-700 dark:text-green-300 flex items-center gap-2">
                   <Shield className="h-4 w-4" />
-                  <strong>{validatedDataCount} indicadores</strong> {tx("já foram pré-preenchidos e validados com dados oficiais.")}
+                  <strong>{tx("{{v0}} indicadores", { v0: validatedDataCount })}</strong> {tx("já foram pré-preenchidos e validados com dados oficiais.")}
                 </p>
               </div>
             )}
@@ -732,7 +730,7 @@ export function NovaRodadaForm({
               </p>
               <ul className="text-sm text-muted-foreground mt-2 space-y-1">
                 <li>{tx("• Normalizar os indicadores")}</li>
-                <li>• Calcular scores dos pilares (RA, OE, AO)</li>
+                <li>{tx("• Calcular scores dos pilares (RA, OE, AO)")}</li>
                 <li>{tx("• Identificar gargalos")}</li>
                 <li>{tx("• Gerar prescrições de capacitação")}</li>
               </ul>

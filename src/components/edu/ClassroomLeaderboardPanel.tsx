@@ -81,7 +81,7 @@ export function ClassroomLeaderboardPanel({ classroomId, showOptInToggle = true 
                     {r.rank}. {r.display_name}
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    Nível {r.level} · {r.total_xp} XP totais
+                    {tx("Nível {{v0}} · {{v1}} XP totais", { v0: r.level, v1: r.total_xp })}
                   </p>
                 </div>
                 <Badge variant="secondary" className="font-mono">

@@ -144,7 +144,7 @@ export default function Precos() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {selectedPlan ? `Interesse no plano ${selectedPlan.name}` : 'Fale com o time'}
+              {selectedPlan ? `Interesse no plano ${selectedPlan.name}` : tx('Fale com o time')}
             </DialogTitle>
             <DialogDescription>
               {tx("Deixe seus dados e retornamos com a proposta ideal para o seu caso.")}
@@ -197,7 +197,7 @@ export default function Precos() {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Telefone (opcional)</FormLabel>
+                        <FormLabel>{tx("Telefone (opcional)")}</FormLabel>
                         <FormControl>
                           <Input placeholder="(00) 00000-0000" {...field} />
                         </FormControl>
@@ -210,7 +210,7 @@ export default function Precos() {
                     name="organization"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Organização (opcional)</FormLabel>
+                        <FormLabel>{tx("Organização (opcional)")}</FormLabel>
                         <FormControl>
                           <Input placeholder={tx("Prefeitura, empresa...")} {...field} />
                         </FormControl>
@@ -224,7 +224,7 @@ export default function Precos() {
                   name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mensagem (opcional)</FormLabel>
+                      <FormLabel>{tx("Mensagem (opcional)")}</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder={tx("Conte um pouco do seu contexto...")}

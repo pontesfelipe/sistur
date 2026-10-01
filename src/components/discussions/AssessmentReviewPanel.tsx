@@ -177,7 +177,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
     if (c.anchor_type === 'pillar') {
       return (
         <Badge variant="outline" className="text-[10px] gap-1 border-primary/40 text-primary">
-          <Layers className="h-3 w-3" /> Pilar {c.anchor_ref}
+          <Layers className="h-3 w-3" /> {tx("Pilar {{v0}}", { v0: c.anchor_ref })}
         </Badge>
       );
     }
@@ -200,8 +200,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
               {tx("Revisão técnica do diagnóstico")}
             </CardTitle>
             <CardDescription>
-              Comentários ancorados em pilares ou indicadores específicos, com responsável e status (aberto / resolvido).
-              Use @ para mencionar pessoas da sua organização.
+              {tx("Comentários ancorados em pilares ou indicadores específicos, com responsável e status (aberto / resolvido). Use @ para mencionar pessoas da sua organização.")}
             </CardDescription>
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -243,7 +242,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                 ))}
                 {indicators.slice(0, 200).map((i) => (
                   <SelectItem key={i.code} value={`indicator:${i.code}`}>
-                    Indicador · {i.label}
+                    {tx("Indicador · {{v0}}", { v0: i.label })}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -290,7 +289,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                       )}
                       {assignee && !isResolved && (
                         <Badge variant="outline" className="text-[10px] gap-1">
-                          <AtSign className="h-3 w-3" /> Resp.: {assignee.full_name}
+                          <AtSign className="h-3 w-3" /> {tx("Resp.: {{v0}}", { v0: assignee.full_name })}
                         </Badge>
                       )}
                       <div className="ml-auto flex items-center gap-1">
@@ -301,7 +300,7 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
                           onClick={() =>
                             setStatus.mutate({ comment_id: c.id, status: isResolved ? 'open' : 'resolved' })
                           }
-                          title={isResolved ? 'Reabrir' : 'Marcar como resolvido'}
+                          title={isResolved ? 'Reabrir' : tx('Marcar como resolvido')}
                         >
                           {isResolved ? (
                             <RotateCcw className="h-3.5 w-3.5" />
@@ -429,14 +428,14 @@ export function AssessmentReviewPanel({ assessmentId, orgId, indicators = [], pi
             <div className="flex items-center justify-between flex-wrap gap-2">
               <span className="text-xs text-muted-foreground">
                 {anchorType === 'general'
-                  ? 'Comentário geral sobre o diagnóstico.'
+                  ? tx('Comentário geral sobre o diagnóstico.')
                   : anchorType === 'pillar'
                     ? anchorRef
                       ? `Ancorado no pilar ${anchorRef}.`
-                      : 'Selecione o pilar.'
+                      : tx('Selecione o pilar.')
                     : anchorRef
                       ? `Ancorado no indicador ${anchorRef}.`
-                      : 'Selecione o indicador.'}
+                      : tx('Selecione o indicador.')}
               </span>
               <Button
                 onClick={submit}

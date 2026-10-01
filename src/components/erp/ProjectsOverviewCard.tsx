@@ -113,7 +113,7 @@ export function ProjectsOverviewCard({ projects, isLoading }: ProjectsOverviewCa
         <div>
           <CardTitle className="text-lg flex items-center gap-2">
             <FolderKanban className="h-5 w-5" />
-            Projetos em Andamento ({activeProjects.length})
+            {tx("Projetos em Andamento ({{v0}})", { v0: activeProjects.length })}
           </CardTitle>
           <CardDescription>
             {tx('Acompanhamento dos projetos derivados de diagnósticos')}

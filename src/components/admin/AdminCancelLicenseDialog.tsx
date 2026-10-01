@@ -102,7 +102,7 @@ export function AdminCancelLicenseDialog({
 
           <div>
             <Label htmlFor="admin-cancel-details" className="text-sm font-medium mb-1.5 block">
-              {selectedReason === 'Outro' ? 'Descreva o motivo *' : 'Detalhes (opcional)'}
+              {selectedReason === 'Outro' ? tx('Descreva o motivo *') : tx('Detalhes (opcional)')}
             </Label>
             <Textarea
               id="admin-cancel-details"
@@ -120,7 +120,7 @@ export function AdminCancelLicenseDialog({
             {tx("Voltar")}
           </Button>
           <Button variant="destructive" onClick={handleCancel} disabled={!canSubmit || processing}>
-            {processing ? 'Cancelando...' : 'Confirmar cancelamento'}
+            {processing ? 'Cancelando...' : tx('Confirmar cancelamento')}
           </Button>
         </DialogFooter>
       </DialogContent>

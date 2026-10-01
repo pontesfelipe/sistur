@@ -163,7 +163,7 @@ export default function AdminIngestionHealth() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <CalendarClock className="h-4 w-4" />
-                Tabela de Referência MTur (gastos turísticos por UF)
+                {tx("Tabela de Referência MTur (gastos turísticos por UF)")}
               </CardTitle>
               <CardDescription>
                 {tx("Lembrete anual: o MTur publica novas médias de gasto e permanência todo ano.")}
@@ -202,7 +202,7 @@ export default function AdminIngestionHealth() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">{tx("Status atual por função")}</CardTitle>
-            <CardDescription>Teste manual (smoke test) registra a execução no histórico abaixo.</CardDescription>
+            <CardDescription>{tx("Teste manual (smoke test) registra a execução no histórico abaixo.")}</CardDescription>
           </CardHeader>
           <CardContent>
             {healthQuery.isLoading ? (
@@ -258,7 +258,7 @@ export default function AdminIngestionHealth() {
                         onClick={() => triggerMut.mutate(row.function_name)}
                       >
                         <PlayCircle className="h-4 w-4 mr-2" />
-                        {triggering === row.function_name ? 'Executando...' : 'Smoke test'}
+                        {triggering === row.function_name ? 'Executando...' : tx('Smoke test')}
                       </Button>
                     </div>
                   );
@@ -272,7 +272,7 @@ export default function AdminIngestionHealth() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">{tx("Últimas 50 execuções")}</CardTitle>
-            <CardDescription>Histórico unificado (cron + manual + admin).</CardDescription>
+            <CardDescription>{tx("Histórico unificado (cron + manual + admin).")}</CardDescription>
           </CardHeader>
           <CardContent>
             {runsQuery.isLoading ? (

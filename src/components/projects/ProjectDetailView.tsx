@@ -382,7 +382,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             <CardHeader>
               <CardTitle className="text-lg">{tx('Fases do Projeto')}</CardTitle>
               <CardDescription>
-                Metodologia {methodologyInfo.name}
+                {tx("Metodologia {{v0}}", { v0: methodologyInfo.name })}
               </CardDescription>
             </CardHeader>
             <CardContent>

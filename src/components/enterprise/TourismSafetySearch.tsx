@@ -73,7 +73,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Analisar Segurança Turística'}
+        {loading ? 'Analisando...' : tx('Analisar Segurança Turística')}
       </Button>
 
       {analysis && (
@@ -106,7 +106,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
               </div>
               <div className="flex items-center justify-between pt-1 border-t">
                 <span className="text-muted-foreground">{tx("Polícia turística")}</span>
-                <span className="font-medium">{analysis.tourist_police_presence ? 'Sim' : 'Não detectada'}</span>
+                <span className="font-medium">{analysis.tourist_police_presence ? 'Sim' : tx('Não detectada')}</span>
               </div>
             </div>
           </div>

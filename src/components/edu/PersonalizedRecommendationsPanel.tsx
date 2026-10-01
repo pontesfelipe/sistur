@@ -111,7 +111,7 @@ function RecommendationCard({
                 {duration && (
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    {duration}min
+                    {tx("{{v0}}min", { v0: duration })}
                   </span>
                 )}
                 <span className="flex items-center gap-1">
@@ -229,8 +229,8 @@ export function PersonalizedRecommendationsPanel({
           <h3 className="font-semibold mb-1">{tx('Nenhuma Recomendação Ainda')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
             {isProfileComplete 
-              ? 'Clique abaixo para gerar suas recomendações personalizadas.'
-              : 'Complete seu perfil para gerar recomendações.'}
+              ? tx('Clique abaixo para gerar suas recomendações personalizadas.')
+              : tx('Complete seu perfil para gerar recomendações.')}
           </p>
           {isProfileComplete ? (
             <Button onClick={handleRefresh} disabled={generateMutation.isPending}>
@@ -277,7 +277,7 @@ export function PersonalizedRecommendationsPanel({
               {tx('Recomendado para Você')}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {courses.length} cursos • {lives.length} lives • {tracks.length} trilhas
+              {tx("{{v0}} cursos • {{v1}} lives • {{v2}} trilhas", { v0: courses.length, v1: lives.length, v2: tracks.length })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -323,7 +323,7 @@ export function PersonalizedRecommendationsPanel({
           
           {hasMore && (
             <Button variant="outline" onClick={() => setAllOpen(true)}>
-              Ver todas as {recommendations?.length} recomendações
+              {tx("Ver todas as {{v0}} recomendações", { v0: recommendations?.length })}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           )}
@@ -335,7 +335,7 @@ export function PersonalizedRecommendationsPanel({
           <DialogHeader>
             <DialogTitle>{tx('Todas as recomendações')}</DialogTitle>
             <DialogDescription>
-              {courses.length} cursos • {lives.length} lives • {tracks.length} trilhas
+              {tx("{{v0}} cursos • {{v1}} lives • {{v2}} trilhas", { v0: courses.length, v1: lives.length, v2: tracks.length })}
             </DialogDescription>
           </DialogHeader>
 

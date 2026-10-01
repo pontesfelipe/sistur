@@ -343,8 +343,7 @@ const ExamHistory = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{tx('Enviar Recurso')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Questione o resultado da prova "{appealDialog?.courseName}". 
-              Descreva os motivos do recurso de forma clara e objetiva.
+              {tx("Questione o resultado da prova \"{{v0}}\". Descreva os motivos do recurso de forma clara e objetiva.", { v0: appealDialog?.courseName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-3 py-4">

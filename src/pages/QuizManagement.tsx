@@ -291,7 +291,7 @@ const QuizManagement = () => {
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
-                    {editingQuestion ? 'Editar Questão' : 'Nova Questão'}
+                    {editingQuestion ? tx('Editar Questão') : tx('Nova Questão')}
                   </DialogTitle>
                   <DialogDescription>
                     {tx("Preencha as informações da questão")}
@@ -399,7 +399,7 @@ const QuizManagement = () => {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="explanation">Explicação (opcional)</Label>
+                    <Label htmlFor="explanation">{tx("Explicação (opcional)")}</Label>
                     <Textarea 
                       id="explanation" 
                       value={formData.explanation || ''}
@@ -417,7 +417,7 @@ const QuizManagement = () => {
                     onClick={handleSubmit}
                     disabled={!formData.stem || createQuiz.isPending || updateQuiz.isPending}
                   >
-                    {editingQuestion ? 'Salvar' : 'Criar Questão'}
+                    {editingQuestion ? 'Salvar' : tx('Criar Questão')}
                   </Button>
                 </div>
               </DialogContent>

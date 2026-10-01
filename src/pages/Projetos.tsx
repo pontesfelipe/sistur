@@ -179,7 +179,7 @@ export default function Projetos() {
                 {tx('Impacto agregado do portfólio')}
               </CardTitle>
               <CardDescription>
-                Indicadores monitorados em {portfolio.projectsWithLinks} projeto(s) com baseline registrado.
+                {tx("Indicadores monitorados em {{v0}} projeto(s) com baseline registrado.", { v0: portfolio.projectsWithLinks })}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -209,9 +209,9 @@ export default function Projetos() {
         <Tabs defaultValue="all" className="space-y-4">
           <TabsList className="w-full sm:w-auto justify-start overflow-x-auto scrollbar-thin">
             <TabsTrigger value="all">Todos ({projects?.length || 0})</TabsTrigger>
-            <TabsTrigger value="active">Em Andamento ({activeProjects.length})</TabsTrigger>
-            <TabsTrigger value="planning">Planejamento ({planningProjects.length})</TabsTrigger>
-            <TabsTrigger value="completed">Concluídos ({completedProjects.length})</TabsTrigger>
+            <TabsTrigger value="active">{tx("Em Andamento ({{v0}})", { v0: activeProjects.length })}</TabsTrigger>
+            <TabsTrigger value="planning">{tx("Planejamento ({{v0}})", { v0: planningProjects.length })}</TabsTrigger>
+            <TabsTrigger value="completed">{tx("Concluídos ({{v0}})", { v0: completedProjects.length })}</TabsTrigger>
           </TabsList>
 
           {isLoading ? (

@@ -53,7 +53,7 @@ export function CompetitorsAutoSearch({ destinationId, businessName, location, p
         </p>
         <Button onClick={run} disabled={loading || !businessName || !location} size="sm">
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-          {loading ? 'Buscando...' : 'Buscar Concorrentes'}
+          {loading ? 'Buscando...' : tx('Buscar Concorrentes')}
         </Button>
       </div>
 
@@ -74,7 +74,7 @@ export function CompetitorsAutoSearch({ destinationId, businessName, location, p
                           <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {c.rating}
                         </Badge>
                       )}
-                      {c.review_volume != null && <Badge variant="outline" className="text-[10px]">{c.review_volume} reviews</Badge>}
+                      {c.review_volume != null && <Badge variant="outline" className="text-[10px]">{tx("{{v0}} reviews", { v0: c.review_volume })}</Badge>}
                       {c.source_name && <Badge variant="secondary" className="text-[10px]">{c.source_name}</Badge>}
                     </div>
                   </div>

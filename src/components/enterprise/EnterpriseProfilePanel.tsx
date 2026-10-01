@@ -268,7 +268,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="star_rating">Categoria (Estrelas)</Label>
+                <Label htmlFor="star_rating">{tx("Categoria (Estrelas)")}</Label>
                 <Select 
                   value={formData.star_rating?.toString() || ''} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, star_rating: value ? parseInt(value) : null }))}
@@ -293,7 +293,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2">
                 <Label htmlFor="room_count" className="flex items-center gap-2">
                   <DoorOpen className="h-4 w-4" />
-                  Número de UHs (Quartos)
+                  {tx("Número de UHs (Quartos)")}
                 </Label>
                 <Input
                   id="room_count"
@@ -409,7 +409,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2">
                 <Label htmlFor="average_occupancy_rate" className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  Taxa de Ocupação Média (%)
+                  {tx("Taxa de Ocupação Média (%)")}
                 </Label>
                 <Input
                   id="average_occupancy_rate"

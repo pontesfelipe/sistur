@@ -49,7 +49,7 @@ export default function AdminInteligencia() {
           </TabsTrigger>
           <TabsTrigger value="mcp" className="flex items-center gap-2 shrink-0">
             <Plug className="h-4 w-4" />
-            Integração IA (MCP)
+            {tx("Integração IA (MCP)")}
           </TabsTrigger>
         </TabsList>
 

@@ -133,7 +133,7 @@ export function ExamManagementPanel() {
           </TabsTrigger>
           <TabsTrigger value="appeals" className="gap-2">
             <MessageSquare className="h-4 w-4" />
-            Recursos ({pendingAppeals})
+            {tx("Recursos ({{v0}})", { v0: pendingAppeals })}
           </TabsTrigger>
         </TabsList>
 
@@ -270,7 +270,7 @@ export function ExamManagementPanel() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {resolveDialog?.action === 'accepted' ? 'Aceitar Recurso' : 'Rejeitar Recurso'}
+              {resolveDialog?.action === 'accepted' ? tx('Aceitar Recurso') : tx('Rejeitar Recurso')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {tx("Forneça uma resposta ao aluno sobre a decisão.")}

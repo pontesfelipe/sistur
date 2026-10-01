@@ -315,7 +315,7 @@ const AuditLogs = () => {
 
         {filteredLogs.length > 100 && (
           <p className="text-center text-sm text-muted-foreground">
-            Mostrando 100 de {filteredLogs.length} registros
+            {tx("Mostrando 100 de {{v0}} registros", { v0: filteredLogs.length })}
           </p>
         )}
 

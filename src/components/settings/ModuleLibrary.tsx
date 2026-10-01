@@ -343,8 +343,7 @@ function IntegrityPanel({ report }: { report: IntegrityReport }) {
     return (
       <div className="flex items-center gap-2 rounded-md border border-severity-bom/30 bg-severity-bom/5 p-2 text-[11px] text-severity-bom">
         <CheckCircle2 className="h-3.5 w-3.5" />
-        Íntegro — {report.filesScanned} arquivos escaneados, {report.totalImports} imports
-        verificados.
+        {tx("Íntegro — {{v0}} arquivos escaneados, {{v1}} imports verificados.", { v0: report.filesScanned, v1: report.totalImports })}
       </div>
     );
   }
@@ -360,7 +359,7 @@ function IntegrityPanel({ report }: { report: IntegrityReport }) {
       {report.missing.length > 0 && (
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Arquivos declarados inexistentes ({report.missing.length})
+            {tx("Arquivos declarados inexistentes ({{v0}})", { v0: report.missing.length })}
           </p>
           <ul className="ml-3 list-disc text-[11px] text-foreground/80">
             {report.missing.map((f) => (
@@ -375,7 +374,7 @@ function IntegrityPanel({ report }: { report: IntegrityReport }) {
       {report.declaredElsewhere.length > 0 && (
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Acoplamento com outros módulos ({report.declaredElsewhere.length})
+            {tx("Acoplamento com outros módulos ({{v0}})", { v0: report.declaredElsewhere.length })}
           </p>
           <ul className="ml-3 list-disc text-[11px] text-foreground/80">
             {report.declaredElsewhere.slice(0, 8).map((d) => (
@@ -396,7 +395,7 @@ function IntegrityPanel({ report }: { report: IntegrityReport }) {
       {report.undeclared.length > 0 && (
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Imports órfãos — não declarados em nenhum módulo ({report.undeclared.length})
+            {tx("Imports órfãos — não declarados em nenhum módulo ({{v0}})", { v0: report.undeclared.length })}
           </p>
           <ul className="ml-3 list-disc text-[11px] text-foreground/80">
             {report.undeclared.slice(0, 8).map((f) => (
@@ -445,9 +444,9 @@ export function ModuleLibrary() {
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline">{totals.totalModules} módulos</Badge>
-            <Badge variant="outline">{totals.totalFiles} arquivos</Badge>
-            <Badge variant="outline">{MODULE_LIBRARY.length} seções</Badge>
+            <Badge variant="outline">{tx("{{v0}} módulos", { v0: totals.totalModules })}</Badge>
+            <Badge variant="outline">{tx("{{v0}} arquivos", { v0: totals.totalFiles })}</Badge>
+            <Badge variant="outline">{tx("{{v0}} seções", { v0: MODULE_LIBRARY.length })}</Badge>
           </div>
         </div>
 
@@ -464,7 +463,7 @@ export function ModuleLibrary() {
       <CardContent>
         {sections.length === 0 ? (
           <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Nenhum módulo encontrado para “{query}”.
+            {tx("Nenhum módulo encontrado para “{{v0}}”.", { v0: query })}
           </div>
         ) : (
           <Accordion type="multiple" defaultValue={defaultOpen} className="w-full">

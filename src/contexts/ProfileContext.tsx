@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/t";
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -158,7 +159,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     systemAccess: 'ERP' | 'EDU',
     role: 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR'
   ) => {
-    if (!user) return { success: false, error: 'No user' };
+    if (!user) return { success: false, error: tx('No user') };
 
     try {
       const { error } = await supabase.rpc('complete_user_onboarding', {
@@ -192,7 +193,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   };
 
   const toggleDemoMode = async (enable: boolean) => {
-    if (!user) return { success: false, error: 'No user' };
+    if (!user) return { success: false, error: tx('No user') };
 
     try {
       const { error } = await supabase.rpc('toggle_demo_mode', {
@@ -213,7 +214,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   };
 
   const updateForumPrivacy = async (showIdentity: boolean) => {
-    if (!user) return { success: false, error: 'No user' };
+    if (!user) return { success: false, error: tx('No user') };
 
     try {
       const { error } = await supabase

@@ -215,8 +215,8 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
       ) : (
         <p className="text-muted-foreground text-center py-8">
           {indicatorScores.length === 0 
-            ? 'Nenhum indicador calculado.' 
-            : 'Nenhum indicador encontrado com os filtros selecionados.'}
+            ? tx('Nenhum indicador calculado.') 
+            : tx('Nenhum indicador encontrado com os filtros selecionados.')}
         </p>
       )}
 
@@ -233,7 +233,7 @@ export function IndicatorScoresView({ indicatorScores }: IndicatorScoresViewProp
               </SelectTrigger>
               <SelectContent>
                 {ITEMS_PER_PAGE_OPTIONS.map(opt => (
-                  <SelectItem key={opt} value={String(opt)}>{opt}/pág</SelectItem>
+                  <SelectItem key={opt} value={String(opt)}>{tx("{{v0}}/pág", { v0: opt })}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

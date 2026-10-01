@@ -222,27 +222,27 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
   // global registry can render meaningful badges/toasts without coupling each
   // search component to the orchestrator.
   const BLOCK_META: Record<string, { label: string; source: string }> = {
-    reviews: { label: tx('Reviews Online'), source: 'Booking + TripAdvisor + Google (nota, volume, sentimento, NPS)' },
-    digital: { label: tx('Presença Digital'), source: 'Google + OTAs + redes sociais' },
-    context: { label: tx('Contexto Municipal'), source: 'IBGE + ANAC + ANATEL + Mapa do Turismo' },
-    complaints: { label: tx('Reclamações Públicas'), source: 'Reclame Aqui + Procon' },
-    competitors: { label: tx('Concorrentes'), source: 'Booking + TripAdvisor + Google' },
-    sustainability: { label: tx('Sustentabilidade & ESG'), source: 'Site oficial + certificadoras' },
-    pricing: { label: tx('Preço & Posicionamento'), source: 'OTAs + metabuscadores' },
-    events: { label: tx('Eventos Locais'), source: 'Sympla + Eventbrite + agendas municipais' },
-    safety: { label: tx('Segurança Turística'), source: 'SSP + notícias regionais' },
-    climate: { label: tx('Clima & Conforto'), source: 'INMET + dados históricos' },
-    transport: { label: tx('Transporte Urbano'), source: 'GTFS + ANTT + prefeituras' },
-    brand: { label: tx('Força da Marca'), source: 'Pesquisa web + menções' },
-    demand: { label: tx('Demanda & Trends'), source: 'Google Trends + buscas sazonais' },
-    reputation: { label: tx('Reputação Consolidada OTAs'), source: 'Booking + Expedia + TripAdvisor' },
-    social: { label: tx('Redes Sociais'), source: 'Instagram + Facebook + TikTok' },
-    air: { label: tx('Conectividade Aérea'), source: 'ANAC (anac_air_connectivity)' },
-    tariff: { label: tx('Sazonalidade Tarifária'), source: 'Derivado: demanda + eventos + ADR' },
-    telecom: { label: tx('Conectividade Telecom'), source: 'Anatel (anatel_coverage_cache)' },
-    accessibility: { label: tx('Acessibilidade Urbana'), source: 'Busca pública na web (5 dimensões)' },
-    health: { label: tx('Infra. de Saúde do Entorno'), source: 'DATASUS/CNES (datasus_health_cache)' },
-    cnpj: { label: tx('CNPJ'), source: 'Busca pública + Receita Federal (BrasilAPI)' },
+    reviews: { label: tx('Reviews Online'), source: tx('Booking + TripAdvisor + Google (nota, volume, sentimento, NPS)') },
+    digital: { label: tx('Presença Digital'), source: tx('Google + OTAs + redes sociais') },
+    context: { label: tx('Contexto Municipal'), source: tx('IBGE + ANAC + ANATEL + Mapa do Turismo') },
+    complaints: { label: tx('Reclamações Públicas'), source: tx('Reclame Aqui + Procon') },
+    competitors: { label: tx('Concorrentes'), source: tx('Booking + TripAdvisor + Google') },
+    sustainability: { label: tx('Sustentabilidade & ESG'), source: tx('Site oficial + certificadoras') },
+    pricing: { label: tx('Preço & Posicionamento'), source: tx('OTAs + metabuscadores') },
+    events: { label: tx('Eventos Locais'), source: tx('Sympla + Eventbrite + agendas municipais') },
+    safety: { label: tx('Segurança Turística'), source: tx('SSP + notícias regionais') },
+    climate: { label: tx('Clima & Conforto'), source: tx('INMET + dados históricos') },
+    transport: { label: tx('Transporte Urbano'), source: tx('GTFS + ANTT + prefeituras') },
+    brand: { label: tx('Força da Marca'), source: tx('Pesquisa web + menções') },
+    demand: { label: tx('Demanda & Trends'), source: tx('Google Trends + buscas sazonais') },
+    reputation: { label: tx('Reputação Consolidada OTAs'), source: tx('Booking + Expedia + TripAdvisor') },
+    social: { label: tx('Redes Sociais'), source: tx('Instagram + Facebook + TikTok') },
+    air: { label: tx('Conectividade Aérea'), source: tx('ANAC (anac_air_connectivity)') },
+    tariff: { label: tx('Sazonalidade Tarifária'), source: tx('Derivado: demanda + eventos + ADR') },
+    telecom: { label: tx('Conectividade Telecom'), source: tx('Anatel (anatel_coverage_cache)') },
+    accessibility: { label: tx('Acessibilidade Urbana'), source: tx('Busca pública na web (5 dimensões)') },
+    health: { label: tx('Infra. de Saúde do Entorno'), source: tx('DATASUS/CNES (datasus_health_cache)') },
+    cnpj: { label: tx('CNPJ'), source: tx('Busca pública + Receita Federal (BrasilAPI)') },
   };
   useEffect(() => {
     Object.entries(BLOCK_META).forEach(([id, m]) => setAutoFillMeta(id, m));
@@ -825,9 +825,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             {tx("Identidade do empreendimento e da marca")}
           </CardTitle>
           <CardDescription>
-            Se este hotel faz parte de uma rede com unidades em outros municípios,
-            selecione (ou crie) a marca. A análise comparativa da rede usará esta
-            associação para confrontar desempenho da marca em diferentes destinos.
+            {tx("Se este hotel faz parte de uma rede com unidades em outros municípios, selecione (ou crie) a marca. A análise comparativa da rede usará esta associação para confrontar desempenho da marca em diferentes destinos.")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -847,7 +845,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                     .map((u) => u.destinations?.name)
                     .filter(Boolean)
                     .join(', ')}.`
-                : 'Empreendimento independente? Crie uma marca com o próprio nome — futuras unidades poderão ser anexadas.'
+                : tx('Empreendimento independente? Crie uma marca com o próprio nome — futuras unidades poderão ser anexadas.')
             }
           />
           <div className="flex justify-end">
@@ -887,7 +885,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 }
               />
               <p className="text-xs text-muted-foreground">
-                Identifica esta unidade dentro da marca (município: <strong>{destinationName}</strong>).
+                {tx("Identifica esta unidade dentro da marca (município:")} <strong>{destinationName}</strong>).
               </p>
             </div>
             <div className="flex items-end gap-2">
@@ -898,7 +896,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                   onChange={(e) => setIsFlagship(e.target.checked)}
                   className="h-4 w-4"
                 />
-                Unidade principal (flagship) da marca
+                {tx("Unidade principal (flagship) da marca")}
               </label>
             </div>
           </div>
@@ -914,7 +912,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
               </div>
               <div>
                 <div className="text-sm font-medium">
-                  Pré-preenchimento automático: {autoFillDone}/{autoFillTotal} itens
+                  {tx("Pré-preenchimento automático: {{v0}}/{{v1}} itens", { v0: autoFillDone, v1: autoFillTotal })}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {tx("Cada item abaixo busca ou aplica dados públicos para preencher o diagnóstico")}
@@ -942,7 +940,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 ) : (
                   <Play className="h-3.5 w-3.5 mr-1" />
                 )}
-                {runAllLoading ? 'Executando...' : 'Rodar todos'}
+                {runAllLoading ? 'Executando...' : tx('Rodar todos')}
               </Button>
               <Button
                 size="sm"
@@ -1151,7 +1149,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             {competitorsCount != null && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />{competitorsCount} encontrados
+                <CheckCircle2 className="h-3 w-3 mr-1" />{tx("{{v0}} encontrados", { v0: competitorsCount })}
               </Badge>
             )}
           </div>
@@ -1206,10 +1204,10 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                Posicionamento de Preço (ADR)
+                {tx("Posicionamento de Preço (ADR)")}
                 <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Diária média estimada vs mercado a partir de OTAs públicas (Booking, Google, Hoteis.com)</CardDescription>
+              <CardDescription>{tx("Diária média estimada vs mercado a partir de OTAs públicas (Booking, Google, Hoteis.com)")}</CardDescription>
             </div>
             {pricingAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
@@ -1451,7 +1449,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 {tx("Conforto Climático")}
                 <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Open-Meteo (5 anos): temperatura, chuva e melhores meses do destino</CardDescription>
+              <CardDescription>{tx("Open-Meteo (5 anos): temperatura, chuva e melhores meses do destino")}</CardDescription>
             </div>
             {climateAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
@@ -1514,7 +1512,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 {tx("Conectividade Telecom")}
                 <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>Anatel — cobertura 4G, 5G e Wi-Fi público do município (afeta PMS cloud, OTA mobile e check-in digital)</CardDescription>
+              <CardDescription>{tx("Anatel — cobertura 4G, 5G e Wi-Fi público do município (afeta PMS cloud, OTA mobile e check-in digital)")}</CardDescription>
             </div>
             {telecomAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>
@@ -1647,7 +1645,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="star_rating">Categoria (Estrelas)</Label>
+              <Label htmlFor="star_rating">{tx("Categoria (Estrelas)")}</Label>
               <Select 
                 value={formData.star_rating?.toString() || ''} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, star_rating: value ? parseInt(value) : null }))}
@@ -1702,7 +1700,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
             <div className="space-y-2">
               <Label htmlFor="average_occupancy_rate">
-                Taxa de Ocupação Média (%)
+                {tx("Taxa de Ocupação Média (%)")}
               </Label>
               <Input
                 id="average_occupancy_rate"
@@ -1740,7 +1738,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
 
           {/* Mercado Alvo */}
           <div className="space-y-2">
-            <Label>Mercado Alvo (selecione todos que se aplicam)</Label>
+            <Label>{tx("Mercado Alvo (selecione todos que se aplicam)")}</Label>
             <div className="flex flex-wrap gap-2">
               {TARGET_MARKETS.map(market => (
                 <Badge

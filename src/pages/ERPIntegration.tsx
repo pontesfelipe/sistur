@@ -286,7 +286,7 @@ const ERPIntegration = () => {
                             const warnings = getWarnings(diag.igma_warnings);
                             return warnings.length ? (
                               <Badge className="bg-yellow-500/20 text-yellow-700">
-                                {warnings.length} alerta(s)
+                                {tx("{{v0}} alerta(s)", { v0: warnings.length })}
                               </Badge>
                             ) : (
                               <Badge variant="outline">{tx("Sem alertas")}</Badge>

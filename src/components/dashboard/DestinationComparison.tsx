@@ -263,8 +263,8 @@ export function DestinationComparison({
             <BarChart3 className="h-12 w-12 mb-4 opacity-30" />
             <p className="text-sm">
               {selectedDestinations.length === 0 
-                ? 'Selecione pelo menos 2 destinos para comparar'
-                : 'Selecione mais 1 destino para iniciar a comparação'}
+                ? tx('Selecione pelo menos 2 destinos para comparar')
+                : tx('Selecione mais 1 destino para iniciar a comparação')}
             </p>
           </div>
         )}

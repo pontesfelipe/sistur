@@ -252,7 +252,7 @@ export default function AdminComercial() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">{tx("Nova assinatura manual")}</CardTitle>
-              <CardDescription>Use para contratos Territoriais (empenho) e ativações negociadas.</CardDescription>
+              <CardDescription>{tx("Use para contratos Territoriais (empenho) e ativações negociadas.")}</CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
               <div className="space-y-1.5">
@@ -288,7 +288,7 @@ export default function AdminComercial() {
                 {tx("Registrar")}
               </Button>
               <div className="md:col-span-5 space-y-1.5">
-                <Label>Observações (contrato, empenho, processo)</Label>
+                <Label>{tx("Observações (contrato, empenho, processo)")}</Label>
                 <Input value={notes} onChange={e => setNotes(e.target.value)} placeholder={tx("Ex.: Contrato 2026/014")} />
               </div>
             </CardContent>
@@ -322,7 +322,7 @@ export default function AdminComercial() {
                         <TableCell>
                           {s.current_period_end
                             ? new Date(s.current_period_end).toLocaleDateString('pt-BR')
-                            : 'Sem prazo'}
+                            : tx('Sem prazo')}
                         </TableCell>
                         <TableCell>{s.source}</TableCell>
                         <TableCell className="text-right">
@@ -420,7 +420,7 @@ export default function AdminComercial() {
                       <TableCell>{orgName(o.org_id)}</TableCell>
                       <TableCell>{o.feature}</TableCell>
                       <TableCell>{o.enabled ? 'Liberado' : 'Bloqueado'}</TableCell>
-                      <TableCell>{o.expires_at ? new Date(o.expires_at).toLocaleDateString('pt-BR') : 'Sem prazo'}</TableCell>
+                      <TableCell>{o.expires_at ? new Date(o.expires_at).toLocaleDateString('pt-BR') : tx('Sem prazo')}</TableCell>
                     </TableRow>
                   ))}
                   {!overrides?.length && (
@@ -528,7 +528,7 @@ export default function AdminComercial() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-base">Cotas do período (top consumidores)</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{tx("Cotas do período (top consumidores)")}</CardTitle></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
@@ -597,7 +597,7 @@ export default function AdminComercial() {
             <CardHeader>
               <CardTitle>{tx("Leads comerciais")}</CardTitle>
               <CardDescription>
-                Interessados capturados na página pública de preços (/planos).
+                {tx("Interessados capturados na página pública de preços (/planos).")}
               </CardDescription>
             </CardHeader>
             <CardContent>

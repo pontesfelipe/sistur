@@ -55,7 +55,7 @@ export function ClimateComfortSearch({ destinationId, onAutoFill, onAnalysisCapt
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Analisar Conforto Climático'}
+        {loading ? 'Analisando...' : tx('Analisar Conforto Climático')}
       </Button>
 
       {analysis && (
@@ -69,7 +69,7 @@ export function ClimateComfortSearch({ destinationId, onAutoFill, onAnalysisCapt
           </div>
 
           <div>
-            <div className="text-xs font-medium mb-2 flex items-center gap-1"><Thermometer className="h-3 w-3" /> Temperatura média (°C) por mês</div>
+            <div className="text-xs font-medium mb-2 flex items-center gap-1"><Thermometer className="h-3 w-3" /> {tx("Temperatura média (°C) por mês")}</div>
             <div className="grid grid-cols-12 gap-1">
               {analysis.months_summary.map((m) => {
                 const comfort = analysis.month_comfort.find((c) => c.month === m.month)?.score ?? 50;
@@ -105,7 +105,7 @@ export function ClimateComfortSearch({ destinationId, onAutoFill, onAnalysisCapt
               </ul>
             </div>
           )}
-          <p className="text-[10px] text-muted-foreground">Fonte: {analysis.data_source}</p>
+          <p className="text-[10px] text-muted-foreground">{tx("Fonte: {{v0}}", { v0: analysis.data_source })}</p>
         </div>
       )}
     </div>

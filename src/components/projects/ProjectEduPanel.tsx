@@ -166,9 +166,9 @@ export function ProjectEduPanel({ projectId }: Props) {
                   </SelectContent>
                 </Select>
               </div>
-              <div><Label>Indicador (opcional)</Label><Input value={form.indicator_code} onChange={e => setForm({ ...form, indicator_code: e.target.value })} /></div>
+              <div><Label>{tx("Indicador (opcional)")}</Label><Input value={form.indicator_code} onChange={e => setForm({ ...form, indicator_code: e.target.value })} /></div>
             </div>
-            <div><Label>Aluno (opcional)</Label><Input value={form.user_name} onChange={e => setForm({ ...form, user_name: e.target.value })} /></div>
+            <div><Label>{tx("Aluno (opcional)")}</Label><Input value={form.user_name} onChange={e => setForm({ ...form, user_name: e.target.value })} /></div>
             <div className="flex items-center gap-2">
               <Checkbox checked={form.is_mandatory} onCheckedChange={v => setForm({ ...form, is_mandatory: !!v })} />
               <Label>{tx('Obrigatório')}</Label>

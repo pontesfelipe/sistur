@@ -51,7 +51,7 @@ export function GlobalReferencesPanel() {
               {tx("Referências Globais")}
             </CardTitle>
             <CardDescription className="mt-1">
-              Documentos de referência usados automaticamente na geração de relatórios e diagnósticos (ex: PNT, legislação, diretrizes)
+              {tx("Documentos de referência usados automaticamente na geração de relatórios e diagnósticos (ex: PNT, legislação, diretrizes)")}
             </CardDescription>
           </div>
           <Button onClick={() => setUploadOpen(true)}>
@@ -124,7 +124,7 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
         <Switch
           checked={file.is_active}
           onCheckedChange={(checked) => updateFile.mutate({ id: file.id, is_active: checked })}
-          title={file.is_active ? 'Ativo (usado nos relatórios)' : 'Inativo'}
+          title={file.is_active ? tx('Ativo (usado nos relatórios)') : 'Inativo'}
         />
         <Button size="icon" variant="ghost" onClick={onEdit} title={tx("Editar resumo")}>
           <Edit className="h-4 w-4" />
@@ -142,7 +142,7 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
             <AlertDialogHeader>
               <AlertDialogTitle>{tx("Remover referência?")}</AlertDialogTitle>
               <AlertDialogDescription>
-                O documento "{file.file_name}" será removido permanentemente.
+                {tx("O documento \"{{v0}}\" será removido permanentemente.", { v0: file.file_name })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -196,7 +196,7 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
                 <div className="flex flex-col items-center gap-1 text-muted-foreground">
                   <Upload className="h-6 w-6" />
                   <span className="text-sm">{tx("Clique para selecionar")}</span>
-                  <span className="text-xs">PDF, DOCX, XLSX, CSV, TXT (máx. 20MB)</span>
+                  <span className="text-xs">{tx("PDF, DOCX, XLSX, CSV, TXT (máx. 20MB)")}</span>
                 </div>
               )}
             </Button>
@@ -243,7 +243,7 @@ function EditDialog({ file, open, onOpenChange }: { file: GlobalReferenceFile; o
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Editar Referência: {file.file_name}</DialogTitle>
+          <DialogTitle>{tx("Editar Referência: {{v0}}", { v0: file.file_name })}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <Input placeholder={tx("Descrição")} value={description} onChange={e => setDescription(e.target.value)} />

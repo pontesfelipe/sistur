@@ -199,7 +199,7 @@ export function EduTrilhaAdaptativaDetalhe() {
                       {step.is_optional && <Badge variant="outline" className="text-xs">{tx('Opcional')}</Badge>}
                       {step.required_status && step.required_status !== 'any' && (
                         <Badge variant="outline" className="text-xs capitalize">
-                          Trigger: {step.required_status}
+                          {tx("Trigger: {{v0}}", { v0: step.required_status })}
                         </Badge>
                       )}
                     </div>

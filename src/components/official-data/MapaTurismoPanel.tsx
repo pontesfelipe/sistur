@@ -107,7 +107,7 @@ export default function MapaTurismoPanel() {
               {Object.entries(stats.byCategoria).sort().map(([cat, count]) => (
                 <div key={cat} className="flex items-center gap-2">
                   <Badge className={CATEGORY_COLORS[cat] || 'bg-muted'}>
-                    Categoria {cat}
+                    {tx("Categoria {{v0}}", { v0: cat })}
                   </Badge>
                   <span className="text-sm font-medium">{count as number}</span>
                 </div>
@@ -234,7 +234,7 @@ export default function MapaTurismoPanel() {
                 <Flame className="h-5 w-5 text-orange-500 shrink-0" />
                 <div className="flex-1">
                   <Label htmlFor="firecrawl-toggle" className="font-medium cursor-pointer">
-                    Usar Firecrawl (Scraping Inteligente)
+                    {tx("Usar Firecrawl (Scraping Inteligente)")}
                   </Label>
                   <p className="text-xs text-muted-foreground">
                     {tx("Busca dados mais recentes via scraping do portal oficial. Se falhar, usa CSVs do CKAN como fallback.")}
@@ -295,15 +295,15 @@ export default function MapaTurismoPanel() {
                   ) : (
                     <Database className="h-4 w-4 mr-2" />
                   )}
-                  {useFirecrawl ? 'Importar via Firecrawl' : 'Importar via CKAN'}
+                  {useFirecrawl ? tx('Importar via Firecrawl') : tx('Importar via CKAN')}
                 </Button>
               </div>
 
               <div className="text-sm text-muted-foreground space-y-1 bg-muted/50 rounded-lg p-4">
                 <p><strong>{tx("Estratégia de coleta:")}</strong></p>
                 <ul className="list-disc ml-4 space-y-1">
-                  <li><strong>🔥 Firecrawl (primário):</strong> {tx("Scraping inteligente do portal oficial para dados mais recentes")}</li>
-                  <li><strong>📊 CKAN (fallback):</strong> CSVs estáticos de dados.turismo.gov.br (2013-2017)</li>
+                  <li><strong>{tx("🔥 Firecrawl (primário):")}</strong> {tx("Scraping inteligente do portal oficial para dados mais recentes")}</li>
+                  <li><strong>{tx("📊 CKAN (fallback):")}</strong> {tx("CSVs estáticos de dados.turismo.gov.br (2013-2017)")}</li>
                 </ul>
                 <p className="mt-2">{tx("Os dados importados são vinculados automaticamente aos destinos cadastrados no SISTUR.")}</p>
               </div>

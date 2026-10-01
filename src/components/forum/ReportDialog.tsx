@@ -95,7 +95,7 @@ export function ReportDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="comment">Comentário adicional (opcional)</Label>
+            <Label htmlFor="comment">{tx("Comentário adicional (opcional)")}</Label>
             <Textarea
               id="comment"
               placeholder={tx('Forneça mais detalhes sobre a denúncia...')}

@@ -80,7 +80,7 @@ export function BusinessRulesPanel() {
       {/* Jornada de acesso */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Jornada de acesso (fluxo)</CardTitle>
+          <CardTitle className="text-lg">{tx("Jornada de acesso (fluxo)")}</CardTitle>
           <CardDescription>{tx("O caminho de todo usuário, do cadastro ao plano pago.")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -94,7 +94,7 @@ export function BusinessRulesPanel() {
             <FlowStep icon={CreditCard} title={tx("Plano pago")} desc="Assinatura desbloqueia módulos completos" tone="accent" />
           </div>
           <p className="text-xs text-muted-foreground">
-            Não há trial por tempo (7 dias). O acesso de avaliação é por <strong>{tx("consumo")}</strong>: termina quando o usuário conclui o curso base e esgota as perguntas gratuitas — sem data de expiração.
+            {tx("Não há trial por tempo (7 dias). O acesso de avaliação é por")} <strong>{tx("consumo")}</strong>: termina quando o usuário conclui o curso base e esgota as perguntas gratuitas — sem data de expiração.
           </p>
         </CardContent>
       </Card>
@@ -130,7 +130,7 @@ export function BusinessRulesPanel() {
                       <div className="flex flex-wrap gap-1.5">
                         {beniQuota != null && (
                           <Badge variant="secondary" className="gap-1">
-                            <Bot className="h-3 w-3" /> {beniQuota} perguntas Beni/mês
+                            <Bot className="h-3 w-3" /> {tx("{{v0}} perguntas Beni/mês", { v0: beniQuota })}
                           </Badge>
                         )}
                         {features.erp && <Badge variant="outline">{tx("Analítico")}</Badge>}
@@ -179,7 +179,7 @@ export function BusinessRulesPanel() {
               </p>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-4">
                 <li>{tx("1 diagnóstico completo permitido")}</li>
-                <li>Resultado em modo teaser (pilares ofuscados + paywall)</li>
+                <li>{tx("Resultado em modo teaser (pilares ofuscados + paywall)")}</li>
                 <li>{tx("Projetos bloqueados até assinar")}</li>
               </ul>
             </div>
@@ -192,8 +192,7 @@ export function BusinessRulesPanel() {
             <FlowStep icon={CreditCard} title={tx("Conversão")} desc="Assinatura (online ou manual pelo admin)" tone="accent" />
           </div>
           <p className="text-xs text-muted-foreground">
-            Toda a base anterior foi convertida automaticamente (grandfathering): usuários e
-            organizações existentes não passam pelo trial.
+            {tx("Toda a base anterior foi convertida automaticamente (grandfathering): usuários e organizações existentes não passam pelo trial.")}
           </p>
         </CardContent>
       </Card>
@@ -214,7 +213,7 @@ export function BusinessRulesPanel() {
                 <RefreshCw className="h-4 w-4 text-primary" /> {tx("Cota mensal")}
               </p>
               <p className="text-sm text-muted-foreground">
-                30 perguntas/mês (60 no Empresarial), renovadas todo mês. Não acumula.
+                {tx("30 perguntas/mês (60 no Empresarial), renovadas todo mês. Não acumula.")}
               </p>
             </div>
             <div className="rounded-lg border p-4 space-y-1">
@@ -258,7 +257,7 @@ export function BusinessRulesPanel() {
           <div className="grid gap-3 md:grid-cols-2 text-sm">
             <div className="rounded-lg border p-3">
               <p className="font-semibold">{tx("Pilares canônicos")}</p>
-              <p className="text-muted-foreground">RA (Relações Ambientais), OE (Organização Estrutural), AO (Ações Operacionais). Nomenclatura fixa.</p>
+              <p className="text-muted-foreground">{tx("RA (Relações Ambientais), OE (Organização Estrutural), AO (Ações Operacionais). Nomenclatura fixa.")}</p>
             </div>
             <div className="rounded-lg border p-3">
               <p className="font-semibold">{tx("Motor de status")}</p>
@@ -266,7 +265,7 @@ export function BusinessRulesPanel() {
             </div>
             <div className="rounded-lg border p-3">
               <p className="font-semibold">{tx("Prescrições EDU")}</p>
-              <p className="text-muted-foreground">Só existem com gatilho de diagnóstico (Atenção/Crítico) + pilar correspondente + interpretação territorial.</p>
+              <p className="text-muted-foreground">{tx("Só existem com gatilho de diagnóstico (Atenção/Crítico) + pilar correspondente + interpretação territorial.")}</p>
             </div>
             <div className="rounded-lg border p-3">
               <p className="font-semibold">{tx("Privacidade competitiva")}</p>
@@ -275,8 +274,7 @@ export function BusinessRulesPanel() {
             <div className="rounded-lg border p-3 md:col-span-2">
               <p className="font-semibold flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> {tx("Multi-organização")}</p>
               <p className="text-muted-foreground">
-                Dados isolados por organização (RLS). Papéis: ADMIN (global), ORG_ADMIN (escopo local),
-                ANALYST, VIEWER, ESTUDANTE e PROFESSOR. O papel define os limites do plano.
+                {tx("Dados isolados por organização (RLS). Papéis: ADMIN (global), ORG_ADMIN (escopo local), ANALYST, VIEWER, ESTUDANTE e PROFESSOR. O papel define os limites do plano.")}
               </p>
             </div>
           </div>
@@ -284,8 +282,7 @@ export function BusinessRulesPanel() {
             <ArrowDown className="h-4 w-4 text-muted-foreground" />
           </div>
           <p className="text-center text-xs text-muted-foreground">
-            {tx("Dúvidas comerciais? A página pública")} <span className="font-mono">{tx("/planos")}</span> e o painel
-            Comercial (admin) refletem estas mesmas regras.
+            {tx("Dúvidas comerciais? A página pública")} <span className="font-mono">{tx("/planos")}</span> {tx("e o painel Comercial (admin) refletem estas mesmas regras.")}
           </p>
         </CardContent>
       </Card>

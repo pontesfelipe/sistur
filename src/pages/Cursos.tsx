@@ -147,7 +147,7 @@ const Cursos = () => {
                 <div className="text-right">
                   {prescriptionsByPillar[pillar].length > 0 && (
                     <Badge variant={pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
-                      {prescriptionsByPillar[pillar].length} prescrições
+                      {tx("{{v0}} prescrições", { v0: prescriptionsByPillar[pillar].length })}
                     </Badge>
                   )}
                 </div>
@@ -221,7 +221,7 @@ const Cursos = () => {
                                 </div>
                               </div>
                               <span className="text-xs text-muted-foreground">
-                                Prioridade #{prescription.priority}
+                                {tx("Prioridade #{{v0}}", { v0: prescription.priority })}
                               </span>
                             </div>
                           </CardHeader>
@@ -352,8 +352,8 @@ const Cursos = () => {
                 </h3>
                 <p className="mt-2 text-muted-foreground">
                   {searchQuery || pillarFilter !== 'all' || levelFilter !== 'all' 
-                    ? 'Tente ajustar os filtros de busca.'
-                    : 'Comece cadastrando seu primeiro curso de capacitação.'}
+                    ? tx('Tente ajustar os filtros de busca.')
+                    : tx('Comece cadastrando seu primeiro curso de capacitação.')}
                 </p>
                 <Button className="mt-4">
                   <Plus className="mr-2 h-4 w-4" />

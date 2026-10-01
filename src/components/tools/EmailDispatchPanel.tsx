@@ -407,7 +407,7 @@ export function EmailDispatchPanel() {
                         <SelectItem key={o.id} value={o.id}>
                           <div className="flex items-center gap-2">
                             <span>{getOrgDisplayName(o.name)}</span>
-                            <Badge variant="secondary" className="text-xs">{o.user_count} usuário(s)</Badge>
+                            <Badge variant="secondary" className="text-xs">{tx("{{v0}} usuário(s)", { v0: o.user_count })}</Badge>
                           </div>
                         </SelectItem>
                       ))}
@@ -416,7 +416,7 @@ export function EmailDispatchPanel() {
                   {selectedOrg && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <AlertCircle className="h-4 w-4" />
-                      Serão enviados {selectedOrg.user_count} e-mail(s) individualmente
+                      {tx("Serão enviados {{v0}} e-mail(s) individualmente", { v0: selectedOrg.user_count })}
                     </div>
                   )}
                 </div>
@@ -437,7 +437,7 @@ export function EmailDispatchPanel() {
                   />
                 </div>
                 {sendProgress.errors > 0 && (
-                  <p className="text-xs text-destructive mt-1">{sendProgress.errors} erro(s)</p>
+                  <p className="text-xs text-destructive mt-1">{tx("{{v0}} erro(s)", { v0: sendProgress.errors })}</p>
                 )}
               </div>
             )}

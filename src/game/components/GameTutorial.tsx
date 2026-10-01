@@ -129,7 +129,7 @@ export function GameTutorial({ onComplete }: GameTutorialProps) {
                 : 'bg-gradient-to-r from-primary to-blue-600'
             )}
           >
-            {isLast ? '🎮 Jogar!' : 'Próximo ➡️'}
+            {isLast ? '🎮 Jogar!' : tx('Próximo ➡️')}
           </button>
         </div>
 

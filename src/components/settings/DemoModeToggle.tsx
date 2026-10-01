@@ -76,8 +76,8 @@ export function DemoModeToggle() {
             </Label>
             <p className="text-sm text-muted-foreground">
               {isViewingDemoData 
-                ? 'Você está visualizando dados de demonstração (Gramado, Bonito, Itanhaém)'
-                : 'Ative para visualizar dados de demonstração com diagnósticos completos'
+                ? tx('Você está visualizando dados de demonstração (Gramado, Bonito, Itanhaém)')
+                : tx('Ative para visualizar dados de demonstração com diagnósticos completos')
               }
             </p>
           </div>

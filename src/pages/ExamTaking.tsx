@@ -250,8 +250,8 @@ const ExamTaking = () => {
       });
 
       toast.success(needsGrading
-        ? 'Exame enviado! Questões dissertativas aguardam correção manual.'
-        : 'Exame enviado com sucesso!');
+        ? tx('Exame enviado! Questões dissertativas aguardam correção manual.')
+        : tx('Exame enviado com sucesso!'));
     } catch (error) {
       toast.error(tx('Erro ao enviar exame'));
       setSubmitted(false);
@@ -319,20 +319,20 @@ const ExamTaking = () => {
                 <XCircle className="h-20 w-20 mx-auto mb-4 text-severity-critical" />
               )}
               <CardTitle className="text-3xl">
-                {needsGrading ? 'Aguardando Correção' : passed ? tx('Parabéns!') : tx('Não foi desta vez')}
+                {needsGrading ? tx('Aguardando Correção') : passed ? tx('Parabéns!') : tx('Não foi desta vez')}
               </CardTitle>
               <CardDescription>
                 {needsGrading 
-                  ? 'Questões dissertativas aguardam correção manual do professor' 
+                  ? tx('Questões dissertativas aguardam correção manual do professor') 
                   : passed 
-                    ? 'Você foi aprovado no exame!' 
-                    : 'Você não atingiu a pontuação mínima'}
+                    ? tx('Você foi aprovado no exame!') 
+                    : tx('Você não atingiu a pontuação mínima')}
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center space-y-6">
               {needsGrading ? (
                 <div className="text-lg text-muted-foreground">
-                  <p>Pontuação parcial (questões objetivas):</p>
+                  <p>{tx("Pontuação parcial (questões objetivas):")}</p>
                   <div className="text-4xl font-bold mt-2">{finalScore.toFixed(0)}%</div>
                   <p className="text-sm mt-3 text-amber-600 dark:text-amber-400">
                     {tx('A nota final será calculada após a correção das questões dissertativas.')}
@@ -483,7 +483,7 @@ const ExamTaking = () => {
                         {!isMinMet && ' (mínimo: 50)'}
                         {isMinMet && ' ✓'}
                       </span>
-                      <span>{charCount} caracteres</span>
+                      <span>{tx("{{v0}} caracteres", { v0: charCount })}</span>
                     </div>
                   );
                 })()}

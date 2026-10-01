@@ -159,7 +159,7 @@ export default function ConsorcioDetalhe() {
             <CardHeader>
               <CardTitle className="text-base">{tx("Convite pendente para o seu município")}</CardTitle>
               <CardDescription>
-                Aceitar significa compartilhar a pontuação por pilar (RA/OE/AO) do último diagnóstico com os demais membros deste consórcio.
+                {tx("Aceitar significa compartilhar a pontuação por pilar (RA/OE/AO) do último diagnóstico com os demais membros deste consórcio.")}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex gap-2">

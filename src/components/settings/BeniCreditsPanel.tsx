@@ -171,7 +171,7 @@ export function BeniCreditsPanel() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(grantKind === 'unlimited' ? 'Acesso ilimitado concedido' : 'Créditos concedidos');
+      toast.success(grantKind === 'unlimited' ? tx('Acesso ilimitado concedido') : tx('Créditos concedidos'));
       resetForm();
       qc.invalidateQueries({ queryKey: ['beni-overview'] });
       qc.invalidateQueries({ queryKey: ['beni-unlimited-grants'] });
@@ -321,7 +321,7 @@ export function BeniCreditsPanel() {
               <Select value={grantKind} onValueChange={(v) => setGrantKind(v as 'credits' | 'unlimited')}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="credits">Créditos (quantidade de perguntas)</SelectItem>
+                  <SelectItem value="credits">{tx("Créditos (quantidade de perguntas)")}</SelectItem>
                   <SelectItem value="unlimited">{tx("Acesso ilimitado")}</SelectItem>
                 </SelectContent>
               </Select>
@@ -390,7 +390,7 @@ export function BeniCreditsPanel() {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="indefinite">
-                    {grantKind === 'unlimited' ? 'Por tempo indeterminado' : 'Padrão (12 meses)'}
+                    {grantKind === 'unlimited' ? tx('Por tempo indeterminado') : tx('Padrão (12 meses)')}
                   </SelectItem>
                   <SelectItem value="date">{tx("Até uma data")}</SelectItem>
                 </SelectContent>
@@ -403,7 +403,7 @@ export function BeniCreditsPanel() {
               </div>
             )}
             <div className="space-y-1.5">
-              <Label>Campanha (opcional)</Label>
+              <Label>{tx("Campanha (opcional)")}</Label>
               <Input value={campaign} onChange={(e) => setCampaign(e.target.value)} placeholder={tx("Ex.: Lançamento 2026")} />
             </div>
           </div>
@@ -415,7 +415,7 @@ export function BeniCreditsPanel() {
 
           <div className="flex justify-end">
             <Button disabled={!canSubmit || grant.isPending} onClick={() => grant.mutate()}>
-              {grantKind === 'unlimited' ? 'Liberar acesso ilimitado' : 'Conceder créditos'}
+              {grantKind === 'unlimited' ? tx('Liberar acesso ilimitado') : tx('Conceder créditos')}
             </Button>
           </div>
         </CardContent>
@@ -453,7 +453,7 @@ export function BeniCreditsPanel() {
           {selectedIds.size > 0 && (
             <div className="flex flex-wrap items-end gap-2 rounded-md border bg-muted/40 p-3">
               <div className="text-sm text-muted-foreground">
-                {selectedIds.size} selecionado(s)
+                {tx("{{v0}} selecionado(s)", { v0: selectedIds.size })}
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">{tx("Adicionar créditos")}</Label>

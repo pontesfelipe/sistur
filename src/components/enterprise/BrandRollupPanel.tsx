@@ -41,9 +41,9 @@ export function BrandRollupPanel({ brandName, units, rollups }: Props) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <Building2 className="h-5 w-5 text-primary" />
-          {tx("Marca:")} <span className="font-semibold">{brandName ?? 'Sem nome'}</span>
+          {tx("Marca:")} <span className="font-semibold">{brandName ?? tx('Sem nome')}</span>
           <Badge variant="outline" className="ml-2">
-            {units.length} unidades
+            {tx("{{v0}} unidades", { v0: units.length })}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -52,7 +52,7 @@ export function BrandRollupPanel({ brandName, units, rollups }: Props) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {(['RA', 'OE', 'AO', 'GLOBAL'] as const).map((p) => {
             const row = byPillar(p);
-            const label = p === 'GLOBAL' ? 'Marca (Final)' : PILLAR_INFO[p as 'RA' | 'OE' | 'AO']?.name || p;
+            const label = p === 'GLOBAL' ? tx('Marca (Final)') : PILLAR_INFO[p as 'RA' | 'OE' | 'AO']?.name || p;
             return (
               <div
                 key={p}
@@ -144,9 +144,7 @@ export function BrandRollupPanel({ brandName, units, rollups }: Props) {
         </div>
 
         <p className="text-[11px] text-muted-foreground border-t pt-2">
-          Consolidação ponderada por número de quartos (UH). Os indicadores, gargalos e prescrições
-          mostrados nas abas abaixo agregam todas as unidades — filtros por unidade entram em fase
-          seguinte.
+          {tx("Consolidação ponderada por número de quartos (UH). Os indicadores, gargalos e prescrições mostrados nas abas abaixo agregam todas as unidades — filtros por unidade entram em fase seguinte.")}
         </p>
       </CardContent>
     </Card>

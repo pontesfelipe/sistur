@@ -158,7 +158,7 @@ export function PillarProgressChart({ data, isLoading }: PillarProgressChartProp
                               <span className="text-sm">{dest.name}</span>
                               {dest.assessmentCount > 1 && (
                                 <span className="text-xs text-muted-foreground">
-                                  ({dest.assessmentCount} diagnósticos)
+                                  {tx("({{v0}} diagnósticos)", { v0: dest.assessmentCount })}
                                 </span>
                               )}
                             </div>

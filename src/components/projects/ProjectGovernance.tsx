@@ -139,7 +139,7 @@ export function ProjectGovernance({ projectId }: Props) {
                             <Button size="sm" variant="default" onClick={() => updateCheckpoint.mutate({ id: cp.id, updates: {}, action: 'approve' })}>
                               <CheckCircle2 className="h-3 w-3 mr-1" />{tx("Aprovar")}
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => updateCheckpoint.mutate({ id: cp.id, updates: { rejection_reason: 'Revisar evidência' }, action: 'reject' })}>
+                            <Button size="sm" variant="outline" onClick={() => updateCheckpoint.mutate({ id: cp.id, updates: { rejection_reason: tx('Revisar evidência') }, action: 'reject' })}>
                               <XCircle className="h-3 w-3 mr-1" />{tx("Rejeitar")}
                             </Button>
                           </>
@@ -219,7 +219,7 @@ export function ProjectGovernance({ projectId }: Props) {
             </div>
             <div className="flex items-center gap-2">
               <Checkbox checked={cpForm.is_mandatory} onCheckedChange={v => setCpForm({ ...cpForm, is_mandatory: !!v })} />
-              <Label>Obrigatório (bloqueia conclusão do projeto)</Label>
+              <Label>{tx("Obrigatório (bloqueia conclusão do projeto)")}</Label>
             </div>
           </div>
           <DialogFooter>

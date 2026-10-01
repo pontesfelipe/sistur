@@ -202,7 +202,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
   const toggleVoiceResponse = useCallback(() => {
     const newState = !voiceEnabled;
     setVoiceEnabled(newState);
-    toast.success(newState ? 'Respostas por voz ativadas' : 'Respostas por voz desativadas');
+    toast.success(newState ? tx('Respostas por voz ativadas') : tx('Respostas por voz desativadas'));
     if (!newState) stopSpeaking();
   }, [voiceEnabled, stopSpeaking]);
 
@@ -226,7 +226,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
 
   const streamChat = async (rawMessage: string) => {
     const file = pendingFile;
-    const userMessage = rawMessage || (file ? 'Poderia avaliar este documento?' : '');
+    const userMessage = rawMessage || (file ? tx('Poderia avaliar este documento?') : '');
     const userMsg: Message = { role: 'user', content: userMessage, attachmentName: file?.name };
     const isNew = !convIdRef.current;
     setMessages(prev => [...prev, userMsg]);
@@ -480,7 +480,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
                     className="text-xs font-normal"
                     title={
                       beniQuota.isTrial
-                        ? 'Perguntas gratuitas do período de teste'
+                        ? tx('Perguntas gratuitas do período de teste')
                         : 'Perguntas restantes neste mês' +
                           (beniQuota.totalCredits > 0 ? ` + ${beniQuota.totalCredits} créditos extras` : '')
                     }
@@ -506,7 +506,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
               size="sm"
               onClick={toggleVoiceResponse}
               className={cn("text-muted-foreground", voiceEnabled && "text-primary-foreground")}
-              title={voiceEnabled ? "Desativar respostas por voz" : "Ativar respostas por voz"}
+              title={voiceEnabled ? tx("Desativar respostas por voz") : tx("Ativar respostas por voz")}
             >
               {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Button>
@@ -541,7 +541,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
           <div className="px-3 pt-2 flex items-center justify-between gap-2 text-xs text-muted-foreground border-t">
             <span>
               {beniQuota.exhausted
-                ? 'Você usou todas as perguntas disponíveis.'
+                ? tx('Você usou todas as perguntas disponíveis.')
                 : beniQuota.isTrial
                   ? `Restam ${beniQuota.remaining} de 10 perguntas gratuitas do teste.`
                   : `Restam ${beniQuota.remaining} de ${beniQuota.allowance} perguntas este mês` +
@@ -549,7 +549,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
             </span>
             {(beniQuota.exhausted || beniQuota.remaining <= 5) && (
               <Link to="/assinatura" className="text-primary underline underline-offset-2 shrink-0">
-                {beniQuota.isTrial ? 'Ver planos' : 'Comprar créditos'}
+                {beniQuota.isTrial ? tx('Ver planos') : tx('Comprar créditos')}
               </Link>
             )}
           </div>

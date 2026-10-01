@@ -151,7 +151,7 @@ export function CycleEvolutionChart({
                       {getEvolutionLabel(cycle.evolutionState)}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      ({cycle.completionRate}% concluído)
+                      {tx("({{v0}}% concluído)", { v0: cycle.completionRate })}
                     </span>
                     {cycle.hasProject && (
                       <Badge variant="outline" className="text-xs gap-1">
@@ -233,7 +233,7 @@ export function CycleEvolutionChart({
             </ChartContainer>
 
             <p className="text-xs text-muted-foreground text-center mt-2">
-              Total de {chartData.length} ciclo(s) de diagnóstico
+              {tx("Total de {{v0}} ciclo(s) de diagnóstico", { v0: chartData.length })}
             </p>
           </>
         )}

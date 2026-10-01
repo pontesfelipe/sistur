@@ -67,7 +67,7 @@ const ExamReview = () => {
                   ) : (
                     <XCircle className="h-5 w-5 text-red-500" />
                   )}
-                  {isPending ? 'Aguardando Correção' : isPassed ? tx('Aprovado') : tx('Reprovado')}
+                  {isPending ? tx('Aguardando Correção') : isPassed ? tx('Aprovado') : tx('Reprovado')}
                 </CardTitle>
                 <CardDescription>
                   {review.submitted_at && `Realizada em ${new Date(review.submitted_at).toLocaleDateString('pt-BR', {

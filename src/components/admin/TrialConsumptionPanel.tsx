@@ -149,7 +149,7 @@ export function TrialConsumptionPanel() {
                           'text-xs font-medium px-2 py-1 rounded-full',
                           r.converted_at ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500',
                         )}>
-                          {r.converted_at ? `Convertido ${fmt(r.converted_at)}` : 'Em trial'}
+                          {r.converted_at ? `Convertido ${fmt(r.converted_at)}` : tx('Em trial')}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">

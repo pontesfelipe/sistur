@@ -212,7 +212,7 @@ export function TrainingMaterialsManager({
                     {tx("Adicionar Material")}
                   </Button>
                   <p className="text-xs text-muted-foreground mt-1">
-                    PDF, Word, Excel, PowerPoint, imagens (máx. 50MB)
+                    {tx("PDF, Word, Excel, PowerPoint, imagens (máx. 50MB)")}
                   </p>
                 </>
               )}
@@ -283,7 +283,7 @@ export function TrainingMaterialsManager({
           <AlertDialogHeader>
             <AlertDialogTitle>{tx("Remover material?")}</AlertDialogTitle>
             <AlertDialogDescription>
-              O arquivo "{deletingMaterial?.name}" será removido permanentemente.
+              {tx("O arquivo \"{{v0}}\" será removido permanentemente.", { v0: deletingMaterial?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

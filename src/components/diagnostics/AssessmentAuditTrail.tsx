@@ -104,7 +104,7 @@ export function AssessmentAuditTrail({
               {tx('Trilha de Auditoria — Procedência por Indicador')}
             </CardTitle>
             <CardDescription>
-              {auditRows.length} indicadores processados neste cálculo
+              {tx("{{v0}} indicadores processados neste cálculo", { v0: auditRows.length })}
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-1.5 items-center">

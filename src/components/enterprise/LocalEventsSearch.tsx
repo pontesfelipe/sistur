@@ -69,7 +69,7 @@ export function LocalEventsSearch({ destinationId, onAutoFill, onAnalysisCapture
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Analisar Eventos & Sazonalidade'}
+        {loading ? 'Analisando...' : tx('Analisar Eventos & Sazonalidade')}
       </Button>
 
       {analysis && (

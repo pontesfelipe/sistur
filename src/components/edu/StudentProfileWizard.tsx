@@ -248,7 +248,7 @@ export function StudentProfileWizard({ onComplete, onCancel }: StudentProfileWiz
 
             <div>
               <Label htmlFor="job_role" className="text-base font-medium">
-                Cargo/Função (opcional)
+                {tx("Cargo/Função (opcional)")}
               </Label>
               <Input
                 id="job_role"

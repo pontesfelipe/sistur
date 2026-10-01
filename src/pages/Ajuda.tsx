@@ -140,7 +140,7 @@ export default function Ajuda() {
                                 {detail && (
                                   <Badge variant="outline" className="text-[10px] flex items-center gap-0.5">
                                     <Clock className="h-2.5 w-2.5" />
-                                    {detail.estimatedMinutes}min
+                                    {tx("{{v0}}min", { v0: detail.estimatedMinutes })}
                                   </Badge>
                                 )}
                                 {done && <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />}
@@ -153,7 +153,7 @@ export default function Ajuda() {
                             </CardDescription>
                             {detail && (
                               <p className="text-[10px] text-muted-foreground mt-1">
-                                {detail.subSteps.length} passos detalhados
+                                {tx("{{v0}} passos detalhados", { v0: detail.subSteps.length })}
                               </p>
                             )}
                             <div className="flex items-center gap-2 mt-3">

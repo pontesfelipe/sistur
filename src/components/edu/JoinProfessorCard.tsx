@@ -51,7 +51,7 @@ export function JoinProfessorCard() {
               <CheckCircle2 className="h-3 w-3" /> {tx("Vinculado")}
             </Badge>
             <span className="text-sm text-muted-foreground">
-              {myLink.professor_name ? `Professor: ${myLink.professor_name}` : 'Você já está vinculado a um professor.'}
+              {myLink.professor_name ? `Professor: ${myLink.professor_name}` : tx('Você já está vinculado a um professor.')}
             </span>
           </div>
         ) : (

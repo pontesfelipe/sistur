@@ -236,7 +236,7 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
         <DialogTrigger asChild>
           <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
             <Plus className="h-3 w-3" />
-            {contextCount === 0 ? 'Adicionar contexto' : 'Editar contexto'}
+            {contextCount === 0 ? tx('Adicionar contexto') : tx('Editar contexto')}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-lg max-h-[80vh]">
@@ -291,7 +291,7 @@ export function BeniContextSelector({ context, onContextChange }: BeniContextSel
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs text-muted-foreground truncate">{destName}</span>
                             <Badge variant="secondary" className={cn("text-[10px] h-4", statusColor(a.status))}>
-                              {a.status === 'CALCULATED' ? 'Calculado' : 'Dados prontos'}
+                              {a.status === 'CALCULATED' ? 'Calculado' : tx('Dados prontos')}
                             </Badge>
                             {a.diagnostic_type && (
                               <Badge variant="outline" className="text-[10px] h-4">

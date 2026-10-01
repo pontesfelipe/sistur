@@ -113,7 +113,7 @@ export default function EduHistoricoEscolar() {
                           <TableCell className="max-w-xs">
                             <div className="font-medium truncate" title={r.course_title}>{r.course_title}</div>
                             {r.curriculum_level && (
-                              <span className="text-xs text-muted-foreground">Nível {r.curriculum_level}</span>
+                              <span className="text-xs text-muted-foreground">{tx("Nível {{v0}}", { v0: r.curriculum_level })}</span>
                             )}
                           </TableCell>
                           <TableCell>

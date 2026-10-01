@@ -73,7 +73,7 @@ export function PricingPositioningSearch({ businessName, location, onAutoFill, o
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Analisar Posicionamento de Preço'}
+        {loading ? 'Analisando...' : tx('Analisar Posicionamento de Preço')}
       </Button>
 
       {analysis && (
@@ -82,14 +82,14 @@ export function PricingPositioningSearch({ businessName, location, onAutoFill, o
 
           <div className="grid grid-cols-3 gap-3">
             <div className="p-3 rounded-lg border bg-emerald-500/5">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><DollarSign className="h-3 w-3" /> Sua diária (média)</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><DollarSign className="h-3 w-3" /> {tx("Sua diária (média)")}</div>
               <div className="text-lg font-bold">{analysis.own_property.avg != null ? `R$ ${analysis.own_property.avg.toFixed(2)}` : '—'}</div>
-              <div className="text-[10px] text-muted-foreground">{analysis.own_property.count} amostras</div>
+              <div className="text-[10px] text-muted-foreground">{tx("{{v0}} amostras", { v0: analysis.own_property.count })}</div>
             </div>
             <div className="p-3 rounded-lg border bg-blue-500/5">
-              <div className="text-xs text-muted-foreground mb-1">Mercado (média)</div>
+              <div className="text-xs text-muted-foreground mb-1">{tx("Mercado (média)")}</div>
               <div className="text-lg font-bold">{analysis.market_reference.avg != null ? `R$ ${analysis.market_reference.avg.toFixed(2)}` : '—'}</div>
-              <div className="text-[10px] text-muted-foreground">{analysis.market_reference.count} amostras</div>
+              <div className="text-[10px] text-muted-foreground">{tx("{{v0}} amostras", { v0: analysis.market_reference.count })}</div>
             </div>
             <div className="p-3 rounded-lg border bg-purple-500/5">
               <div className="text-xs text-muted-foreground mb-1">Índice (100 = paridade)</div>

@@ -152,15 +152,15 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
 
           <div className="space-y-2">
             <Label htmlFor="title">
-              {feedbackType === 'feature' ? 'Título da sugestão' : 'Título do bug'}
+              {feedbackType === 'feature' ? tx('Título da sugestão') : tx('Título do bug')}
             </Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={feedbackType === 'feature' 
-                ? 'Ex: Adicionar exportação para Excel' 
-                : 'Ex: Erro ao salvar diagnóstico'
+                ? tx('Ex: Adicionar exportação para Excel') 
+                : tx('Ex: Erro ao salvar diagnóstico')
               }
               required
             />
@@ -173,8 +173,8 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={feedbackType === 'feature'
-                ? 'Descreva a funcionalidade que gostaria de ver no sistema...'
-                : 'Descreva o que aconteceu, os passos para reproduzir o erro e o que era esperado...'
+                ? tx('Descreva a funcionalidade que gostaria de ver no sistema...')
+                : tx('Descreva o que aconteceu, os passos para reproduzir o erro e o que era esperado...')
               }
               rows={4}
               required

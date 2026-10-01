@@ -454,7 +454,7 @@ const AdminEdu = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="duration">Duração (minutos)</Label>
+                      <Label htmlFor="duration">{tx("Duração (minutos)")}</Label>
                       <Input 
                         id="duration" 
                         type="number"
@@ -760,7 +760,7 @@ const AdminEdu = () => {
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Eventos (30 dias)</CardTitle>
+                <CardTitle className="text-sm font-medium">{tx("Eventos (30 dias)")}</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>

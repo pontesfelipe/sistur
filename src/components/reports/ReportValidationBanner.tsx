@@ -457,20 +457,13 @@ export function ReportValidationBanner({
                 </p>
                 <ul className="list-disc pl-5 space-y-1 text-xs text-muted-foreground">
                   <li>
-                    <span className="font-medium text-foreground">{tx('Auto-correção numérica determinística')}</span> —
-                    cada valor citado na narrativa é comparado, indicador a indicador, com a tabela
-                    oficial de auditoria do diagnóstico (fontes IBGE, CADASTUR, STN, DATASUS, INEP e
-                    derivados).
+                    <span className="font-medium text-foreground">{tx('Auto-correção numérica determinística')}</span> {tx("— cada valor citado na narrativa é comparado, indicador a indicador, com a tabela oficial de auditoria do diagnóstico (fontes IBGE, CADASTUR, STN, DATASUS, INEP e derivados).")}
                   </li>
                   <li>
-                    <span className="font-medium text-foreground">{tx('Motor de coerência')}</span> —
-                    verifica contradições internas, status (Adequado/Atenção/Crítico) coerentes com
-                    os percentuais e citações dentro das faixas permitidas.
+                    <span className="font-medium text-foreground">{tx('Motor de coerência')}</span> {tx("— verifica contradições internas, status (Adequado/Atenção/Crítico) coerentes com os percentuais e citações dentro das faixas permitidas.")}
                   </li>
                   <li>
-                    <span className="font-medium text-foreground">{tx('Agente IA validador')}</span> —
-                    cruza o texto com a bibliografia canônica (Beni, IGMA, PNT, ODS) e sinaliza
-                    afirmações sem respaldo nas fontes anexadas.
+                    <span className="font-medium text-foreground">{tx('Agente IA validador')}</span> {tx("— cruza o texto com a bibliografia canônica (Beni, IGMA, PNT, ODS) e sinaliza afirmações sem respaldo nas fontes anexadas.")}
                   </li>
                 </ul>
                 <div className="flex flex-wrap gap-2 pt-1">
@@ -480,7 +473,7 @@ export function ReportValidationBanner({
                   </Badge>
                   <Badge variant={issuesCount > 0 ? 'destructive' : 'secondary'} className="gap-1">
                     <Eye className="h-3 w-3" />
-                    {issuesCount} para revisão manual
+                    {tx("{{v0}} para revisão manual", { v0: issuesCount })}
                   </Badge>
                 </div>
               </section>
@@ -489,18 +482,14 @@ export function ReportValidationBanner({
               {correctionsCount > 0 && (
                 <section>
                   <h4 className="text-sm font-semibold mb-1">
-                    Divergências corrigidas automaticamente ({correctionsCount})
+                    {tx("Divergências corrigidas automaticamente ({{v0}})", { v0: correctionsCount })}
                   </h4>
                   <p className="text-xs text-muted-foreground mb-2">
                     <span className="font-medium text-foreground">{tx('Resolução:')}</span> {tx("o valor já foi substituído pelo número oficial da tabela de auditoria antes do relatório ser salvo. Nenhuma ação adicional é necessária — o documento já está consistente.")}
                   </p>
                   <p className="text-xs text-muted-foreground mb-2">
                     <span className="font-medium text-foreground">{tx("O que é a \"tabela oficial\":")}</span>{' '}
-                    é a tabela de auditoria do diagnóstico (<code>{tx("indicator_values")}</code>) — onde
-                    ficam os valores numéricos confirmados por você ou importados das fontes
-                    oficiais (IBGE, CADASTUR, STN, DATASUS, INEP etc.). Quando a IA cita um número
-                    diferente do que está nessa tabela, o sistema substitui pelo valor oficial
-                    automaticamente.
+                    é a tabela de auditoria do diagnóstico (<code>{tx("indicator_values")}</code>{tx(") — onde ficam os valores numéricos confirmados por você ou importados das fontes oficiais (IBGE, CADASTUR, STN, DATASUS, INEP etc.). Quando a IA cita um número diferente do que está nessa tabela, o sistema substitui pelo valor oficial automaticamente.")}
                   </p>
                   <ul className="space-y-2 text-sm">
                     {corrections.map((c, idx) => {
@@ -529,7 +518,7 @@ export function ReportValidationBanner({
                               title={
                                 fix?.collected_at
                                   ? `Fixado em ${new Date(fix.collected_at).toLocaleString('pt-BR')}`
-                                  : 'Fixado na tabela de auditoria'
+                                  : tx('Fixado na tabela de auditoria')
                               }
                             >
                               <BadgeCheck className="h-3 w-3" />
@@ -596,7 +585,7 @@ export function ReportValidationBanner({
               {determIssues.length > 0 && (
                 <section>
                   <h4 className="text-sm font-semibold mb-1">
-                    Avisos determinísticos ({determIssues.length})
+                    {tx("Avisos determinísticos ({{v0}})", { v0: determIssues.length })}
                   </h4>
                   <p className="text-xs text-muted-foreground mb-2">
                     <span className="font-medium text-foreground">{tx('Resolução:')}</span> {tx("o motor de coerência identificou estes pontos mas não tinha um valor oficial a substituir. Revisão humana recomendada antes de publicar.")}
@@ -614,7 +603,7 @@ export function ReportValidationBanner({
               {aiIssues.length > 0 && (
                 <section>
                   <h4 className="text-sm font-semibold mb-1">
-                    Pontos sinalizados pelo agente IA validador ({aiIssues.length})
+                    {tx("Pontos sinalizados pelo agente IA validador ({{v0}})", { v0: aiIssues.length })}
                   </h4>
                   <p className="text-xs text-muted-foreground mb-2">
                     <span className="font-medium text-foreground">{tx('Resolução:')}</span> {tx("o agente identificou afirmações que não encontrou respaldo direto na bibliografia ou na tabela de auditoria. Confirme ou ajuste manualmente antes de publicar — pode ser tanto um falso positivo quanto uma fragilidade real do texto.")}
@@ -645,8 +634,7 @@ export function ReportValidationBanner({
           <DialogHeader>
             <DialogTitle>{tx('Editar conteúdo do relatório')}</DialogTitle>
             <DialogDescription>
-              Ajuste o texto manualmente. A alteração é salva no relatório atual e refletida em
-              exportações (DOCX/PDF/cópia). O histórico de quem editou fica registrado.
+              {tx("Ajuste o texto manualmente. A alteração é salva no relatório atual e refletida em exportações (DOCX/PDF/cópia). O histórico de quem editou fica registrado.")}
             </DialogDescription>
           </DialogHeader>
           <Textarea
@@ -802,7 +790,7 @@ function IndicatorFixDialog({
               <Input id="vraw" value={valueRaw} onChange={(e) => setValueRaw(e.target.value)} placeholder={tx('ex.: 42.5')} />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="vtext" className="text-xs">Valor textual (opcional)</Label>
+              <Label htmlFor="vtext" className="text-xs">{tx("Valor textual (opcional)")}</Label>
               <Input id="vtext" value={valueText} onChange={(e) => setValueText(e.target.value)} />
             </div>
             <div className="space-y-1">

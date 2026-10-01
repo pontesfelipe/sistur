@@ -102,14 +102,14 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [], indicator
             {tx('Procedência dos Dados')}
           </span>
           <Badge variant={analysis.coveragePct >= 60 ? 'default' : 'secondary'}>
-            Cobertura automática: {analysis.coveragePct}%
+            {tx("Cobertura automática: {{v0}}%", { v0: analysis.coveragePct })}
           </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="text-muted-foreground">{analysis.automated} de {analysis.total} indicadores via fontes oficiais ou derivados</span>
+            <span className="text-muted-foreground">{tx("{{v0}} de {{v1}} indicadores via fontes oficiais ou derivados", { v0: analysis.automated, v1: analysis.total })}</span>
           </div>
           <Progress value={analysis.coveragePct} className="h-2" />
         </div>
@@ -145,7 +145,7 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [], indicator
           <div className="rounded-lg border p-3 bg-muted/30">
             <p className="text-xs font-medium mb-2 flex items-center gap-1">
               <CheckCircle2 className="h-3.5 w-3.5 text-blue-600" />
-              Indicadores calculados ({analysis.derived.length})
+              {tx("Indicadores calculados ({{v0}})", { v0: analysis.derived.length })}
             </p>
             <div className="space-y-1">
               {analysis.derived.slice(0, 8).map((v: any, i: number) => (
@@ -169,7 +169,7 @@ export function DataProvenancePanel({ indicatorValues, auditRows = [], indicator
           <div className="rounded-lg border p-3 bg-muted/30">
             <p className="text-xs font-medium mb-1 flex items-center gap-1">
               <PenLine className="h-3.5 w-3.5 text-amber-600" />
-              Indicadores manuais ({analysis.manual.length})
+              {tx("Indicadores manuais ({{v0}})", { v0: analysis.manual.length })}
             </p>
             <p className="text-[11px] text-muted-foreground">
               {tx('Sem fonte automática disponível — atualize periodicamente para manter a confiabilidade.')}

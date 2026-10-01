@@ -212,7 +212,7 @@ export function IndicadoresTable({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{indicator.name}</DialogTitle>
-          <DialogDescription>Código: {indicator.code}</DialogDescription>
+          <DialogDescription>{tx("Código: {{v0}}", { v0: indicator.code })}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           {isIGMA && (
@@ -276,7 +276,7 @@ export function IndicadoresTable({
               </p>
               {INDICATOR_GUIDANCE[indicator.code].examples && (
                 <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1 italic">
-                  Exemplo: {INDICATOR_GUIDANCE[indicator.code].examples}
+                  {tx("Exemplo: {{v0}}", { v0: INDICATOR_GUIDANCE[indicator.code].examples })}
                 </p>
               )}
               {INDICATOR_GUIDANCE[indicator.code].validation && (
@@ -660,10 +660,10 @@ export function IndicadoresTable({
                   <Tooltip>
                     <TooltipTrigger className="cursor-help">{tx('Confiab.')}</TooltipTrigger>
                     <TooltipContent>
-                      Confiabilidade da fonte (1-5):<br/>
-                      5★ Automático (API oficial)<br/>
-                      4★ Calculado (derivado oficial)<br/>
-                      3★ Manual (entrada do usuário)<br/>
+                      {tx("Confiabilidade da fonte (1-5):")}<br/>
+                      {tx("5★ Automático (API oficial)")}<br/>
+                      {tx("4★ Calculado (derivado oficial)")}<br/>
+                      {tx("3★ Manual (entrada do usuário)")}<br/>
                       {tx('2★ Estimado')}
                     </TooltipContent>
                   </Tooltip>
@@ -855,8 +855,8 @@ export function IndicadoresTable({
           </h3>
           <p className="mt-2 text-muted-foreground">
             {indicators.length === 0
-              ? 'Comece cadastrando seu primeiro indicador.'
-              : 'Tente ajustar os filtros de busca.'}
+              ? tx('Comece cadastrando seu primeiro indicador.')
+              : tx('Tente ajustar os filtros de busca.')}
           </p>
           {indicators.length === 0 && (
             <Button className="mt-4">

@@ -258,7 +258,7 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
       onApplied?.();
     } catch (err: any) {
       console.error('PMS CSV import failed:', err);
-      toast.error(tx('Falha ao importar CSV'), { description: err?.message ?? 'Tente novamente.' });
+      toast.error(tx('Falha ao importar CSV'), { description: err?.message ?? tx('Tente novamente.') });
     } finally {
       setBusy(false);
     }
@@ -271,11 +271,10 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
           <div>
             <CardTitle className="flex items-center gap-2">
               <FileSpreadsheet className="h-5 w-5" />
-              Importar dados operacionais (PMS / CSV)
+              {tx("Importar dados operacionais (PMS / CSV)")}
             </CardTitle>
             <CardDescription>
-              Opcional. Suba uma planilha exportada do seu PMS (Opera, Cloudbeds, Stays) ou um CSV genérico
-              com as métricas mensais. Aceita UTF-8/Latin1, vírgula decimal e separador <code>;</code> ou <code>,</code>.
+              {tx("Opcional. Suba uma planilha exportada do seu PMS (Opera, Cloudbeds, Stays) ou um CSV genérico com as métricas mensais. Aceita UTF-8/Latin1, vírgula decimal e separador")} <code>;</code> ou <code>,</code>.
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={downloadTemplate}>
@@ -294,7 +293,7 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
         >
           <CloudUpload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
           <p className="text-sm font-medium">
-            {fileName ?? 'Arraste o CSV aqui ou clique para selecionar'}
+            {fileName ?? tx('Arraste o CSV aqui ou clique para selecionar')}
           </p>
           <p className="text-xs text-muted-foreground mt-1">{tx("Máx. 1 arquivo .csv")}</p>
           <input
@@ -317,12 +316,12 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
                 className="cursor-pointer"
                 onClick={() => setSource(s)}
               >
-                {s === 'csv_generic' ? 'CSV genérico' : s.charAt(0).toUpperCase() + s.slice(1)}
+                {s === 'csv_generic' ? tx('CSV genérico') : s.charAt(0).toUpperCase() + s.slice(1)}
               </Badge>
             ))}
             {period.start && period.end && (
               <span className="ml-auto text-muted-foreground">
-                Período: {period.start} → {period.end} · {rows.length} linha(s)
+                {tx("Período: {{v0}} → {{v1}} · {{v2}} linha(s)", { v0: period.start, v1: period.end, v2: rows.length })}
               </span>
             )}
           </div>
@@ -371,7 +370,7 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              {totalOob} valor(es) fora do intervalo permitido foram ignorados. Verifique a coluna correspondente no CSV.
+              {tx("{{v0}} valor(es) fora do intervalo permitido foram ignorados. Verifique a coluna correspondente no CSV.", { v0: totalOob })}
             </AlertDescription>
           </Alert>
         )}
@@ -380,7 +379,7 @@ export function PmsCsvImportPanel({ assessmentId, onApplied }: Props) {
         {rows.length > 0 && (
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="text-sm text-muted-foreground">
-              {validMetricCount} de {METRIC_SPECS.length} métricas com média calculada.
+              {tx("{{v0}} de {{v1}} métricas com média calculada.", { v0: validMetricCount, v1: METRIC_SPECS.length })}
             </div>
             <Button onClick={applyImport} disabled={busy || validMetricCount === 0 || done}>
               {busy ? (

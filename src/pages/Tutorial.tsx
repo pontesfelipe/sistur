@@ -70,7 +70,7 @@ export default function Tutorial() {
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="outline" className="text-sm px-3 py-1">
-              {doneSteps}/{totalSteps} concluídos ({progressPct}%)
+              {tx("{{v0}}/{{v1}} concluídos ({{v2}}%)", { v0: doneSteps, v1: totalSteps, v2: progressPct })}
             </Badge>
             <Badge className="bg-primary/10 text-primary border-primary/20">
               {ROLE_LABELS[viewRole]}
@@ -133,7 +133,7 @@ export default function Tutorial() {
                             {detail && (
                               <Badge variant="outline" className="text-[10px] flex items-center gap-0.5">
                                 <Clock className="h-2.5 w-2.5" />
-                                {detail.estimatedMinutes}min
+                                {tx("{{v0}}min", { v0: detail.estimatedMinutes })}
                               </Badge>
                             )}
                             {done && <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />}
@@ -146,7 +146,7 @@ export default function Tutorial() {
                         </CardDescription>
                         {detail && (
                           <p className="text-[10px] text-muted-foreground mt-1">
-                            {detail.subSteps.length} passos detalhados
+                            {tx("{{v0}} passos detalhados", { v0: detail.subSteps.length })}
                           </p>
                         )}
                         <div className="flex items-center gap-2 mt-3">

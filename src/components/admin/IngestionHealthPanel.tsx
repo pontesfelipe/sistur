@@ -141,7 +141,7 @@ export function IngestionHealthPanel() {
         <div>
           <h3 className="text-base font-semibold">{tx("Saúde das Ingestões Oficiais")}</h3>
           <p className="text-xs text-muted-foreground">
-            Monitoramento e teste manual das funções automáticas (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo).
+            {tx("Monitoramento e teste manual das funções automáticas (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo).")}
           </p>
         </div>
         <Button
@@ -162,7 +162,7 @@ export function IngestionHealthPanel() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <CalendarClock className="h-4 w-4" />
-              Tabela de Referência MTur (gastos turísticos por UF)
+              {tx("Tabela de Referência MTur (gastos turísticos por UF)")}
             </CardTitle>
             <CardDescription>
               {tx("Lembrete anual: o MTur publica novas médias de gasto e permanência todo ano.")}
@@ -200,7 +200,7 @@ export function IngestionHealthPanel() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{tx("Status atual por função")}</CardTitle>
-          <CardDescription>Teste manual (smoke test) registra a execução no histórico abaixo.</CardDescription>
+          <CardDescription>{tx("Teste manual (smoke test) registra a execução no histórico abaixo.")}</CardDescription>
         </CardHeader>
         <CardContent>
           {healthQuery.isLoading ? (
@@ -256,7 +256,7 @@ export function IngestionHealthPanel() {
                       onClick={() => triggerMut.mutate(row.function_name)}
                     >
                       <PlayCircle className="h-4 w-4 mr-2" />
-                      {triggering === row.function_name ? 'Executando...' : 'Smoke test'}
+                      {triggering === row.function_name ? 'Executando...' : tx('Smoke test')}
                     </Button>
                   </div>
                 );
@@ -269,7 +269,7 @@ export function IngestionHealthPanel() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{tx("Últimas 50 execuções")}</CardTitle>
-          <CardDescription>Histórico unificado (cron + manual + admin).</CardDescription>
+          <CardDescription>{tx("Histórico unificado (cron + manual + admin).")}</CardDescription>
         </CardHeader>
         <CardContent>
           {runsQuery.isLoading ? (

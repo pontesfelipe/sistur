@@ -49,7 +49,7 @@ export default function EduRecompensas() {
                   </Button>
                 )
               ) : (
-                <Badge variant="secondary" className="gap-1"><Lock className="w-3 h-3" /> Nível {r.unlock_level}</Badge>
+                <Badge variant="secondary" className="gap-1"><Lock className="w-3 h-3" /> {tx("Nível {{v0}}", { v0: r.unlock_level })}</Badge>
               )}
             </CardContent>
           </Card>

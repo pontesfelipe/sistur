@@ -52,11 +52,11 @@ export function DestinationContextSearch({ destinationId, onAutoFill, onAnalysis
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          Puxa automaticamente conectividade aérea (ANAC), cobertura de telecom (ANATEL), eventos do destino, Mapa do Turismo e indicadores socioeconômicos do município.
+          {tx("Puxa automaticamente conectividade aérea (ANAC), cobertura de telecom (ANATEL), eventos do destino, Mapa do Turismo e indicadores socioeconômicos do município.")}
         </p>
         <Button onClick={run} disabled={loading} size="sm">
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-          {loading ? 'Carregando...' : 'Carregar Contexto'}
+          {loading ? 'Carregando...' : tx('Carregar Contexto')}
         </Button>
       </div>
 

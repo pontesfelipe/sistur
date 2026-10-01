@@ -196,7 +196,7 @@ export function ImportReviewQueue() {
               )}
               {lastResult.channelId && (
                 <span className="text-muted-foreground">
-                  Canal: {lastResult.channelId}
+                  {tx("Canal: {{v0}}", { v0: lastResult.channelId })}
                 </span>
               )}
             </div>
@@ -211,14 +211,14 @@ export function ImportReviewQueue() {
             <div>
               <CardTitle>{tx('Fila de Revisão')}</CardTitle>
               <CardDescription>
-                {filteredTrainings.length} treinamentos importados aguardando revisão
+                {tx("{{v0}} treinamentos importados aguardando revisão", { v0: filteredTrainings.length })}
               </CardDescription>
             </div>
             
             {selectedIds.size > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {selectedIds.size} selecionados
+                  {tx("{{v0}} selecionados", { v0: selectedIds.size })}
                 </span>
                 <Select onValueChange={(v) => handleBatchUpdatePillar(v as 'RA' | 'AO' | 'OE')}>
                   <SelectTrigger className="w-32">
@@ -361,7 +361,7 @@ export function ImportReviewQueue() {
                       ) : training.duration_minutes ? (
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
                           <Clock className="h-3 w-3" />
-                          {training.duration_minutes}min
+                          {tx("{{v0}}min", { v0: training.duration_minutes })}
                         </div>
                       ) : (
                         <span className="text-xs text-muted-foreground">-</span>

@@ -239,7 +239,7 @@ export default function Configuracoes() {
                   {tx("Versão do Sistema")}
                 </CardTitle>
                 <CardDescription>
-                  Controle de versão semântico (MAJOR.MINOR.PATCH)
+                  {tx("Controle de versão semântico (MAJOR.MINOR.PATCH)")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -520,9 +520,9 @@ export default function Configuracoes() {
                   <div className="p-4 bg-muted/30 rounded-lg">
                     <p className="font-semibold text-foreground mb-2">{tx("Estrutura de Pilares")}</p>
                     <ul className="space-y-1 text-sm">
-                      <li>• <strong className="text-pillar-ra">{tx("RA:")}</strong> Relações Ambientais (sustentabilidade)</li>
-                      <li>• <strong className="text-pillar-oe">{tx("OE:")}</strong> Organização Estrutural (infraestrutura)</li>
-                      <li>• <strong className="text-pillar-ao">{tx("AO:")}</strong> Ações Operacionais (execução)</li>
+                      <li>• <strong className="text-pillar-ra">{tx("RA:")}</strong> {tx("Relações Ambientais (sustentabilidade)")}</li>
+                      <li>• <strong className="text-pillar-oe">{tx("OE:")}</strong> {tx("Organização Estrutural (infraestrutura)")}</li>
+                      <li>• <strong className="text-pillar-ao">{tx("AO:")}</strong> {tx("Ações Operacionais (execução)")}</li>
                       <li>{tx("• 41 indicadores distribuídos entre os 3 pilares")}</li>
                     </ul>
                   </div>
@@ -532,7 +532,7 @@ export default function Configuracoes() {
                   <p className="font-semibold text-foreground mb-2">{tx("Prescrições vs. Relatórios")}</p>
                   <div className="grid gap-3 md:grid-cols-2 text-sm">
                     <div>
-                      <p className="font-medium text-foreground">SISTUR EDU (Prescrições)</p>
+                      <p className="font-medium text-foreground">{tx("SISTUR EDU (Prescrições)")}</p>
                       <p>{tx("100% determinísticas, baseadas em regras. Cada capacitação é prescrita quando Indicador + Pilar + Status atendem critérios específicos. Sem IA.")}</p>
                     </div>
                     <div>

@@ -31,11 +31,11 @@ export default function PublicDestinations() {
           <div className="flex gap-4">
             <Badge variant="secondary" className="py-1.5 px-3">
               <CheckCircle className="w-4 h-4 mr-1" />
-              {readyCount} destinos prontos
+              {tx("{{v0}} destinos prontos", { v0: readyCount })}
             </Badge>
             <Badge variant="secondary" className="py-1.5 px-3">
               <Award className="w-4 h-4 mr-1" />
-              {certifiedCount} certificados
+              {tx("{{v0}} certificados", { v0: certifiedCount })}
             </Badge>
           </div>
         </div>
@@ -48,9 +48,7 @@ export default function PublicDestinations() {
               <div className="text-sm text-muted-foreground">
                 <p className="font-medium text-foreground mb-1">{tx("Metodologia SISTUR")}</p>
                 <p>
-                  Os destinos listados foram avaliados segundo os princípios sistêmicos de Mario Carlos Beni,
-                  priorizando sustentabilidade ambiental (RA), governança responsável (AO) e infraestrutura
-                  adequada (OE). Apenas destinos sem limitações críticas são exibidos publicamente.
+                  {tx("Os destinos listados foram avaliados segundo os princípios sistêmicos de Mario Carlos Beni, priorizando sustentabilidade ambiental (RA), governança responsável (AO) e infraestrutura adequada (OE). Apenas destinos sem limitações críticas são exibidos publicamente.")}
                 </p>
               </div>
             </div>

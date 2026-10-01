@@ -62,7 +62,7 @@ export function BrandStrengthSearch({ businessName, location, onAutoFill, onAnal
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Analisando...' : 'Analisar Força da Marca'}
+        {loading ? 'Analisando...' : tx('Analisar Força da Marca')}
       </Button>
 
       {analysis && (
