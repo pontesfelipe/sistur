@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -130,7 +131,7 @@ export function TrainingMaterialsManager({
 
       onMaterialsChange(newMaterials);
     } catch (error) {
-      toast.error('Erro ao enviar arquivos');
+      toast.error(tx("Erro ao enviar arquivos"));
       console.error('Upload error:', error);
     } finally {
       setIsUploading(false);
@@ -153,9 +154,9 @@ export function TrainingMaterialsManager({
 
       const updatedMaterials = materials.filter(m => m.id !== material.id);
       onMaterialsChange(updatedMaterials);
-      toast.success('Material removido!');
+      toast.success(tx("Material removido!"));
     } catch (error) {
-      toast.error('Erro ao remover material');
+      toast.error(tx("Erro ao remover material"));
       console.error('Delete error:', error);
     } finally {
       setDeletingMaterial(null);
@@ -172,10 +173,10 @@ export function TrainingMaterialsManager({
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            Materiais de Apoio
+            {tx("Materiais de Apoio")}
           </CardTitle>
           <CardDescription>
-            Adicione PDFs, planilhas, apresentações e outros documentos de suporte
+            {tx("Adicione PDFs, planilhas, apresentações e outros documentos de suporte")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -193,13 +194,13 @@ export function TrainingMaterialsManager({
               {isUploading ? (
                 <>
                   <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                  <p className="text-sm text-muted-foreground">Enviando arquivos...</p>
+                  <p className="text-sm text-muted-foreground">{tx("Enviando arquivos...")}</p>
                 </>
               ) : (
                 <>
                   <Upload className="h-8 w-8 text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">
-                    Arraste arquivos aqui ou clique para selecionar
+                    {tx("Arraste arquivos aqui ou clique para selecionar")}
                   </p>
                   <Button 
                     type="button"
@@ -208,7 +209,7 @@ export function TrainingMaterialsManager({
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    Adicionar Material
+                    {tx("Adicionar Material")}
                   </Button>
                   <p className="text-xs text-muted-foreground mt-1">
                     PDF, Word, Excel, PowerPoint, imagens (máx. 50MB)
@@ -248,7 +249,7 @@ export function TrainingMaterialsManager({
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDownload(material)}
-                        title="Baixar"
+                        title={tx("Baixar")}
                       >
                         <Download className="h-4 w-4" />
                       </Button>
@@ -257,7 +258,7 @@ export function TrainingMaterialsManager({
                         variant="ghost"
                         size="icon"
                         onClick={() => setDeletingMaterial(material)}
-                        title="Remover"
+                        title={tx("Remover")}
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -270,7 +271,7 @@ export function TrainingMaterialsManager({
           ) : (
             <div className="text-center py-4 text-muted-foreground text-sm">
               <AlertCircle className="h-6 w-6 mx-auto mb-2 opacity-50" />
-              Nenhum material anexado ainda
+              {tx("Nenhum material anexado ainda")}
             </div>
           )}
         </CardContent>
@@ -280,18 +281,18 @@ export function TrainingMaterialsManager({
       <AlertDialog open={!!deletingMaterial} onOpenChange={() => setDeletingMaterial(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover material?</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Remover material?")}</AlertDialogTitle>
             <AlertDialogDescription>
               O arquivo "{deletingMaterial?.name}" será removido permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deletingMaterial && handleDeleteMaterial(deletingMaterial)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Remover
+              {tx("Remover")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

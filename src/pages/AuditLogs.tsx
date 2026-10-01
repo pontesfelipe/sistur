@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -95,16 +96,16 @@ const AuditLogs = () => {
 
   const getActionBadge = (action: string) => {
     if (action.includes('create') || action.includes('insert')) {
-      return <Badge className="bg-green-500/20 text-green-700">Criar</Badge>;
+      return <Badge className="bg-green-500/20 text-green-700">{tx("Criar")}</Badge>;
     }
     if (action.includes('update') || action.includes('edit')) {
-      return <Badge className="bg-blue-500/20 text-blue-700">Editar</Badge>;
+      return <Badge className="bg-blue-500/20 text-blue-700">{tx("Editar")}</Badge>;
     }
     if (action.includes('delete') || action.includes('remove')) {
-      return <Badge variant="destructive">Excluir</Badge>;
+      return <Badge variant="destructive">{tx("Excluir")}</Badge>;
     }
     if (action.includes('view') || action.includes('read')) {
-      return <Badge variant="secondary">Visualizar</Badge>;
+      return <Badge variant="secondary">{tx("Visualizar")}</Badge>;
     }
     return <Badge variant="outline">{action}</Badge>;
   };
@@ -133,8 +134,8 @@ const AuditLogs = () => {
 
   return (
     <AppLayout 
-      title="Logs de Auditoria" 
-      subtitle="Monitoramento de atividades do sistema LMS"
+      title={tx("Logs de Auditoria")} 
+      subtitle={tx("Monitoramento de atividades do sistema LMS")}
     >
       <div className="space-y-6">
         {/* Stats */}
@@ -144,7 +145,7 @@ const AuditLogs = () => {
               <CardTitle className="text-2xl font-bold">{stats.total}</CardTitle>
               <CardDescription className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
-                Total de Logs
+                {tx("Total de Logs")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -153,7 +154,7 @@ const AuditLogs = () => {
               <CardTitle className="text-2xl font-bold text-primary">{stats.today}</CardTitle>
               <CardDescription className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
-                Hoje
+                {tx("Hoje")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -162,7 +163,7 @@ const AuditLogs = () => {
               <CardTitle className="text-2xl font-bold text-green-600">{stats.actions.create}</CardTitle>
               <CardDescription className="flex items-center gap-1">
                 <Plus className="h-4 w-4" />
-                Criações
+                {tx("Criações")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -171,7 +172,7 @@ const AuditLogs = () => {
               <CardTitle className="text-2xl font-bold text-blue-600">{stats.actions.update}</CardTitle>
               <CardDescription className="flex items-center gap-1">
                 <Edit className="h-4 w-4" />
-                Edições
+                {tx("Edições")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -180,7 +181,7 @@ const AuditLogs = () => {
               <CardTitle className="text-2xl font-bold text-red-600">{stats.actions.delete}</CardTitle>
               <CardDescription className="flex items-center gap-1">
                 <Trash2 className="h-4 w-4" />
-                Exclusões
+                {tx("Exclusões")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -192,7 +193,7 @@ const AuditLogs = () => {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar logs..."
+                placeholder={tx("Buscar logs...")}
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -201,36 +202,36 @@ const AuditLogs = () => {
             <Select value={actionFilter} onValueChange={setActionFilter}>
               <SelectTrigger className="w-36">
                 <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Ação" />
+                <SelectValue placeholder={tx("Ação")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="create">Criação</SelectItem>
-                <SelectItem value="update">Edição</SelectItem>
-                <SelectItem value="delete">Exclusão</SelectItem>
-                <SelectItem value="view">Visualização</SelectItem>
+                <SelectItem value="all">{tx("Todas")}</SelectItem>
+                <SelectItem value="create">{tx("Criação")}</SelectItem>
+                <SelectItem value="update">{tx("Edição")}</SelectItem>
+                <SelectItem value="delete">{tx("Exclusão")}</SelectItem>
+                <SelectItem value="view">{tx("Visualização")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => refetch()}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar
+              {tx("Atualizar")}
             </Button>
             <Button variant="outline" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
-              Exportar CSV
+              {tx("Exportar CSV")}
             </Button>
             <Button variant="outline" asChild>
               <Link to="/admin/report-logs">
                 <Sparkles className="h-4 w-4 mr-2" />
-                Logs do Gerador
+                {tx("Logs do Gerador")}
               </Link>
             </Button>
             <Button variant="outline" asChild>
               <Link to="/admin/semantica">
                 <Sparkles className="h-4 w-4 mr-2" />
-                Camada Semântica
+                {tx("Camada Semântica")}
               </Link>
             </Button>
           </div>
@@ -248,18 +249,18 @@ const AuditLogs = () => {
             ) : filteredLogs.length === 0 ? (
               <div className="p-12 text-center text-muted-foreground">
                 <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Nenhum log encontrado</p>
+                <p>{tx("Nenhum log encontrado")}</p>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-12"></TableHead>
-                    <TableHead>Ação</TableHead>
-                    <TableHead>Entidade</TableHead>
-                    <TableHead>Usuário</TableHead>
+                    <TableHead>{tx("Ação")}</TableHead>
+                    <TableHead>{tx("Entidade")}</TableHead>
+                    <TableHead>{tx("Usuário")}</TableHead>
                     <TableHead>IP</TableHead>
-                    <TableHead>Data/Hora</TableHead>
+                    <TableHead>{tx("Data/Hora")}</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -324,55 +325,55 @@ const AuditLogs = () => {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Detalhes do Log
+                {tx("Detalhes do Log")}
               </DialogTitle>
               <DialogDescription>
-                Informações completas do registro de auditoria
+                {tx("Informações completas do registro de auditoria")}
               </DialogDescription>
             </DialogHeader>
             {selectedLog && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-sm text-muted-foreground">ID do Log</span>
+                    <span className="text-sm text-muted-foreground">{tx("ID do Log")}</span>
                     <p className="font-mono">{selectedLog.log_id}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-muted-foreground">Ação</span>
+                    <span className="text-sm text-muted-foreground">{tx("Ação")}</span>
                     <p className="flex items-center gap-2">
                       {getActionIcon(selectedLog.action)}
                       {selectedLog.action}
                     </p>
                   </div>
                   <div>
-                    <span className="text-sm text-muted-foreground">Tipo de Entidade</span>
+                    <span className="text-sm text-muted-foreground">{tx("Tipo de Entidade")}</span>
                     <p>{selectedLog.entity_type || '-'}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-muted-foreground">ID da Entidade</span>
+                    <span className="text-sm text-muted-foreground">{tx("ID da Entidade")}</span>
                     <p className="font-mono">{selectedLog.entity_id || '-'}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-muted-foreground">Usuário</span>
+                    <span className="text-sm text-muted-foreground">{tx("Usuário")}</span>
                     <p className="font-mono">{selectedLog.user_id || 'Sistema'}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-muted-foreground">Endereço IP</span>
+                    <span className="text-sm text-muted-foreground">{tx("Endereço IP")}</span>
                     <p className="font-mono">{selectedLog.ip_address || '-'}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-muted-foreground">User Agent</span>
+                    <span className="text-sm text-muted-foreground">{tx("User Agent")}</span>
                     <p className="text-sm truncate">{selectedLog.user_agent || '-'}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-muted-foreground">Data/Hora</span>
+                    <span className="text-sm text-muted-foreground">{tx("Data/Hora")}</span>
                     <p>{format(new Date(selectedLog.created_at), "dd/MM/yyyy 'às' HH:mm:ss", { locale: getDateLocale() })}</p>
                   </div>
                 </div>
                 
                 {selectedLog.metadata && Object.keys(selectedLog.metadata as object).length > 0 && (
                   <div>
-                    <span className="text-sm text-muted-foreground">Detalhes Adicionais</span>
+                    <span className="text-sm text-muted-foreground">{tx("Detalhes Adicionais")}</span>
                     <pre className="mt-2 p-3 bg-muted rounded-lg text-xs overflow-auto max-h-48">
                       {JSON.stringify(selectedLog.metadata, null, 2)}
                     </pre>

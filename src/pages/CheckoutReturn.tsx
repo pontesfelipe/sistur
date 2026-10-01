@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -38,10 +39,10 @@ export default function CheckoutReturn() {
           </p>
           <div className="flex gap-2 justify-center">
             <Button asChild>
-              <Link to="/assinatura">Ver minha assinatura</Link>
+              <Link to="/assinatura">{tx("Ver minha assinatura")}</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/">Ir para o início</Link>
+              <Link to="/">{tx("Ir para o início")}</Link>
             </Button>
           </div>
         </CardContent>

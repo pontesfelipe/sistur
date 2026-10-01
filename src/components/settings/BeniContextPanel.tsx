@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,10 +36,10 @@ const DEFAULTS: Record<SectionKey, string> = {
 };
 
 const SECTION_META: Record<SectionKey, { title: string; description?: string; icon: any }> = {
-  persona: { title: 'Persona', icon: BookOpen },
-  output_format: { title: 'Formato de saída (TTS-friendly)', description: 'Respostas lidas em voz alta pelo ElevenLabs.', icon: Volume2 },
-  base_theory: { title: 'Base teórica injetada no contexto', icon: BookOpen },
-  dynamic_context: { title: 'Contexto dinâmico enviado a cada chamada', icon: Bot },
+  persona: { title: tx("Persona"), icon: BookOpen },
+  output_format: { title: 'Formato de saída (TTS-friendly)', description: tx("Respostas lidas em voz alta pelo ElevenLabs."), icon: Volume2 },
+  base_theory: { title: tx("Base teórica injetada no contexto"), icon: BookOpen },
+  dynamic_context: { title: tx("Contexto dinâmico enviado a cada chamada"), icon: Bot },
   scope_guardrails: { title: 'Escopo & Guardrails', icon: ShieldAlert },
 };
 
@@ -70,7 +71,7 @@ export function BeniContextPanel() {
         .maybeSingle();
       if (error) {
         console.error(error);
-        toast.error('Falha ao carregar configurações do Beni');
+        toast.error(tx("Falha ao carregar configurações do Beni"));
       }
       setSettings(
         data ?? {
@@ -105,7 +106,7 @@ export function BeniContextPanel() {
       return false;
     }
     setSettings((s) => (s ? { ...s, [key]: value } as BeniSettings : s));
-    toast.success('Configuração salva');
+    toast.success(tx("Configuração salva"));
     if (key !== 'model') setEditing(null);
     return true;
   };
@@ -113,7 +114,7 @@ export function BeniContextPanel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12 text-muted-foreground">
-        <Loader2 className="h-5 w-5 animate-spin mr-2" /> Carregando configurações…
+        <Loader2 className="h-5 w-5 animate-spin mr-2" /> {tx("Carregando configurações…")}
       </div>
     );
   }
@@ -134,7 +135,7 @@ export function BeniContextPanel() {
             {meta.description && <CardDescription>{meta.description}</CardDescription>}
           </div>
           {isAdmin && !isEditing && (
-            <Button size="icon" variant="ghost" onClick={() => startEdit(key)} title="Editar">
+            <Button size="icon" variant="ghost" onClick={() => startEdit(key)} title={tx("Editar")}>
               <Pencil className="h-4 w-4" />
             </Button>
           )}
@@ -150,7 +151,7 @@ export function BeniContextPanel() {
               />
               <div className="flex gap-2 justify-end">
                 <Button variant="ghost" size="sm" onClick={() => setEditing(null)} disabled={saving === key}>
-                  <X className="h-4 w-4 mr-1" /> Cancelar
+                  <X className="h-4 w-4 mr-1" /> {tx("Cancelar")}
                 </Button>
                 <Button size="sm" onClick={() => saveField(key, draft)} disabled={saving === key}>
                   {saving === key ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Save className="h-4 w-4 mr-1" />}
@@ -191,12 +192,12 @@ export function BeniContextPanel() {
         <CardHeader>
           <CardTitle className="text-base">Modelo & Infraestrutura</CardTitle>
           <CardDescription>
-            Escolha qual modelo de IA o Professor Beni usará para responder. A alteração entra em vigor na próxima mensagem.
+            {tx("Escolha qual modelo de IA o Professor Beni usará para responder. A alteração entra em vigor na próxima mensagem.")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Modelo de resposta</Label>
+            <Label>{tx("Modelo de resposta")}</Label>
             <Select
               value={settings?.model ?? 'google/gemini-3-flash-preview'}
               onValueChange={(v) => saveField('model', v)}
@@ -217,13 +218,13 @@ export function BeniContextPanel() {
               </SelectContent>
             </Select>
             {!isAdmin && (
-              <p className="text-xs text-muted-foreground">Apenas administradores podem alterar o modelo.</p>
+              <p className="text-xs text-muted-foreground">{tx("Apenas administradores podem alterar o modelo.")}</p>
             )}
           </div>
           <div className="text-sm text-muted-foreground space-y-1 pt-2 border-t">
-            <p>Edge function: <code className="text-xs">beni-chat</code> (streaming SSE, JWT obrigatório)</p>
-            <p>TTS: ElevenLabs via <code className="text-xs">elevenlabs-tts</code></p>
-            <p>Modelo atual: <Badge variant="outline">{settings?.model}</Badge></p>
+            <p>{tx("Edge function:")} <code className="text-xs">{tx("beni-chat")}</code> (streaming SSE, JWT obrigatório)</p>
+            <p>{tx("TTS: ElevenLabs via")} <code className="text-xs">{tx("elevenlabs-tts")}</code></p>
+            <p>{tx("Modelo atual:")} <Badge variant="outline">{settings?.model}</Badge></p>
           </div>
         </CardContent>
       </Card>

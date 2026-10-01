@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -190,7 +191,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
         </Label>
         <Button type="button" variant="outline" size="sm" onClick={handleOpenCreateModule}>
           <Plus className="h-4 w-4 mr-1" />
-          Adicionar Módulo
+          {tx("Adicionar Módulo")}
         </Button>
       </div>
 
@@ -199,7 +200,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
           <CardContent className="py-8 text-center">
             <BookOpen className="mx-auto h-10 w-10 text-muted-foreground/50 mb-3" />
             <p className="text-muted-foreground text-sm">
-              Nenhum módulo cadastrado. Adicione módulos para estruturar o conteúdo do curso.
+              {tx("Nenhum módulo cadastrado. Adicione módulos para estruturar o conteúdo do curso.")}
             </p>
           </CardContent>
         </Card>
@@ -268,7 +269,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground italic">
-                      Nenhuma aula cadastrada neste módulo
+                      {tx("Nenhuma aula cadastrada neste módulo")}
                     </p>
                   )}
                   <div className="flex gap-2 pt-2 border-t">
@@ -279,7 +280,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
                       onClick={() => handleOpenEditModule(index)}
                     >
                       <Pencil className="h-3 w-3 mr-1" />
-                      Editar
+                      {tx("Editar")}
                     </Button>
                     <Button
                       type="button"
@@ -289,7 +290,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
                       onClick={() => handleOpenDeleteModule(index)}
                     >
                       <Trash2 className="h-3 w-3 mr-1" />
-                      Excluir
+                      {tx("Excluir")}
                     </Button>
                   </div>
                 </div>
@@ -315,17 +316,17 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="module-title">Título do Módulo *</Label>
+              <Label htmlFor="module-title">{tx("Título do Módulo *")}</Label>
               <Input
                 id="module-title"
                 value={moduleForm.module_title}
                 onChange={(e) => setModuleForm(prev => ({ ...prev, module_title: e.target.value }))}
-                placeholder="Ex: Introdução ao Turismo Sustentável"
+                placeholder={tx("Ex: Introdução ao Turismo Sustentável")}
               />
             </div>
 
             <div className="space-y-3">
-              <Label>Aulas / Conteúdos</Label>
+              <Label>{tx("Aulas / Conteúdos")}</Label>
               
               {moduleForm.lives.length > 0 && (
                 <div className="space-y-2">
@@ -376,7 +377,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
                 <Input
                   value={newLiveTitle}
                   onChange={(e) => setNewLiveTitle(e.target.value)}
-                  placeholder="Título da aula..."
+                  placeholder={tx("Título da aula...")}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -394,14 +395,14 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Pressione Enter ou clique no botão para adicionar uma aula
+                {tx("Pressione Enter ou clique no botão para adicionar uma aula")}
               </p>
             </div>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setIsModuleDialogOpen(false)}>
-              Cancelar
+              {tx("Cancelar")}
             </Button>
             <Button
               type="button"
@@ -418,7 +419,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir Módulo</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Excluir Módulo")}</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja excluir o módulo "
               {deletingModuleIndex !== null ? modules[deletingModuleIndex]?.module_title : ''}"?
@@ -426,12 +427,12 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              Excluir
+              {tx("Excluir")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

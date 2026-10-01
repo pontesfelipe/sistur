@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -27,44 +28,44 @@ const TOOLS = [
   {
     icon: MapPin,
     name: 'list_destinations',
-    title: 'Listar destinos',
+    title: tx("Listar destinos"),
     description: 'Destinos turísticos acessíveis ao usuário (com unidade/brand quando aplicável).',
   },
   {
     icon: Gauge,
     name: 'list_assessments',
-    title: 'Listar diagnósticos',
+    title: tx("Listar diagnósticos"),
     description: 'Rodadas de avaliação com nota final e classificação (Adequado, Atenção, Crítico).',
   },
   {
     icon: ListTree,
     name: 'get_assessment',
-    title: 'Detalhar diagnóstico',
+    title: tx("Detalhar diagnóstico"),
     description: 'Diagnóstico completo: notas por pilar (RA, OE, AO) e indicadores relevantes.',
   },
   {
     icon: ClipboardList,
     name: 'list_projects',
-    title: 'Listar projetos',
-    description: 'Projetos de intervenção da organização, com status e vínculo diagnóstico.',
+    title: tx("Listar projetos"),
+    description: tx("Projetos de intervenção da organização, com status e vínculo diagnóstico."),
   },
   {
     icon: ClipboardList,
     name: 'list_project_tasks',
-    title: 'Listar tarefas',
-    description: 'Tarefas de um projeto, com responsável, prazo e status.',
+    title: tx("Listar tarefas"),
+    description: tx("Tarefas de um projeto, com responsável, prazo e status."),
   },
   {
     icon: PlusCircle,
     name: 'create_project_task',
-    title: 'Criar tarefa',
-    description: 'Cria uma tarefa em um projeto existente, em nome do usuário conectado.',
+    title: tx("Criar tarefa"),
+    description: tx("Cria uma tarefa em um projeto existente, em nome do usuário conectado."),
   },
   {
     icon: GraduationCap,
     name: 'list_trainings',
-    title: 'Listar capacitações',
-    description: 'Catálogo educacional: cursos, trilhas e lives disponíveis.',
+    title: tx("Listar capacitações"),
+    description: tx("Catálogo educacional: cursos, trilhas e lives disponíveis."),
   },
 ];
 
@@ -145,7 +146,7 @@ export function McpGuidePanel() {
           <div className="flex items-start gap-3 rounded-lg border p-4">
             <ShieldCheck className="h-5 w-5 mt-0.5 shrink-0 text-primary" />
             <div className="text-sm space-y-1">
-              <p className="font-medium">Seguro por padrão</p>
+              <p className="font-medium">{tx("Seguro por padrão")}</p>
               <p className="text-muted-foreground">
                 Cada pessoa autoriza com a própria conta SISTUR em uma tela de consentimento, e o
                 assistente só enxerga os mesmos dados que essa pessoa vê dentro do sistema — nada de
@@ -161,7 +162,7 @@ export function McpGuidePanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5" />
-            Como conectar
+            {tx("Como conectar")}
           </CardTitle>
           <CardDescription>
             Escolha o assistente que você usa e siga os passos. Em todos eles, o login é feito na
@@ -200,7 +201,7 @@ export function McpGuidePanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5" />
-            Ferramentas disponíveis
+            {tx("Ferramentas disponíveis")}
           </CardTitle>
           <CardDescription>
             Tudo que o assistente pode fazer em nome de quem conectou. Dados de leitura consultam o
@@ -228,7 +229,7 @@ export function McpGuidePanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquareQuote className="h-5 w-5" />
-            Exemplos de uso
+            {tx("Exemplos de uso")}
           </CardTitle>
           <CardDescription>
             Depois de conectado, basta conversar naturalmente. Exemplos de pedidos que o assistente

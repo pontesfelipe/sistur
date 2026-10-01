@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -174,7 +175,7 @@ export function QuestionBankPanel() {
           },
           options: optionsFormatted,
         });
-        toast.success('Questão atualizada com sucesso!');
+        toast.success(tx("Questão atualizada com sucesso!"));
       } else {
         await createQuiz.mutateAsync({
           question: {
@@ -189,13 +190,13 @@ export function QuestionBankPanel() {
           options: optionsFormatted,
         });
 
-        toast.success('Questão criada com sucesso!');
+        toast.success(tx("Questão criada com sucesso!"));
       }
       setIsDialogOpen(false);
       setFormData(defaultFormData);
       setEditingQuestion(null);
     } catch (error) {
-      toast.error('Erro ao salvar questão');
+      toast.error(tx("Erro ao salvar questão"));
       console.error(error);
     }
   };
@@ -204,10 +205,10 @@ export function QuestionBankPanel() {
     if (!deleteConfirmId) return;
     try {
       await deleteQuiz.mutateAsync(deleteConfirmId);
-      toast.success('Questão excluída');
+      toast.success(tx("Questão excluída"));
       setDeleteConfirmId(null);
     } catch (error) {
-      toast.error('Erro ao excluir questão');
+      toast.error(tx("Erro ao excluir questão"));
     }
   };
 
@@ -231,19 +232,19 @@ export function QuestionBankPanel() {
   };
 
   const getDifficultyBadge = (difficulty: number) => {
-    if (difficulty <= 1) return <Badge variant="outline" className="bg-green-500/10 text-green-700">Fácil</Badge>;
-    if (difficulty <= 2) return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700">Médio</Badge>;
-    return <Badge variant="outline" className="bg-red-500/10 text-red-700">Difícil</Badge>;
+    if (difficulty <= 1) return <Badge variant="outline" className="bg-green-500/10 text-green-700">{tx("Fácil")}</Badge>;
+    if (difficulty <= 2) return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700">{tx("Médio")}</Badge>;
+    return <Badge variant="outline" className="bg-red-500/10 text-red-700">{tx("Difícil")}</Badge>;
   };
 
   const getTypeBadge = (type: string) => {
     switch (type) {
       case 'multiple_choice':
-        return <Badge variant="secondary"><ListChecks className="w-3 h-3 mr-1" />Múltipla Escolha</Badge>;
+        return <Badge variant="secondary"><ListChecks className="w-3 h-3 mr-1" />{tx("Múltipla Escolha")}</Badge>;
       case 'true_false':
-        return <Badge variant="secondary"><CheckCircle className="w-3 h-3 mr-1" />V/F</Badge>;
+        return <Badge variant="secondary"><CheckCircle className="w-3 h-3 mr-1" />{tx("V/F")}</Badge>;
       case 'essay':
-        return <Badge variant="secondary"><FileQuestion className="w-3 h-3 mr-1" />Dissertativa</Badge>;
+        return <Badge variant="secondary"><FileQuestion className="w-3 h-3 mr-1" />{tx("Dissertativa")}</Badge>;
       default:
         return <Badge variant="secondary">{type}</Badge>;
     }
@@ -255,15 +256,15 @@ export function QuestionBankPanel() {
         <TabsList className="grid w-full max-w-lg grid-cols-3">
           <TabsTrigger value="questions" className="gap-2">
             <HelpCircle className="h-4 w-4" />
-            Questões
+            {tx("Questões")}
           </TabsTrigger>
           <TabsTrigger value="builder" className="gap-2">
             <ClipboardList className="h-4 w-4" />
-            Montar Exame
+            {tx("Montar Exame")}
           </TabsTrigger>
           <TabsTrigger value="stats" className="gap-2">
             <BarChart3 className="h-4 w-4" />
-            Estatísticas
+            {tx("Estatísticas")}
           </TabsTrigger>
         </TabsList>
 
@@ -274,7 +275,7 @@ export function QuestionBankPanel() {
               <div className="relative max-w-sm flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar questões..."
+                  placeholder={tx("Buscar questões...")}
                   className="pl-9"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -282,10 +283,10 @@ export function QuestionBankPanel() {
               </div>
               <Select value={pillarFilter} onValueChange={setPillarFilter}>
                 <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Pilar" />
+                  <SelectValue placeholder={tx("Pilar")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="all">{tx("Todos")}</SelectItem>
                   <SelectItem value="RA">RA</SelectItem>
                   <SelectItem value="OE">OE</SelectItem>
                   <SelectItem value="AO">AO</SelectItem>
@@ -296,7 +297,7 @@ export function QuestionBankPanel() {
               <DialogTrigger asChild>
                 <Button onClick={handleOpenCreate}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Nova Questão
+                  {tx("Nova Questão")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -305,24 +306,24 @@ export function QuestionBankPanel() {
                     {editingQuestion ? 'Editar Questão' : 'Nova Questão'}
                   </DialogTitle>
                   <DialogDescription>
-                    Preencha as informações da questão
+                    {tx("Preencha as informações da questão")}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="stem">Enunciado</Label>
+                    <Label htmlFor="stem">{tx("Enunciado")}</Label>
                     <Textarea 
                       id="stem" 
                       value={formData.stem}
                       onChange={(e) => setFormData(prev => ({ ...prev, stem: e.target.value }))}
-                      placeholder="Digite o enunciado da questão..."
+                      placeholder={tx("Digite o enunciado da questão...")}
                       rows={3}
                     />
                   </div>
 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label>Tipo</Label>
+                      <Label>{tx("Tipo")}</Label>
                       <Select 
                         value={formData.question_type} 
                         onValueChange={(v) => setFormData(prev => ({ ...prev, question_type: v as any }))}
@@ -332,14 +333,14 @@ export function QuestionBankPanel() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="multiple_choice">Múltipla Escolha</SelectItem>
-                          <SelectItem value="true_false">Verdadeiro/Falso</SelectItem>
-                          <SelectItem value="essay">Dissertativa</SelectItem>
+                          <SelectItem value="multiple_choice">{tx("Múltipla Escolha")}</SelectItem>
+                          <SelectItem value="true_false">{tx("Verdadeiro/Falso")}</SelectItem>
+                          <SelectItem value="essay">{tx("Dissertativa")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Pilar</Label>
+                      <Label>{tx("Pilar")}</Label>
                       <Select 
                         value={formData.pillar} 
                         onValueChange={(v) => setFormData(prev => ({ ...prev, pillar: v as Pillar }))}
@@ -355,7 +356,7 @@ export function QuestionBankPanel() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Dificuldade</Label>
+                      <Label>{tx("Dificuldade")}</Label>
                       <Select 
                         value={formData.difficulty.toString()} 
                         onValueChange={(v) => setFormData(prev => ({ ...prev, difficulty: parseInt(v) }))}
@@ -364,9 +365,9 @@ export function QuestionBankPanel() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1">Fácil</SelectItem>
-                          <SelectItem value="2">Médio</SelectItem>
-                          <SelectItem value="3">Difícil</SelectItem>
+                          <SelectItem value="1">{tx("Fácil")}</SelectItem>
+                          <SelectItem value="2">{tx("Médio")}</SelectItem>
+                          <SelectItem value="3">{tx("Difícil")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -374,7 +375,7 @@ export function QuestionBankPanel() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="level">Nível</Label>
+                      <Label htmlFor="level">{tx("Nível")}</Label>
                       <Input 
                         id="level" 
                         type="number"
@@ -386,7 +387,7 @@ export function QuestionBankPanel() {
 
                   {formData.question_type === 'multiple_choice' && (
                     <div className="space-y-4 pt-4 border-t">
-                      <Label className="text-base font-semibold">Alternativas</Label>
+                      <Label className="text-base font-semibold">{tx("Alternativas")}</Label>
                       {formData.options.map((opt, idx) => (
                         <div key={idx} className="flex items-center gap-3">
                           <Button
@@ -422,14 +423,14 @@ export function QuestionBankPanel() {
                       id="explanation" 
                       value={formData.explanation || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, explanation: e.target.value }))}
-                      placeholder="Explicação exibida após resposta..."
+                      placeholder={tx("Explicação exibida após resposta...")}
                       rows={2}
                     />
                   </div>
                 </div>
                 <div className="flex justify-end gap-3 pt-4 border-t">
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancelar
+                    {tx("Cancelar")}
                   </Button>
                   <Button 
                     onClick={handleSubmit}
@@ -454,18 +455,18 @@ export function QuestionBankPanel() {
               ) : filteredQuestions.length === 0 ? (
                 <div className="p-12 text-center text-muted-foreground">
                   <HelpCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Nenhuma questão encontrada</p>
+                  <p>{tx("Nenhuma questão encontrada")}</p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[50%]">Enunciado</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Pilar</TableHead>
-                      <TableHead>Dificuldade</TableHead>
-                      <TableHead>Nível</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
+                      <TableHead className="w-[50%]">{tx("Enunciado")}</TableHead>
+                      <TableHead>{tx("Tipo")}</TableHead>
+                      <TableHead>{tx("Pilar")}</TableHead>
+                      <TableHead>{tx("Dificuldade")}</TableHead>
+                      <TableHead>{tx("Nível")}</TableHead>
+                      <TableHead className="text-right">{tx("Ações")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -521,53 +522,53 @@ export function QuestionBankPanel() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-2xl font-bold">{stats.total}</CardTitle>
-                <CardDescription>Total de Questões</CardDescription>
+                <CardDescription>{tx("Total de Questões")}</CardDescription>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-2xl font-bold text-green-600">{stats.byPillar.RA}</CardTitle>
-                <CardDescription>Pilar RA</CardDescription>
+                <CardDescription>{tx("Pilar RA")}</CardDescription>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-2xl font-bold text-blue-600">{stats.byPillar.OE}</CardTitle>
-                <CardDescription>Pilar OE</CardDescription>
+                <CardDescription>{tx("Pilar OE")}</CardDescription>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-2xl font-bold text-purple-600">{stats.byPillar.AO}</CardTitle>
-                <CardDescription>Pilar AO</CardDescription>
+                <CardDescription>{tx("Pilar AO")}</CardDescription>
               </CardHeader>
             </Card>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Distribuição por Tipo</CardTitle>
+              <CardTitle>{tx("Distribuição por Tipo")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <ListChecks className="h-4 w-4" />
-                    Múltipla Escolha
+                    {tx("Múltipla Escolha")}
                   </span>
                   <span className="font-semibold">{stats.byType.multiple_choice}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4" />
-                    Verdadeiro/Falso
+                    {tx("Verdadeiro/Falso")}
                   </span>
                   <span className="font-semibold">{stats.byType.true_false}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <FileQuestion className="h-4 w-4" />
-                    Dissertativa
+                    {tx("Dissertativa")}
                   </span>
                   <span className="font-semibold">{stats.byType.essay}</span>
                 </div>
@@ -586,15 +587,15 @@ export function QuestionBankPanel() {
       <AlertDialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir Questão</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Excluir Questão")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir esta questão? Esta ação não pode ser desfeita.
+              {tx("Tem certeza que deseja excluir esta questão? Esta ação não pode ser desfeita.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Excluir
+              {tx("Excluir")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

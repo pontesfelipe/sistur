@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -144,7 +145,7 @@ export default function AdminComercial() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-comercial-leads'] });
-      toast.success('Status do lead atualizado.');
+      toast.success(tx("Status do lead atualizado."));
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -169,7 +170,7 @@ export default function AdminComercial() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Créditos concedidos');
+      toast.success(tx("Créditos concedidos"));
       setCreditReason('');
       qc.invalidateQueries({ queryKey: ['admin-beni-credits'] });
     },
@@ -196,7 +197,7 @@ export default function AdminComercial() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Assinatura registrada');
+      toast.success(tx("Assinatura registrada"));
       setNotes(''); setPeriodEnd('');
       qc.invalidateQueries({ queryKey: ['admin-subscriptions'] });
     },
@@ -209,7 +210,7 @@ export default function AdminComercial() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Assinatura atualizada');
+      toast.success(tx("Assinatura atualizada"));
       qc.invalidateQueries({ queryKey: ['admin-subscriptions'] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -225,7 +226,7 @@ export default function AdminComercial() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Concessão criada');
+      toast.success(tx("Concessão criada"));
       setOvrFeature('');
       qc.invalidateQueries({ queryKey: ['admin-entitlement-overrides'] });
     },
@@ -236,76 +237,76 @@ export default function AdminComercial() {
   const planName = (id: string) => plans?.find(p => p.id === id)?.name ?? id.slice(0, 8);
 
   return (
-    <AppLayout title="Comercial" subtitle="Planos, assinaturas e concessões">
+    <AppLayout title={tx("Comercial")} subtitle={tx("Planos, assinaturas e concessões")}>
       <Tabs defaultValue="assinaturas" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="assinaturas">Assinaturas</TabsTrigger>
-          <TabsTrigger value="planos">Planos</TabsTrigger>
-          <TabsTrigger value="concessoes">Concessões</TabsTrigger>
-          <TabsTrigger value="beni">Beni</TabsTrigger>
-          <TabsTrigger value="trials">Trials</TabsTrigger>
-          <TabsTrigger value="leads">Leads</TabsTrigger>
+          <TabsTrigger value="assinaturas">{tx("Assinaturas")}</TabsTrigger>
+          <TabsTrigger value="planos">{tx("Planos")}</TabsTrigger>
+          <TabsTrigger value="concessoes">{tx("Concessões")}</TabsTrigger>
+          <TabsTrigger value="beni">{tx("Beni")}</TabsTrigger>
+          <TabsTrigger value="trials">{tx("Trials")}</TabsTrigger>
+          <TabsTrigger value="leads">{tx("Leads")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="assinaturas" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Nova assinatura manual</CardTitle>
+              <CardTitle className="text-base">{tx("Nova assinatura manual")}</CardTitle>
               <CardDescription>Use para contratos Territoriais (empenho) e ativações negociadas.</CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
               <div className="space-y-1.5">
-                <Label>Organização</Label>
+                <Label>{tx("Organização")}</Label>
                 <Select value={orgId} onValueChange={setOrgId}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={tx("Selecione")} /></SelectTrigger>
                   <SelectContent>
                     {orgs?.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Plano</Label>
+                <Label>{tx("Plano")}</Label>
                 <Select value={planId} onValueChange={setPlanId}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={tx("Selecione")} /></SelectTrigger>
                   <SelectContent>
                     {plans?.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Assentos</Label>
+                <Label>{tx("Assentos")}</Label>
                 <Input type="number" min={1} value={seats} onChange={e => setSeats(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Fim do período</Label>
+                <Label>{tx("Fim do período")}</Label>
                 <Input type="date" value={periodEnd} onChange={e => setPeriodEnd(e.target.value)} />
               </div>
               <Button
                 disabled={!orgId || !planId || createSub.isPending}
                 onClick={() => createSub.mutate()}
               >
-                Registrar
+                {tx("Registrar")}
               </Button>
               <div className="md:col-span-5 space-y-1.5">
                 <Label>Observações (contrato, empenho, processo)</Label>
-                <Input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Ex.: Contrato 2026/014" />
+                <Input value={notes} onChange={e => setNotes(e.target.value)} placeholder={tx("Ex.: Contrato 2026/014")} />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-base">Assinaturas ativas e históricas</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{tx("Assinaturas ativas e históricas")}</CardTitle></CardHeader>
             <CardContent>
               {subsLoading ? <Skeleton className="h-32" /> : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Organização</TableHead>
-                      <TableHead>Plano</TableHead>
-                      <TableHead>Situação</TableHead>
-                      <TableHead>Assentos</TableHead>
-                      <TableHead>Vigência</TableHead>
-                      <TableHead>Origem</TableHead>
+                      <TableHead>{tx("Organização")}</TableHead>
+                      <TableHead>{tx("Plano")}</TableHead>
+                      <TableHead>{tx("Situação")}</TableHead>
+                      <TableHead>{tx("Assentos")}</TableHead>
+                      <TableHead>{tx("Vigência")}</TableHead>
+                      <TableHead>{tx("Origem")}</TableHead>
                       <TableHead />
                     </TableRow>
                   </TableHeader>
@@ -336,7 +337,7 @@ export default function AdminComercial() {
                       </TableRow>
                     ))}
                     {!subs?.length && (
-                      <TableRow><TableCell colSpan={7} className="text-muted-foreground">Nenhuma assinatura registrada.</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={7} className="text-muted-foreground">{tx("Nenhuma assinatura registrada.")}</TableCell></TableRow>
                     )}
                   </TableBody>
                 </Table>
@@ -347,15 +348,15 @@ export default function AdminComercial() {
 
         <TabsContent value="planos">
           <Card>
-            <CardHeader><CardTitle className="text-base">Catálogo vigente</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{tx("Catálogo vigente")}</CardTitle></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Plano</TableHead>
-                    <TableHead>Público</TableHead>
-                    <TableHead>Preço</TableHead>
-                    <TableHead>Recursos</TableHead>
+                    <TableHead>{tx("Plano")}</TableHead>
+                    <TableHead>{tx("Público")}</TableHead>
+                    <TableHead>{tx("Preço")}</TableHead>
+                    <TableHead>{tx("Recursos")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -378,39 +379,39 @@ export default function AdminComercial() {
         <TabsContent value="concessoes" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Nova concessão</CardTitle>
-              <CardDescription>Libera um recurso específico para a organização, independente do plano.</CardDescription>
+              <CardTitle className="text-base">{tx("Nova concessão")}</CardTitle>
+              <CardDescription>{tx("Libera um recurso específico para a organização, independente do plano.")}</CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
               <div className="space-y-1.5">
-                <Label>Organização</Label>
+                <Label>{tx("Organização")}</Label>
                 <Select value={ovrOrg} onValueChange={setOvrOrg}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={tx("Selecione")} /></SelectTrigger>
                   <SelectContent>
                     {orgs?.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Recurso</Label>
-                <Input value={ovrFeature} onChange={e => setOvrFeature(e.target.value)} placeholder="ex.: reports" />
+                <Label>{tx("Recurso")}</Label>
+                <Input value={ovrFeature} onChange={e => setOvrFeature(e.target.value)} placeholder={tx("ex.: reports")} />
               </div>
               <Button disabled={!ovrOrg || !ovrFeature || createOverride.isPending} onClick={() => createOverride.mutate()}>
-                Conceder
+                {tx("Conceder")}
               </Button>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-base">Concessões vigentes</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{tx("Concessões vigentes")}</CardTitle></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Organização</TableHead>
-                    <TableHead>Recurso</TableHead>
-                    <TableHead>Situação</TableHead>
-                    <TableHead>Validade</TableHead>
+                    <TableHead>{tx("Organização")}</TableHead>
+                    <TableHead>{tx("Recurso")}</TableHead>
+                    <TableHead>{tx("Situação")}</TableHead>
+                    <TableHead>{tx("Validade")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -423,7 +424,7 @@ export default function AdminComercial() {
                     </TableRow>
                   ))}
                   {!overrides?.length && (
-                    <TableRow><TableCell colSpan={4} className="text-muted-foreground">Nenhuma concessão registrada.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={4} className="text-muted-foreground">{tx("Nenhuma concessão registrada.")}</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -434,27 +435,27 @@ export default function AdminComercial() {
         <TabsContent value="beni" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Conceder créditos do Professor Beni</CardTitle>
+              <CardTitle className="text-base">{tx("Conceder créditos do Professor Beni")}</CardTitle>
               <CardDescription>
                 Créditos valem 12 meses e são consumidos após a cota mensal. Pacotes: 50 (R$ 14,90), 150 (R$ 34,90), org 500 (R$ 99).
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
               <div className="space-y-1.5">
-                <Label>Destino</Label>
+                <Label>{tx("Destino")}</Label>
                 <Select value={creditTarget} onValueChange={(v) => setCreditTarget(v as 'org' | 'user')}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="org">Organização</SelectItem>
-                    <SelectItem value="user">Usuário</SelectItem>
+                    <SelectItem value="org">{tx("Organização")}</SelectItem>
+                    <SelectItem value="user">{tx("Usuário")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               {creditTarget === 'org' ? (
                 <div className="space-y-1.5">
-                  <Label>Organização</Label>
+                  <Label>{tx("Organização")}</Label>
                   <Select value={creditOrg} onValueChange={setCreditOrg}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={tx("Selecione")} /></SelectTrigger>
                     <SelectContent>
                       {orgs?.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
                     </SelectContent>
@@ -462,23 +463,23 @@ export default function AdminComercial() {
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <Label>ID do usuário</Label>
-                  <Input value={creditUser} onChange={e => setCreditUser(e.target.value)} placeholder="uuid" />
+                  <Label>{tx("ID do usuário")}</Label>
+                  <Input value={creditUser} onChange={e => setCreditUser(e.target.value)} placeholder={tx("uuid")} />
                 </div>
               )}
               <div className="space-y-1.5">
-                <Label>Quantidade</Label>
+                <Label>{tx("Quantidade")}</Label>
                 <Input type="number" min={1} value={creditAmount} onChange={e => setCreditAmount(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Origem</Label>
+                <Label>{tx("Origem")}</Label>
                 <Select value={creditSource} onValueChange={setCreditSource}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="manual">Manual</SelectItem>
-                    <SelectItem value="pack_50">Pacote 50</SelectItem>
-                    <SelectItem value="pack_150">Pacote 150</SelectItem>
-                    <SelectItem value="pack_org_500">Pacote org 500</SelectItem>
+                    <SelectItem value="manual">{tx("Manual")}</SelectItem>
+                    <SelectItem value="pack_50">{tx("Pacote 50")}</SelectItem>
+                    <SelectItem value="pack_150">{tx("Pacote 150")}</SelectItem>
+                    <SelectItem value="pack_org_500">{tx("Pacote org 500")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -486,26 +487,26 @@ export default function AdminComercial() {
                 disabled={grantCredits.isPending || (creditTarget === 'org' ? !creditOrg : !creditUser) || !(Number(creditAmount) > 0)}
                 onClick={() => grantCredits.mutate()}
               >
-                Conceder
+                {tx("Conceder")}
               </Button>
               <div className="md:col-span-5 space-y-1.5">
-                <Label>Motivo</Label>
-                <Input value={creditReason} onChange={e => setCreditReason(e.target.value)} placeholder="Ex.: Compra pacote 50 — pedido #123" />
+                <Label>{tx("Motivo")}</Label>
+                <Input value={creditReason} onChange={e => setCreditReason(e.target.value)} placeholder={tx("Ex.: Compra pacote 50 — pedido #123")} />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-base">Créditos ativos</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{tx("Créditos ativos")}</CardTitle></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Destino</TableHead>
-                    <TableHead>Saldo</TableHead>
-                    <TableHead>Origem</TableHead>
-                    <TableHead>Expira</TableHead>
-                    <TableHead>Motivo</TableHead>
+                    <TableHead>{tx("Destino")}</TableHead>
+                    <TableHead>{tx("Saldo")}</TableHead>
+                    <TableHead>{tx("Origem")}</TableHead>
+                    <TableHead>{tx("Expira")}</TableHead>
+                    <TableHead>{tx("Motivo")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -519,7 +520,7 @@ export default function AdminComercial() {
                     </TableRow>
                   ))}
                   {!beniCredits?.length && (
-                    <TableRow><TableCell colSpan={5} className="text-muted-foreground">Nenhum crédito concedido.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={5} className="text-muted-foreground">{tx("Nenhum crédito concedido.")}</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -532,10 +533,10 @@ export default function AdminComercial() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Usuário</TableHead>
-                    <TableHead>Período</TableHead>
-                    <TableHead>Usado</TableHead>
-                    <TableHead>Cota</TableHead>
+                    <TableHead>{tx("Usuário")}</TableHead>
+                    <TableHead>{tx("Período")}</TableHead>
+                    <TableHead>{tx("Usado")}</TableHead>
+                    <TableHead>{tx("Cota")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -548,7 +549,7 @@ export default function AdminComercial() {
                     </TableRow>
                   ))}
                   {!beniQuotas?.length && (
-                    <TableRow><TableCell colSpan={4} className="text-muted-foreground">Nenhum consumo registrado.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={4} className="text-muted-foreground">{tx("Nenhum consumo registrado.")}</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -556,16 +557,16 @@ export default function AdminComercial() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle className="text-base">Uso recente</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{tx("Uso recente")}</CardTitle></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Usuário</TableHead>
-                    <TableHead>Organização</TableHead>
-                    <TableHead>Fonte</TableHead>
-                    <TableHead>Caracteres</TableHead>
+                    <TableHead>{tx("Data")}</TableHead>
+                    <TableHead>{tx("Usuário")}</TableHead>
+                    <TableHead>{tx("Organização")}</TableHead>
+                    <TableHead>{tx("Fonte")}</TableHead>
+                    <TableHead>{tx("Caracteres")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -579,7 +580,7 @@ export default function AdminComercial() {
                     </TableRow>
                   ))}
                   {!beniUsage?.length && (
-                    <TableRow><TableCell colSpan={5} className="text-muted-foreground">Nenhum uso registrado.</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={5} className="text-muted-foreground">{tx("Nenhum uso registrado.")}</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -594,7 +595,7 @@ export default function AdminComercial() {
         <TabsContent value="leads" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Leads comerciais</CardTitle>
+              <CardTitle>{tx("Leads comerciais")}</CardTitle>
               <CardDescription>
                 Interessados capturados na página pública de preços (/planos).
               </CardDescription>
@@ -606,19 +607,19 @@ export default function AdminComercial() {
                 </div>
               ) : !leads?.length ? (
                 <p className="text-sm text-muted-foreground py-6 text-center">
-                  Nenhum lead recebido até o momento.
+                  {tx("Nenhum lead recebido até o momento.")}
                 </p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>Contato</TableHead>
-                      <TableHead>Organização</TableHead>
-                      <TableHead>Plano</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="w-[160px]">Ação</TableHead>
+                      <TableHead>{tx("Data")}</TableHead>
+                      <TableHead>{tx("Nome")}</TableHead>
+                      <TableHead>{tx("Contato")}</TableHead>
+                      <TableHead>{tx("Organização")}</TableHead>
+                      <TableHead>{tx("Plano")}</TableHead>
+                      <TableHead>{tx("Status")}</TableHead>
+                      <TableHead className="w-[160px]">{tx("Ação")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

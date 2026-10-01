@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -212,10 +213,10 @@ export function PerformanceMetricsPanel() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
-              Métricas de Performance
+              {tx("Métricas de Performance")}
             </CardTitle>
             <CardDescription>
-              Monitoramento do uso de recursos e recomendações de escalabilidade
+              {tx("Monitoramento do uso de recursos e recomendações de escalabilidade")}
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={fetchMetrics} disabled={loading}>
@@ -274,7 +275,7 @@ export function PerformanceMetricsPanel() {
                   : 'O sistema está crescendo. Considere aumentar a instância se a tendência continuar.'}
               </p>
               <p className="text-xs text-muted-foreground">
-                Acesse <strong>Backend → Configurações Avançadas → Upgrade de Instância</strong> para 
+                {tx("Acesse")} <strong>{tx("Backend → Configurações Avançadas → Upgrade de Instância")}</strong> para 
                 ajustar os recursos de CPU, memória e I/O do banco de dados.
               </p>
             </AlertDescription>
@@ -314,7 +315,7 @@ export function PerformanceMetricsPanel() {
           <div className="space-y-4 pt-2">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">Uso do Banco de Dados</span>
+                <span className="text-sm font-medium">{tx("Uso do Banco de Dados")}</span>
                 <span className="text-sm text-muted-foreground">
                   {metrics.dbSizeMB.toFixed(1)} MB / {DB_SIZE_LIMIT_MB} MB
                 </span>
@@ -326,7 +327,7 @@ export function PerformanceMetricsPanel() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium">Conexões Estimadas</span>
+                <span className="text-sm font-medium">{tx("Conexões Estimadas")}</span>
                 <span className="text-sm text-muted-foreground">
                   ~{Math.ceil(metrics.totalUsers * 0.1)} / {MAX_CONNECTIONS}
                 </span>
@@ -344,19 +345,19 @@ export function PerformanceMetricsPanel() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
             <div className="text-center p-3 bg-muted/50 rounded-lg">
               <p className="text-2xl font-bold">{metrics.totalAssessments}</p>
-              <p className="text-xs text-muted-foreground">Diagnósticos</p>
+              <p className="text-xs text-muted-foreground">{tx("Diagnósticos")}</p>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
               <p className="text-2xl font-bold">{metrics.totalReports}</p>
-              <p className="text-xs text-muted-foreground">Relatórios</p>
+              <p className="text-xs text-muted-foreground">{tx("Relatórios")}</p>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
               <p className="text-2xl font-bold">{metrics.totalUsers}</p>
-              <p className="text-xs text-muted-foreground">Usuários</p>
+              <p className="text-xs text-muted-foreground">{tx("Usuários")}</p>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
               <p className="text-2xl font-bold">{metrics.avgQueryTimeMs}ms</p>
-              <p className="text-xs text-muted-foreground">Latência Média</p>
+              <p className="text-xs text-muted-foreground">{tx("Latência Média")}</p>
             </div>
           </div>
         )}

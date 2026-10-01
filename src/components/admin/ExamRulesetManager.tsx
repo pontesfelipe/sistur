@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -74,7 +75,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
 
   const handleSave = async () => {
     if (!selectedCourseId) {
-      toast.error('Selecione um curso LMS primeiro');
+      toast.error(tx("Selecione um curso LMS primeiro"));
       return;
     }
 
@@ -110,21 +111,21 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-primary" />
-            Curso LMS Vinculado
+            {tx("Curso LMS Vinculado")}
           </CardTitle>
           <CardDescription>
-            Selecione o curso para configurar as regras de exame
+            {tx("Selecione o curso para configurar as regras de exame")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Select value={selectedCourseId} onValueChange={setSelectedCourseId}>
             <SelectTrigger>
-              <SelectValue placeholder="Selecione um curso..." />
+              <SelectValue placeholder={tx("Selecione um curso...")} />
             </SelectTrigger>
             <SelectContent>
               {filteredCourses.length === 0 ? (
                 <div className="py-4 text-center text-sm text-muted-foreground">
-                  Nenhum curso disponível
+                  {tx("Nenhum curso disponível")}
                 </div>
               ) : (
                 filteredCourses.map(course => (
@@ -166,7 +167,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                 </div>
                 {ruleset && (
                   <Badge variant="outline" className="bg-green-500/10 text-green-700">
-                    Ativo
+                    {tx("Ativo")}
                   </Badge>
                 )}
               </div>
@@ -180,7 +181,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
-                  Critérios de Aprovação
+                  {tx("Critérios de Aprovação")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -195,12 +196,12 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                     onChange={(e) => setFormData({ ...formData, min_score_pct: parseInt(e.target.value) || 0 })}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Percentual mínimo para aprovação no exame
+                    {tx("Percentual mínimo para aprovação no exame")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="question_count">Número de questões</Label>
+                  <Label htmlFor="question_count">{tx("Número de questões")}</Label>
                   <Input
                     id="question_count"
                     type="number"
@@ -210,7 +211,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                     onChange={(e) => setFormData({ ...formData, question_count: parseInt(e.target.value) || 10 })}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Questões selecionadas aleatoriamente do banco
+                    {tx("Questões selecionadas aleatoriamente do banco")}
                   </p>
                 </div>
               </CardContent>
@@ -221,7 +222,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Clock className="h-4 w-4 text-primary" />
-                  Tempo
+                  {tx("Tempo")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -236,12 +237,12 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                     onChange={(e) => setFormData({ ...formData, time_limit_minutes: parseInt(e.target.value) || 60 })}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Tempo máximo para completar o exame
+                    {tx("Tempo máximo para completar o exame")}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="min_days">Dias entre mesmas questões</Label>
+                  <Label htmlFor="min_days">{tx("Dias entre mesmas questões")}</Label>
                   <Input
                     id="min_days"
                     type="number"
@@ -251,7 +252,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                     onChange={(e) => setFormData({ ...formData, min_days_between_same_quiz: parseInt(e.target.value) || 30 })}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Evita repetição de questões recentes
+                    {tx("Evita repetição de questões recentes")}
                   </p>
                 </div>
               </CardContent>
@@ -262,16 +263,16 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <RefreshCw className="h-4 w-4 text-primary" />
-                  Regras de Retentativa
+                  {tx("Regras de Retentativa")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-6 md:grid-cols-3">
                   <div className="flex items-center justify-between space-x-2 md:col-span-3">
                     <div>
-                      <Label htmlFor="allow_retake" className="font-medium">Permitir retentativas</Label>
+                      <Label htmlFor="allow_retake" className="font-medium">{tx("Permitir retentativas")}</Label>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Alunos podem refazer o exame se reprovados
+                        {tx("Alunos podem refazer o exame se reprovados")}
                       </p>
                     </div>
                     <Switch
@@ -286,7 +287,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                       <Separator className="md:col-span-3" />
                       
                       <div className="space-y-2">
-                        <Label htmlFor="max_attempts">Máximo de tentativas</Label>
+                        <Label htmlFor="max_attempts">{tx("Máximo de tentativas")}</Label>
                         <Input
                           id="max_attempts"
                           type="number"
@@ -296,7 +297,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                           onChange={(e) => setFormData({ ...formData, max_attempts: parseInt(e.target.value) || 3 })}
                         />
                         <p className="text-xs text-muted-foreground">
-                          Total de tentativas permitidas
+                          {tx("Total de tentativas permitidas")}
                         </p>
                       </div>
 
@@ -311,7 +312,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                           onChange={(e) => setFormData({ ...formData, retake_wait_hours: parseInt(e.target.value) || 24 })}
                         />
                         <p className="text-xs text-muted-foreground">
-                          Tempo de espera antes de nova tentativa
+                          {tx("Tempo de espera antes de nova tentativa")}
                         </p>
                       </div>
                     </>
@@ -327,7 +328,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
               {isSaving ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Salvando...
+                  {tx("Salvando...")}
                 </>
               ) : (
                 <>
@@ -346,9 +347,9 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
             <div className="flex items-start gap-3">
               <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
               <div>
-                <p className="font-medium text-yellow-800">Selecione um curso</p>
+                <p className="font-medium text-yellow-800">{tx("Selecione um curso")}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Escolha um curso LMS acima para configurar as regras de exame.
+                  {tx("Escolha um curso LMS acima para configurar as regras de exame.")}
                 </p>
               </div>
             </div>

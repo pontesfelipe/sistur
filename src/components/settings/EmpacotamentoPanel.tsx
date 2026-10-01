@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,21 +41,21 @@ export function EmpacotamentoPanel() {
       <div>
         <h2 className="text-xl font-bold flex items-center gap-2">
           <Package className="h-5 w-5 text-primary" />
-          Empacotamento Modular
+          {tx("Empacotamento Modular")}
         </h2>
         <p className="text-muted-foreground mt-1 text-sm">
-          Habilite ou desabilite módulos do Analítico individualmente por organização.
+          {tx("Habilite ou desabilite módulos do Analítico individualmente por organização.")}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Organização</CardTitle>
-          <CardDescription>Selecione para gerenciar o pacote contratado.</CardDescription>
+          <CardTitle>{tx("Organização")}</CardTitle>
+          <CardDescription>{tx("Selecione para gerenciar o pacote contratado.")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Select value={orgId} onValueChange={setOrgId}>
-            <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+            <SelectTrigger className="max-w-md"><SelectValue placeholder={tx("Selecione...")} /></SelectTrigger>
             <SelectContent>
               {orgs.map((o: any) => (
                 <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>
@@ -67,7 +68,7 @@ export function EmpacotamentoPanel() {
       {orgId && (
         <Card>
           <CardHeader>
-            <CardTitle>Módulos contratados</CardTitle>
+            <CardTitle>{tx("Módulos contratados")}</CardTitle>
             <CardDescription>
               Por padrão, todos os módulos ficam habilitados. Desabilite para criar pacotes customizados (ex: ICP A apenas com Diagnóstico).
             </CardDescription>

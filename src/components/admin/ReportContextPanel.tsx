@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
@@ -50,7 +51,7 @@ export function ReportContextPanel() {
         ? supabase.from("orgs").select("id, name").order("name")
         : Promise.resolve({ data: profile?.org_id ? [{ id: profile.org_id, name: "Minha organização" }] : [], error: null } as any),
     ]);
-    if (profilesRes.error) toast.error("Erro ao carregar contextos", { description: profilesRes.error.message });
+    if (profilesRes.error) toast.error(tx("Erro ao carregar contextos"), { description: profilesRes.error.message });
     else setItems(profilesRes.data as any);
     if (!orgsRes.error && orgsRes.data) setOrgs(orgsRes.data as any);
     if (!activeId && profilesRes.data?.[0]) setActiveId((profilesRes.data as any)[0].id);
@@ -76,8 +77,8 @@ export function ReportContextPanel() {
       })
       .eq("id", p.id);
     setSaving(null);
-    if (error) toast.error("Erro ao salvar", { description: error.message });
-    else { toast.success("Contexto atualizado — vale para os próximos relatórios."); setEditingIds(prev => { const next = new Set(prev); next.delete(p.id); return next; }); load(); }
+    if (error) toast.error(tx("Erro ao salvar"), { description: error.message });
+    else { toast.success(tx("Contexto atualizado — vale para os próximos relatórios.")); setEditingIds(prev => { const next = new Set(prev); next.delete(p.id); return next; }); load(); }
   };
 
   const createForOrg = async (orgId: string | null, scope: "territorial" | "enterprise") => {
@@ -88,24 +89,24 @@ export function ReportContextPanel() {
         org_id: orgId,
         scope,
         name: `Contexto ${scope === "territorial" ? "Territorial" : "Empresarial"} — ${orgs.find(o => o.id === orgId)?.name ?? "Global"}`,
-        description: "Contexto editorial específico desta organização.",
+        description: tx("Contexto editorial específico desta organização."),
         context: base?.context ?? "Persona: ...\nAudiência: ...\nTom: ...\nFoco: ...\nRestrições: ...",
         active: true,
       })
       .select()
       .single();
-    if (error) return toast.error("Erro ao criar contexto", { description: error.message });
-    toast.success("Contexto criado");
+    if (error) return toast.error(tx("Erro ao criar contexto"), { description: error.message });
+    toast.success(tx("Contexto criado"));
     setActiveId((data as any).id);
     load();
   };
 
   const remove = async (p: Profile) => {
-    if (!p.org_id) return toast.error("Contextos globais não podem ser removidos — apenas desativados.");
+    if (!p.org_id) return toast.error(tx("Contextos globais não podem ser removidos — apenas desativados."));
     if (!confirm(`Remover contexto "${p.name}"?`)) return;
     const { error } = await supabase.from("report_context_profiles").delete().eq("id", p.id);
-    if (error) toast.error("Erro ao remover", { description: error.message });
-    else { toast.success("Contexto removido"); load(); }
+    if (error) toast.error(tx("Erro ao remover"), { description: error.message });
+    else { toast.success(tx("Contexto removido")); load(); }
   };
 
   const grouped = useMemo(() => {
@@ -120,7 +121,7 @@ export function ReportContextPanel() {
 
   if (loading) {
     return <Card><CardContent className="py-8 flex items-center justify-center gap-2 text-muted-foreground">
-      <Loader2 className="h-4 w-4 animate-spin" /> Carregando contextos…
+      <Loader2 className="h-4 w-4 animate-spin" /> {tx("Carregando contextos…")}
     </CardContent></Card>;
   }
 
@@ -131,10 +132,10 @@ export function ReportContextPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          Camada de Contexto do Relatório
+          {tx("Camada de Contexto do Relatório")}
         </CardTitle>
         <CardDescription>
-          Define a <strong>persona, audiência, tom e prioridades editoriais</strong> que o agente de IA aplica em TODO relatório gerado.
+          {tx("Define a")} <strong>{tx("persona, audiência, tom e prioridades editoriais")}</strong> que o agente de IA aplica em TODO relatório gerado.
           O contexto da organização (quando existir) prevalece sobre o contexto global. É usado junto com a camada semântica, a estrutura canônica e os dados do diagnóstico.
         </CardDescription>
       </CardHeader>
@@ -164,30 +165,30 @@ export function ReportContextPanel() {
                 </Button>
                 {p.org_id && (
                   <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(p)}>
-                    <Trash2 className="h-3 w-3 mr-1" /> Remover
+                    <Trash2 className="h-3 w-3 mr-1" /> {tx("Remover")}
                   </Button>
                 )}
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Nome</label>
+                  <label className="text-xs font-medium text-muted-foreground">{tx("Nome")}</label>
                   <Input value={p.name} onChange={e => update(p.id, { name: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Escopo</label>
+                  <label className="text-xs font-medium text-muted-foreground">{tx("Escopo")}</label>
                   <Select value={p.scope} onValueChange={(v: any) => update(p.id, { scope: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="territorial">Territorial</SelectItem>
-                      <SelectItem value="enterprise">Empresarial</SelectItem>
-                      <SelectItem value="both">Ambos</SelectItem>
+                      <SelectItem value="territorial">{tx("Territorial")}</SelectItem>
+                      <SelectItem value="enterprise">{tx("Empresarial")}</SelectItem>
+                      <SelectItem value="both">{tx("Ambos")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Descrição</label>
+                <label className="text-xs font-medium text-muted-foreground">{tx("Descrição")}</label>
                 <Input value={p.description ?? ""} onChange={e => update(p.id, { description: e.target.value })} />
               </div>
               <div>
@@ -202,8 +203,8 @@ export function ReportContextPanel() {
                     className="h-7 text-xs gap-1"
                   >
                     {editingIds.has(p.id)
-                      ? <><Pencil className="h-3 w-3" /> Cancelar edição</>
-                      : <><Pencil className="h-3 w-3" /> Editar</>}
+                      ? <><Pencil className="h-3 w-3" /> {tx("Cancelar edição")}</>
+                      : <><Pencil className="h-3 w-3" /> {tx("Editar")}</>}
                   </Button>
                 </div>
                 <Textarea
@@ -214,15 +215,15 @@ export function ReportContextPanel() {
                   className={`font-mono text-sm ${!editingIds.has(p.id) ? "bg-muted/40 cursor-default opacity-80" : ""}`}
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  Sugestão de seções: <strong>Persona</strong>, <strong>Audiência</strong>, <strong>Tom</strong>, <strong>Foco analítico</strong>, <strong>Prioridades editoriais</strong>, <strong>Restrições</strong>.
+                  {tx("Sugestão de seções:")} <strong>{tx("Persona")}</strong>, <strong>{tx("Audiência")}</strong>, <strong>{tx("Tom")}</strong>, <strong>{tx("Foco analítico")}</strong>, <strong>{tx("Prioridades editoriais")}</strong>, <strong>{tx("Restrições")}</strong>.
                 </p>
               </div>
 
               <div className="flex justify-end">
                 <Button onClick={() => save(p)} disabled={saving === p.id}>
                   {saving === p.id
-                    ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Salvando…</>
-                    : <><Save className="h-4 w-4 mr-1" /> Salvar contexto</>}
+                    ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {tx("Salvando…")}</>
+                    : <><Save className="h-4 w-4 mr-1" /> {tx("Salvar contexto")}</>}
                 </Button>
               </div>
             </TabsContent>
@@ -230,9 +231,9 @@ export function ReportContextPanel() {
         </Tabs>
 
         <div className="border-t pt-4 space-y-2">
-          <p className="text-sm font-medium">Criar contexto para uma organização</p>
+          <p className="text-sm font-medium">{tx("Criar contexto para uma organização")}</p>
           <p className="text-xs text-muted-foreground">
-            Quando uma organização tem contexto próprio, ele substitui o global ao gerar relatórios daquela org.
+            {tx("Quando uma organização tem contexto próprio, ele substitui o global ao gerar relatórios daquela org.")}
           </p>
           <CreateContextRow orgs={orgs} onCreate={createForOrg} isAdmin={isAdmin} myOrgId={profile?.org_id ?? null} existing={items} />
         </div>
@@ -256,21 +257,21 @@ function CreateContextRow({
   return (
     <div className="flex flex-wrap items-end gap-2">
       <div className="flex-1 min-w-[200px]">
-        <label className="text-xs text-muted-foreground">Organização</label>
+        <label className="text-xs text-muted-foreground">{tx("Organização")}</label>
         <Select value={orgId} onValueChange={setOrgId} disabled={!isAdmin}>
-          <SelectTrigger><SelectValue placeholder="Selecione…" /></SelectTrigger>
+          <SelectTrigger><SelectValue placeholder={tx("Selecione…")} /></SelectTrigger>
           <SelectContent>
             {orgs.map(o => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
       <div>
-        <label className="text-xs text-muted-foreground">Escopo</label>
+        <label className="text-xs text-muted-foreground">{tx("Escopo")}</label>
         <Select value={scope} onValueChange={(v: any) => setScope(v)}>
           <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="territorial">Territorial</SelectItem>
-            <SelectItem value="enterprise">Empresarial</SelectItem>
+            <SelectItem value="territorial">{tx("Territorial")}</SelectItem>
+            <SelectItem value="enterprise">{tx("Empresarial")}</SelectItem>
           </SelectContent>
         </Select>
       </div>

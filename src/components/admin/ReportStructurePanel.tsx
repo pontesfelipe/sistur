@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,7 +36,7 @@ export function ReportStructurePanel() {
       .select("*")
       .order("scope", { ascending: true });
     if (error) {
-      toast.error("Erro ao carregar estruturas", { description: error.message });
+      toast.error(tx("Erro ao carregar estruturas"), { description: error.message });
     } else {
       const normalized = (data || []).map((t: any) => ({
         ...t,
@@ -82,7 +83,7 @@ export function ReportStructurePanel() {
   const add = (id: string) => {
     setItems(prev => prev.map(t => {
       if (t.id !== id) return t;
-      const sections = [...t.sections, { order: t.sections.length + 1, title: "Nova seção", description: "Descreva o conteúdo obrigatório desta seção." }];
+      const sections = [...t.sections, { order: t.sections.length + 1, title: tx("Nova seção"), description: tx("Descreva o conteúdo obrigatório desta seção.") }];
       return { ...t, sections };
     }));
   };
@@ -97,9 +98,9 @@ export function ReportStructurePanel() {
       .eq("id", t.id);
     setSaving(null);
     if (error) {
-      toast.error("Erro ao salvar", { description: error.message });
+      toast.error(tx("Erro ao salvar"), { description: error.message });
     } else {
-      toast.success("Estrutura atualizada — vale para os próximos relatórios.");
+      toast.success(tx("Estrutura atualizada — vale para os próximos relatórios."));
       load();
     }
   };
@@ -107,7 +108,7 @@ export function ReportStructurePanel() {
   if (loading) {
     return (
       <Card><CardContent className="py-8 flex items-center justify-center gap-2 text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" /> Carregando estruturas…
+        <Loader2 className="h-4 w-4 animate-spin" /> {tx("Carregando estruturas…")}
       </CardContent></Card>
     );
   }
@@ -115,7 +116,7 @@ export function ReportStructurePanel() {
   if (items.length === 0) {
     return (
       <Card><CardContent className="py-8 text-center text-muted-foreground">
-        Nenhuma estrutura cadastrada.
+        {tx("Nenhuma estrutura cadastrada.")}
       </CardContent></Card>
     );
   }
@@ -125,10 +126,10 @@ export function ReportStructurePanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-primary" />
-          Estrutura Canônica do Relatório
+          {tx("Estrutura Canônica do Relatório")}
         </CardTitle>
         <CardDescription>
-          Define a ordem fixa de seções que TODO relatório gerado deve seguir. O agente de IA recebe esta lista como contrato obrigatório — UMA passada, sem repetir nem voltar a seções já escritas.
+          {tx("Define a ordem fixa de seções que TODO relatório gerado deve seguir. O agente de IA recebe esta lista como contrato obrigatório — UMA passada, sem repetir nem voltar a seções já escritas.")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -146,11 +147,11 @@ export function ReportStructurePanel() {
             <TabsContent key={t.id} value={t.id} className="space-y-4 mt-4">
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Nome</label>
+                  <label className="text-xs font-medium text-muted-foreground">{tx("Nome")}</label>
                   <Input value={t.name} onChange={e => updateLocal(t.id, { name: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Versão atual</label>
+                  <label className="text-xs font-medium text-muted-foreground">{tx("Versão atual")}</label>
                   <div className="flex items-center gap-2 h-10">
                     <Badge variant="secondary">v{t.version}</Badge>
                     <Badge variant={t.active ? "default" : "outline"}>{t.active ? "Ativa" : "Inativa"}</Badge>
@@ -173,7 +174,7 @@ export function ReportStructurePanel() {
                       <Input
                         value={s.title}
                         onChange={e => updateSection(t.id, idx, { title: e.target.value })}
-                        placeholder="Título da seção"
+                        placeholder={tx("Título da seção")}
                         className="font-medium"
                       />
                       <Button size="icon" variant="ghost" onClick={() => move(t.id, idx, -1)} disabled={idx === 0}>
@@ -199,12 +200,12 @@ export function ReportStructurePanel() {
 
               <div className="flex items-center justify-between">
                 <Button variant="outline" size="sm" onClick={() => add(t.id)}>
-                  <Plus className="h-4 w-4 mr-1" /> Adicionar seção
+                  <Plus className="h-4 w-4 mr-1" /> {tx("Adicionar seção")}
                 </Button>
                 <Button onClick={() => save(t)} disabled={saving === t.id}>
                   {saving === t.id
-                    ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Salvando…</>
-                    : <><Save className="h-4 w-4 mr-1" /> Salvar estrutura</>}
+                    ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {tx("Salvando…")}</>
+                    : <><Save className="h-4 w-4 mr-1" /> {tx("Salvar estrutura")}</>}
                 </Button>
               </div>
             </TabsContent>

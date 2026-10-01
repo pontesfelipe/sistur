@@ -118,7 +118,7 @@ export default function AdminCertificacoes() {
             </p>
           </div>
           <Button onClick={() => setOpenIssue(true)}>
-            <Award className="h-4 w-4 mr-2" /> Emitir certificado
+            <Award className="h-4 w-4 mr-2" /> {tx("Emitir certificado")}
           </Button>
         </div>
 

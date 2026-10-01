@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -74,7 +75,7 @@ function PlanCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base">{p.name}</CardTitle>
-          {isCurrent && <Badge>Plano atual</Badge>}
+          {isCurrent && <Badge>{tx("Plano atual")}</Badge>}
         </div>
         <CardDescription>{AUDIENCE_LABELS[p.audience] ?? p.audience}</CardDescription>
         {useAnnual ? (
@@ -86,7 +87,7 @@ function PlanCard({
               <p className="text-2xl font-bold tracking-tight">
                 {formatBRL(p.annual_price_cents!)}/ano{p.seat_based ? ' por usuário' : ''}
               </p>
-              <Badge variant="secondary">15% de desconto</Badge>
+              <Badge variant="secondary">{tx("15% de desconto")}</Badge>
             </div>
             <p className="text-xs text-muted-foreground">
               Equivale a {formatBRL(Math.floor(p.annual_price_cents! / 1200) * 100)}/mês, pago uma vez por ano.
@@ -97,7 +98,7 @@ function PlanCard({
         )}
         {p.code === 'professor' && (
           <p className="text-xs text-muted-foreground">
-            Gratuito quando você tem 5 ou mais estudantes ativos que entraram pelo seu link de indicação.
+            {tx("Gratuito quando você tem 5 ou mais estudantes ativos que entraram pelo seu link de indicação.")}
           </p>
         )}
         {p.seat_based && (
@@ -121,7 +122,7 @@ function PlanCard({
         {p.seat_based && !p.quote_only && (
           <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
             <Label htmlFor={`seats-${p.code}`} className="text-xs flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5" /> Usuários
+              <Users className="h-3.5 w-3.5" /> {tx("Usuários")}
             </Label>
             <Input
               id={`seats-${p.code}`}
@@ -137,7 +138,7 @@ function PlanCard({
             />
             {monthlyTotal !== null && (
               <p className="text-xs text-muted-foreground">
-                Total estimado: <strong className="text-foreground">{formatBRL(monthlyTotal)}/{periodLabel}</strong> para {quantity} usuários.
+                {tx("Total estimado:")} <strong className="text-foreground">{formatBRL(monthlyTotal)}/{periodLabel}</strong> para {quantity} usuários.
                 Acima de {MAX_SEATS} usuários, fale com o time comercial.
               </p>
             )}
@@ -152,7 +153,7 @@ function PlanCard({
               onCheckout!({ code: p.code, name: p.name, priceId: onlinePriceId!, quantity })
             }
           >
-            Atualizar usuários
+            {tx("Atualizar usuários")}
           </Button>
         ) : (
           !isCurrent && (
@@ -199,7 +200,7 @@ export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {})
     <div>
       <div className="flex items-center gap-2 mb-1">
         <Sparkles className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-bold">Planos SISTUR</h3>
+        <h3 className="text-lg font-bold">{tx("Planos SISTUR")}</h3>
       </div>
       <p className="text-sm text-muted-foreground mb-6">
         Preços vigentes. O plano Territorial (gestão pública) é contratado por proposta/empenho; os demais
@@ -207,12 +208,12 @@ export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {})
       </p>
 
       <div className="flex justify-center mb-6">
-        <div className="inline-flex rounded-full border border-border bg-muted/40 p-1" role="tablist" aria-label="Período de cobrança">
+        <div className="inline-flex rounded-full border border-border bg-muted/40 p-1" role="tablist" aria-label={tx("Período de cobrança")}>
           <Button size="sm" variant={annual ? 'ghost' : 'default'} className="rounded-full" onClick={() => setAnnual(false)} aria-pressed={!annual}>
-            Mensal
+            {tx("Mensal")}
           </Button>
           <Button size="sm" variant={annual ? 'default' : 'ghost'} className="rounded-full gap-2" onClick={() => setAnnual(true)} aria-pressed={annual}>
-            Anual <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">-15%</Badge>
+            {tx("Anual")} <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">-15%</Badge>
           </Button>
         </div>
       </div>

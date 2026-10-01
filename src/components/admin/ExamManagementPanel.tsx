@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -87,9 +88,9 @@ export function ExamManagementPanel() {
 
   const getResultBadge = (result: string | null) => {
     switch (result) {
-      case 'passed': return <Badge className="bg-green-500/10 text-green-700 border-green-200"><CheckCircle className="w-3 h-3 mr-1" />Aprovado</Badge>;
-      case 'failed': return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Reprovado</Badge>;
-      case 'pending': return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pendente</Badge>;
+      case 'passed': return <Badge className="bg-green-500/10 text-green-700 border-green-200"><CheckCircle className="w-3 h-3 mr-1" />{tx("Aprovado")}</Badge>;
+      case 'failed': return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />{tx("Reprovado")}</Badge>;
+      case 'pending': return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />{tx("Pendente")}</Badge>;
       default: return <Badge variant="outline">—</Badge>;
     }
   };
@@ -100,27 +101,27 @@ export function ExamManagementPanel() {
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <Card><CardContent className="pt-3 pb-2 text-center">
           <p className="text-xl font-bold">{stats.totalAttempts}</p>
-          <p className="text-[10px] text-muted-foreground">Total</p>
+          <p className="text-[10px] text-muted-foreground">{tx("Total")}</p>
         </CardContent></Card>
         <Card><CardContent className="pt-3 pb-2 text-center">
           <p className="text-xl font-bold text-green-600">{stats.passed}</p>
-          <p className="text-[10px] text-muted-foreground">Aprovados</p>
+          <p className="text-[10px] text-muted-foreground">{tx("Aprovados")}</p>
         </CardContent></Card>
         <Card><CardContent className="pt-3 pb-2 text-center">
           <p className="text-xl font-bold text-red-600">{stats.failed}</p>
-          <p className="text-[10px] text-muted-foreground">Reprovados</p>
+          <p className="text-[10px] text-muted-foreground">{tx("Reprovados")}</p>
         </CardContent></Card>
         <Card><CardContent className="pt-3 pb-2 text-center">
           <p className="text-xl font-bold text-amber-600">{stats.pending}</p>
-          <p className="text-[10px] text-muted-foreground">Pendentes</p>
+          <p className="text-[10px] text-muted-foreground">{tx("Pendentes")}</p>
         </CardContent></Card>
         <Card><CardContent className="pt-3 pb-2 text-center">
           <p className="text-xl font-bold">{stats.avgScore}%</p>
-          <p className="text-[10px] text-muted-foreground">Média</p>
+          <p className="text-[10px] text-muted-foreground">{tx("Média")}</p>
         </CardContent></Card>
         <Card><CardContent className="pt-3 pb-2 text-center">
           <p className="text-xl font-bold">{stats.passRate}%</p>
-          <p className="text-[10px] text-muted-foreground">Taxa Aprovação</p>
+          <p className="text-[10px] text-muted-foreground">{tx("Taxa Aprovação")}</p>
         </CardContent></Card>
       </div>
 
@@ -128,7 +129,7 @@ export function ExamManagementPanel() {
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="attempts" className="gap-2">
             <Users className="h-4 w-4" />
-            Tentativas
+            {tx("Tentativas")}
           </TabsTrigger>
           <TabsTrigger value="appeals" className="gap-2">
             <MessageSquare className="h-4 w-4" />
@@ -140,13 +141,13 @@ export function ExamManagementPanel() {
           <div className="flex justify-between items-center">
             <Select value={resultFilter} onValueChange={setResultFilter}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filtrar" />
+                <SelectValue placeholder={tx("Filtrar")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="passed">Aprovados</SelectItem>
-                <SelectItem value="failed">Reprovados</SelectItem>
-                <SelectItem value="pending">Pendentes</SelectItem>
+                <SelectItem value="all">{tx("Todos")}</SelectItem>
+                <SelectItem value="passed">{tx("Aprovados")}</SelectItem>
+                <SelectItem value="failed">{tx("Reprovados")}</SelectItem>
+                <SelectItem value="pending">{tx("Pendentes")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -160,17 +161,17 @@ export function ExamManagementPanel() {
               ) : !filteredAttempts.length ? (
                 <div className="p-12 text-center text-muted-foreground">
                   <ClipboardList className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Nenhuma tentativa encontrada</p>
+                  <p>{tx("Nenhuma tentativa encontrada")}</p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Aluno</TableHead>
-                      <TableHead>Curso</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Nota</TableHead>
-                      <TableHead>Resultado</TableHead>
+                      <TableHead>{tx("Aluno")}</TableHead>
+                      <TableHead>{tx("Curso")}</TableHead>
+                      <TableHead>{tx("Data")}</TableHead>
+                      <TableHead>{tx("Nota")}</TableHead>
+                      <TableHead>{tx("Resultado")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -207,17 +208,17 @@ export function ExamManagementPanel() {
               ) : !appeals?.length ? (
                 <div className="p-12 text-center text-muted-foreground">
                   <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Nenhum recurso</p>
+                  <p>{tx("Nenhum recurso")}</p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Aluno</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Motivo</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
+                      <TableHead>{tx("Aluno")}</TableHead>
+                      <TableHead>{tx("Data")}</TableHead>
+                      <TableHead>{tx("Motivo")}</TableHead>
+                      <TableHead>{tx("Status")}</TableHead>
+                      <TableHead className="text-right">{tx("Ações")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -272,20 +273,20 @@ export function ExamManagementPanel() {
               {resolveDialog?.action === 'accepted' ? 'Aceitar Recurso' : 'Rejeitar Recurso'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Forneça uma resposta ao aluno sobre a decisão.
+              {tx("Forneça uma resposta ao aluno sobre a decisão.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-3 py-4">
-            <Label>Resposta</Label>
+            <Label>{tx("Resposta")}</Label>
             <Textarea
               value={adminResponse}
               onChange={(e) => setAdminResponse(e.target.value)}
-              placeholder="Justificativa da decisão..."
+              placeholder={tx("Justificativa da decisão...")}
               rows={4}
             />
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleResolve}
               disabled={!adminResponse.trim() || resolveAppeal.isPending}

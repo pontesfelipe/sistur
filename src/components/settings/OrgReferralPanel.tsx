@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,13 +17,13 @@ export function OrgReferralManagePanel() {
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast.success('Código copiado!');
+    toast.success(tx("Código copiado!"));
   };
 
   const copyLink = (code: string) => {
     const link = `${window.location.origin}/auth?orgref=${code}`;
     navigator.clipboard.writeText(link);
-    toast.success('Link de convite copiado!');
+    toast.success(tx("Link de convite copiado!"));
   };
 
   return (
@@ -30,10 +31,10 @@ export function OrgReferralManagePanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Building2 className="h-5 w-5 text-primary" />
-          Códigos de Convite da Organização
+          {tx("Códigos de Convite da Organização")}
         </CardTitle>
         <CardDescription>
-          Gere códigos para convidar pessoas a ingressar na sua organização
+          {tx("Gere códigos para convidar pessoas a ingressar na sua organização")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -65,17 +66,17 @@ export function OrgReferralManagePanel() {
                 </Badge>
                 {c.is_active && (
                   <>
-                    <Button variant="outline" size="icon" onClick={() => copyCode(c.code)} title="Copiar código">
+                    <Button variant="outline" size="icon" onClick={() => copyCode(c.code)} title={tx("Copiar código")}>
                       <Copy className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="icon" onClick={() => copyLink(c.code)} title="Copiar link">
+                    <Button variant="outline" size="icon" onClick={() => copyLink(c.code)} title={tx("Copiar link")}>
                       <Link2 className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => deactivateCode.mutate(c.id)}
-                      title="Desativar"
+                      title={tx("Desativar")}
                     >
                       <XCircle className="h-4 w-4 text-destructive" />
                     </Button>
@@ -85,7 +86,7 @@ export function OrgReferralManagePanel() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">Nenhum código gerado ainda.</p>
+          <p className="text-sm text-muted-foreground">{tx("Nenhum código gerado ainda.")}</p>
         )}
       </CardContent>
     </Card>
@@ -99,7 +100,7 @@ export function JoinOrgByCodePanel() {
 
   const handleSubmit = () => {
     if (!code.trim()) {
-      toast.error('Informe um código');
+      toast.error(tx("Informe um código"));
       return;
     }
     linkToOrg.mutate(code.trim());
@@ -111,21 +112,21 @@ export function JoinOrgByCodePanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Tag className="h-5 w-5 text-primary" />
-          Vincular a uma Organização
+          {tx("Vincular a uma Organização")}
         </CardTitle>
         <CardDescription>
-          Se você recebeu um código de convite de uma organização, insira abaixo para ingressar
+          {tx("Se você recebeu um código de convite de uma organização, insira abaixo para ingressar")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-3">
           <div className="flex-1 space-y-2">
-            <Label htmlFor="org-code">Código da Organização</Label>
+            <Label htmlFor="org-code">{tx("Código da Organização")}</Label>
             <Input
               id="org-code"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
-              placeholder="Ex: ORGAB3XYZ"
+              placeholder={tx("Ex: ORGAB3XYZ")}
               maxLength={20}
               className="font-mono tracking-widest"
             />

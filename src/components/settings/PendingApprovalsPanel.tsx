@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,7 +41,7 @@ export function PendingApprovalsPanel() {
       setPendingUsers(users);
     } catch (error) {
       console.error('Error fetching pending users:', error);
-      toast.error('Erro ao carregar usuários pendentes');
+      toast.error(tx("Erro ao carregar usuários pendentes"));
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ export function PendingApprovalsPanel() {
         console.warn('Failed to send approval email:', emailError);
       }
 
-      toast.success('Usuário aprovado com sucesso');
+      toast.success(tx("Usuário aprovado com sucesso"));
       await fetchPendingUsers();
     } catch (error: any) {
       console.error('Error approving user:', error);
@@ -94,7 +95,7 @@ export function PendingApprovalsPanel() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      toast.success('Solicitação rejeitada');
+      toast.success(tx("Solicitação rejeitada"));
       await fetchPendingUsers();
     } catch (error: any) {
       console.error('Error rejecting user:', error);
@@ -115,7 +116,7 @@ export function PendingApprovalsPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-primary" />
-            Aprovações Pendentes
+            {tx("Aprovações Pendentes")}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-8">
@@ -138,14 +139,14 @@ export function PendingApprovalsPanel() {
           )}
         </CardTitle>
         <CardDescription>
-          Usuários aguardando aprovação para acessar o sistema
+          {tx("Usuários aguardando aprovação para acessar o sistema")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {pendingUsers.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Nenhuma solicitação pendente</p>
+            <p>{tx("Nenhuma solicitação pendente")}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -174,7 +175,7 @@ export function PendingApprovalsPanel() {
                     }
                   >
                     <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Papel" />
+                      <SelectValue placeholder={tx("Papel")} />
                     </SelectTrigger>
                     <SelectContent>
                       {approvalRoles(user.system_access).map(role => (

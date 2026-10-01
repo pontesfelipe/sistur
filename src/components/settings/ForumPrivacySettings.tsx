@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -23,7 +24,7 @@ export function ForumPrivacySettings() {
           : 'Você aparecerá como anônimo em posts públicos'
       );
     } else {
-      toast.error('Erro ao atualizar configuração: ' + result.error);
+      toast.error(tx("Erro ao atualizar configuração: ") + result.error);
     }
   };
 
@@ -32,10 +33,10 @@ export function ForumPrivacySettings() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="h-5 w-5 text-primary" />
-          Privacidade no Social Turismo
+          {tx("Privacidade no Social Turismo")}
         </CardTitle>
         <CardDescription>
-          Controle como você aparece em posts públicos do fórum
+          {tx("Controle como você aparece em posts públicos do fórum")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -48,7 +49,7 @@ export function ForumPrivacySettings() {
             )}
             <div>
               <Label htmlFor="forum-identity" className="font-medium">
-                Exibir identidade em posts públicos
+                {tx("Exibir identidade em posts públicos")}
               </Label>
               <p className="text-sm text-muted-foreground">
                 {profile?.forum_show_identity 
@@ -68,15 +69,15 @@ export function ForumPrivacySettings() {
         <Alert>
           <Shield className="h-4 w-4" />
           <AlertDescription className="text-sm">
-            <strong>Nota de segurança:</strong> Esta configuração afeta apenas posts com 
-            visibilidade <strong>pública</strong>. Em posts da sua organização, sua identidade 
+            <strong>{tx("Nota de segurança:")}</strong> Esta configuração afeta apenas posts com 
+            visibilidade <strong>{tx("pública")}</strong>. Em posts da sua organização, sua identidade 
             sempre será visível para membros da mesma organização.
           </AlertDescription>
         </Alert>
 
         <div className="text-xs text-muted-foreground space-y-1">
-          <p>• <strong>Identidade visível:</strong> Nome e foto aparecem normalmente</p>
-          <p>• <strong>Anônimo:</strong> Exibido como "Usuário Anônimo" sem foto</p>
+          <p>• <strong>{tx("Identidade visível:")}</strong> {tx("Nome e foto aparecem normalmente")}</p>
+          <p>• <strong>{tx("Anônimo:")}</strong> {tx("Exibido como \"Usuário Anônimo\" sem foto")}</p>
           <p>• Você ainda pode editar e excluir seus próprios posts</p>
         </div>
       </CardContent>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,7 +92,7 @@ export function OrganizationUsersPanel() {
         );
       } catch (error) {
         console.error('Error fetching organizations:', error);
-        toast.error('Erro ao carregar organizações');
+        toast.error(tx("Erro ao carregar organizações"));
       } finally {
         setLoading(false);
       }
@@ -153,7 +154,7 @@ export function OrganizationUsersPanel() {
         setUsers(orgUsers);
       } catch (error) {
         console.error('Error fetching org users:', error);
-        toast.error('Erro ao carregar usuários da organização');
+        toast.error(tx("Erro ao carregar usuários da organização"));
       } finally {
         setUsersLoading(false);
       }
@@ -207,7 +208,7 @@ export function OrganizationUsersPanel() {
       const orgName = organizations.find(o => o.id === selectedOrg)?.name;
       await logOrgAction('ORG_USER_ADDED', userId, selectedOrg, { org_name: orgName });
 
-      toast.success('Usuário adicionado à organização');
+      toast.success(tx("Usuário adicionado à organização"));
       setAddUserDialogOpen(false);
       
       // Refresh users
@@ -261,7 +262,7 @@ export function OrganizationUsersPanel() {
         user_name: userName 
       });
 
-      toast.success('Usuário removido da organização');
+      toast.success(tx("Usuário removido da organização"));
       setUsers(prev => prev.filter(u => u.user_id !== userId));
     } catch (error: any) {
       console.error('Error removing user from org:', error);
@@ -293,7 +294,7 @@ export function OrganizationUsersPanel() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-center gap-2">
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Carregando...</span>
+            <span>{tx("Carregando...")}</span>
           </div>
         </CardContent>
       </Card>
@@ -305,10 +306,10 @@ export function OrganizationUsersPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
-          Usuários por Organização
+          {tx("Usuários por Organização")}
         </CardTitle>
         <CardDescription>
-          Visualize e gerencie usuários de cada organização
+          {tx("Visualize e gerencie usuários de cada organização")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -318,7 +319,7 @@ export function OrganizationUsersPanel() {
             <Select value={selectedOrg || ''} onValueChange={setSelectedOrg}>
               <SelectTrigger>
                 <Building2 className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Selecione uma organização" />
+                <SelectValue placeholder={tx("Selecione uma organização")} />
               </SelectTrigger>
               <SelectContent>
                 {organizations.map(org => (
@@ -337,12 +338,12 @@ export function OrganizationUsersPanel() {
             <DialogTrigger asChild>
               <Button disabled={!selectedOrg || isPendingOrganizationSelected}>
                 <UserPlus className="h-4 w-4 mr-2" />
-                Adicionar Usuário
+                {tx("Adicionar Usuário")}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle>Adicionar Usuário à Organização</DialogTitle>
+                <DialogTitle>{tx("Adicionar Usuário à Organização")}</DialogTitle>
                 <DialogDescription>
                   {isPendingOrganizationSelected
                     ? 'Usuários pendentes são gerenciados pelo fluxo de aprovação.'
@@ -353,7 +354,7 @@ export function OrganizationUsersPanel() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Buscar usuário..."
+                    placeholder={tx("Buscar usuário...")}
                     value={addUserSearch}
                     onChange={(e) => setAddUserSearch(e.target.value)}
                     className="pl-10"
@@ -363,7 +364,7 @@ export function OrganizationUsersPanel() {
                   <div className="space-y-2">
                     {filteredAvailableUsers.length === 0 ? (
                       <p className="text-center text-muted-foreground py-4">
-                        Nenhum usuário disponível
+                        {tx("Nenhum usuário disponível")}
                       </p>
                     ) : (
                       filteredAvailableUsers.map(user => (
@@ -411,7 +412,7 @@ export function OrganizationUsersPanel() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar usuários..."
+              placeholder={tx("Buscar usuários...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -426,11 +427,11 @@ export function OrganizationUsersPanel() {
           </div>
         ) : !selectedOrg ? (
           <div className="text-center py-8 text-muted-foreground">
-            Selecione uma organização para ver seus usuários
+            {tx("Selecione uma organização para ver seus usuários")}
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            Nenhum usuário encontrado nesta organização
+            {tx("Nenhum usuário encontrado nesta organização")}
           </div>
         ) : (
           <ScrollArea className="h-[400px]">
@@ -484,19 +485,19 @@ export function OrganizationUsersPanel() {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Remover usuário da organização?</AlertDialogTitle>
+                        <AlertDialogTitle>{tx("Remover usuário da organização?")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          O usuário <strong>{user.full_name}</strong> será removido desta organização.
+                          {tx("O usuário")} <strong>{user.full_name}</strong> será removido desta organização.
                           Ele ainda terá acesso ao sistema, mas precisará ser adicionado a outra organização.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
                         <AlertDialogAction
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           onClick={() => handleRemoveUser(user.user_id, user.full_name || '')}
                         >
-                          Remover
+                          {tx("Remover")}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

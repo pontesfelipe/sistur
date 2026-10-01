@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -62,9 +63,9 @@ export function CancelSubscriptionDialog({
     } catch (err: any) {
       const msg = err?.message || '';
       if (msg.includes('no_active_license')) {
-        toast.error('Nenhuma licença ativa encontrada.');
+        toast.error(tx("Nenhuma licença ativa encontrada."));
       } else {
-        toast.error('Erro ao cancelar: ' + msg);
+        toast.error(tx("Erro ao cancelar: ") + msg);
       }
     } finally {
       setProcessing(false);
@@ -77,7 +78,7 @@ export function CancelSubscriptionDialog({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            <DialogTitle>Cancelar plano</DialogTitle>
+            <DialogTitle>{tx("Cancelar plano")}</DialogTitle>
           </div>
           <DialogDescription>
             {isTrial
@@ -89,7 +90,7 @@ export function CancelSubscriptionDialog({
         <div className="space-y-4 py-2">
           <div>
             <Label className="text-sm font-medium mb-2 block">
-              Motivo do cancelamento <span className="text-destructive">*</span>
+              {tx("Motivo do cancelamento")} <span className="text-destructive">*</span>
             </Label>
             <div className="flex flex-wrap gap-2">
               {CANCELLATION_REASONS.map(reason => (
@@ -117,7 +118,7 @@ export function CancelSubscriptionDialog({
               id="cancel-details"
               value={details}
               onChange={e => setDetails(e.target.value)}
-              placeholder="Conte-nos mais sobre sua decisão..."
+              placeholder={tx("Conte-nos mais sobre sua decisão...")}
               className="resize-none"
               rows={3}
             />
@@ -126,7 +127,7 @@ export function CancelSubscriptionDialog({
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={processing}>
-            Voltar
+            {tx("Voltar")}
           </Button>
           <Button
             variant="destructive"

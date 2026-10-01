@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -57,7 +58,7 @@ export function AdminCancelLicenseDialog({
       onCancelled();
       onOpenChange(false);
     } catch (err: any) {
-      toast.error('Erro ao cancelar: ' + (err?.message || 'Tente novamente'));
+      toast.error(tx("Erro ao cancelar: ") + (err?.message || 'Tente novamente'));
     } finally {
       setProcessing(false);
     }
@@ -69,10 +70,10 @@ export function AdminCancelLicenseDialog({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            <DialogTitle>Cancelar licença</DialogTitle>
+            <DialogTitle>{tx("Cancelar licença")}</DialogTitle>
           </div>
           <DialogDescription>
-            Cancelar o plano <strong>{planLabel}</strong> de <strong>{userName}</strong>.
+            {tx("Cancelar o plano")} <strong>{planLabel}</strong> {tx("de")} <strong>{userName}</strong>.
             O acesso será mantido até o fim do período vigente.
           </DialogDescription>
         </DialogHeader>
@@ -80,7 +81,7 @@ export function AdminCancelLicenseDialog({
         <div className="space-y-4 py-2">
           <div>
             <Label className="text-sm font-medium mb-2 block">
-              Motivo <span className="text-destructive">*</span>
+              {tx("Motivo")} <span className="text-destructive">*</span>
             </Label>
             <div className="flex flex-wrap gap-2">
               {ADMIN_REASONS.map(reason => (
@@ -108,7 +109,7 @@ export function AdminCancelLicenseDialog({
               id="admin-cancel-details"
               value={details}
               onChange={e => setDetails(e.target.value)}
-              placeholder="Observações internas..."
+              placeholder={tx("Observações internas...")}
               className="resize-none"
               rows={3}
             />
@@ -117,7 +118,7 @@ export function AdminCancelLicenseDialog({
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={processing}>
-            Voltar
+            {tx("Voltar")}
           </Button>
           <Button variant="destructive" onClick={handleCancel} disabled={!canSubmit || processing}>
             {processing ? 'Cancelando...' : 'Confirmar cancelamento'}

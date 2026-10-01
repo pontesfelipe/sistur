@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -155,50 +156,50 @@ function FeedbackItem({ feedback, onUpdate }: { feedback: UserFeedback; onUpdate
       {expanded && (
         <div className="space-y-4 pt-2 border-t">
           <div>
-            <p className="text-sm font-medium mb-1">Descrição:</p>
+            <p className="text-sm font-medium mb-1">{tx("Descrição:")}</p>
             <p className="text-sm text-muted-foreground whitespace-pre-wrap">{feedback.description}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
+              <label className="text-sm font-medium">{tx("Status")}</label>
               <Select value={feedback.status} onValueChange={handleStatusChange} disabled={saving}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">Pendente</SelectItem>
-                  <SelectItem value="reviewing">Em Análise</SelectItem>
-                  <SelectItem value="planned">Planejado</SelectItem>
-                  <SelectItem value="in_progress">Em Progresso</SelectItem>
-                  <SelectItem value="completed">Concluído</SelectItem>
-                  <SelectItem value="rejected">Rejeitado</SelectItem>
+                  <SelectItem value="pending">{tx("Pendente")}</SelectItem>
+                  <SelectItem value="reviewing">{tx("Em Análise")}</SelectItem>
+                  <SelectItem value="planned">{tx("Planejado")}</SelectItem>
+                  <SelectItem value="in_progress">{tx("Em Progresso")}</SelectItem>
+                  <SelectItem value="completed">{tx("Concluído")}</SelectItem>
+                  <SelectItem value="rejected">{tx("Rejeitado")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Prioridade</label>
+              <label className="text-sm font-medium">{tx("Prioridade")}</label>
               <Select value={feedback.priority} onValueChange={handlePriorityChange}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Baixa</SelectItem>
-                  <SelectItem value="medium">Média</SelectItem>
-                  <SelectItem value="high">Alta</SelectItem>
-                  <SelectItem value="critical">Crítica</SelectItem>
+                  <SelectItem value="low">{tx("Baixa")}</SelectItem>
+                  <SelectItem value="medium">{tx("Média")}</SelectItem>
+                  <SelectItem value="high">{tx("Alta")}</SelectItem>
+                  <SelectItem value="critical">{tx("Crítica")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Notas do Admin</label>
+            <label className="text-sm font-medium">{tx("Notas do Admin")}</label>
             <Textarea
               value={adminNotes}
               onChange={(e) => setAdminNotes(e.target.value)}
-              placeholder="Adicione notas internas sobre este feedback..."
+              placeholder={tx("Adicione notas internas sobre este feedback...")}
               rows={2}
             />
             <div className="flex gap-2">
@@ -215,19 +216,19 @@ function FeedbackItem({ feedback, onUpdate }: { feedback: UserFeedback; onUpdate
                 <AlertDialogTrigger asChild>
                   <Button size="sm" variant="destructive">
                     <Trash2 className="h-4 w-4 mr-1" />
-                    Excluir
+                    {tx("Excluir")}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Excluir feedback?</AlertDialogTitle>
+                    <AlertDialogTitle>{tx("Excluir feedback?")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Esta ação não pode ser desfeita. O feedback será permanentemente removido.
+                      {tx("Esta ação não pode ser desfeita. O feedback será permanentemente removido.")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}>Excluir</AlertDialogAction>
+                    <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>{tx("Excluir")}</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -262,10 +263,10 @@ export function FeedbackManagementPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="h-5 w-5 text-primary" />
-          Gerenciamento de Feedback
+          {tx("Gerenciamento de Feedback")}
         </CardTitle>
         <CardDescription>
-          Sugestões de features e bugs reportados pelos usuários
+          {tx("Sugestões de features e bugs reportados pelos usuários")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -273,19 +274,19 @@ export function FeedbackManagementPanel() {
         <div className="grid grid-cols-4 gap-4">
           <div className="p-3 bg-muted/50 rounded-lg text-center">
             <p className="text-2xl font-bold">{stats.total}</p>
-            <p className="text-xs text-muted-foreground">Total</p>
+            <p className="text-xs text-muted-foreground">{tx("Total")}</p>
           </div>
           <div className="p-3 bg-yellow-500/10 rounded-lg text-center">
             <p className="text-2xl font-bold text-yellow-600">{stats.features}</p>
-            <p className="text-xs text-muted-foreground">Sugestões</p>
+            <p className="text-xs text-muted-foreground">{tx("Sugestões")}</p>
           </div>
           <div className="p-3 bg-red-500/10 rounded-lg text-center">
             <p className="text-2xl font-bold text-red-600">{stats.bugs}</p>
-            <p className="text-xs text-muted-foreground">Bugs</p>
+            <p className="text-xs text-muted-foreground">{tx("Bugs")}</p>
           </div>
           <div className="p-3 bg-blue-500/10 rounded-lg text-center">
             <p className="text-2xl font-bold text-blue-600">{stats.pending}</p>
-            <p className="text-xs text-muted-foreground">Pendentes</p>
+            <p className="text-xs text-muted-foreground">{tx("Pendentes")}</p>
           </div>
         </div>
 
@@ -293,30 +294,30 @@ export function FeedbackManagementPanel() {
         <div className="flex gap-4">
           <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)} className="flex-1">
             <TabsList>
-              <TabsTrigger value="all">Todos</TabsTrigger>
+              <TabsTrigger value="all">{tx("Todos")}</TabsTrigger>
               <TabsTrigger value="feature" className="gap-1">
                 <Lightbulb className="h-3 w-3" />
-                Sugestões
+                {tx("Sugestões")}
               </TabsTrigger>
               <TabsTrigger value="bug" className="gap-1">
                 <Bug className="h-3 w-3" />
-                Bugs
+                {tx("Bugs")}
               </TabsTrigger>
             </TabsList>
           </Tabs>
           
           <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={tx("Status")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os Status</SelectItem>
-              <SelectItem value="pending">Pendente</SelectItem>
-              <SelectItem value="reviewing">Em Análise</SelectItem>
-              <SelectItem value="planned">Planejado</SelectItem>
-              <SelectItem value="in_progress">Em Progresso</SelectItem>
-              <SelectItem value="completed">Concluído</SelectItem>
-              <SelectItem value="rejected">Rejeitado</SelectItem>
+              <SelectItem value="all">{tx("Todos os Status")}</SelectItem>
+              <SelectItem value="pending">{tx("Pendente")}</SelectItem>
+              <SelectItem value="reviewing">{tx("Em Análise")}</SelectItem>
+              <SelectItem value="planned">{tx("Planejado")}</SelectItem>
+              <SelectItem value="in_progress">{tx("Em Progresso")}</SelectItem>
+              <SelectItem value="completed">{tx("Concluído")}</SelectItem>
+              <SelectItem value="rejected">{tx("Rejeitado")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -332,8 +333,8 @@ export function FeedbackManagementPanel() {
           ) : filteredFeedbacks.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <MessageSquare className="h-12 w-12 mb-4 opacity-20" />
-              <p className="font-medium">Nenhum feedback encontrado</p>
-              <p className="text-sm">Os feedbacks dos usuários aparecerão aqui</p>
+              <p className="font-medium">{tx("Nenhum feedback encontrado")}</p>
+              <p className="text-sm">{tx("Os feedbacks dos usuários aparecerão aqui")}</p>
             </div>
           ) : (
             <div className="space-y-3 pr-4">

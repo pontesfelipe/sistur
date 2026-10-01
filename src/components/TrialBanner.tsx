@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, X, ArrowRight, AlertTriangle } from 'lucide-react';
@@ -57,7 +58,7 @@ export function TrialBanner() {
                   : 'bg-amber-500 hover:bg-amber-600 text-amber-950',
               )}
             >
-              Ver Planos <ArrowRight className="h-3 w-3" />
+              {tx("Ver Planos")} <ArrowRight className="h-3 w-3" />
             </button>
             {!isTrialExpired && (
               <button

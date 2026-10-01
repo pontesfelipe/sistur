@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -25,26 +26,26 @@ export default function AdminInteligencia() {
 
   return (
     <AppLayout
-      title="Inteligência"
-      subtitle="Professor Beni, contexto dos relatórios, camada semântica, estrutura de análise e integração MCP."
+      title={tx("Inteligência")}
+      subtitle={tx("Professor Beni, contexto dos relatórios, camada semântica, estrutura de análise e integração MCP.")}
     >
       <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className="flex w-full gap-1 overflow-x-auto whitespace-nowrap justify-start">
           <TabsTrigger value="beni" className="flex items-center gap-2 shrink-0">
             <Bot className="h-4 w-4" />
-            Beni
+            {tx("Beni")}
           </TabsTrigger>
           <TabsTrigger value="contexto" className="flex items-center gap-2 shrink-0">
             <Sparkles className="h-4 w-4" />
-            Contexto
+            {tx("Contexto")}
           </TabsTrigger>
           <TabsTrigger value="semantica" className="flex items-center gap-2 shrink-0">
             <ScrollText className="h-4 w-4" />
-            Semântica
+            {tx("Semântica")}
           </TabsTrigger>
           <TabsTrigger value="estrutura" className="flex items-center gap-2 shrink-0">
             <ListOrdered className="h-4 w-4" />
-            Estrutura
+            {tx("Estrutura")}
           </TabsTrigger>
           <TabsTrigger value="mcp" className="flex items-center gap-2 shrink-0">
             <Plug className="h-4 w-4" />
@@ -57,25 +58,25 @@ export default function AdminInteligencia() {
         </TabsContent>
 
         <TabsContent value="contexto" className="space-y-6">
-          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando contexto do relatório…</div>}>
+          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">{tx("Carregando contexto do relatório…")}</div>}>
             <ReportContextPanel />
           </Suspense>
         </TabsContent>
 
         <TabsContent value="semantica" className="space-y-6">
-          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando camada semântica…</div>}>
+          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">{tx("Carregando camada semântica…")}</div>}>
             <AdminSemanticLayer embedded />
           </Suspense>
         </TabsContent>
 
         <TabsContent value="estrutura" className="space-y-6">
-          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando estrutura do relatório…</div>}>
+          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">{tx("Carregando estrutura do relatório…")}</div>}>
             <ReportStructurePanel />
           </Suspense>
         </TabsContent>
 
         <TabsContent value="mcp" className="space-y-6">
-          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Carregando guia de integração…</div>}>
+          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">{tx("Carregando guia de integração…")}</div>}>
             <McpGuidePanel />
           </Suspense>
         </TabsContent>

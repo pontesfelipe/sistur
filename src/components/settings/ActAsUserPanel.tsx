@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from '@/hooks/useProfile';
@@ -67,7 +68,7 @@ export function ActAsUserPanel() {
       setUsers(enrichedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('Erro ao carregar usuários');
+      toast.error(tx("Erro ao carregar usuários"));
     } finally {
       setLoading(false);
     }
@@ -75,7 +76,7 @@ export function ActAsUserPanel() {
 
   const switchToUser = async () => {
     if (!selectedUserId) {
-      toast.error('Selecione um usuário');
+      toast.error(tx("Selecione um usuário"));
       return;
     }
 
@@ -116,7 +117,7 @@ export function ActAsUserPanel() {
 
       if (error) throw error;
 
-      toast.success('Voltando para seus próprios dados');
+      toast.success(tx("Voltando para seus próprios dados"));
       window.location.reload();
     } catch (error: any) {
       console.error('Error stopping act as:', error);
@@ -136,7 +137,7 @@ export function ActAsUserPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
-            Visualizar como Usuário
+            {tx("Visualizar como Usuário")}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-8">
@@ -151,10 +152,10 @@ export function ActAsUserPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
-          Visualizar como Usuário
+          {tx("Visualizar como Usuário")}
         </CardTitle>
         <CardDescription>
-          Visualize os dados de outro usuário/organização
+          {tx("Visualize os dados de outro usuário/organização")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -164,10 +165,10 @@ export function ActAsUserPanel() {
               <Eye className="h-5 w-5 text-amber-500" />
               <div>
                 <p className="font-medium text-amber-700 dark:text-amber-400">
-                  Visualizando dados de outra organização
+                  {tx("Visualizando dados de outra organização")}
                 </p>
                 <p className="text-sm text-amber-600 dark:text-amber-500">
-                  Os dados exibidos não são seus
+                  {tx("Os dados exibidos não são seus")}
                 </p>
               </div>
             </div>
@@ -189,11 +190,11 @@ export function ActAsUserPanel() {
         <div className="flex items-end gap-4">
           <div className="flex-1">
             <label className="text-sm font-medium mb-2 block">
-              Selecionar usuário
+              {tx("Selecionar usuário")}
             </label>
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
               <SelectTrigger>
-                <SelectValue placeholder="Escolha um usuário..." />
+                <SelectValue placeholder={tx("Escolha um usuário...")} />
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (
@@ -224,7 +225,7 @@ export function ActAsUserPanel() {
 
         {users.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-4">
-            Nenhum outro usuário encontrado
+            {tx("Nenhum outro usuário encontrado")}
           </p>
         )}
       </CardContent>

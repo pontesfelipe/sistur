@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -220,9 +221,9 @@ export function EssayGradingPanel() {
       <Card>
         <CardContent className="py-12 text-center">
           <CheckCircle className="h-12 w-12 mx-auto mb-4 text-severity-good" />
-          <h3 className="text-lg font-semibold">Nenhuma correção pendente</h3>
+          <h3 className="text-lg font-semibold">{tx("Nenhuma correção pendente")}</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Todas as questões dissertativas foram corrigidas.
+            {tx("Todas as questões dissertativas foram corrigidas.")}
           </p>
         </CardContent>
       </Card>
@@ -235,7 +236,7 @@ export function EssayGradingPanel() {
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Correção de Questões Dissertativas
+            {tx("Correção de Questões Dissertativas")}
           </h2>
           <p className="text-sm text-muted-foreground">
             {pendingAttempts.length} {pendingAttempts.length === 1 ? 'exame aguardando' : 'exames aguardando'} correção
@@ -283,13 +284,13 @@ export function EssayGradingPanel() {
                       </CardHeader>
                       <CardContent className="space-y-4">
                         {/* Rubric (always visible to grader, ignoring visible_to_student) */}
-                        <RubricDisplay rubric={answer.rubric} hideIfNotVisible={false} title="Rubrica de avaliação" />
+                        <RubricDisplay rubric={answer.rubric} hideIfNotVisible={false} title={tx("Rubrica de avaliação")} />
 
                         {/* Student's answer */}
                         <div>
-                          <Label className="text-xs text-muted-foreground mb-1 block">Resposta do aluno:</Label>
+                          <Label className="text-xs text-muted-foreground mb-1 block">{tx("Resposta do aluno:")}</Label>
                           <div className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap leading-relaxed">
-                            {answer.free_text_answer || <span className="italic text-muted-foreground">Sem resposta</span>}
+                            {answer.free_text_answer || <span className="italic text-muted-foreground">{tx("Sem resposta")}</span>}
                           </div>
                           {answer.free_text_answer && (
                             <p className="text-xs text-muted-foreground mt-1">
@@ -319,7 +320,7 @@ export function EssayGradingPanel() {
                             <Textarea
                               id={`cmt-${key}`}
                               rows={2}
-                              placeholder="Feedback para o aluno..."
+                              placeholder={tx("Feedback para o aluno...")}
                               value={grade.comment}
                               onChange={(e) => setGrade(attempt.attempt_id, answer.quiz_id, 'comment', e.target.value)}
                             />
@@ -340,7 +341,7 @@ export function EssayGradingPanel() {
                     disabled={!allEssaysGraded(attempt) || saveGrading.isPending}
                   >
                     <Save className="mr-2 h-4 w-4" />
-                    Salvar Correção
+                    {tx("Salvar Correção")}
                   </Button>
                 </div>
               </div>
