@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 23,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.23.1",
+    date: "2026-10-01",
+    type: "patch" as const,
+    changes: [
+      "Idiomas: nova varredura em toda a plataforma — cerca de 2.600 textos que seguiam em português (incluindo frases com números, avisos, selos, nomes dos pilares e justificativas geradas pelo cálculo) agora aparecem em inglês e espanhol.",
+    ],
+  },
   {
     version: "2.23.0",
     date: "2026-10-01",
