@@ -2115,6 +2115,7 @@
   "Cria uma tarefa em um projeto existente, em nome do usuário conectado.": "Creates a task in an existing project, on behalf of the logged-in user.",
   "Cria uma tarefa em um projeto existente, no nome do usuário autenticado.": "Creates a task in an existing project, under the name of the authenticated user.",
   "Criado em": "Created on",
+  "Criado em {{date}}": "Created on {{date}}",
   "Criando conta...": "Creating account...",
   "Criando projeto...": "Creating project...",
   "Criando...": "Creating...",
