@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 22,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.22.1",
+    date: "2026-10-01",
+    type: "patch" as const,
+    changes: [
+      "Idioma preferido salvo na conta do usuário: a escolha vale em qualquer dispositivo e é restaurada automaticamente ao entrar.",
+    ],
+  },
   {
     version: "2.22.0",
     date: "2026-10-01",
