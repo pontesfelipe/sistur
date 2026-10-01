@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,8 +92,8 @@ function DocumentDownloadItem({
     } else if (downloadUrl) {
       window.open(downloadUrl, '_blank');
     } else {
-      toast.info('Documento em preparação', {
-        description: 'Este documento estará disponível para download em breve.',
+      toast.info(tx("Documento em preparação"), {
+        description: tx("Este documento estará disponível para download em breve."),
       });
     }
   };
@@ -164,7 +165,7 @@ export default function Configuracoes() {
   };
 
   return (
-    <AppLayout title="Configurações" subtitle="Documentação, metodologia de cálculo e ferramentas do SISTUR">
+    <AppLayout title={tx("Configurações")} subtitle={tx("Documentação, metodologia de cálculo e ferramentas do SISTUR")}>
       <div className="space-y-6">
 
         {/*
@@ -178,37 +179,37 @@ export default function Configuracoes() {
 
             <TabsTrigger value="geral" className="flex items-center gap-2 shrink-0">
               <Settings2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Geral</span>
+              <span className="hidden sm:inline">{tx("Geral")}</span>
             </TabsTrigger>
             {(isAdmin || isOrgAdmin) && (
               <TabsTrigger value="usuarios" className="flex items-center gap-2 shrink-0">
                 <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Usuários</span>
+                <span className="hidden sm:inline">{tx("Usuários")}</span>
               </TabsTrigger>
             )}
             {isAdmin && (
               <TabsTrigger value="feedback" className="flex items-center gap-2 shrink-0">
                 <MessageSquare className="h-4 w-4" />
-                <span className="hidden sm:inline">Feedback</span>
+                <span className="hidden sm:inline">{tx("Feedback")}</span>
               </TabsTrigger>
             )}
             {isAdmin && (
               <TabsTrigger value="logs" className="flex items-center gap-2 shrink-0">
                 <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Logs</span>
+                <span className="hidden sm:inline">{tx("Logs")}</span>
               </TabsTrigger>
             )}
             <TabsTrigger value="documentacao" className="flex items-center gap-2 shrink-0">
               <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Docs</span>
+              <span className="hidden sm:inline">{tx("Docs")}</span>
             </TabsTrigger>
             <TabsTrigger value="biblioteca" className="flex items-center gap-2 shrink-0">
               <Library className="h-4 w-4" />
-              <span className="hidden sm:inline">Biblioteca</span>
+              <span className="hidden sm:inline">{tx("Biblioteca")}</span>
             </TabsTrigger>
             <TabsTrigger value="ferramentas" className="flex items-center gap-2 shrink-0">
               <Wrench className="h-4 w-4" />
-              <span className="hidden sm:inline">Ferramentas</span>
+              <span className="hidden sm:inline">{tx("Ferramentas")}</span>
             </TabsTrigger>
             <TabsTrigger value="regras-negocio" className="flex items-center gap-2 shrink-0">
               <Sparkles className="h-4 w-4" />
@@ -217,13 +218,13 @@ export default function Configuracoes() {
             {isAdmin && (
               <TabsTrigger value="empacotamento" className="flex items-center gap-2 shrink-0">
                 <Package className="h-4 w-4" />
-                <span className="hidden sm:inline">Empacotamento</span>
+                <span className="hidden sm:inline">{tx("Empacotamento")}</span>
               </TabsTrigger>
             )}
             {isAdmin && (
               <TabsTrigger value="creditos-beni" className="flex items-center gap-2 shrink-0">
                 <Coins className="h-4 w-4" />
-                <span className="hidden sm:inline">Créditos Beni</span>
+                <span className="hidden sm:inline">{tx("Créditos Beni")}</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -235,7 +236,7 @@ export default function Configuracoes() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 shrink-0">
                   <Info className="h-5 w-5 text-primary" />
-                  Versão do Sistema
+                  {tx("Versão do Sistema")}
                 </CardTitle>
                 <CardDescription>
                   Controle de versão semântico (MAJOR.MINOR.PATCH)
@@ -261,7 +262,7 @@ export default function Configuracoes() {
                 <div className="mt-4 pt-4 border-t">
                   <div className="flex items-center gap-2 mb-3">
                     <History className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium text-sm">Histórico de Versões</span>
+                    <span className="font-medium text-sm">{tx("Histórico de Versões")}</span>
                   </div>
                   <div className="space-y-3 max-h-60 overflow-y-auto">
                     {VERSION_HISTORY.map((entry, idx) => (
@@ -314,7 +315,7 @@ export default function Configuracoes() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-center text-muted-foreground">
-                    Acesso restrito a administradores da organização.
+                    {tx("Acesso restrito a administradores da organização.")}
                   </p>
                 </CardContent>
               </Card>
@@ -330,10 +331,10 @@ export default function Configuracoes() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 shrink-0">
                     <MessageSquare className="h-5 w-5 text-primary" />
-                    Feedback
+                    {tx("Feedback")}
                   </CardTitle>
                   <CardDescription>
-                    Você não tem permissão para gerenciar feedbacks. Use o botão no cabeçalho para enviar sugestões.
+                    {tx("Você não tem permissão para gerenciar feedbacks. Use o botão no cabeçalho para enviar sugestões.")}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -353,7 +354,7 @@ export default function Configuracoes() {
                 <div className="flex items-start gap-3">
                   <Brain className="h-6 w-6 text-primary shrink-0" />
                   <div>
-                    <p className="font-semibold text-foreground">Filosofia de Transformação</p>
+                    <p className="font-semibold text-foreground">{tx("Filosofia de Transformação")}</p>
                     <blockquote className="mt-2 text-sm italic text-foreground/80 border-l-2 border-primary pl-3">
                       "Indicadores criam obrigação. Aprendizado é execução. Monitoramento fecha o ciclo. 
                       O SISTUR não informa. O SISTUR transforma."
@@ -368,51 +369,51 @@ export default function Configuracoes() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 shrink-0">
                     <FileText className="h-5 w-5 text-primary" />
-                    Guias e Manuais
+                    {tx("Guias e Manuais")}
                   </CardTitle>
                   <CardDescription>
-                    Documentação técnica e metodológica do SISTUR
+                    {tx("Documentação técnica e metodológica do SISTUR")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <DocumentDownloadItem
-                    title="Manual do Usuário SISTUR"
-                    description="Guia completo de navegação e uso do sistema"
+                    title={tx("Manual do Usuário SISTUR")}
+                    description={tx("Guia completo de navegação e uso do sistema")}
                     version={`v${APP_VERSION.full}`}
                     onDownload={() => exportManualUsuarioDocx()}
                   />
                   
                   <DocumentDownloadItem
-                    title="Metodologia SISTUR"
-                    description="Pipeline de 9 etapas, normalização e cálculo dos pilares RA, OE e AO"
+                    title={tx("Metodologia SISTUR")}
+                    description={tx("Pipeline de 9 etapas, normalização e cálculo dos pilares RA, OE e AO")}
                     version={`v${APP_VERSION.full}`}
                     onDownload={() => exportMetodologiaDocx()}
                   />
                   
                   <DocumentDownloadItem
-                    title="Glossário de Indicadores"
-                    description="41 indicadores com definição, fonte oficial e periodicidade"
+                    title={tx("Glossário de Indicadores")}
+                    description={tx("41 indicadores com definição, fonte oficial e periodicidade")}
                     version={`v${APP_VERSION.full}`}
                     onDownload={() => exportGlossarioIndicadoresDocx()}
                   />
 
                   <DocumentDownloadItem
-                    title="Guia SISTUR EDU"
-                    description="Sistema de prescrição determinística de capacitação"
+                    title={tx("Guia SISTUR EDU")}
+                    description={tx("Sistema de prescrição determinística de capacitação")}
                     version={`v${APP_VERSION.full}`}
                     onDownload={() => exportGuiaEduDocx()}
                   />
 
                   <DocumentDownloadItem
-                    title="Manual de Diagnósticos"
-                    description="Como criar, calcular e interpretar diagnósticos territoriais"
+                    title={tx("Manual de Diagnósticos")}
+                    description={tx("Como criar, calcular e interpretar diagnósticos territoriais")}
                     version={`v${APP_VERSION.full}`}
                     onDownload={() => exportManualDiagnosticosDocx()}
                   />
 
                   <DocumentDownloadItem
-                    title="FAQ — Perguntas Frequentes"
-                    description="Perguntas e respostas sobre o SISTUR, Analítico, EDU e Empresarial"
+                    title={tx("FAQ — Perguntas Frequentes")}
+                    description={tx("Perguntas e respostas sobre o SISTUR, Analítico, EDU e Empresarial")}
                     version={`v${APP_VERSION.full}`}
                     onDownload={async () => {
                       const { faqItems } = await import('@/pages/FAQ');
@@ -421,8 +422,8 @@ export default function Configuracoes() {
                   />
 
                   <DocumentDownloadItem
-                    title="Documento Técnico — Registro de Software"
-                    description="Arquitetura, Motor IGMA, fluxos, modelo de dados e propriedade intelectual"
+                    title={tx("Documento Técnico — Registro de Software")}
+                    description={tx("Arquitetura, Motor IGMA, fluxos, modelo de dados e propriedade intelectual")}
                     version={`v${APP_VERSION.full}`}
                     onDownload={() => exportTechnicalDocx()}
                   />
@@ -433,57 +434,57 @@ export default function Configuracoes() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 shrink-0">
                     <BookOpen className="h-5 w-5 text-primary" />
-                    Referências Oficiais
+                    {tx("Referências Oficiais")}
                   </CardTitle>
                   <CardDescription>
-                    Fontes de dados e frameworks utilizados
+                    {tx("Fontes de dados e frameworks utilizados")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <ExternalReferenceItem
-                    title="IGMA - Índice de Gestão Municipal"
-                    description="Backbone de legitimidade e governança municipal"
+                    title={tx("IGMA - Índice de Gestão Municipal")}
+                    description={tx("Backbone de legitimidade e governança municipal")}
                     url="https://igma.gov.br"
                   />
                   
                   <ExternalReferenceItem
-                    title="Mapa do Turismo Brasileiro"
-                    description="Categorização A, B, C, D, E dos municípios turísticos"
+                    title={tx("Mapa do Turismo Brasileiro")}
+                    description={tx("Categorização A, B, C, D, E dos municípios turísticos")}
                     url="https://mapa.turismo.gov.br"
                   />
                   
                   <ExternalReferenceItem
-                    title="IBGE Cidades"
-                    description="Dados socioeconômicos, demográficos e territoriais"
+                    title={tx("IBGE Cidades")}
+                    description={tx("Dados socioeconômicos, demográficos e territoriais")}
                     url="https://cidades.ibge.gov.br"
                   />
 
                   <ExternalReferenceItem
-                    title="IBGE / SIDRA"
+                    title={tx("IBGE / SIDRA")}
                     description="API oficial — população estimada (tab. 6579) e PIB municipal (tab. 5938) usados no Observatório"
                     url="https://servicodados.ibge.gov.br/api/v3/agregados"
                   />
 
                   <ExternalReferenceItem
                     title="CADASTUR"
-                    description="Cadastro nacional de prestadores de serviços turísticos"
+                    description={tx("Cadastro nacional de prestadores de serviços turísticos")}
                     url="https://cadastur.turismo.gov.br"
                   />
 
                   <ExternalReferenceItem
-                    title="DataSUS"
-                    description="Indicadores de saúde pública municipal"
+                    title={tx("DataSUS")}
+                    description={tx("Indicadores de saúde pública municipal")}
                     url="https://datasus.saude.gov.br"
                   />
 
                   <ExternalReferenceItem
-                    title="INEP / IDEB"
-                    description="Índice de Desenvolvimento da Educação Básica"
+                    title={tx("INEP / IDEB")}
+                    description={tx("Índice de Desenvolvimento da Educação Básica")}
                     url="https://www.gov.br/inep"
                   />
 
                   <ExternalReferenceItem
-                    title="Novo CAGED / MTE"
+                    title={tx("Novo CAGED / MTE")}
                     description="Empregos formais no turismo (base anual via IGMA; baseline mensal estimado pelo Observatório)"
                     url="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged"
                   />
@@ -495,10 +496,10 @@ export default function Configuracoes() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 shrink-0">
                   <Info className="h-5 w-5 text-primary" />
-                  Sobre o SISTUR
+                  {tx("Sobre o SISTUR")}
                 </CardTitle>
                 <CardDescription>
-                  Sistema de Inteligência Territorial para Sustentabilidade Turística
+                  {tx("Sistema de Inteligência Territorial para Sustentabilidade Turística")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none text-muted-foreground space-y-4">
@@ -510,36 +511,36 @@ export default function Configuracoes() {
                 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="p-4 bg-muted/30 rounded-lg">
-                    <p className="font-semibold text-foreground mb-2">Princípios Fundamentais</p>
+                    <p className="font-semibold text-foreground mb-2">{tx("Princípios Fundamentais")}</p>
                     <ul className="space-y-1 text-sm">
-                      <li>• <strong>Transparência:</strong> Dados, fontes e cálculos rastreáveis</li>
-                      <li>• <strong>Sem rankings:</strong> Avaliação individual, não competitiva</li>
-                      <li>• <strong>Determinístico:</strong> Prescrições automáticas por regras</li>
-                      <li>• <strong>Ciclo fechado:</strong> Diagnóstico → Ação → Monitoramento</li>
+                      <li>• <strong>{tx("Transparência:")}</strong> {tx("Dados, fontes e cálculos rastreáveis")}</li>
+                      <li>• <strong>{tx("Sem rankings:")}</strong> {tx("Avaliação individual, não competitiva")}</li>
+                      <li>• <strong>{tx("Determinístico:")}</strong> {tx("Prescrições automáticas por regras")}</li>
+                      <li>• <strong>{tx("Ciclo fechado:")}</strong> {tx("Diagnóstico → Ação → Monitoramento")}</li>
                     </ul>
                   </div>
 
                   <div className="p-4 bg-muted/30 rounded-lg">
-                    <p className="font-semibold text-foreground mb-2">Estrutura de Pilares</p>
+                    <p className="font-semibold text-foreground mb-2">{tx("Estrutura de Pilares")}</p>
                     <ul className="space-y-1 text-sm">
-                      <li>• <strong className="text-pillar-ra">RA:</strong> Relações Ambientais (sustentabilidade)</li>
-                      <li>• <strong className="text-pillar-oe">OE:</strong> Organização Estrutural (infraestrutura)</li>
-                      <li>• <strong className="text-pillar-ao">AO:</strong> Ações Operacionais (execução)</li>
+                      <li>• <strong className="text-pillar-ra">{tx("RA:")}</strong> Relações Ambientais (sustentabilidade)</li>
+                      <li>• <strong className="text-pillar-oe">{tx("OE:")}</strong> Organização Estrutural (infraestrutura)</li>
+                      <li>• <strong className="text-pillar-ao">{tx("AO:")}</strong> Ações Operacionais (execução)</li>
                       <li>• 41 indicadores distribuídos entre os 3 pilares</li>
                     </ul>
                   </div>
                 </div>
 
                 <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                  <p className="font-semibold text-foreground mb-2">Prescrições vs. Relatórios</p>
+                  <p className="font-semibold text-foreground mb-2">{tx("Prescrições vs. Relatórios")}</p>
                   <div className="grid gap-3 md:grid-cols-2 text-sm">
                     <div>
                       <p className="font-medium text-foreground">SISTUR EDU (Prescrições)</p>
-                      <p>100% determinísticas, baseadas em regras. Cada capacitação é prescrita quando Indicador + Pilar + Status atendem critérios específicos. Sem IA.</p>
+                      <p>{tx("100% determinísticas, baseadas em regras. Cada capacitação é prescrita quando Indicador + Pilar + Status atendem critérios específicos. Sem IA.")}</p>
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">Relatórios Estratégicos</p>
-                      <p>Utilizam IA para síntese e contextualização dos dados diagnósticos. A IA analisa resultados, mas não prescreve capacitações.</p>
+                      <p className="font-medium text-foreground">{tx("Relatórios Estratégicos")}</p>
+                      <p>{tx("Utilizam IA para síntese e contextualização dos dados diagnósticos. A IA analisa resultados, mas não prescreve capacitações.")}</p>
                     </div>
                   </div>
                 </div>
@@ -558,10 +559,10 @@ export default function Configuracoes() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 shrink-0">
                   <Wrench className="h-5 w-5 text-primary" />
-                  Ferramentas de Análise
+                  {tx("Ferramentas de Análise")}
                 </CardTitle>
                 <CardDescription>
-                  Utilitários para cálculo, simulação e exportação de dados
+                  {tx("Utilitários para cálculo, simulação e exportação de dados")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -570,10 +571,10 @@ export default function Configuracoes() {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
                         <Calculator className="h-4 w-4 text-primary" />
-                        Calculadora de Normalização
+                        {tx("Calculadora de Normalização")}
                       </CardTitle>
                       <CardDescription className="text-xs">
-                        Simule o cálculo de normalização de indicadores
+                        {tx("Simule o cálculo de normalização de indicadores")}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -585,10 +586,10 @@ export default function Configuracoes() {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
                         <FlaskConical className="h-4 w-4 text-primary" />
-                        Simulador de Indicadores
+                        {tx("Simulador de Indicadores")}
                       </CardTitle>
                       <CardDescription className="text-xs">
-                        Simule valores e veja o impacto nos pilares
+                        {tx("Simule valores e veja o impacto nos pilares")}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -600,10 +601,10 @@ export default function Configuracoes() {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
                         <Download className="h-4 w-4 text-primary" />
-                        Exportar Dados
+                        {tx("Exportar Dados")}
                       </CardTitle>
                       <CardDescription className="text-xs">
-                        Exporte diagnósticos, indicadores, planos de ação e outros dados do sistema
+                        {tx("Exporte diagnósticos, indicadores, planos de ação e outros dados do sistema")}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -615,10 +616,10 @@ export default function Configuracoes() {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
                         <Search className="h-4 w-4 text-primary" />
-                        Busca de Reviews Online
+                        {tx("Busca de Reviews Online")}
                       </CardTitle>
                       <CardDescription className="text-xs">
-                        Pesquise avaliações do estabelecimento no Google, TripAdvisor e outros
+                        {tx("Pesquise avaliações do estabelecimento no Google, TripAdvisor e outros")}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -648,10 +649,10 @@ export default function Configuracoes() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 shrink-0">
                     <Map className="h-5 w-5 text-primary" />
-                    Mapa do Turismo Brasileiro
+                    {tx("Mapa do Turismo Brasileiro")}
                   </CardTitle>
                   <CardDescription>
-                    Dados de regiões turísticas e categorização de municípios do Ministério do Turismo
+                    {tx("Dados de regiões turísticas e categorização de municípios do Ministério do Turismo")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

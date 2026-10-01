@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Coins } from 'lucide-react';
@@ -11,9 +12,9 @@ export interface BeniPack {
 }
 
 export const BENI_PACKS: BeniPack[] = [
-  { priceId: 'beni_pack_50', name: '50 perguntas', credits: 50, price: 'R$ 29,00', description: 'Créditos pessoais para o Professor Beni' },
-  { priceId: 'beni_pack_150', name: '150 perguntas', credits: 150, price: 'R$ 69,00', description: 'Créditos pessoais com melhor custo por pergunta' },
-  { priceId: 'beni_pack_org_500', name: '500 perguntas (organização)', credits: 500, price: 'R$ 199,00', description: 'Créditos compartilhados por toda a organização' },
+  { priceId: 'beni_pack_50', name: '50 perguntas', credits: 50, price: 'R$ 29,00', description: tx("Créditos pessoais para o Professor Beni") },
+  { priceId: 'beni_pack_150', name: '150 perguntas', credits: 150, price: 'R$ 69,00', description: tx("Créditos pessoais com melhor custo por pergunta") },
+  { priceId: 'beni_pack_org_500', name: '500 perguntas (organização)', credits: 500, price: 'R$ 199,00', description: tx("Créditos compartilhados por toda a organização") },
 ];
 
 interface BeniCreditPacksProps {
@@ -25,10 +26,10 @@ export function BeniCreditPacks({ onBuy }: BeniCreditPacksProps) {
     <div>
       <div className="flex items-center gap-2 mb-1">
         <Coins className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-bold">Pacotes de créditos do Professor Beni</h3>
+        <h3 className="text-lg font-bold">{tx("Pacotes de créditos do Professor Beni")}</h3>
       </div>
       <p className="text-sm text-muted-foreground mb-6">
-        Compra avulsa de perguntas adicionais, usadas quando a cota mensal do plano acabar.
+        {tx("Compra avulsa de perguntas adicionais, usadas quando a cota mensal do plano acabar.")}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {BENI_PACKS.map((pack) => (
@@ -40,7 +41,7 @@ export function BeniCreditPacks({ onBuy }: BeniCreditPacksProps) {
             </CardHeader>
             <CardContent>
               <Button className="w-full" onClick={() => onBuy(pack)}>
-                Comprar créditos
+                {tx("Comprar créditos")}
               </Button>
             </CardContent>
           </Card>

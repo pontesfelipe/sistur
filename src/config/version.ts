@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 21,
-  patch: 1,
+  minor: 22,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.22.0",
+    date: "2026-10-01",
+    type: "minor" as const,
+    changes: [
+      "Idiomas (fase 4): Planos e preços, Assinatura, Configurações e telas de Administração disponíveis em inglês e espanhol (cerca de 1.100 textos).",
+    ],
+  },
   {
     version: "2.21.1",
     date: "2026-09-30",

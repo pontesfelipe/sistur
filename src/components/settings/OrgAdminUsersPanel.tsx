@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,7 +84,7 @@ export function OrgAdminUsersPanel() {
       setUsers(response.data.users || []);
     } catch (error: any) {
       console.error('Error fetching users:', error);
-      toast.error('Erro ao carregar usuários');
+      toast.error(tx("Erro ao carregar usuários"));
     } finally {
       setLoading(false);
     }
@@ -106,12 +107,12 @@ export function OrgAdminUsersPanel() {
 
   const handleCreateUser = async () => {
     if (!formData.email || !formData.password || !formData.fullName || !formData.systemAccess || !formData.role) {
-      toast.error('Preencha todos os campos obrigatórios');
+      toast.error(tx("Preencha todos os campos obrigatórios"));
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres');
+      toast.error(tx("A senha deve ter pelo menos 6 caracteres"));
       return;
     }
 
@@ -131,7 +132,7 @@ export function OrgAdminUsersPanel() {
       if (response.error) throw new Error(response.error.message);
       if (response.data.error) throw new Error(response.data.error);
 
-      toast.success('Usuário criado com sucesso');
+      toast.success(tx("Usuário criado com sucesso"));
       setCreateDialogOpen(false);
       setFormData({ email: '', password: '', fullName: '', systemAccess: '', role: '' });
       fetchUsers();
@@ -150,7 +151,7 @@ export function OrgAdminUsersPanel() {
       });
       if (response.error) throw new Error(response.error.message);
       if (response.data?.error) throw new Error(response.data.error);
-      toast.success('Papel atualizado');
+      toast.success(tx("Papel atualizado"));
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao atualizar papel');
@@ -180,7 +181,7 @@ export function OrgAdminUsersPanel() {
         }
       }
 
-      toast.success('Acesso atualizado');
+      toast.success(tx("Acesso atualizado"));
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao atualizar acesso');
@@ -214,7 +215,7 @@ export function OrgAdminUsersPanel() {
       });
       if (response.error) throw new Error(response.error.message);
       if (response.data?.error) throw new Error(response.data.error);
-      toast.success('Usuário removido da organização');
+      toast.success(tx("Usuário removido da organização"));
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao remover usuário');
@@ -251,73 +252,73 @@ export function OrgAdminUsersPanel() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary" />
-                Membros da Organização
+                {tx("Membros da Organização")}
               </CardTitle>
               <CardDescription>
-                Gerencie os usuários vinculados à sua organização
+                {tx("Gerencie os usuários vinculados à sua organização")}
               </CardDescription>
             </div>
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="h-4 w-4 mr-2" />
-                  Novo Usuário
+                  {tx("Novo Usuário")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Adicionar Novo Membro</DialogTitle>
+                  <DialogTitle>{tx("Adicionar Novo Membro")}</DialogTitle>
                   <DialogDescription>
-                    Crie uma conta para um novo membro da sua organização.
+                    {tx("Crie uma conta para um novo membro da sua organização.")}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label>Nome Completo *</Label>
+                    <Label>{tx("Nome Completo *")}</Label>
                     <Input
                       value={formData.fullName}
                       onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                      placeholder="Nome completo"
+                      placeholder={tx("Nome completo")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Email *</Label>
+                    <Label>{tx("Email *")}</Label>
                     <Input
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="email@exemplo.com"
+                      placeholder={tx("email@exemplo.com")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Senha *</Label>
+                    <Label>{tx("Senha *")}</Label>
                     <Input
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      placeholder="Mínimo 6 caracteres"
+                      placeholder={tx("Mínimo 6 caracteres")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Sistema de Acesso *</Label>
+                    <Label>{tx("Sistema de Acesso *")}</Label>
                     <Select
                       value={formData.systemAccess}
                       onValueChange={(value) => setFormData(prev => ({ ...prev, systemAccess: value as 'ERP' | 'EDU' }))}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o sistema" />
+                        <SelectValue placeholder={tx("Selecione o sistema")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="ERP">
                           <div className="flex items-center gap-2">
                             <Building2 className="h-4 w-4" />
-                            Analítico - Sistema Territorial
+                            {tx("Analítico - Sistema Territorial")}
                           </div>
                         </SelectItem>
                         <SelectItem value="EDU">
                           <div className="flex items-center gap-2">
                             <GraduationCap className="h-4 w-4" />
-                            EDU - Plataforma Educacional
+                            {tx("EDU - Plataforma Educacional")}
                           </div>
                         </SelectItem>
                       </SelectContent>
@@ -325,13 +326,13 @@ export function OrgAdminUsersPanel() {
                   </div>
                   {formData.systemAccess && (
                     <div className="space-y-2">
-                      <Label>Papel *</Label>
+                      <Label>{tx("Papel *")}</Label>
                       <Select
                         value={formData.role}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione o papel" />
+                          <SelectValue placeholder={tx("Selecione o papel")} />
                         </SelectTrigger>
                         <SelectContent>
                           {(formData.systemAccess === 'EDU' ? ASSIGNABLE_EDU_ROLES : ASSIGNABLE_ERP_ROLES).map(role => (
@@ -355,7 +356,7 @@ export function OrgAdminUsersPanel() {
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
-                    Cancelar
+                    {tx("Cancelar")}
                   </Button>
                   <Button
                     onClick={handleCreateUser}
@@ -374,7 +375,7 @@ export function OrgAdminUsersPanel() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar membros..."
+              placeholder={tx("Buscar membros...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -388,7 +389,7 @@ export function OrgAdminUsersPanel() {
             </div>
           ) : filteredUsers.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              Nenhum membro encontrado
+              {tx("Nenhum membro encontrado")}
             </div>
           ) : (
             <ScrollArea className="h-[500px]">
@@ -414,7 +415,7 @@ export function OrgAdminUsersPanel() {
                           <div className="flex items-center gap-2">
                             <p className="font-medium">{user.full_name || 'Sem nome'}</p>
                             {isSelf(user.user_id) && (
-                              <Badge variant="outline" className="text-xs">Você</Badge>
+                              <Badge variant="outline" className="text-xs">{tx("Você")}</Badge>
                             )}
                           </div>
                           {user.email && (
@@ -449,7 +450,7 @@ export function OrgAdminUsersPanel() {
                           <DropdownMenuContent align="end">
                             {/* Role change */}
                             <DropdownMenuItem disabled className="text-xs font-semibold text-muted-foreground">
-                              Alterar Papel
+                              {tx("Alterar Papel")}
                             </DropdownMenuItem>
                             {(user.system_access === 'EDU' ? ASSIGNABLE_EDU_ROLES : ASSIGNABLE_ERP_ROLES)
                               .filter(r => r !== user.role)
@@ -488,7 +489,7 @@ export function OrgAdminUsersPanel() {
                               className="text-destructive"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Remover da Organização
+                              {tx("Remover da Organização")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

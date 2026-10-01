@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { getDateLocale } from '@/i18n/dateLocale';
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -71,7 +72,7 @@ const PHASE_DEFS: Array<{
   {
     key: 'pillars',
     label: 'Pilares (RA · OE · AO)',
-    description: 'Geração paralela das 3 subseções por pilar',
+    description: tx("Geração paralela das 3 subseções por pilar"),
     icon: <Layers className="h-4 w-4" />,
     startStages: ['phase1_pillars_start', 'parallel_pipeline_enabled', 'parallel_provider_try'],
     doneStages: ['phase1_pillars_done'],
@@ -80,7 +81,7 @@ const PHASE_DEFS: Array<{
   {
     key: 'envelope',
     label: 'Envelope (capa, sumário, fechamento)',
-    description: 'Montagem sequencial unindo os pilares',
+    description: tx("Montagem sequencial unindo os pilares"),
     icon: <Mail className="h-4 w-4" />,
     startStages: ['phase2_envelope_start'],
     doneStages: ['phase2_envelope_done', 'parallel_pipeline_success'],
@@ -89,7 +90,7 @@ const PHASE_DEFS: Array<{
   {
     key: 'validation',
     label: 'Validação (determinística + IA)',
-    description: 'Coerência numérica e revisão por agente',
+    description: tx("Coerência numérica e revisão por agente"),
     icon: <ShieldCheck className="h-4 w-4" />,
     startStages: ['validation_deterministic_start', 'validation_agent_start'],
     doneStages: ['validation_agent_done', 'validation_issues_summary'],
@@ -97,7 +98,7 @@ const PHASE_DEFS: Array<{
   {
     key: 'persistence',
     label: 'Persistência',
-    description: 'Gravação do relatório, validações e auditoria',
+    description: tx("Gravação do relatório, validações e auditoria"),
     icon: <Database className="h-4 w-4" />,
     startStages: ['persist_lookup_existing'],
     doneStages: ['persist_inserted', 'persist_updated', 'stream_closed_ok', 'report_job_marked_completed'],
@@ -203,10 +204,10 @@ function ClaudeLivePipeline({ rows }: { rows: LogRow[] }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Activity className="h-4 w-4" />
-            Pipeline Claude — Tempo Real
+            {tx("Pipeline Claude — Tempo Real")}
           </CardTitle>
           <CardDescription>
-            Nenhuma execução recente do Claude detectada. Gere um relatório com Claude para visualizar o progresso por etapa.
+            {tx("Nenhuma execução recente do Claude detectada. Gere um relatório com Claude para visualizar o progresso por etapa.")}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -225,7 +226,7 @@ function ClaudeLivePipeline({ rows }: { rows: LogRow[] }) {
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
               <Activity className={`h-4 w-4 ${!hasError && completed < PHASE_DEFS.length ? 'text-primary animate-pulse' : ''}`} />
-              Pipeline Claude — Tempo Real
+              {tx("Pipeline Claude — Tempo Real")}
             </CardTitle>
             <CardDescription className="text-xs mt-1">
               Trace {live.traceId?.slice(0, 14) ?? '—'} • {live.rowCount} eventos •{' '}
@@ -340,7 +341,7 @@ export default function AdminReportLogs() {
 
   return (
     <AppLayout
-      title="Logs do Gerador de Relatórios"
+      title={tx("Logs do Gerador de Relatórios")}
       subtitle="Eventos e erros da edge function generate-report (filtrado por provedor de IA)"
     >
       <div className="space-y-6">
@@ -365,7 +366,7 @@ export default function AdminReportLogs() {
               <CardTitle className="text-2xl font-bold text-destructive">{stats.errors}</CardTitle>
               <CardDescription className="flex items-center gap-1 text-xs">
                 <AlertTriangle className="h-3.5 w-3.5" />
-                Erros
+                {tx("Erros")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -374,7 +375,7 @@ export default function AdminReportLogs() {
               <CardTitle className="text-2xl font-bold text-severity-moderate">{stats.warns}</CardTitle>
               <CardDescription className="flex items-center gap-1 text-xs">
                 <AlertCircle className="h-3.5 w-3.5" />
-                Avisos
+                {tx("Avisos")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -383,7 +384,7 @@ export default function AdminReportLogs() {
               <CardTitle className="text-2xl font-bold text-severity-good">{stats.providerSelected}</CardTitle>
               <CardDescription className="flex items-center gap-1 text-xs">
                 <Sparkles className="h-3.5 w-3.5" />
-                Provider OK
+                {tx("Provider OK")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -392,7 +393,7 @@ export default function AdminReportLogs() {
               <CardTitle className="text-2xl font-bold text-destructive">{stats.providerFailed}</CardTitle>
               <CardDescription className="flex items-center gap-1 text-xs">
                 <AlertTriangle className="h-3.5 w-3.5" />
-                Provider Falhou
+                {tx("Provider Falhou")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -404,31 +405,31 @@ export default function AdminReportLogs() {
             <Select value={providerFilter} onValueChange={setProviderFilter}>
               <SelectTrigger className="w-44">
                 <Sparkles className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Provedor" />
+                <SelectValue placeholder={tx("Provedor")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="claude">Claude (Anthropic)</SelectItem>
                 <SelectItem value="gpt5">GPT-5 (OpenAI)</SelectItem>
                 <SelectItem value="gemini">Gemini (Google)</SelectItem>
-                <SelectItem value="all">Todos os provedores</SelectItem>
+                <SelectItem value="all">{tx("Todos os provedores")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={levelFilter} onValueChange={setLevelFilter}>
               <SelectTrigger className="w-36">
                 <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Nível" />
+                <SelectValue placeholder={tx("Nível")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="info">Info</SelectItem>
-                <SelectItem value="warn">Warn</SelectItem>
-                <SelectItem value="error">Error</SelectItem>
+                <SelectItem value="all">{tx("Todos")}</SelectItem>
+                <SelectItem value="info">{tx("Info")}</SelectItem>
+                <SelectItem value="warn">{tx("Warn")}</SelectItem>
+                <SelectItem value="error">{tx("Error")}</SelectItem>
               </SelectContent>
             </Select>
             <div className="relative flex-1 min-w-[220px] max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar stage, mensagem, trace, job…"
+                placeholder={tx("Buscar stage, mensagem, trace, job…")}
                 className="pl-9"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -437,7 +438,7 @@ export default function AdminReportLogs() {
           </div>
           <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
             <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-            Atualizar
+            {tx("Atualizar")}
           </Button>
         </div>
 
@@ -451,7 +452,7 @@ export default function AdminReportLogs() {
             ) : error ? (
               <div className="p-12 text-center text-muted-foreground">
                 <AlertTriangle className="h-10 w-10 mx-auto mb-3 text-destructive" />
-                <p className="text-sm">Falha ao carregar logs.</p>
+                <p className="text-sm">{tx("Falha ao carregar logs.")}</p>
                 <p className="text-xs mt-1 opacity-70">{(error as Error).message}</p>
               </div>
             ) : filtered.length === 0 ? (
@@ -462,7 +463,7 @@ export default function AdminReportLogs() {
                   <strong>{PROVIDER_LABEL[providerFilter] ?? providerFilter}</strong>.
                 </p>
                 <p className="text-xs mt-2 opacity-70">
-                  Os eventos são gerados a cada execução de geração de relatório.
+                  {tx("Os eventos são gerados a cada execução de geração de relatório.")}
                 </p>
               </div>
             ) : (
@@ -470,12 +471,12 @@ export default function AdminReportLogs() {
                 <Table>
                   <TableHeader className="sticky top-0 bg-background z-10">
                     <TableRow>
-                      <TableHead className="w-[140px]">Data/Hora</TableHead>
-                      <TableHead className="w-[80px]">Nível</TableHead>
-                      <TableHead className="w-[100px]">Provider</TableHead>
-                      <TableHead>Stage</TableHead>
-                      <TableHead>Mensagem</TableHead>
-                      <TableHead className="w-[120px]">Trace</TableHead>
+                      <TableHead className="w-[140px]">{tx("Data/Hora")}</TableHead>
+                      <TableHead className="w-[80px]">{tx("Nível")}</TableHead>
+                      <TableHead className="w-[100px]">{tx("Provider")}</TableHead>
+                      <TableHead>{tx("Stage")}</TableHead>
+                      <TableHead>{tx("Mensagem")}</TableHead>
+                      <TableHead className="w-[120px]">{tx("Trace")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -527,7 +528,7 @@ export default function AdminReportLogs() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Detalhes do Evento
+                {tx("Detalhes do Evento")}
               </DialogTitle>
               <DialogDescription>
                 {selected && format(new Date(selected.created_at), "dd/MM/yyyy 'às' HH:mm:ss", { locale: getDateLocale() })}
@@ -536,24 +537,24 @@ export default function AdminReportLogs() {
             {selected && (
               <div className="space-y-3 text-sm">
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Nível" value={selected.level} />
+                  <Field label={tx("Nível")} value={selected.level} />
                   <Field label="Stage" value={selected.stage ?? '—'} mono />
                   <Field label="Provider" value={selected.provider ? (PROVIDER_LABEL[selected.provider] ?? selected.provider) : '—'} />
                   <Field label="Modelo" value={selected.model ?? '—'} mono />
-                  <Field label="Duração" value={selected.duration_ms != null ? `${(selected.duration_ms / 1000).toFixed(1)}s` : '—'} />
-                  <Field label="Trace ID" value={selected.trace_id ?? '—'} mono />
-                  <Field label="Job ID" value={selected.job_id ?? '—'} mono />
-                  <Field label="Report ID" value={selected.report_id ?? '—'} mono />
+                  <Field label={tx("Duração")} value={selected.duration_ms != null ? `${(selected.duration_ms / 1000).toFixed(1)}s` : '—'} />
+                  <Field label={tx("Trace ID")} value={selected.trace_id ?? '—'} mono />
+                  <Field label={tx("Job ID")} value={selected.job_id ?? '—'} mono />
+                  <Field label={tx("Report ID")} value={selected.report_id ?? '—'} mono />
                 </div>
                 {selected.message && (
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Mensagem</p>
+                    <p className="text-xs text-muted-foreground mb-1">{tx("Mensagem")}</p>
                     <pre className="p-3 bg-muted rounded text-xs whitespace-pre-wrap">{selected.message}</pre>
                   </div>
                 )}
                 {selected.metadata && Object.keys(selected.metadata).length > 0 && (
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Metadata</p>
+                    <p className="text-xs text-muted-foreground mb-1">{tx("Metadata")}</p>
                     <pre className="p-3 bg-muted rounded text-xs overflow-auto max-h-64">
                       {JSON.stringify(selected.metadata, null, 2)}
                     </pre>

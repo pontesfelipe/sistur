@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -142,7 +143,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
   const clearLastImport = () => {
     localStorage.removeItem(LAST_IMPORT_KEY);
     setLastImport(null);
-    toast.success("Histórico de importação removido.");
+    toast.success(tx("Histórico de importação removido."));
   };
 
   // ===== Auditoria de relatório =====
@@ -198,7 +199,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       }));
       setSavedReports(rows);
     } catch (e: any) {
-      toast.error("Erro ao carregar relatórios salvos: " + (e?.message ?? String(e)));
+      toast.error(tx("Erro ao carregar relatórios salvos: ") + (e?.message ?? String(e)));
     } finally {
       setSavedLoading(false);
     }
@@ -217,7 +218,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
     const name = file.name.toLowerCase();
     const isTextual = /\.(txt|md|markdown|json|html|htm|csv|log)$/.test(name) || file.type.startsWith("text/");
     if (!isTextual) {
-      toast.error("Formato não suportado para extração automática. Converta para .txt/.md ou cole o conteúdo na caixa abaixo.");
+      toast.error(tx("Formato não suportado para extração automática. Converta para .txt/.md ou cole o conteúdo na caixa abaixo."));
       return;
     }
     try {
@@ -226,13 +227,13 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       setAuditFileName(file.name);
       toast.success(`Arquivo ${file.name} carregado (${text.length.toLocaleString("pt-BR")} caracteres).`);
     } catch (e: any) {
-      toast.error("Falha ao ler arquivo: " + (e?.message ?? String(e)));
+      toast.error(tx("Falha ao ler arquivo: ") + (e?.message ?? String(e)));
     }
   };
 
   const runAudit = async () => {
     if (!auditText || auditText.trim().length < 30) {
-      toast.error("Cole ou envie um relatório com no mínimo 30 caracteres.");
+      toast.error(tx("Cole ou envie um relatório com no mínimo 30 caracteres."));
       return;
     }
     setAuditRunning(true);
@@ -246,9 +247,9 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       if (!data?.ok) throw new Error(data?.error || "Falha desconhecida");
       setAuditResult(data.result as AuditResult);
       setAuditMeta({ truncated: !!data.truncated, report_chars: data.report_chars, rules_evaluated: data.rules_evaluated });
-      toast.success("Auditoria concluída.");
+      toast.success(tx("Auditoria concluída."));
     } catch (e: any) {
-      toast.error("Erro na auditoria: " + (e?.message ?? String(e)));
+      toast.error(tx("Erro na auditoria: ") + (e?.message ?? String(e)));
     } finally {
       setAuditRunning(false);
     }
@@ -289,7 +290,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       .order("category", { ascending: true })
       .order("injection_order", { ascending: true });
     if (error) {
-      toast.error("Erro ao carregar camada semântica: " + error.message);
+      toast.error(tx("Erro ao carregar camada semântica: ") + error.message);
     } else {
       setEntries((data as Entry[]) || []);
     }
@@ -314,7 +315,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
 
   const save = async () => {
     if (!draft.key || !draft.title || !draft.content) {
-      toast.error("Preencha chave, título e conteúdo.");
+      toast.error(tx("Preencha chave, título e conteúdo."));
       return;
     }
     if (creating) {
@@ -330,8 +331,8 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
         active: draft.active ?? true,
         created_by: user?.id ?? null,
       });
-      if (error) return toast.error("Erro ao criar: " + error.message);
-      toast.success("Entrada criada");
+      if (error) return toast.error(tx("Erro ao criar: ") + error.message);
+      toast.success(tx("Entrada criada"));
       setCreating(false);
       setDraft(emptyDraft());
     } else if (selected) {
@@ -348,8 +349,8 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
           updated_by: user?.id ?? null,
         })
         .eq("id", selected.id);
-      if (error) return toast.error("Erro ao salvar: " + error.message);
-      toast.success("Alterações salvas. O próximo relatório usará esta versão.");
+      if (error) return toast.error(tx("Erro ao salvar: ") + error.message);
+      toast.success(tx("Alterações salvas. O próximo relatório usará esta versão."));
     }
     await load();
     setSelected(null);
@@ -359,7 +360,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
     if (!confirm("Excluir esta entrada permanentemente?")) return;
     const { error } = await supabase.from("report_semantic_entries").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success("Entrada excluída");
+    toast.success(tx("Entrada excluída"));
     setSelected(null);
     await load();
   };
@@ -476,7 +477,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
         format = "json";
       }
     } catch (err: any) {
-      toast.error("Falha ao ler o arquivo: " + err.message);
+      toast.error(tx("Falha ao ler o arquivo: ") + err.message);
       return;
     }
     const valid = rows.filter((r) => r.key && r.title && r.content && r.category);
@@ -500,7 +501,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
           .from("report_semantic_entries")
           .update({ active: false, updated_by: user?.id ?? null })
           .in("id", toDeactivate.map((e) => e.id));
-        if (error) toast.error("Erro ao desativar entradas removidas: " + error.message);
+        if (error) toast.error(tx("Erro ao desativar entradas removidas: ") + error.message);
         else deactivated = toDeactivate.length;
       }
     }
@@ -535,8 +536,8 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
     const msgs = [`${inserted} inserida(s)`, `${updated} atualizada(s)`];
     if (deactivated) msgs.push(`${deactivated} desativada(s)`);
     if (failed) msgs.push(`${failed} com erro`);
-    if (failed > 0) toast.error("Importação concluída com erros: " + msgs.join(", "));
-    else toast.success("Importação concluída: " + msgs.join(", "));
+    if (failed > 0) toast.error(tx("Importação concluída com erros: ") + msgs.join(", "));
+    else toast.success(tx("Importação concluída: ") + msgs.join(", "));
     saveLastImport(importPreview.filename, rows.length, importMode);
     setImportPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -550,13 +551,13 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
           {!embedded && (
             <Button variant="ghost" size="sm" asChild className="mb-2">
               <Link to="/admin/audit">
-                <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
+                <ArrowLeft className="h-4 w-4 mr-2" /> {tx("Voltar")}
               </Link>
             </Button>
           )}
           {!embedded && (
             <>
-              <h1 className="text-3xl font-display font-bold">Camada Semântica de Relatórios</h1>
+              <h1 className="text-3xl font-display font-bold">{tx("Camada Semântica de Relatórios")}</h1>
               <p className="text-muted-foreground mt-1">
                 Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.
               </p>
@@ -571,7 +572,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
         <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Exportar</Button>
+              <Button variant="outline"><Download className="h-4 w-4 mr-2" /> {tx("Exportar")}</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel className="text-xs text-muted-foreground">
@@ -583,7 +584,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-            <Upload className="h-4 w-4 mr-2" /> Importar
+            <Upload className="h-4 w-4 mr-2" /> {tx("Importar")}
           </Button>
           <input
             ref={fileInputRef}
@@ -596,15 +597,15 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             }}
           />
           <Button onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}>
-            <Plus className="h-4 w-4 mr-2" /> Nova entrada
+            <Plus className="h-4 w-4 mr-2" /> {tx("Nova entrada")}
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="rules" className="w-full">
         <TabsList>
-          <TabsTrigger value="rules"><FileText className="h-4 w-4 mr-2" /> Regras</TabsTrigger>
-          <TabsTrigger value="audit"><ShieldCheck className="h-4 w-4 mr-2" /> Conferir relatório</TabsTrigger>
+          <TabsTrigger value="rules"><FileText className="h-4 w-4 mr-2" /> {tx("Regras")}</TabsTrigger>
+          <TabsTrigger value="audit"><ShieldCheck className="h-4 w-4 mr-2" /> {tx("Conferir relatório")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="rules" className="mt-4 space-y-6">
@@ -619,18 +620,18 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
           {isDragging ? (
             <div className="flex flex-col items-center gap-2 text-primary">
               <FileUp className="h-8 w-8" />
-              <p className="font-medium">Solte o arquivo aqui para importar</p>
+              <p className="font-medium">{tx("Solte o arquivo aqui para importar")}</p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <FileUp className="h-6 w-6" />
               <p className="text-sm">
-                Arraste e solte um arquivo JSON ou CSV aqui, ou use o botão <b>Importar</b> acima.
+                {tx("Arraste e solte um arquivo JSON ou CSV aqui, ou use o botão")} <b>{tx("Importar")}</b> {tx("acima.")}
               </p>
               {lastImport && (
                 <div className="mt-3 flex items-center gap-3 rounded-md border bg-background px-3 py-2 text-xs text-foreground shadow-sm">
                   <div className="flex flex-col items-start gap-0.5">
-                    <span className="font-medium">Última importação</span>
+                    <span className="font-medium">{tx("Última importação")}</span>
                     <span className="text-muted-foreground">
                       {lastImport.filename} — {lastImport.count} entrada(s) — modo {lastImport.mode} —{" "}
                       {new Date(lastImport.date).toLocaleString("pt-BR")}
@@ -650,12 +651,12 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Entradas</CardTitle>
+              <CardTitle className="text-base">{tx("Entradas")}</CardTitle>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}
-                title="Adicionar nova regra"
+                title={tx("Adicionar nova regra")}
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -664,18 +665,18 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
               <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas as categorias</SelectItem>
+                  <SelectItem value="all">{tx("Todas as categorias")}</SelectItem>
                   {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Input placeholder="Buscar…" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input placeholder={tx("Buscar…")} value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
           </CardHeader>
           <CardContent className="space-y-1 max-h-[70vh] overflow-y-auto">
             {loading ? (
               [...Array(8)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)
             ) : filtered.length === 0 ? (
-              <p className="text-sm text-muted-foreground p-4">Nenhuma entrada.</p>
+              <p className="text-sm text-muted-foreground p-4">{tx("Nenhuma entrada.")}</p>
             ) : filtered.map((e) => (
               <button
                 key={e.id}
@@ -684,7 +685,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium text-sm truncate">{e.title}</span>
-                  {!e.active && <Badge variant="secondary" className="text-xs">inativa</Badge>}
+                  {!e.active && <Badge variant="secondary" className="text-xs">{tx("inativa")}</Badge>}
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="outline" className="text-[10px]">{e.category}</Badge>
@@ -704,15 +705,15 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             {creating && (
               <div className="flex items-center justify-between gap-2 mt-2">
                 <p className="text-xs text-muted-foreground">
-                  Cada regra é injetada como bloco de texto no prompt do gerador de relatórios. Preencha os campos abaixo, ou clique em <b>Inserir exemplo</b> para carregar uma regra válida.
+                  {tx("Cada regra é injetada como bloco de texto no prompt do gerador de relatórios. Preencha os campos abaixo, ou clique em")} <b>{tx("Inserir exemplo")}</b> {tx("para carregar uma regra válida.")}
                 </p>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => setDraft({ ...EXAMPLE_DRAFT })}
-                  title="Preencher o formulário com um exemplo válido"
+                  title={tx("Preencher o formulário com um exemplo válido")}
                 >
-                  <Sparkles className="h-4 w-4 mr-2" /> Inserir exemplo
+                  <Sparkles className="h-4 w-4 mr-2" /> {tx("Inserir exemplo")}
                 </Button>
               </div>
             )}
@@ -721,24 +722,24 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             {(creating || selected) ? (
               <Tabs defaultValue="edit">
                 <TabsList>
-                  <TabsTrigger value="edit">Editor</TabsTrigger>
-                  <TabsTrigger value="preview">Preview</TabsTrigger>
-                  <TabsTrigger value="example">Exemplo</TabsTrigger>
+                  <TabsTrigger value="edit">{tx("Editor")}</TabsTrigger>
+                  <TabsTrigger value="preview">{tx("Preview")}</TabsTrigger>
+                  <TabsTrigger value="example">{tx("Exemplo")}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="edit" className="space-y-4 mt-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label>Chave canônica</Label>
+                      <Label>{tx("Chave canônica")}</Label>
                       <Input
                         value={draft.key ?? ""}
                         disabled={!creating}
                         onChange={(e) => setDraft({ ...draft, key: e.target.value })}
-                        placeholder="ex.: classification.scale_5_levels"
+                        placeholder={tx("ex.: classification.scale_5_levels")}
                       />
                       <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.key}</p>
                     </div>
                     <div>
-                      <Label>Categoria</Label>
+                      <Label>{tx("Categoria")}</Label>
                       <Select value={draft.category} onValueChange={(v) => setDraft({ ...draft, category: v })}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
@@ -749,7 +750,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     </div>
                   </div>
                   <div>
-                    <Label>Título</Label>
+                    <Label>{tx("Título")}</Label>
                     <Input value={draft.title ?? ""} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
                     <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.title}</p>
                   </div>
@@ -774,19 +775,19 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <Label>Aplica-se a</Label>
+                      <Label>{tx("Aplica-se a")}</Label>
                       <Select value={draft.applies_to} onValueChange={(v: any) => setDraft({ ...draft, applies_to: v })}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="both">Ambos</SelectItem>
-                          <SelectItem value="territorial">Territorial</SelectItem>
-                          <SelectItem value="enterprise">Empresarial</SelectItem>
+                          <SelectItem value="both">{tx("Ambos")}</SelectItem>
+                          <SelectItem value="territorial">{tx("Territorial")}</SelectItem>
+                          <SelectItem value="enterprise">{tx("Empresarial")}</SelectItem>
                         </SelectContent>
                       </Select>
                       <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.applies_to}</p>
                     </div>
                     <div>
-                      <Label>Ordem de injeção</Label>
+                      <Label>{tx("Ordem de injeção")}</Label>
                       <Input
                         type="number"
                         value={draft.injection_order ?? 100}
@@ -799,12 +800,12 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                         checked={draft.active ?? true}
                         onCheckedChange={(v) => setDraft({ ...draft, active: v })}
                       />
-                      <Label>Ativa</Label>
+                      <Label>{tx("Ativa")}</Label>
                     </div>
                   </div>
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex gap-2">
-                      <Button onClick={save}><Save className="h-4 w-4 mr-2" /> Salvar</Button>
+                      <Button onClick={save}><Save className="h-4 w-4 mr-2" /> {tx("Salvar")}</Button>
                       {selected && !creating && (
                         <Button variant="outline" onClick={() => openHistory(selected.id)}>
                           <History className="h-4 w-4 mr-2" /> Histórico (v{selected.version})
@@ -813,7 +814,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     </div>
                     {selected && !creating && (
                       <Button variant="ghost" className="text-destructive" onClick={() => remove(selected.id)}>
-                        <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                        <Trash2 className="h-4 w-4 mr-2" /> {tx("Excluir")}
                       </Button>
                     )}
                   </div>
@@ -827,11 +828,11 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   <div className="flex items-start gap-2 rounded-md border bg-muted/30 p-3 text-xs">
                     <Info className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
                     <p>
-                      Esta é uma <b>regra válida</b> de exemplo. Use como modelo. Para carregá-la no editor, clique em <b>Inserir exemplo</b> no topo do painel.
+                      {tx("Esta é uma")} <b>{tx("regra válida")}</b> {tx("de exemplo. Use como modelo. Para carregá-la no editor, clique em")} <b>{tx("Inserir exemplo")}</b> {tx("no topo do painel.")}
                     </p>
                   </div>
                   <div className="rounded-md border overflow-hidden">
-                    <div className="bg-muted px-3 py-2 text-xs font-medium">Campos do formulário</div>
+                    <div className="bg-muted px-3 py-2 text-xs font-medium">{tx("Campos do formulário")}</div>
                     <table className="w-full text-xs">
                       <tbody>
                         {([
@@ -863,12 +864,12 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
               </Tabs>
             ) : (
               <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">Selecione uma entrada na lista ou clique no botão abaixo para adicionar uma nova regra.</p>
+                <p className="text-sm text-muted-foreground">{tx("Selecione uma entrada na lista ou clique no botão abaixo para adicionar uma nova regra.")}</p>
                 <Button
                   variant="outline"
                   onClick={() => { setCreating(true); setSelected(null); setDraft(emptyDraft()); }}
                 >
-                  <Plus className="h-4 w-4 mr-2" /> Nova regra
+                  <Plus className="h-4 w-4 mr-2" /> {tx("Nova regra")}
                 </Button>
               </div>
             )}
@@ -881,22 +882,22 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-primary" /> Auditoria semântica de relatório
+                <ShieldCheck className="h-5 w-5 text-primary" /> {tx("Auditoria semântica de relatório")}
               </CardTitle>
               <p className="text-xs text-muted-foreground mt-1">
-                Envie um relatório (arquivo texto ou colado abaixo) e a IA confronta o conteúdo com todas as regras <b>ativas</b> da camada semântica, retornando aprovações, alertas e violações com trechos citados.
+                Envie um relatório (arquivo texto ou colado abaixo) e a IA confronta o conteúdo com todas as regras <b>{tx("ativas")}</b> {tx("da camada semântica, retornando aprovações, alertas e violações com trechos citados.")}
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-3 items-end">
                 <div>
-                  <Label className="text-xs">Arquivo do relatório</Label>
+                  <Label className="text-xs">{tx("Arquivo do relatório")}</Label>
                   <div className="flex gap-2 mt-1">
                     <Button variant="outline" size="sm" onClick={() => auditFileInputRef.current?.click()}>
-                      <Upload className="h-4 w-4 mr-2" /> Selecionar arquivo
+                      <Upload className="h-4 w-4 mr-2" /> {tx("Selecionar arquivo")}
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => { if (savedReports.length === 0) loadSavedReports(); else loadSavedReports(); }}>
-                      <FileText className="h-4 w-4 mr-2" /> Carregar relatório salvo
+                      <FileText className="h-4 w-4 mr-2" /> {tx("Carregar relatório salvo")}
                     </Button>
                     <input
                       ref={auditFileInputRef}
@@ -912,17 +913,17 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     )}
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-1">
-                    Formatos suportados: .txt, .md, .json, .html, .csv. Para PDF/DOCX, copie o texto e cole na caixa abaixo.
+                    {tx("Formatos suportados: .txt, .md, .json, .html, .csv. Para PDF/DOCX, copie o texto e cole na caixa abaixo.")}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-xs">Escopo das regras</Label>
+                  <Label className="text-xs">{tx("Escopo das regras")}</Label>
                   <Select value={auditScope} onValueChange={(v: any) => setAuditScope(v)}>
                     <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="both">Todas (territorial + enterprise)</SelectItem>
-                      <SelectItem value="territorial">Apenas territorial</SelectItem>
-                      <SelectItem value="enterprise">Apenas enterprise</SelectItem>
+                      <SelectItem value="territorial">{tx("Apenas territorial")}</SelectItem>
+                      <SelectItem value="enterprise">{tx("Apenas enterprise")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -936,9 +937,9 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                       <Select value={savedScope} onValueChange={(v: any) => setSavedScope(v)}>
                         <SelectTrigger className="h-7 text-xs w-[180px]"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Todos</SelectItem>
-                          <SelectItem value="territorial">Territorial</SelectItem>
-                          <SelectItem value="enterprise">Empresarial</SelectItem>
+                          <SelectItem value="all">{tx("Todos")}</SelectItem>
+                          <SelectItem value="territorial">{tx("Territorial")}</SelectItem>
+                          <SelectItem value="enterprise">{tx("Empresarial")}</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button size="sm" variant="ghost" onClick={() => setSavedReports([])}>
@@ -947,7 +948,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     </div>
                   </div>
                   {savedLoading ? (
-                    <p className="text-xs text-muted-foreground">Carregando…</p>
+                    <p className="text-xs text-muted-foreground">{tx("Carregando…")}</p>
                   ) : (
                     <div className="max-h-56 overflow-y-auto space-y-1">
                       {savedReports.filter(r => savedScope === "all" || r.diagnostic_type === savedScope).map((r) => (
@@ -966,7 +967,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                         </button>
                       ))}
                       {savedReports.filter(r => savedScope === "all" || r.diagnostic_type === savedScope).length === 0 && (
-                        <p className="text-xs text-muted-foreground">Nenhum relatório nesta categoria.</p>
+                        <p className="text-xs text-muted-foreground">{tx("Nenhum relatório nesta categoria.")}</p>
                       )}
                     </div>
                   )}
@@ -974,7 +975,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
               )}
 
               <div>
-                <Label className="text-xs">Conteúdo do relatório</Label>
+                <Label className="text-xs">{tx("Conteúdo do relatório")}</Label>
                 <Textarea
                   value={auditText}
                   onChange={(e) => { setAuditText(e.target.value); if (!e.target.value) setAuditFileName(""); }}
@@ -991,7 +992,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                 </Button>
                 {auditText && (
                   <Button variant="ghost" size="sm" onClick={() => { setAuditText(""); setAuditFileName(""); setAuditResult(null); setAuditMeta(null); }}>
-                    <X className="h-4 w-4 mr-2" /> Limpar
+                    <X className="h-4 w-4 mr-2" /> {tx("Limpar")}
                   </Button>
                 )}
               </div>
@@ -1003,7 +1004,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
               <CardHeader>
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div>
-                    <CardTitle className="text-base">Resultado da auditoria</CardTitle>
+                    <CardTitle className="text-base">{tx("Resultado da auditoria")}</CardTitle>
                     {auditMeta && (
                       <p className="text-[11px] text-muted-foreground mt-1">
                         {auditMeta.rules_evaluated} regra(s) avaliada(s) · {auditMeta.report_chars.toLocaleString("pt-BR")} caracteres analisados
@@ -1015,7 +1016,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     <div className={`text-2xl font-bold ${auditResult.score >= 85 ? "text-green-600" : auditResult.score >= 60 ? "text-yellow-600" : "text-destructive"}`}>
                       {Math.round(auditResult.score)}%
                     </div>
-                    <div className="text-xs text-muted-foreground">conformidade</div>
+                    <div className="text-xs text-muted-foreground">{tx("conformidade")}</div>
                   </div>
                 </div>
               </CardHeader>
@@ -1069,7 +1070,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                               )}
                               {f.suggested_fix && (
                                 <p className="mt-2 text-xs">
-                                  <b>Sugestão:</b> {f.suggested_fix}
+                                  <b>{tx("Sugestão:")}</b> {f.suggested_fix}
                                 </p>
                               )}
                             </div>
@@ -1087,11 +1088,11 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       <Dialog open={showHistory} onOpenChange={setShowHistory}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Histórico de alterações</DialogTitle>
+            <DialogTitle>{tx("Histórico de alterações")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             {history.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Sem histórico.</p>
+              <p className="text-sm text-muted-foreground">{tx("Sem histórico.")}</p>
             ) : history.map((h) => (
               <div key={h.id} className="rounded-md border p-3">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
@@ -1099,14 +1100,14 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   <span>{h.active_after ? "ativa" : "inativa"}</span>
                 </div>
                 <details>
-                  <summary className="cursor-pointer text-sm font-medium">Ver conteúdo</summary>
+                  <summary className="cursor-pointer text-sm font-medium">{tx("Ver conteúdo")}</summary>
                   <pre className="mt-2 text-xs whitespace-pre-wrap bg-muted/40 p-2 rounded">{h.content_after}</pre>
                 </details>
               </div>
             ))}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowHistory(false)}>Fechar</Button>
+            <Button variant="outline" onClick={() => setShowHistory(false)}>{tx("Fechar")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1114,21 +1115,21 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       <Dialog open={!!importPreview} onOpenChange={(o) => !o && setImportPreview(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Pré-visualização da importação</DialogTitle>
+            <DialogTitle>{tx("Pré-visualização da importação")}</DialogTitle>
           </DialogHeader>
           {importPreview && (
             <div className="space-y-4">
               <div className="text-sm text-muted-foreground">
-                Arquivo <code className="text-foreground">{importPreview.filename}</code> — formato <b>{importPreview.format.toUpperCase()}</b> — {importPreview.rows.length} entrada(s) válida(s).
+                {tx("Arquivo")} <code className="text-foreground">{importPreview.filename}</code> — formato <b>{importPreview.format.toUpperCase()}</b> — {importPreview.rows.length} entrada(s) válida(s).
               </div>
 
               <div className="rounded-md border max-h-64 overflow-y-auto">
                 <table className="w-full text-xs">
                   <thead className="bg-muted sticky top-0">
                     <tr>
-                      <th className="text-left p-2">Chave</th>
-                      <th className="text-left p-2">Categoria</th>
-                      <th className="text-left p-2">Ação</th>
+                      <th className="text-left p-2">{tx("Chave")}</th>
+                      <th className="text-left p-2">{tx("Categoria")}</th>
+                      <th className="text-left p-2">{tx("Ação")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1151,7 +1152,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
               </div>
 
               <div>
-                <Label className="text-sm">Modo de importação</Label>
+                <Label className="text-sm">{tx("Modo de importação")}</Label>
                 <RadioGroup value={importMode} onValueChange={(v: any) => setImportMode(v)} className="mt-2 space-y-2">
                   <div className="flex items-start gap-2">
                     <RadioGroupItem value="merge" id="imp-merge" className="mt-1" />
@@ -1162,7 +1163,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   <div className="flex items-start gap-2">
                     <RadioGroupItem value="replace" id="imp-replace" className="mt-1" />
                     <Label htmlFor="imp-replace" className="font-normal cursor-pointer">
-                      <span className="font-medium">Substituir</span> — insere/atualiza do arquivo e <b>desativa</b> entradas ativas que não estão no arquivo (não exclui, permite reverter).
+                      <span className="font-medium">{tx("Substituir")}</span> — insere/atualiza do arquivo e <b>{tx("desativa")}</b> entradas ativas que não estão no arquivo (não exclui, permite reverter).
                     </Label>
                   </div>
                 </RadioGroup>
@@ -1170,9 +1171,9 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             </div>
           )}
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setImportPreview(null)}>Cancelar</Button>
+            <Button variant="ghost" onClick={() => setImportPreview(null)}>{tx("Cancelar")}</Button>
             <Button onClick={confirmImport}>
-              <Upload className="h-4 w-4 mr-2" /> Confirmar importação
+              <Upload className="h-4 w-4 mr-2" /> {tx("Confirmar importação")}
             </Button>
           </DialogFooter>
         </DialogContent>

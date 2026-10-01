@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -185,7 +186,7 @@ export function BeniCreditsPanel() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Acesso ilimitado revogado');
+      toast.success(tx("Acesso ilimitado revogado"));
       qc.invalidateQueries({ queryKey: ['beni-overview'] });
       qc.invalidateQueries({ queryKey: ['beni-unlimited-grants'] });
     },
@@ -262,7 +263,7 @@ export function BeniCreditsPanel() {
       return userId;
     },
     onSuccess: (userId) => {
-      toast.success('Créditos adicionados');
+      toast.success(tx("Créditos adicionados"));
       setRowAmounts((p) => ({ ...p, [userId]: '' }));
       refreshOverview();
     },
@@ -296,7 +297,7 @@ export function BeniCreditsPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Coins className="h-5 w-5 text-primary" />
-            Créditos do Professor Beni
+            {tx("Créditos do Professor Beni")}
           </CardTitle>
           <CardDescription>
             Acompanhe as perguntas usadas por pessoa, conceda créditos promocionais para um usuário ou para toda a
@@ -308,7 +309,7 @@ export function BeniCreditsPanel() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Gift className="h-4 w-4 text-primary" /> Nova concessão
+            <Gift className="h-4 w-4 text-primary" /> {tx("Nova concessão")}
           </CardTitle>
           <CardDescription>
             Créditos entram depois que a cota mensal do plano acaba. O acesso ilimitado ignora qualquer cota enquanto
@@ -318,30 +319,30 @@ export function BeniCreditsPanel() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div className="space-y-1.5">
-              <Label>Tipo</Label>
+              <Label>{tx("Tipo")}</Label>
               <Select value={grantKind} onValueChange={(v) => setGrantKind(v as 'credits' | 'unlimited')}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="credits">Créditos (quantidade de perguntas)</SelectItem>
-                  <SelectItem value="unlimited">Acesso ilimitado</SelectItem>
+                  <SelectItem value="unlimited">{tx("Acesso ilimitado")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Destino</Label>
+              <Label>{tx("Destino")}</Label>
               <Select value={target} onValueChange={(v) => setTarget(v as 'user' | 'org')}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">Usuário</SelectItem>
-                  <SelectItem value="org">Organização inteira</SelectItem>
+                  <SelectItem value="user">{tx("Usuário")}</SelectItem>
+                  <SelectItem value="org">{tx("Organização inteira")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             {target === 'org' ? (
               <div className="space-y-1.5 md:col-span-2">
-                <Label>Organização</Label>
+                <Label>{tx("Organização")}</Label>
                 <Select value={targetOrg} onValueChange={setTargetOrg}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={tx("Selecione")} /></SelectTrigger>
                   <SelectContent>
                     {orgs?.map((o) => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
                   </SelectContent>
@@ -349,9 +350,9 @@ export function BeniCreditsPanel() {
               </div>
             ) : (
               <div className="space-y-1.5 md:col-span-2">
-                <Label>Usuário</Label>
+                <Label>{tx("Usuário")}</Label>
                 <Select value={targetUser} onValueChange={setTargetUser}>
-                  <SelectTrigger><SelectValue placeholder="Selecione na lista abaixo" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={tx("Selecione na lista abaixo")} /></SelectTrigger>
                   <SelectContent>
                     {overview?.map((r) => (
                       <SelectItem key={r.user_id} value={r.user_id}>
@@ -368,50 +369,50 @@ export function BeniCreditsPanel() {
             {grantKind === 'credits' && (
               <>
                 <div className="space-y-1.5">
-                  <Label>Quantidade de perguntas</Label>
+                  <Label>{tx("Quantidade de perguntas")}</Label>
                   <Input type="number" min={1} value={amount} onChange={(e) => setAmount(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Origem</Label>
+                  <Label>{tx("Origem")}</Label>
                   <Select value={source} onValueChange={setSource}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="manual">Manual / promocional</SelectItem>
-                      <SelectItem value="pack_50">Pacote 50</SelectItem>
-                      <SelectItem value="pack_150">Pacote 150</SelectItem>
-                      <SelectItem value="pack_org_500">Pacote organização 500</SelectItem>
+                      <SelectItem value="manual">{tx("Manual / promocional")}</SelectItem>
+                      <SelectItem value="pack_50">{tx("Pacote 50")}</SelectItem>
+                      <SelectItem value="pack_150">{tx("Pacote 150")}</SelectItem>
+                      <SelectItem value="pack_org_500">{tx("Pacote organização 500")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </>
             )}
             <div className="space-y-1.5">
-              <Label>Validade</Label>
+              <Label>{tx("Validade")}</Label>
               <Select value={indefinite ? 'indefinite' : 'date'} onValueChange={(v) => setIndefinite(v === 'indefinite')}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="indefinite">
                     {grantKind === 'unlimited' ? 'Por tempo indeterminado' : 'Padrão (12 meses)'}
                   </SelectItem>
-                  <SelectItem value="date">Até uma data</SelectItem>
+                  <SelectItem value="date">{tx("Até uma data")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             {!indefinite && (
               <div className="space-y-1.5">
-                <Label>Vence em</Label>
+                <Label>{tx("Vence em")}</Label>
                 <Input type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
               </div>
             )}
             <div className="space-y-1.5">
               <Label>Campanha (opcional)</Label>
-              <Input value={campaign} onChange={(e) => setCampaign(e.target.value)} placeholder="Ex.: Lançamento 2026" />
+              <Input value={campaign} onChange={(e) => setCampaign(e.target.value)} placeholder={tx("Ex.: Lançamento 2026")} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Motivo</Label>
-            <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Ex.: cortesia promocional" />
+            <Label>{tx("Motivo")}</Label>
+            <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder={tx("Ex.: cortesia promocional")} />
           </div>
 
           <div className="flex justify-end">
@@ -425,7 +426,7 @@ export function BeniCreditsPanel() {
       <Card>
         <CardHeader className="space-y-3">
           <div>
-            <CardTitle className="text-base">Créditos por usuário</CardTitle>
+            <CardTitle className="text-base">{tx("Créditos por usuário")}</CardTitle>
             <CardDescription>
               Consumo do mês atual, créditos disponíveis e liberações ilimitadas. Clique nos títulos das colunas para
               ordenar, filtre por organização e adicione créditos direto na linha ou para vários de uma vez.
@@ -437,17 +438,17 @@ export function BeniCreditsPanel() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && setAppliedSearch(search)}
-                placeholder="Buscar por nome, e-mail ou organização"
+                placeholder={tx("Buscar por nome, e-mail ou organização")}
               />
               <Button variant="outline" onClick={() => setAppliedSearch(search)}>
                 <Search className="h-4 w-4" />
               </Button>
             </div>
             <Select value={orgFilter} onValueChange={setOrgFilter}>
-              <SelectTrigger className="md:w-72"><SelectValue placeholder="Todas as organizações" /></SelectTrigger>
+              <SelectTrigger className="md:w-72"><SelectValue placeholder={tx("Todas as organizações")} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas as organizações</SelectItem>
-                <SelectItem value="none">Sem organização</SelectItem>
+                <SelectItem value="all">{tx("Todas as organizações")}</SelectItem>
+                <SelectItem value="none">{tx("Sem organização")}</SelectItem>
                 {orgOptions.map((o) => <SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -458,7 +459,7 @@ export function BeniCreditsPanel() {
                 {selectedIds.size} selecionado(s)
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Adicionar créditos</Label>
+                <Label className="text-xs">{tx("Adicionar créditos")}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -472,9 +473,9 @@ export function BeniCreditsPanel() {
                 disabled={bulkGrant.isPending || Number(bulkAmount) <= 0}
                 onClick={() => bulkGrant.mutate()}
               >
-                <Plus className="h-4 w-4 mr-1" /> Aplicar a todos
+                <Plus className="h-4 w-4 mr-1" /> {tx("Aplicar a todos")}
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>Limpar seleção</Button>
+              <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>{tx("Limpar seleção")}</Button>
             </div>
           )}
         </CardHeader>
@@ -492,16 +493,16 @@ export function BeniCreditsPanel() {
                         onCheckedChange={(v) =>
                           setSelectedIds(v ? new Set(rows.map((r) => r.user_id)) : new Set())
                         }
-                        aria-label="Selecionar todos"
+                        aria-label={tx("Selecionar todos")}
                       />
                     </TableHead>
                     <SortHead field="name" label="Pessoa" sort={sort} onSort={toggleSort} />
-                    <SortHead field="org" label="Organização" sort={sort} onSort={toggleSort} />
-                    <SortHead field="used" label="Uso no mês" sort={sort} onSort={toggleSort} />
-                    <SortHead field="user_credits" label="Créditos próprios" sort={sort} onSort={toggleSort} />
-                    <SortHead field="org_credits" label="Créditos da organização" sort={sort} onSort={toggleSort} />
-                    <SortHead field="status" label="Situação" sort={sort} onSort={toggleSort} />
-                    <TableHead className="text-right">Adicionar créditos</TableHead>
+                    <SortHead field="org" label={tx("Organização")} sort={sort} onSort={toggleSort} />
+                    <SortHead field="used" label={tx("Uso no mês")} sort={sort} onSort={toggleSort} />
+                    <SortHead field="user_credits" label={tx("Créditos próprios")} sort={sort} onSort={toggleSort} />
+                    <SortHead field="org_credits" label={tx("Créditos da organização")} sort={sort} onSort={toggleSort} />
+                    <SortHead field="status" label={tx("Situação")} sort={sort} onSort={toggleSort} />
+                    <TableHead className="text-right">{tx("Adicionar créditos")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -511,7 +512,7 @@ export function BeniCreditsPanel() {
                         <Checkbox
                           checked={selectedIds.has(r.user_id)}
                           onCheckedChange={() => toggleSelected(r.user_id)}
-                          aria-label="Selecionar usuário"
+                          aria-label={tx("Selecionar usuário")}
                         />
                       </TableCell>
                       <TableCell>
@@ -531,7 +532,7 @@ export function BeniCreditsPanel() {
                             {r.unlimited_expires_at ? `até ${fmtDate(r.unlimited_expires_at)}` : 'sem prazo'}
                           </Badge>
                         ) : (
-                          <Badge variant="outline">Cota do plano</Badge>
+                          <Badge variant="outline">{tx("Cota do plano")}</Badge>
                         )}
                       </TableCell>
                       <TableCell>
@@ -563,7 +564,7 @@ export function BeniCreditsPanel() {
                   ))}
                   {!rows.length && (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-muted-foreground">Nenhum usuário encontrado.</TableCell>
+                      <TableCell colSpan={8} className="text-muted-foreground">{tx("Nenhum usuário encontrado.")}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -577,20 +578,20 @@ export function BeniCreditsPanel() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <InfinityIcon className="h-4 w-4 text-primary" /> Liberações ilimitadas
+            <InfinityIcon className="h-4 w-4 text-primary" /> {tx("Liberações ilimitadas")}
           </CardTitle>
-          <CardDescription>Promoções e cortesias com acesso sem limite de perguntas.</CardDescription>
+          <CardDescription>{tx("Promoções e cortesias com acesso sem limite de perguntas.")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Destino</TableHead>
-                  <TableHead>Validade</TableHead>
-                  <TableHead>Campanha</TableHead>
-                  <TableHead>Motivo</TableHead>
-                  <TableHead>Situação</TableHead>
+                  <TableHead>{tx("Destino")}</TableHead>
+                  <TableHead>{tx("Validade")}</TableHead>
+                  <TableHead>{tx("Campanha")}</TableHead>
+                  <TableHead>{tx("Motivo")}</TableHead>
+                  <TableHead>{tx("Situação")}</TableHead>
                   <TableHead />
                 </TableRow>
               </TableHeader>
@@ -623,7 +624,7 @@ export function BeniCreditsPanel() {
                             disabled={revoke.isPending}
                             onClick={() => revoke.mutate(g.id)}
                           >
-                            <Ban className="h-4 w-4 mr-1" /> Revogar
+                            <Ban className="h-4 w-4 mr-1" /> {tx("Revogar")}
                           </Button>
                         )}
                       </TableCell>
@@ -632,7 +633,7 @@ export function BeniCreditsPanel() {
                 })}
                 {!unlimitedGrants?.length && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-muted-foreground">Nenhuma liberação registrada.</TableCell>
+                    <TableCell colSpan={6} className="text-muted-foreground">{tx("Nenhuma liberação registrada.")}</TableCell>
                   </TableRow>
                 )}
               </TableBody>

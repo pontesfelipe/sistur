@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -61,7 +62,7 @@ function PlanCard({
   const canCheckout = !!onlinePriceId && !!onCheckout;
   const quantity = p.seat_based ? seats : 1;
   const monthlyTotal = p.seat_based && unitCents ? unitCents * quantity : null;
-  const periodLabel = useAnnual ? 'ano' : 'mês';
+  const periodLabel = useAnnual ? tx('ano') : tx('mês');
 
   return (
     <Card
@@ -73,23 +74,23 @@ function PlanCard({
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base">{p.name}</CardTitle>
-          {isCurrent && <Badge>Plano atual</Badge>}
+          <CardTitle className="text-base">{tx(p.name)}</CardTitle>
+          {isCurrent && <Badge>{tx("Plano atual")}</Badge>}
         </div>
-        <CardDescription>{AUDIENCE_LABELS[p.audience] ?? p.audience}</CardDescription>
+        <CardDescription>{tx(AUDIENCE_LABELS[p.audience] ?? p.audience)}</CardDescription>
         {useAnnual ? (
           <div className="mt-3 space-y-1">
             <p className="text-sm text-muted-foreground line-through">
-              {formatBRL(p.price_cents! * 12)}/ano
+              {formatBRL(p.price_cents! * 12)}{tx('/ano')}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-2xl font-bold tracking-tight">
-                {formatBRL(p.annual_price_cents!)}/ano{p.seat_based ? ' por usuário' : ''}
+                {formatBRL(p.annual_price_cents!)}{tx('/ano')}{p.seat_based ? ' ' + tx('por usuário') : ''}
               </p>
-              <Badge variant="secondary">15% de desconto</Badge>
+              <Badge variant="secondary">{tx("15% de desconto")}</Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              Equivale a {formatBRL(Math.floor(p.annual_price_cents! / 1200) * 100)}/mês, pago uma vez por ano.
+              {tx('Equivale a {{v}}/mês, pago uma vez por ano.', { v: formatBRL(Math.floor(p.annual_price_cents! / 1200) * 100) })}
             </p>
           </div>
         ) : (
@@ -97,23 +98,22 @@ function PlanCard({
         )}
         {p.code === 'professor' && (
           <p className="text-xs text-muted-foreground">
-            Gratuito quando você tem 5 ou mais estudantes ativos que entraram pelo seu link de indicação.
+            {tx("Gratuito quando você tem 5 ou mais estudantes ativos que entraram pelo seu link de indicação.")}
           </p>
         )}
         {p.seat_based && (
           <p className="text-xs text-muted-foreground">
-            A partir de {p.min_seats} usuários. Sem limite máximo — acrescente usuários quando precisar,
-            pagando apenas o valor por usuário adicional.
+            {tx('A partir de {{n}} usuários. Sem limite máximo — acrescente usuários quando precisar, pagando apenas o valor por usuário adicional.', { n: p.min_seats })}
           </p>
         )}
       </CardHeader>
       <CardContent className="space-y-3 flex flex-col flex-1">
-        {p.description && <p className="text-sm text-muted-foreground">{p.description}</p>}
+        {p.description && <p className="text-sm text-muted-foreground">{tx(p.description)}</p>}
         <ul className="space-y-1.5">
           {features.map(([key]) => (
             <li key={key} className="flex items-start gap-2 text-sm">
               <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-              <span>{FEATURE_LABELS[key] ?? key}</span>
+              <span>{tx(FEATURE_LABELS[key] ?? key)}</span>
             </li>
           ))}
         </ul>
@@ -121,7 +121,7 @@ function PlanCard({
         {p.seat_based && !p.quote_only && (
           <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
             <Label htmlFor={`seats-${p.code}`} className="text-xs flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5" /> Usuários
+              <Users className="h-3.5 w-3.5" /> {tx("Usuários")}
             </Label>
             <Input
               id={`seats-${p.code}`}
@@ -137,8 +137,7 @@ function PlanCard({
             />
             {monthlyTotal !== null && (
               <p className="text-xs text-muted-foreground">
-                Total estimado: <strong className="text-foreground">{formatBRL(monthlyTotal)}/{periodLabel}</strong> para {quantity} usuários.
-                Acima de {MAX_SEATS} usuários, fale com o time comercial.
+                {tx("Total estimado:")} <strong className="text-foreground">{formatBRL(monthlyTotal)}/{periodLabel}</strong> {tx('para {{n}} usuários. Acima de {{max}} usuários, fale com o time comercial.', { n: quantity, max: MAX_SEATS })}
               </p>
             )}
           </div>
@@ -152,7 +151,7 @@ function PlanCard({
               onCheckout!({ code: p.code, name: p.name, priceId: onlinePriceId!, quantity })
             }
           >
-            Atualizar usuários
+            {tx("Atualizar usuários")}
           </Button>
         ) : (
           !isCurrent && (
@@ -171,7 +170,7 @@ function PlanCard({
                 window.location.href = `/planos?contato=${encodeURIComponent(p.code)}&plano=${encodeURIComponent(p.name)}`;
               }}
             >
-              {p.quote_only ? 'Falar com o time' : canCheckout ? 'Assinar agora' : 'Quero contratar'}
+              {tx(p.quote_only ? 'Falar com o time' : canCheckout ? 'Assinar agora' : 'Quero contratar')}
             </Button>
           )
         )}
@@ -199,20 +198,19 @@ export function PlanCatalog({ onSelectPlan, onCheckout }: PlanCatalogProps = {})
     <div>
       <div className="flex items-center gap-2 mb-1">
         <Sparkles className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-bold">Planos SISTUR</h3>
+        <h3 className="text-lg font-bold">{tx("Planos SISTUR")}</h3>
       </div>
       <p className="text-sm text-muted-foreground mb-6">
-        Preços vigentes. O plano Territorial (gestão pública) é contratado por proposta/empenho; os demais
-        podem ser assinados online e alterados a qualquer momento.
+        {tx('Preços vigentes. O plano Territorial (gestão pública) é contratado por proposta/empenho; os demais podem ser assinados online e alterados a qualquer momento.')}
       </p>
 
       <div className="flex justify-center mb-6">
-        <div className="inline-flex rounded-full border border-border bg-muted/40 p-1" role="tablist" aria-label="Período de cobrança">
+        <div className="inline-flex rounded-full border border-border bg-muted/40 p-1" role="tablist" aria-label={tx("Período de cobrança")}>
           <Button size="sm" variant={annual ? 'ghost' : 'default'} className="rounded-full" onClick={() => setAnnual(false)} aria-pressed={!annual}>
-            Mensal
+            {tx("Mensal")}
           </Button>
           <Button size="sm" variant={annual ? 'default' : 'ghost'} className="rounded-full gap-2" onClick={() => setAnnual(true)} aria-pressed={annual}>
-            Anual <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">-15%</Badge>
+            {tx("Anual")} <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">-15%</Badge>
           </Button>
         </div>
       </div>

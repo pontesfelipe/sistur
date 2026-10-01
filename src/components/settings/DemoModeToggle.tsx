@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -18,14 +19,14 @@ export function DemoModeToggle() {
     
     if (result.success) {
       if (enabled) {
-        toast.success('Modo Demo ativado! Você está visualizando dados de demonstração.');
+        toast.success(tx("Modo Demo ativado! Você está visualizando dados de demonstração."));
       } else {
-        toast.success('Modo Demo desativado. Visualizando dados da sua organização.');
+        toast.success(tx("Modo Demo desativado. Visualizando dados da sua organização."));
       }
       // Reload the page to refresh all data
       window.location.reload();
     } else {
-      toast.error('Erro ao alterar modo: ' + result.error);
+      toast.error(tx("Erro ao alterar modo: ") + result.error);
     }
   };
 
@@ -39,7 +40,7 @@ export function DemoModeToggle() {
         <CardContent className="pt-6">
           <div className="flex items-center justify-center gap-2">
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Carregando...</span>
+            <span>{tx("Carregando...")}</span>
           </div>
         </CardContent>
       </Card>
@@ -57,12 +58,12 @@ export function DemoModeToggle() {
               {isViewingDemoData && (
                 <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
                   <Eye className="h-3 w-3 mr-1" />
-                  Ativo
+                  {tx("Ativo")}
                 </Badge>
               )}
             </CardTitle>
             <CardDescription>
-              Visualize dados de demonstração do SISTUR com diagnósticos pré-configurados
+              {tx("Visualize dados de demonstração do SISTUR com diagnósticos pré-configurados")}
             </CardDescription>
           </div>
         </div>
@@ -71,7 +72,7 @@ export function DemoModeToggle() {
         <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
           <div className="space-y-1">
             <Label htmlFor="demo-mode" className="font-medium">
-              Visualizar Dataset Demo
+              {tx("Visualizar Dataset Demo")}
             </Label>
             <p className="text-sm text-muted-foreground">
               {isViewingDemoData 
@@ -91,7 +92,7 @@ export function DemoModeToggle() {
         {isViewingDemoData && (
           <div className="mt-4 p-3 bg-amber-100/50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              <strong>Atenção:</strong> Os dados exibidos são de demonstração. 
+              <strong>{tx("Atenção:")}</strong> Os dados exibidos são de demonstração. 
               Para criar seus próprios diagnósticos, desative o modo demo.
             </p>
           </div>

@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,7 +34,7 @@ export function CertificateStatsPanel() {
     return (
       <Card className="border-destructive/30 bg-destructive/5">
         <CardContent className="py-6 text-center text-destructive">
-          Erro ao carregar estatísticas de certificados
+          {tx("Erro ao carregar estatísticas de certificados")}
         </CardContent>
       </Card>
     );
@@ -53,7 +54,7 @@ export function CertificateStatsPanel() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-3xl font-bold">{stats.total}</p>
-                <p className="text-sm text-muted-foreground">Total de Certificados</p>
+                <p className="text-sm text-muted-foreground">{tx("Total de Certificados")}</p>
               </div>
               <div className="p-3 rounded-full bg-primary/10">
                 <Award className="h-6 w-6 text-primary" />
@@ -67,7 +68,7 @@ export function CertificateStatsPanel() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-3xl font-bold text-green-600">{stats.active}</p>
-                <p className="text-sm text-muted-foreground">Ativos</p>
+                <p className="text-sm text-muted-foreground">{tx("Ativos")}</p>
               </div>
               <div className="p-3 rounded-full bg-green-500/10">
                 <CheckCircle className="h-6 w-6 text-green-600" />
@@ -81,7 +82,7 @@ export function CertificateStatsPanel() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-3xl font-bold text-red-600">{stats.revoked}</p>
-                <p className="text-sm text-muted-foreground">Revogados</p>
+                <p className="text-sm text-muted-foreground">{tx("Revogados")}</p>
               </div>
               <div className="p-3 rounded-full bg-red-500/10">
                 <XCircle className="h-6 w-6 text-red-600" />
@@ -113,7 +114,7 @@ export function CertificateStatsPanel() {
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">Este mês</p>
+                <p className="text-sm text-muted-foreground">{tx("Este mês")}</p>
               </div>
               <div className="p-3 rounded-full bg-blue-500/10">
                 <BarChart3 className="h-6 w-6 text-blue-600" />
@@ -126,15 +127,15 @@ export function CertificateStatsPanel() {
       {/* By Pillar */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Certificados por Pilar</CardTitle>
-          <CardDescription>Distribuição de certificados emitidos por área</CardDescription>
+          <CardTitle className="text-base">{tx("Certificados por Pilar")}</CardTitle>
+          <CardDescription>{tx("Distribuição de certificados emitidos por área")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex items-center justify-between p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
               <div>
                 <p className="text-2xl font-bold text-blue-700">{stats.byPillar.RA}</p>
-                <p className="text-sm text-muted-foreground">Relações Ambientais</p>
+                <p className="text-sm text-muted-foreground">{tx("Relações Ambientais")}</p>
               </div>
               <Badge variant="outline" className="bg-blue-500/10 text-blue-700 border-blue-500/30">
                 RA
@@ -144,7 +145,7 @@ export function CertificateStatsPanel() {
             <div className="flex items-center justify-between p-4 rounded-lg bg-green-500/5 border border-green-500/20">
               <div>
                 <p className="text-2xl font-bold text-green-700">{stats.byPillar.OE}</p>
-                <p className="text-sm text-muted-foreground">Organização Estrutural</p>
+                <p className="text-sm text-muted-foreground">{tx("Organização Estrutural")}</p>
               </div>
               <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
                 OE
@@ -154,7 +155,7 @@ export function CertificateStatsPanel() {
             <div className="flex items-center justify-between p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">
               <div>
                 <p className="text-2xl font-bold text-purple-700">{stats.byPillar.AO}</p>
-                <p className="text-sm text-muted-foreground">Ações Operacionais</p>
+                <p className="text-sm text-muted-foreground">{tx("Ações Operacionais")}</p>
               </div>
               <Badge variant="outline" className="bg-purple-500/10 text-purple-700 border-purple-500/30">
                 AO

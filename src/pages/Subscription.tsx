@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -115,7 +116,7 @@ export default function Subscription() {
         return;
       }
       if (samePrice) {
-        toast.info('Você já está neste plano com essa quantidade de usuários.');
+        toast.info(tx("Você já está neste plano com essa quantidade de usuários."));
         return;
       }
 
@@ -147,11 +148,11 @@ export default function Subscription() {
           message = body?.error || '';
         }
         if (status === 404 || /assinatura online/i.test(message)) {
-          toast.info('Você ainda não tem uma assinatura online ativa. Escolha um plano para começar.');
+          toast.info(tx("Você ainda não tem uma assinatura online ativa. Escolha um plano para começar."));
           return;
         }
         if (status === 401) {
-          toast.error('Sua sessão expirou. Entre novamente para gerenciar a conta.');
+          toast.error(tx("Sua sessão expirou. Entre novamente para gerenciar a conta."));
           return;
         }
         throw new Error(message || 'Não foi possível abrir o gerenciamento da conta');
@@ -173,7 +174,7 @@ export default function Subscription() {
     : inTrial ? 'Avaliação por uso' : 'Nenhum plano ativo';
 
   return (
-    <AppLayout title="Planos e assinatura" subtitle="Escolha o plano certo e gerencie sua contratação">
+    <AppLayout title={tx("Planos e assinatura")} subtitle={tx("Escolha o plano certo e gerencie sua contratação")}>
       <div className="max-w-5xl mx-auto space-y-10">
         {/* Situação atual */}
         <motion.section
@@ -233,7 +234,7 @@ export default function Subscription() {
                 onClick={() => setShowCancelDialog(true)}
                 className="text-muted-foreground hover:text-destructive gap-1.5"
               >
-                <Ban className="h-3.5 w-3.5" /> Cancelar plano
+                <Ban className="h-3.5 w-3.5" /> {tx("Cancelar plano")}
               </Button>
             )}
           </div>
@@ -242,21 +243,21 @@ export default function Subscription() {
             <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <TrialItem
                 icon={<GraduationCap className="h-4 w-4" />}
-                label="Curso base do EDU"
+                label={tx("Curso base do EDU")}
                 done={trainingConsumed}
                 doneText="Concluído — trilhas completas exigem plano"
                 openText="Disponível na sua avaliação"
               />
               <TrialItem
                 icon={<Building2 className="h-4 w-4" />}
-                label="1 diagnóstico"
+                label={tx("1 diagnóstico")}
                 done={assessmentUsed}
                 doneText="Utilizado — resultados em prévia"
                 openText="Ainda disponível"
               />
               <TrialItem
                 icon={<Coins className="h-4 w-4" />}
-                label="Professor Beni"
+                label={tx("Professor Beni")}
                 done={beniRemaining + beniCredits <= 0 && !beniUnlimited}
                 doneText="Perguntas de cortesia esgotadas"
                 openText={`${beniRemaining + beniCredits} pergunta(s) restante(s)`}
@@ -277,7 +278,7 @@ export default function Subscription() {
         {/* Módulos liberados */}
         <section>
           <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
-            Módulos liberados na sua conta
+            {tx("Módulos liberados na sua conta")}
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {FEATURE_GRID.map(f => {
@@ -300,7 +301,7 @@ export default function Subscription() {
           </div>
           {!isLicenseValid && !hasSubscription && (
             <p className="text-xs text-muted-foreground mt-3">
-              Módulos bloqueados são liberados imediatamente após a contratação.
+              {tx("Módulos bloqueados são liberados imediatamente após a contratação.")}
             </p>
           )}
         </section>
@@ -326,9 +327,9 @@ export default function Subscription() {
         {paymentsReady && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4">
             <div>
-              <p className="text-sm font-medium">Gerenciar conta</p>
+              <p className="text-sm font-medium">{tx("Gerenciar conta")}</p>
               <p className="text-xs text-muted-foreground">
-                Ajuste a quantidade de usuários, atualize o pagamento e baixe faturas.
+                {tx("Ajuste a quantidade de usuários, atualize o pagamento e baixe faturas.")}
               </p>
             </div>
             <Button variant="outline" onClick={handleOpenPortal} disabled={openingPortal}>
@@ -341,7 +342,7 @@ export default function Subscription() {
         <section>
           <div className="flex items-center gap-2 mb-4">
             <HelpCircle className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-bold">Perguntas frequentes</h3>
+            <h3 className="text-lg font-bold">{tx("Perguntas frequentes")}</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {FAQ.map(item => (
@@ -354,7 +355,7 @@ export default function Subscription() {
           <p className="text-xs text-muted-foreground mt-4">
             Precisa de uma proposta institucional, nota de empenho ou volume acima de 100 usuários?{' '}
             <a className="underline" href="mailto:contato@sistur.com.br?subject=Proposta%20SISTUR">
-              Fale com o time comercial
+              {tx("Fale com o time comercial")}
             </a>.
           </p>
         </section>

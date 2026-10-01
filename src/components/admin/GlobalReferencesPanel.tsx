@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { getDateLocale } from '@/i18n/dateLocale';
 import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -47,14 +48,14 @@ export function GlobalReferencesPanel() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <BookOpenCheck className="h-5 w-5 text-primary" />
-              Referências Globais
+              {tx("Referências Globais")}
             </CardTitle>
             <CardDescription className="mt-1">
               Documentos de referência usados automaticamente na geração de relatórios e diagnósticos (ex: PNT, legislação, diretrizes)
             </CardDescription>
           </div>
           <Button onClick={() => setUploadOpen(true)}>
-            <Upload className="h-4 w-4 mr-2" /> Adicionar
+            <Upload className="h-4 w-4 mr-2" /> {tx("Adicionar")}
           </Button>
         </div>
       </CardHeader>
@@ -66,10 +67,10 @@ export function GlobalReferencesPanel() {
         ) : files.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground border-2 border-dashed rounded-lg">
             <FolderOpen className="h-12 w-12 mb-3 opacity-50" />
-            <p className="text-lg font-medium">Nenhum documento de referência</p>
-            <p className="text-sm">Adicione documentos como o Plano Nacional de Turismo para enriquecer relatórios</p>
+            <p className="text-lg font-medium">{tx("Nenhum documento de referência")}</p>
+            <p className="text-sm">{tx("Adicione documentos como o Plano Nacional de Turismo para enriquecer relatórios")}</p>
             <Button variant="outline" className="mt-4" onClick={() => setUploadOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" /> Adicionar documento
+              <Plus className="h-4 w-4 mr-2" /> {tx("Adicionar documento")}
             </Button>
           </div>
         ) : (
@@ -105,12 +106,12 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           <Badge variant="secondary" className="text-xs shrink-0">{catLabel}</Badge>
           {!file.is_active && (
             <Badge variant="outline" className="text-xs shrink-0 bg-destructive/10 text-destructive">
-              <EyeOff className="h-3 w-3 mr-1" /> Inativo
+              <EyeOff className="h-3 w-3 mr-1" /> {tx("Inativo")}
             </Badge>
           )}
           {file.summary && (
             <Badge variant="outline" className="text-xs shrink-0 bg-primary/5">
-              Resumo ✓
+              {tx("Resumo ✓")}
             </Badge>
           )}
         </div>
@@ -125,7 +126,7 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           onCheckedChange={(checked) => updateFile.mutate({ id: file.id, is_active: checked })}
           title={file.is_active ? 'Ativo (usado nos relatórios)' : 'Inativo'}
         />
-        <Button size="icon" variant="ghost" onClick={onEdit} title="Editar resumo">
+        <Button size="icon" variant="ghost" onClick={onEdit} title={tx("Editar resumo")}>
           <Edit className="h-4 w-4" />
         </Button>
         <Button size="icon" variant="ghost" onClick={() => downloadFile.mutate(file)} disabled={downloadFile.isPending}>
@@ -139,15 +140,15 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Remover referência?</AlertDialogTitle>
+              <AlertDialogTitle>{tx("Remover referência?")}</AlertDialogTitle>
               <AlertDialogDescription>
                 O documento "{file.file_name}" será removido permanentemente.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
               <AlertDialogAction onClick={() => deleteFile.mutate(file)} className="bg-destructive text-destructive-foreground">
-                Remover
+                {tx("Remover")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -179,7 +180,7 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Adicionar Documento de Referência</DialogTitle>
+          <DialogTitle>{tx("Adicionar Documento de Referência")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -194,7 +195,7 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
               ) : (
                 <div className="flex flex-col items-center gap-1 text-muted-foreground">
                   <Upload className="h-6 w-6" />
-                  <span className="text-sm">Clique para selecionar</span>
+                  <span className="text-sm">{tx("Clique para selecionar")}</span>
                   <span className="text-xs">PDF, DOCX, XLSX, CSV, TXT (máx. 20MB)</span>
                 </div>
               )}
@@ -202,7 +203,7 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
           </div>
           <Input placeholder="Descrição (ex: Plano Nacional de Turismo 2024-2027)" value={description} onChange={e => setDescription(e.target.value)} />
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger><SelectValue placeholder="Categoria" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={tx("Categoria")} /></SelectTrigger>
             <SelectContent>
               {REFERENCE_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
             </SelectContent>
@@ -218,7 +219,7 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
           </p>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{tx("Cancelar")}</Button>
           <Button onClick={handleSubmit} disabled={!file || uploadFile.isPending}>
             {uploadFile.isPending ? 'Enviando...' : 'Adicionar'}
           </Button>
@@ -245,7 +246,7 @@ function EditDialog({ file, open, onOpenChange }: { file: GlobalReferenceFile; o
           <DialogTitle>Editar Referência: {file.file_name}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input placeholder="Descrição" value={description} onChange={e => setDescription(e.target.value)} />
+          <Input placeholder={tx("Descrição")} value={description} onChange={e => setDescription(e.target.value)} />
           <Textarea
             placeholder="Resumo do documento (injetado nos relatórios via IA)"
             value={summary}
@@ -257,7 +258,7 @@ function EditDialog({ file, open, onOpenChange }: { file: GlobalReferenceFile; o
           </p>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{tx("Cancelar")}</Button>
           <Button onClick={handleSubmit} disabled={updateFile.isPending}>
             {updateFile.isPending ? 'Salvando...' : 'Salvar'}
           </Button>

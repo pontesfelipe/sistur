@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users, Building2, CheckCircle2, FlaskConical } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -104,7 +105,7 @@ export function TrialConsumptionPanel() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <FlaskConical className="h-4 w-4" /> Trial por consumo
+            <FlaskConical className="h-4 w-4" /> {tx("Trial por consumo")}
           </CardTitle>
           <CardDescription>
             Usuário novo: curso base + 10 perguntas ao Professor Beni. Organização nova: 1 diagnóstico
@@ -117,18 +118,18 @@ export function TrialConsumptionPanel() {
               {[0, 1, 2].map(i => <Skeleton key={i} className="h-10 w-full" />)}
             </div>
           ) : rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-8 text-center">Nenhum registro de trial.</p>
+            <p className="text-sm text-muted-foreground py-8 text-center">{tx("Nenhum registro de trial.")}</p>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Assunto</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Curso base</TableHead>
-                    <TableHead>Diagnóstico</TableHead>
-                    <TableHead>Situação</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
+                    <TableHead>{tx("Assunto")}</TableHead>
+                    <TableHead>{tx("Tipo")}</TableHead>
+                    <TableHead>{tx("Curso base")}</TableHead>
+                    <TableHead>{tx("Diagnóstico")}</TableHead>
+                    <TableHead>{tx("Situação")}</TableHead>
+                    <TableHead className="text-right">{tx("Ações")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -160,7 +161,7 @@ export function TrialConsumptionPanel() {
                             disabled={convert.isPending}
                             onClick={() => convert.mutate(r)}
                           >
-                            Converter
+                            {tx("Converter")}
                           </Button>
                         )}
                       </TableCell>

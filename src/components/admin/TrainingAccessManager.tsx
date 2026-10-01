@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,19 +51,19 @@ interface TrainingAccessManagerProps {
 const ACCESS_TYPE_INFO = {
   public: {
     label: 'Público',
-    description: 'Todos os usuários têm acesso',
+    description: tx("Todos os usuários têm acesso"),
     icon: Globe,
     color: 'bg-green-500/10 text-green-700 border-green-500/20',
   },
   org: {
     label: 'Organização',
-    description: 'Apenas membros da organização',
+    description: tx("Apenas membros da organização"),
     icon: Building2,
     color: 'bg-blue-500/10 text-blue-700 border-blue-500/20',
   },
   user: {
     label: 'Usuário',
-    description: 'Usuário específico',
+    description: tx("Usuário específico"),
     icon: User,
     color: 'bg-purple-500/10 text-purple-700 border-purple-500/20',
   },
@@ -135,7 +136,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8 text-muted-foreground">
-        Carregando configurações de acesso...
+        {tx("Carregando configurações de acesso...")}
       </div>
     );
   }
@@ -145,7 +146,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
       <div className="flex items-center gap-3 pb-2 border-b">
         <Shield className="h-5 w-5 text-primary" />
         <div>
-          <h3 className="font-medium">Controle de Acesso</h3>
+          <h3 className="font-medium">{tx("Controle de Acesso")}</h3>
           <p className="text-sm text-muted-foreground">
             Gerencie quem pode acessar: {trainingTitle}
           </p>
@@ -161,9 +162,9 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
                 <Globe className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <div className="font-medium">Acesso Público</div>
+                <div className="font-medium">{tx("Acesso Público")}</div>
                 <p className="text-sm text-muted-foreground">
-                  Liberar para todos os usuários autenticados
+                  {tx("Liberar para todos os usuários autenticados")}
                 </p>
               </div>
             </div>
@@ -181,10 +182,10 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Building2 className="h-4 w-4" />
-            Acesso por Organização
+            {tx("Acesso por Organização")}
           </CardTitle>
           <CardDescription>
-            Libere acesso para todos os membros de organizações específicas
+            {tx("Libere acesso para todos os membros de organizações específicas")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -192,12 +193,12 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
           <div className="flex gap-2">
             <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Selecione uma organização" />
+                <SelectValue placeholder={tx("Selecione uma organização")} />
               </SelectTrigger>
               <SelectContent>
                 {availableOrgs.length === 0 ? (
                   <div className="p-2 text-sm text-muted-foreground text-center">
-                    Nenhuma organização disponível
+                    {tx("Nenhuma organização disponível")}
                   </div>
                 ) : (
                   availableOrgs.map(org => (
@@ -247,7 +248,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
             </div>
           ) : (
             <div className="text-sm text-muted-foreground text-center py-4 border rounded-lg border-dashed">
-              Nenhuma organização com acesso específico
+              {tx("Nenhuma organização com acesso específico")}
             </div>
           )}
         </CardContent>
@@ -258,10 +259,10 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <User className="h-4 w-4" />
-            Acesso por Usuário
+            {tx("Acesso por Usuário")}
           </CardTitle>
           <CardDescription>
-            Libere acesso para usuários específicos
+            {tx("Libere acesso para usuários específicos")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -269,12 +270,12 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
           <div className="flex gap-2">
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Selecione um usuário" />
+                <SelectValue placeholder={tx("Selecione um usuário")} />
               </SelectTrigger>
               <SelectContent>
                 {availableUsers.length === 0 ? (
                   <div className="p-2 text-sm text-muted-foreground text-center">
-                    Nenhum usuário disponível
+                    {tx("Nenhum usuário disponível")}
                   </div>
                 ) : (
                   availableUsers.map(user => (
@@ -329,7 +330,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
             </div>
           ) : (
             <div className="text-sm text-muted-foreground text-center py-4 border rounded-lg border-dashed">
-              Nenhum usuário com acesso específico
+              {tx("Nenhum usuário com acesso específico")}
             </div>
           )}
         </CardContent>
@@ -341,12 +342,12 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
           <div className="flex items-center gap-3">
             <Users className="h-5 w-5 text-primary" />
             <div className="flex-1">
-              <div className="font-medium text-sm">Resumo de Acessos</div>
+              <div className="font-medium text-sm">{tx("Resumo de Acessos")}</div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {isPublic && (
                   <Badge variant="outline" className={ACCESS_TYPE_INFO.public.color}>
                     <Globe className="h-3 w-3 mr-1" />
-                    Público
+                    {tx("Público")}
                   </Badge>
                 )}
                 {orgAccesses.length > 0 && (
@@ -363,7 +364,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
                 )}
                 {!isPublic && orgAccesses.length === 0 && userAccesses.length === 0 && (
                   <span className="text-sm text-muted-foreground">
-                    Apenas membros da organização do curso têm acesso
+                    {tx("Apenas membros da organização do curso têm acesso")}
                   </span>
                 )}
               </div>
@@ -376,7 +377,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
       <AlertDialog open={revokeDialogOpen} onOpenChange={setRevokeDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Revogar acesso?</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Revogar acesso?")}</AlertDialogTitle>
             <AlertDialogDescription>
               {accessToRevoke?.access_type === 'org' 
                 ? `Os membros da organização "${accessToRevoke?.org_name}" perderão acesso a este treinamento.`
@@ -385,12 +386,12 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmRevoke}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Revogar
+              {tx("Revogar")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

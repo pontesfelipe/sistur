@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { getDateLocale } from '@/i18n/dateLocale';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -138,7 +139,7 @@ export default function AdminIngestionHealth() {
 
   return (
     <AppLayout
-      title="Saúde das Ingestões Oficiais"
+      title={tx("Saúde das Ingestões Oficiais")}
       subtitle="Monitoramento e teste manual das funções automáticas que coletam dados oficiais (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo)."
       actions={
         <Button
@@ -150,7 +151,7 @@ export default function AdminIngestionHealth() {
             qc.invalidateQueries({ queryKey: ['mtur-freshness'] });
           }}
         >
-          <RefreshCw className="h-4 w-4 mr-2" /> Atualizar
+          <RefreshCw className="h-4 w-4 mr-2" /> {tx("Atualizar")}
         </Button>
       }
     >
@@ -165,31 +166,31 @@ export default function AdminIngestionHealth() {
                 Tabela de Referência MTur (gastos turísticos por UF)
               </CardTitle>
               <CardDescription>
-                Lembrete anual: o MTur publica novas médias de gasto e permanência todo ano.
+                {tx("Lembrete anual: o MTur publica novas médias de gasto e permanência todo ano.")}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-6 text-sm">
               <div>
-                <div className="text-muted-foreground text-xs">Ano-referência mais recente</div>
+                <div className="text-muted-foreground text-xs">{tx("Ano-referência mais recente")}</div>
                 <div className="text-2xl font-display font-bold">{mturQuery.data.latest_reference_year ?? '—'}</div>
               </div>
               <div>
-                <div className="text-muted-foreground text-xs">Linhas no catálogo</div>
+                <div className="text-muted-foreground text-xs">{tx("Linhas no catálogo")}</div>
                 <div className="text-2xl font-display font-bold">{mturQuery.data.rows_count}</div>
               </div>
               <div>
-                <div className="text-muted-foreground text-xs">Última atualização</div>
+                <div className="text-muted-foreground text-xs">{tx("Última atualização")}</div>
                 <div className="text-base font-medium">{formatDate(mturQuery.data.last_updated)}</div>
               </div>
               <div>
-                <div className="text-muted-foreground text-xs">Status</div>
+                <div className="text-muted-foreground text-xs">{tx("Status")}</div>
                 {mturQuery.data.needs_review ? (
                   <Badge variant="outline" className="bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30">
-                    <AlertTriangle className="h-3 w-3 mr-1" /> Revisão recomendada
+                    <AlertTriangle className="h-3 w-3 mr-1" /> {tx("Revisão recomendada")}
                   </Badge>
                 ) : (
                   <Badge variant="outline" className="bg-severity-good/15 text-severity-good border-severity-good/30">
-                    <CheckCircle2 className="h-3 w-3 mr-1" /> Atualizada
+                    <CheckCircle2 className="h-3 w-3 mr-1" /> {tx("Atualizada")}
                   </Badge>
                 )}
               </div>
@@ -200,7 +201,7 @@ export default function AdminIngestionHealth() {
         {/* Health cards */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Status atual por função</CardTitle>
+            <CardTitle className="text-base">{tx("Status atual por função")}</CardTitle>
             <CardDescription>Teste manual (smoke test) registra a execução no histórico abaixo.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -226,21 +227,21 @@ export default function AdminIngestionHealth() {
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
-                          <div className="text-muted-foreground">Cadência</div>
+                          <div className="text-muted-foreground">{tx("Cadência")}</div>
                           <div className="font-medium">{row.expected_cadence}</div>
                         </div>
                         <div>
-                          <div className="text-muted-foreground">Última execução</div>
+                          <div className="text-muted-foreground">{tx("Última execução")}</div>
                           <div className="font-medium">
                             {row.last_run_at ? `${formatDate(row.last_run_at)} (${row.age_days}d)` : 'Nunca'}
                           </div>
                         </div>
                         <div>
-                          <div className="text-muted-foreground">Processados</div>
+                          <div className="text-muted-foreground">{tx("Processados")}</div>
                           <div className="font-medium tabular-nums">{row.last_records_processed ?? 0}</div>
                         </div>
                         <div>
-                          <div className="text-muted-foreground">Falhas</div>
+                          <div className="text-muted-foreground">{tx("Falhas")}</div>
                           <div className="font-medium tabular-nums">{row.last_records_failed ?? 0}</div>
                         </div>
                       </div>
@@ -270,7 +271,7 @@ export default function AdminIngestionHealth() {
         {/* Recent runs history */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Últimas 50 execuções</CardTitle>
+            <CardTitle className="text-base">{tx("Últimas 50 execuções")}</CardTitle>
             <CardDescription>Histórico unificado (cron + manual + admin).</CardDescription>
           </CardHeader>
           <CardContent>
@@ -278,20 +279,20 @@ export default function AdminIngestionHealth() {
               <Skeleton className="h-48 w-full" />
             ) : (runsQuery.data ?? []).length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
-                Nenhuma execução registrada ainda. Rode um smoke test para começar.
+                {tx("Nenhuma execução registrada ainda. Rode um smoke test para começar.")}
               </div>
             ) : (
               <div className="rounded-md border max-h-[500px] overflow-auto">
                 <Table>
                   <TableHeader className="sticky top-0 bg-background z-10">
                     <TableRow>
-                      <TableHead>Início</TableHead>
-                      <TableHead>Função</TableHead>
-                      <TableHead>Origem</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Proc.</TableHead>
-                      <TableHead className="text-right">Falhas</TableHead>
-                      <TableHead className="text-right">Duração</TableHead>
+                      <TableHead>{tx("Início")}</TableHead>
+                      <TableHead>{tx("Função")}</TableHead>
+                      <TableHead>{tx("Origem")}</TableHead>
+                      <TableHead>{tx("Status")}</TableHead>
+                      <TableHead className="text-right">{tx("Proc.")}</TableHead>
+                      <TableHead className="text-right">{tx("Falhas")}</TableHead>
+                      <TableHead className="text-right">{tx("Duração")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

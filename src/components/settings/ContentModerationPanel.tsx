@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,35 +30,35 @@ const STRICTNESS_DETAILS: Record<number, {
 }> = {
   1: {
     label: 'Muito Permissivo',
-    description: 'Apenas conteúdo explícito é bloqueado',
+    description: tx("Apenas conteúdo explícito é bloqueado"),
     color: 'text-green-600',
     blocked: ['Nudez explícita', 'Conteúdo sexual gráfico', 'Gore extremo'],
     allowed: ['Selfies e fotos pessoais', 'Memes e conteúdo informal', 'Fotos genéricas', 'Conteúdo profissional', 'Conteúdo turístico'],
   },
   2: {
     label: 'Permissivo',
-    description: 'Bloqueia conteúdo explícito e violento',
+    description: tx("Bloqueia conteúdo explícito e violento"),
     color: 'text-emerald-600',
     blocked: ['Nudez', 'Conteúdo sexual', 'Violência gráfica', 'Símbolos de ódio'],
     allowed: ['Selfies e fotos pessoais', 'Memes', 'Fotos genéricas', 'Conteúdo profissional', 'Conteúdo turístico'],
   },
   3: {
     label: 'Moderado',
-    description: 'Equilíbrio entre permissividade e restrição',
+    description: tx("Equilíbrio entre permissividade e restrição"),
     color: 'text-amber-600',
     blocked: ['Nudez e conteúdo sexual', 'Violência', 'Discurso de ódio', 'Uso de drogas', 'Spam e memes', 'Informações pessoais (RG, cartões)'],
     allowed: ['Fotos de turismo', 'Fotos profissionais', 'Conteúdo educacional', 'Mapas e gráficos', 'Fotos normais do cotidiano'],
   },
   4: {
     label: 'Restritivo',
-    description: 'Aceita apenas conteúdo claramente profissional',
+    description: tx("Aceita apenas conteúdo claramente profissional"),
     color: 'text-orange-600',
     blocked: ['Tudo que não é profissional/educacional', 'Selfies e fotos pessoais', 'Memes e conteúdo informal', 'Conteúdo não relacionado'],
     allowed: ['Destinos turísticos', 'Hotéis e paisagens', 'Eventos profissionais', 'Mapas e diagramas', 'Documentos e apresentações'],
   },
   5: {
     label: 'Muito Restritivo',
-    description: 'Apenas conteúdo diretamente relacionado a turismo',
+    description: tx("Apenas conteúdo diretamente relacionado a turismo"),
     color: 'text-red-600',
     blocked: ['Tudo não-turístico', 'Conteúdo profissional genérico', 'Fotos pessoais', 'Memes', 'Qualquer conteúdo não-turístico'],
     allowed: ['Destinos turísticos', 'Hotéis e infraestrutura', 'Patrimônio histórico', 'Eventos de turismo', 'Mapas/gráficos de turismo'],
@@ -141,9 +142,9 @@ export function ContentModerationPanel() {
         if (error) throw error;
         setSettings(prev => ({ ...prev, id: data.id }));
       }
-      toast.success('Configurações de moderação salvas!');
+      toast.success(tx("Configurações de moderação salvas!"));
     } catch (error: any) {
-      toast.error('Erro ao salvar: ' + error.message);
+      toast.error(tx("Erro ao salvar: ") + error.message);
     } finally {
       setIsSaving(false);
     }
@@ -166,10 +167,10 @@ export function ContentModerationPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-primary" />
-          Moderação de Conteúdo
+          {tx("Moderação de Conteúdo")}
         </CardTitle>
         <CardDescription>
-          Configure as políticas de moderação automática para o Social Turismo
+          {tx("Configure as políticas de moderação automática para o Social Turismo")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -178,7 +179,7 @@ export function ContentModerationPanel() {
           <div className="flex items-center justify-between">
             <Label className="flex items-center gap-2 text-base font-medium">
               <Thermometer className="h-4 w-4" />
-              Nível de Restrição
+              {tx("Nível de Restrição")}
             </Label>
             <Badge variant="outline" className={strictnessInfo.color}>
               {strictnessInfo.label}
@@ -188,8 +189,8 @@ export function ContentModerationPanel() {
           {/* Visual thermometer */}
           <div className="relative pt-2 pb-4">
             <div className="flex justify-between mb-2 text-xs text-muted-foreground">
-              <span>Permissivo</span>
-              <span>Restritivo</span>
+              <span>{tx("Permissivo")}</span>
+              <span>{tx("Restritivo")}</span>
             </div>
             <div className="relative h-3 rounded-full overflow-hidden bg-gradient-to-r from-green-200 via-amber-200 to-red-200 dark:from-green-900 dark:via-amber-900 dark:to-red-900">
               <div 
@@ -213,7 +214,7 @@ export function ContentModerationPanel() {
             <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 space-y-2">
               <p className="text-xs font-semibold text-destructive flex items-center gap-1.5">
                 <Ban className="h-3.5 w-3.5" />
-                Bloqueado neste nível
+                {tx("Bloqueado neste nível")}
               </p>
               <ul className="space-y-1">
                 {strictnessInfo.blocked.map((item, i) => (
@@ -227,7 +228,7 @@ export function ContentModerationPanel() {
             <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-3 space-y-2">
               <p className="text-xs font-semibold text-green-600 dark:text-green-400 flex items-center gap-1.5">
                 <Check className="h-3.5 w-3.5" />
-                Permitido neste nível
+                {tx("Permitido neste nível")}
               </p>
               <ul className="space-y-1">
                 {strictnessInfo.allowed.map((item, i) => (
@@ -246,9 +247,9 @@ export function ContentModerationPanel() {
         {/* Auto-reject toggle */}
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label className="text-sm font-medium">Rejeição Automática</Label>
+            <Label className="text-sm font-medium">{tx("Rejeição Automática")}</Label>
             <p className="text-xs text-muted-foreground">
-              Bloquear automaticamente imagens que não passam na moderação
+              {tx("Bloquear automaticamente imagens que não passam na moderação")}
             </p>
           </div>
           <Switch
@@ -262,10 +263,10 @@ export function ContentModerationPanel() {
           <div className="space-y-0.5">
             <Label className="flex items-center gap-2 text-sm font-medium">
               <Eye className="h-4 w-4" />
-              Revisão Manual
+              {tx("Revisão Manual")}
             </Label>
             <p className="text-xs text-muted-foreground">
-              Exigir aprovação manual de admin antes de publicar imagens
+              {tx("Exigir aprovação manual de admin antes de publicar imagens")}
             </p>
           </div>
           <Switch
@@ -281,7 +282,7 @@ export function ContentModerationPanel() {
           <div className="flex items-center justify-between">
             <Label className="flex items-center gap-2 text-sm font-medium">
               <ImageIcon className="h-4 w-4" />
-              Máximo de Imagens por Post
+              {tx("Máximo de Imagens por Post")}
             </Label>
             <Badge variant="secondary">{settings.max_images_per_post}</Badge>
           </div>
@@ -293,8 +294,8 @@ export function ContentModerationPanel() {
             step={1}
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>1 imagem</span>
-            <span>10 imagens</span>
+            <span>{tx("1 imagem")}</span>
+            <span>{tx("10 imagens")}</span>
           </div>
         </div>
 

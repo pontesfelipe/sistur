@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -116,7 +117,7 @@ export function OrganizationManagement() {
       setOrganizations(enrichedOrgs);
     } catch (error) {
       console.error('Error fetching organizations:', error);
-      toast.error('Erro ao carregar organizações');
+      toast.error(tx("Erro ao carregar organizações"));
     } finally {
       setLoading(false);
     }
@@ -128,7 +129,7 @@ export function OrganizationManagement() {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      toast.error('Nome é obrigatório');
+      toast.error(tx("Nome é obrigatório"));
       return;
     }
 
@@ -148,14 +149,14 @@ export function OrganizationManagement() {
           .eq('id', editingOrg.id);
 
         if (error) throw error;
-        toast.success('Organização atualizada');
+        toast.success(tx("Organização atualizada"));
       } else {
         const { error } = await supabase
           .from('orgs')
           .insert(updateData);
 
         if (error) throw error;
-        toast.success('Organização criada');
+        toast.success(tx("Organização criada"));
       }
 
       setDialogOpen(false);
@@ -192,7 +193,7 @@ export function OrganizationManagement() {
         .eq('id', orgId);
 
       if (error) throw error;
-      toast.success('Organização excluída');
+      toast.success(tx("Organização excluída"));
       await fetchOrganizations();
     } catch (error: any) {
       console.error('Error deleting organization:', error);
@@ -210,7 +211,7 @@ export function OrganizationManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
-            Organizações
+            {tx("Organizações")}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-8">
@@ -227,10 +228,10 @@ export function OrganizationManagement() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
-              Organizações
+              {tx("Organizações")}
             </CardTitle>
             <CardDescription>
-              Gerencie as organizações cadastradas no sistema
+              {tx("Gerencie as organizações cadastradas no sistema")}
             </CardDescription>
           </div>
           <Dialog open={dialogOpen} onOpenChange={(open) => {
@@ -243,7 +244,7 @@ export function OrganizationManagement() {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Nova Organização
+                {tx("Nova Organização")}
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -259,17 +260,17 @@ export function OrganizationManagement() {
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nome da Organização</Label>
+                  <Label htmlFor="name">{tx("Nome da Organização")}</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Ex: Secretaria de Turismo de..."
+                    placeholder={tx("Ex: Secretaria de Turismo de...")}
                   />
                 </div>
 
                 <div className="space-y-3">
-                  <Label>Acessos Habilitados</Label>
+                  <Label>{tx("Acessos Habilitados")}</Label>
                   <p className="text-xs text-muted-foreground mb-2">
                     Configure quais tipos de diagnóstico esta organização pode executar.
                     Ambos podem ser habilitados simultaneamente.
@@ -283,10 +284,10 @@ export function OrganizationManagement() {
                       </div>
                       <div>
                         <Label htmlFor="territorial-access" className="font-medium">
-                          Acesso Territorial
+                          {tx("Acesso Territorial")}
                         </Label>
                         <p className="text-xs text-muted-foreground">
-                          Diagnósticos públicos com indicadores IGMA para destinos turísticos.
+                          {tx("Diagnósticos públicos com indicadores IGMA para destinos turísticos.")}
                         </p>
                       </div>
                     </div>
@@ -305,7 +306,7 @@ export function OrganizationManagement() {
                       </div>
                       <div>
                         <Label htmlFor="enterprise-access" className="font-medium">
-                          Acesso Empresarial
+                          {tx("Acesso Empresarial")}
                         </Label>
                         <p className="text-xs text-muted-foreground">
                           Diagnósticos hoteleiros com indicadores de performance (RevPAR, NPS, etc).
@@ -322,7 +323,7 @@ export function OrganizationManagement() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                  Cancelar
+                  {tx("Cancelar")}
                 </Button>
                 <Button onClick={handleSave} disabled={saving}>
                   {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
@@ -338,7 +339,7 @@ export function OrganizationManagement() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar organizações..."
+            placeholder={tx("Buscar organizações...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -350,7 +351,7 @@ export function OrganizationManagement() {
           <Card className="bg-muted/30">
             <CardContent className="pt-4 pb-4">
               <div className="text-2xl font-bold">{organizations.length}</div>
-              <p className="text-sm text-muted-foreground">Organizações</p>
+              <p className="text-sm text-muted-foreground">{tx("Organizações")}</p>
             </CardContent>
           </Card>
           <Card className="bg-muted/30">
@@ -358,7 +359,7 @@ export function OrganizationManagement() {
               <div className="text-2xl font-bold">
                 {organizations.reduce((sum, o) => sum + o.user_count, 0)}
               </div>
-              <p className="text-sm text-muted-foreground">Usuários Totais</p>
+              <p className="text-sm text-muted-foreground">{tx("Usuários Totais")}</p>
             </CardContent>
           </Card>
           <Card className="bg-muted/30">
@@ -366,7 +367,7 @@ export function OrganizationManagement() {
               <div className="text-2xl font-bold">
                 {organizations.reduce((sum, o) => sum + o.destination_count, 0)}
               </div>
-              <p className="text-sm text-muted-foreground">Destinos Totais</p>
+              <p className="text-sm text-muted-foreground">{tx("Destinos Totais")}</p>
             </CardContent>
           </Card>
         </div>
@@ -375,11 +376,11 @@ export function OrganizationManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Organização</TableHead>
-              <TableHead>Acessos</TableHead>
-              <TableHead className="text-center">Usuários</TableHead>
-              <TableHead className="text-center">Destinos</TableHead>
-              <TableHead>Criado em</TableHead>
+              <TableHead>{tx("Organização")}</TableHead>
+              <TableHead>{tx("Acessos")}</TableHead>
+              <TableHead className="text-center">{tx("Usuários")}</TableHead>
+              <TableHead className="text-center">{tx("Destinos")}</TableHead>
+              <TableHead>{tx("Criado em")}</TableHead>
               <TableHead className="w-[100px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -406,17 +407,17 @@ export function OrganizationManagement() {
                       {org.has_territorial_access && (
                         <Badge variant="outline" className="text-xs gap-1 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30">
                           <Landmark className="h-3 w-3" />
-                          Territorial
+                          {tx("Territorial")}
                         </Badge>
                       )}
                       {org.has_enterprise_access && (
                         <Badge variant="outline" className="text-xs gap-1 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30">
                           <Hotel className="h-3 w-3" />
-                          Empresarial
+                          {tx("Empresarial")}
                         </Badge>
                       )}
                       {!org.has_territorial_access && !org.has_enterprise_access && (
-                        <span className="text-xs text-muted-foreground">Nenhum</span>
+                        <span className="text-xs text-muted-foreground">{tx("Nenhum")}</span>
                       )}
                     </div>
                   </TableCell>
@@ -457,18 +458,18 @@ export function OrganizationManagement() {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Excluir organização?</AlertDialogTitle>
+                            <AlertDialogTitle>{tx("Excluir organização?")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Esta ação não pode ser desfeita. A organização <strong>{org.name}</strong> será permanentemente removida.
+                              {tx("Esta ação não pode ser desfeita. A organização")} <strong>{org.name}</strong> {tx("será permanentemente removida.")}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               onClick={() => handleDelete(org.id)}
                             >
-                              Excluir
+                              {tx("Excluir")}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

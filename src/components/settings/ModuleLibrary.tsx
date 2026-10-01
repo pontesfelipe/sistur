@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useMemo, useState } from 'react';
 import {
   Accordion,
@@ -44,7 +45,7 @@ async function copyToClipboard(text: string, successMessage: string) {
     await navigator.clipboard.writeText(text);
     toast.success(successMessage);
   } catch {
-    toast.error('Não foi possível copiar para a área de transferência');
+    toast.error(tx("Não foi possível copiar para a área de transferência"));
   }
 }
 
@@ -144,10 +145,10 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
                   `Prompt de migração de "${m.module}" copiado — cole em outro projeto Lovable`,
                 )
               }
-              title="Gera prompt em linguagem natural para portar este módulo a outro projeto Lovable"
+              title={tx("Gera prompt em linguagem natural para portar este módulo a outro projeto Lovable")}
             >
               <Sparkles className="h-3.5 w-3.5" />
-              Prompt
+              {tx("Prompt")}
             </Button>
             <Button
               variant="outline"
@@ -167,7 +168,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
               size="sm"
               onClick={handleBundle}
               disabled={bundleLoading}
-              title="Baixa um .txt com manifesto + código completo + migrations deste módulo"
+              title={tx("Baixa um .txt com manifesto + código completo + migrations deste módulo")}
             >
               {bundleLoading ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -181,7 +182,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
               size="sm"
               onClick={handleScan}
               disabled={scanLoading}
-              title="Detecta imports @/... fora do escopo declarado do módulo"
+              title={tx("Detecta imports @/... fora do escopo declarado do módulo")}
             >
               {scanLoading ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -196,7 +197,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
       <CardContent className="space-y-3 pt-0">
         <div>
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Arquivos-chave
+            {tx("Arquivos-chave")}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {m.files.map((path) => (
@@ -218,7 +219,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
         {m.routes && m.routes.length > 0 && (
           <div>
             <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              <Route className="h-3 w-3" /> Rotas
+              <Route className="h-3 w-3" /> {tx("Rotas")}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {m.routes.map((r) => (
@@ -239,7 +240,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
         {m.supabaseTables && m.supabaseTables.length > 0 && (
           <div>
             <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              <Database className="h-3 w-3" /> Tabelas Supabase
+              <Database className="h-3 w-3" /> {tx("Tabelas Supabase")}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {m.supabaseTables.map((t) => (
@@ -254,7 +255,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
         {m.edgeFunctions && m.edgeFunctions.length > 0 && (
           <div>
             <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              <Zap className="h-3 w-3" /> Edge Functions
+              <Zap className="h-3 w-3" /> {tx("Edge Functions")}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {m.edgeFunctions.map((fn) => {
@@ -278,7 +279,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
         {m.secrets && m.secrets.length > 0 && (
           <div>
             <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              <KeyRound className="h-3 w-3" /> Secrets necessários
+              <KeyRound className="h-3 w-3" /> {tx("Secrets necessários")}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {m.secrets.map((s) => (
@@ -298,7 +299,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
               {m.dependencies.hooks && m.dependencies.hooks.length > 0 && (
                 <div>
                   <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Hooks
+                    {tx("Hooks")}
                   </p>
                   <p className="text-[11px] text-foreground/80">
                     {m.dependencies.hooks.join(', ')}
@@ -308,7 +309,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
               {m.dependencies.contexts && m.dependencies.contexts.length > 0 && (
                 <div>
                   <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Contexts
+                    {tx("Contexts")}
                   </p>
                   <p className="text-[11px] text-foreground/80">
                     {m.dependencies.contexts.join(', ')}
@@ -318,7 +319,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
               {m.dependencies.ui && m.dependencies.ui.length > 0 && (
                 <div>
                   <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    UI / Libs
+                    {tx("UI / Libs")}
                   </p>
                   <p className="text-[11px] text-foreground/80">
                     {m.dependencies.ui.join(', ')}
@@ -437,7 +438,7 @@ export function ModuleLibrary() {
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2">
               <Library className="h-5 w-5 text-primary" />
-              Biblioteca de Módulos
+              {tx("Biblioteca de Módulos")}
             </CardTitle>
             <CardDescription>
               Catálogo interno dos blocos funcionais do SISTUR — copie paths, tabelas ou o
@@ -456,7 +457,7 @@ export function ModuleLibrary() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por nome, descrição, arquivo ou tabela…"
+            placeholder={tx("Buscar por nome, descrição, arquivo ou tabela…")}
             className="pl-9"
           />
         </div>

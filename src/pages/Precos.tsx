@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -84,7 +85,7 @@ export default function Precos() {
       form.reset();
     } catch (err) {
       console.error('Erro ao enviar interesse:', err);
-      toast.error('Não foi possível enviar. Tente novamente em instantes.');
+      toast.error(tx("Não foi possível enviar. Tente novamente em instantes."));
     } finally {
       setSubmitting(false);
     }
@@ -100,10 +101,10 @@ export default function Precos() {
           </Link>
           <div className="flex items-center gap-2">
             <Button variant="ghost" asChild>
-              <Link to="/auth">Entrar</Link>
+              <Link to="/auth">{tx("Entrar")}</Link>
             </Button>
             <Button asChild>
-              <Link to="/auth">Começar teste gratuito</Link>
+              <Link to="/auth">{tx("Começar teste gratuito")}</Link>
             </Button>
           </div>
         </div>
@@ -112,12 +113,10 @@ export default function Precos() {
       <main className="max-w-6xl mx-auto px-4 py-12 space-y-12">
         <section className="text-center space-y-4 max-w-2xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-display font-bold">
-            Planos para cada perfil do turismo
+            {tx("Planos para cada perfil do turismo")}
           </h1>
           <p className="text-muted-foreground">
-            Diagnósticos sistêmicos, formação certificada e o Professor Beni — do município
-            ao empreendimento. Comece com o teste gratuito: curso base, 10 perguntas ao Beni
-            e 1 diagnóstico de experimentação.
+            {tx('Diagnósticos sistêmicos, formação certificada e o Professor Beni — do município ao empreendimento. Comece com o teste gratuito: curso base, 10 perguntas ao Beni e 1 diagnóstico de experimentação.')}
           </p>
         </section>
 
@@ -125,12 +124,12 @@ export default function Precos() {
 
         <section className="text-center text-sm text-muted-foreground">
           <p>
-            Gestão pública (plano Territorial): contratação por contrato/empenho —{' '}
+            {tx('Gestão pública (plano Territorial): contratação por contrato/empenho —')}{' '}
             <button
               className="text-primary underline-offset-2 hover:underline"
               onClick={() => handleSelectPlan({ code: 'territorial', name: 'Territorial' })}
             >
-              fale com o time
+              {tx("fale com o time")}
             </button>
             .
           </p>
@@ -138,7 +137,7 @@ export default function Precos() {
       </main>
 
       <footer className="border-t py-6 text-center text-xs text-muted-foreground">
-        SISTUR — Sistema Integrado de Suporte para Turismo em Regiões
+        {tx("SISTUR — Sistema Integrado de Suporte para Turismo em Regiões")}
       </footer>
 
       <Dialog open={leadDialogOpen} onOpenChange={setLeadDialogOpen}>
@@ -148,19 +147,19 @@ export default function Precos() {
               {selectedPlan ? `Interesse no plano ${selectedPlan.name}` : 'Fale com o time'}
             </DialogTitle>
             <DialogDescription>
-              Deixe seus dados e retornamos com a proposta ideal para o seu caso.
+              {tx("Deixe seus dados e retornamos com a proposta ideal para o seu caso.")}
             </DialogDescription>
           </DialogHeader>
 
           {submitted ? (
             <div className="py-8 text-center space-y-3">
               <CheckCircle2 className="h-12 w-12 text-primary mx-auto" />
-              <p className="font-semibold">Recebemos seu interesse!</p>
+              <p className="font-semibold">{tx("Recebemos seu interesse!")}</p>
               <p className="text-sm text-muted-foreground">
-                Nossa equipe entra em contato pelo e-mail informado.
+                {tx("Nossa equipe entra em contato pelo e-mail informado.")}
               </p>
               <Button variant="outline" onClick={() => setLeadDialogOpen(false)}>
-                Fechar
+                {tx("Fechar")}
               </Button>
             </div>
           ) : (
@@ -171,9 +170,9 @@ export default function Precos() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nome completo</FormLabel>
+                      <FormLabel>{tx("Nome completo")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Seu nome" {...field} />
+                        <Input placeholder={tx("Seu nome")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -184,9 +183,9 @@ export default function Precos() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>E-mail</FormLabel>
+                      <FormLabel>{tx("E-mail")}</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="voce@exemplo.com" {...field} />
+                        <Input type="email" placeholder={tx("voce@exemplo.com")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -213,7 +212,7 @@ export default function Precos() {
                       <FormItem>
                         <FormLabel>Organização (opcional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Prefeitura, empresa..." {...field} />
+                          <Input placeholder={tx("Prefeitura, empresa...")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -228,7 +227,7 @@ export default function Precos() {
                       <FormLabel>Mensagem (opcional)</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Conte um pouco do seu contexto..."
+                          placeholder={tx("Conte um pouco do seu contexto...")}
                           rows={3}
                           {...field}
                         />
