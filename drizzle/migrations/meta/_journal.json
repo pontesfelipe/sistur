@@ -78,6 +78,13 @@
       "when": 1790822834723,
       "tag": "0010_fix_student_transcript_exam_join",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790823496417,
+      "tag": "0011_onboarding_without_module_choice",
+      "breakpoints": true
     }
   ]
 }

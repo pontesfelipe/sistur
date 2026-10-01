@@ -79,11 +79,6 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
     return labels[role] || role;
   };
 
-  const getSystemAccessLabel = () => {
-    if (profile?.system_access === 'ERP') return 'Analítico (Completo)';
-    if (profile?.system_access === 'EDU') return 'EDU (Educacional)';
-    return 'Não definido';
-  };
 
   return (
     <header className="h-14 md:h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
@@ -222,14 +217,6 @@ export function AppHeader({ title, subtitle, onMobileMenuClick, actions }: AppHe
                 />
               </div>
               
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">{t('Tipo de Acesso')}</Label>
-                <Input 
-                  value={t(getSystemAccessLabel())} 
-                  readOnly 
-                  className="bg-muted"
-                />
-              </div>
               
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">{t('Papéis')}</Label>

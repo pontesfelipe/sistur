@@ -10,6 +10,7 @@ export interface UserProfile {
   avatar_url: string | null;
   system_access: 'ERP' | 'EDU' | null;
   pending_approval: boolean;
+  approval_requested_at: string | null;
   viewing_demo_org_id: string | null;
   forum_show_identity: boolean;
   blocked_at: string | null;
@@ -41,7 +42,7 @@ interface ProfileContextType {
   isViewingDemoData: boolean;
   isBlocked: boolean;
   effectiveOrgId: string | undefined;
-  completeOnboarding: (systemAccess: 'ERP' | 'EDU', role: 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR') => Promise<{ success: boolean; error?: string }>;
+  completeOnboarding: (systemAccess: 'ERP' | 'EDU' | null, role?: 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR') => Promise<{ success: boolean; error?: string }>;
   toggleDemoMode: (enable: boolean) => Promise<{ success: boolean; error?: string }>;
   updateForumPrivacy: (showIdentity: boolean) => Promise<{ success: boolean; error?: string }>;
   refetchProfile: () => Promise<void>;
@@ -78,7 +79,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       const [profileResult, rolesResult] = await Promise.all([
         supabase
           .from('profiles')
-          .select('user_id, org_id, full_name, avatar_url, system_access, pending_approval, viewing_demo_org_id, forum_show_identity, blocked_at, created_at, updated_at')
+          .select('user_id, org_id, full_name, avatar_url, system_access, pending_approval, approval_requested_at, viewing_demo_org_id, forum_show_identity, blocked_at, created_at, updated_at')
           .eq('user_id', user.id)
           .single(),
         supabase
@@ -99,6 +100,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
           avatar_url: profileResult.data.avatar_url,
           system_access: profileResult.data.system_access as 'ERP' | 'EDU' | null,
           pending_approval: profileResult.data.pending_approval ?? false,
+          approval_requested_at: (profileResult.data as any).approval_requested_at ?? null,
           viewing_demo_org_id: profileResult.data.viewing_demo_org_id ?? null,
           forum_show_identity: profileResult.data.forum_show_identity ?? true,
           blocked_at: (profileResult.data as any).blocked_at ?? null,
@@ -147,8 +149,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const isEstudante = hasRoleFn('ESTUDANTE');
     const hasERPAccess = profile?.system_access === 'ERP' || isAdmin || isOrgAdmin;
     const hasEDUAccess = profile?.system_access === 'EDU' || profile?.system_access === 'ERP' || isAdmin || isOrgAdmin || isProfessor || isEstudante;
-    const needsOnboarding = profile?.pending_approval === true && profile?.system_access === null;
-    const awaitingApproval = profile?.pending_approval === true && profile?.system_access !== null;
+    // v2.24.0: module choice removed from signup — the request marker is now
+    // approval_requested_at (system_access stays null until an admin approves).
+    const needsOnboarding = profile?.pending_approval === true && !profile?.approval_requested_at;
+    const awaitingApproval = profile?.pending_approval === true && !!profile?.approval_requested_at;
     const isViewingDemoData = profile?.viewing_demo_org_id !== null;
     const isBlocked = !!profile?.blocked_at;
     const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
@@ -156,8 +160,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, [roles, profile]);
 
   const completeOnboarding = async (
-    systemAccess: 'ERP' | 'EDU',
-    role: 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR'
+    systemAccess: 'ERP' | 'EDU' | null,
+    role: 'VIEWER' | 'ESTUDANTE' | 'PROFESSOR' = 'VIEWER'
   ) => {
     if (!user) return { success: false, error: tx('No user') };
 

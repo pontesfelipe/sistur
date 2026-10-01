@@ -39,7 +39,12 @@ export function assignableRoles(opts: {
 
 /** Papéis oferecidos na aprovação de solicitação (nunca privilegiados). */
 export function approvalRoles(system?: SystemAccess | null): AppRole[] {
-  const base = system === 'EDU' ? ['ESTUDANTE', 'PROFESSOR'] : ['VIEWER', 'ANALYST'];
+  // v2.24.0: sem escolha de módulo no cadastro, o admin vê todos os papéis não privilegiados.
+  const base = system === 'EDU'
+    ? ['ESTUDANTE', 'PROFESSOR']
+    : system === 'ERP'
+      ? ['VIEWER', 'ANALYST']
+      : ['VIEWER', 'ANALYST', 'ESTUDANTE', 'PROFESSOR'];
   return base as AppRole[];
 }
 
