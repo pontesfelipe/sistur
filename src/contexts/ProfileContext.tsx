@@ -2,6 +2,7 @@ import { tx } from "@/i18n/t";
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useEntitlements } from '@/hooks/useEntitlements';
 
 export interface UserProfile {
   user_id: string;
@@ -57,6 +58,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
   const lastUserId = useRef<string | null>(null);
+  const { entitlements, isLoading: entitlementsLoading } = useEntitlements();
 
   const fetchProfile = useCallback(async () => {
     if (!user) {
@@ -147,8 +149,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const isAnalyst = hasRoleFn('ANALYST') || isAdmin;
     const isProfessor = hasRoleFn('PROFESSOR');
     const isEstudante = hasRoleFn('ESTUDANTE');
-    const hasERPAccess = profile?.system_access === 'ERP' || isAdmin || isOrgAdmin;
-    const hasEDUAccess = profile?.system_access === 'EDU' || profile?.system_access === 'ERP' || isAdmin || isOrgAdmin || isProfessor || isEstudante;
+    // v2.24.1: module access follows the contracted plan (get_my_entitlements),
+    // never the legacy profiles.system_access chosen at signup.
+    const f = entitlements.features || {};
+    const hasERPAccess = isAdmin || isOrgAdmin || f.erp === true || f.enterprise === true;
+    const hasEDUAccess = isAdmin || isOrgAdmin || isProfessor || isEstudante || f.edu === true || hasERPAccess;
     // v2.24.0: module choice removed from signup — the request marker is now
     // approval_requested_at (system_access stays null until an admin approves).
     const needsOnboarding = profile?.pending_approval === true && !profile?.approval_requested_at;
@@ -249,7 +254,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       profile,
       roles,
       loading,
-      initialized,
+      initialized: initialized && (!user || !entitlementsLoading),
       hasRole: derived.hasRoleFn,
       isAdmin: derived.isAdmin,
       isOrgAdmin: derived.isOrgAdmin,
