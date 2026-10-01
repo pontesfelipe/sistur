@@ -663,7 +663,8 @@ export default function Relatorios() {
       CRITICO: 'status-critico',
       INFORMATIVO: 'status-info',
     };
-    // Inline style fallback (used in <td>) so the preview matches the print sheet. const statusInlineMap: Record<string, React.CSSProperties> = {
+    // Inline style fallback (used in <td>) so the preview matches the print sheet.
+    const statusInlineMap: Record<string, React.CSSProperties> = {
       EXCELENTE: { background: '#D1FADF', color: '#054F31', fontWeight: 600, textAlign: 'center' },
       FORTE:     { background: '#DBEAFE', color: '#1E3A8A', fontWeight: 600, textAlign: 'center' },
       ADEQUADO:  { background: '#FEF3C7', color: '#78350F', fontWeight: 600, textAlign: 'center' },
