@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 24,
-  patch: 1,
+  minor: 25,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,18 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.25.0",
+    date: "2026-10-01",
+    type: "minor" as const,
+    changes: [
+      "Nova opção de degustação gratuita na tela de Planos: o usuário escolhe entre assinar um plano ou ativar 7 dias de avaliação sem cartão.",
+      "A degustação libera o curso base do EDU, 1 diagnóstico com resultado em prévia e 10 perguntas ao Professor Beni; cursos completos, relatórios, projetos, Observatório e Consórcios seguem exclusivos dos planos pagos.",
+      "`get_my_entitlements` passa a reconhecer a licença de avaliação (plan 'trial'), liberando os módulos da degustação enquanto o prazo estiver aberto.",
+      "`activate_my_trial` recriada com as features da degustação (erp, edu, games, beni, enterprise) e nota de origem.",
+      "Perguntas frequentes atualizadas com as regras da degustação gratuita.",
+    ],
+  },
   {
     version: "2.24.1",
     date: "2026-10-01",
