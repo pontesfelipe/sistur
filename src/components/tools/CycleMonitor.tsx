@@ -18,6 +18,7 @@ import {
   BarChart3
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface PillarScore {
   assessment_id: string;
   pillar: string;
@@ -218,13 +219,13 @@ export function CycleMonitor() {
   const getEvolutionBadge = (state: string | null) => {
     switch (state) {
       case 'EVOLUTION':
-        return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">Evolução</Badge>;
+        return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">{tx("Evolução")}</Badge>;
       case 'REGRESSION':
-        return <Badge variant="destructive">Regressão</Badge>;
+        return <Badge variant="destructive">{tx("Regressão")}</Badge>;
       case 'STAGNATION':
-        return <Badge className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30">Estagnação</Badge>;
+        return <Badge className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30">{tx("Estagnação")}</Badge>;
       default:
-        return <Badge variant="outline">Primeira avaliação</Badge>;
+        return <Badge variant="outline">{tx("Primeira avaliação")}</Badge>;
     }
   };
 
@@ -240,17 +241,17 @@ export function CycleMonitor() {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Abrir Monitor
+          {tx("Abrir Monitor")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl max-h-[85vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <RefreshCw className="h-5 w-5 text-primary" />
-            Monitor de Ciclos
+            {tx("Monitor de Ciclos")}
           </DialogTitle>
           <DialogDescription>
-            Acompanhe a evolução, estagnação e regressão de indicadores entre ciclos
+            {tx("Acompanhe a evolução, estagnação e regressão de indicadores entre ciclos")}
           </DialogDescription>
         </DialogHeader>
 
@@ -259,10 +260,10 @@ export function CycleMonitor() {
           <div className="flex items-center gap-4">
             <Select value={selectedDestination} onValueChange={setSelectedDestination}>
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Filtrar por destino" />
+                <SelectValue placeholder={tx("Filtrar por destino")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Destinos</SelectItem>
+                <SelectItem value="all">{tx("Todos os Destinos")}</SelectItem>
                 {destinations.map(d => (
                   <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
                 ))}
@@ -270,7 +271,7 @@ export function CycleMonitor() {
             </Select>
             <Button variant="outline" size="sm" onClick={fetchData}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar
+              {tx("Atualizar")}
             </Button>
           </div>
 
@@ -281,7 +282,7 @@ export function CycleMonitor() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-green-500" />
-                    Evolução
+                    {tx("Evolução")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -293,7 +294,7 @@ export function CycleMonitor() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Minus className="h-4 w-4 text-yellow-500" />
-                    Estagnação
+                    {tx("Estagnação")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -305,7 +306,7 @@ export function CycleMonitor() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <TrendingDown className="h-4 w-4 text-red-500" />
-                    Regressão
+                    {tx("Regressão")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -326,20 +327,20 @@ export function CycleMonitor() {
             ) : evolutions.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <RefreshCw className="h-12 w-12 mb-4 opacity-20" />
-                <p className="font-medium">Nenhum diagnóstico calculado</p>
-                <p className="text-sm">Calcule diagnósticos para ver a evolução dos pilares</p>
+                <p className="font-medium">{tx("Nenhum diagnóstico calculado")}</p>
+                <p className="text-sm">{tx("Calcule diagnósticos para ver a evolução dos pilares")}</p>
               </div>
             ) : !hasEvolutionData ? (
               <div className="space-y-4">
                 <div className="flex flex-col items-center justify-center py-6 text-muted-foreground bg-muted/30 rounded-lg">
                   <BarChart3 className="h-8 w-8 mb-2 opacity-40" />
-                  <p className="font-medium text-sm">Aguardando segundo ciclo</p>
+                  <p className="font-medium text-sm">{tx("Aguardando segundo ciclo")}</p>
                   <p className="text-xs text-center px-4">
-                    A comparação de evolução aparecerá após uma segunda rodada de diagnóstico para os destinos.
+                    {tx("A comparação de evolução aparecerá após uma segunda rodada de diagnóstico para os destinos.")}
                   </p>
                 </div>
                 
-                <p className="text-sm font-medium text-muted-foreground">Scores atuais dos pilares:</p>
+                <p className="text-sm font-medium text-muted-foreground">{tx("Scores atuais dos pilares:")}</p>
                 <div className="space-y-3 pr-4">
                   {evolutions.map((item, idx) => (
                     <div 
@@ -415,15 +416,15 @@ export function CycleMonitor() {
               <div className="grid grid-cols-3 gap-4 text-xs">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  <span><strong>Evolução:</strong> Score aumentou</span>
+                  <span><strong>{tx("Evolução:")}</strong> {tx("Score aumentou")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-yellow-500" />
-                  <span><strong>Estagnação:</strong> Score estável</span>
+                  <span><strong>{tx("Estagnação:")}</strong> {tx("Score estável")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-red-500" />
-                  <span><strong>Regressão:</strong> Score diminuiu</span>
+                  <span><strong>{tx("Regressão:")}</strong> {tx("Score diminuiu")}</span>
                 </div>
               </div>
             </CardContent>

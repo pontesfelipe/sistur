@@ -6,11 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Globe, Award, CheckCircle, Info } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 export default function PublicDestinations() {
   const { destinations, isLoading, certifiedCount, readyCount } = usePublicDestinations(true);
 
   return (
-    <AppLayout title="Destinos Públicos">
+    <AppLayout title={tx("Destinos Públicos")}>
       <div className="container py-8 space-y-8">
         {/* Header */}
         <div className="space-y-4">
@@ -19,9 +20,9 @@ export default function PublicDestinations() {
               <Globe className="w-8 h-8 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Destinos Turísticos Certificados</h1>
+              <h1 className="text-3xl font-bold">{tx("Destinos Turísticos Certificados")}</h1>
               <p className="text-muted-foreground">
-                Avaliados pela metodologia SISTUR de Mario Carlos Beni
+                {tx("Avaliados pela metodologia SISTUR de Mario Carlos Beni")}
               </p>
             </div>
           </div>
@@ -45,7 +46,7 @@ export default function PublicDestinations() {
             <div className="flex items-start gap-3">
               <Info className="w-5 h-5 text-primary mt-0.5" />
               <div className="text-sm text-muted-foreground">
-                <p className="font-medium text-foreground mb-1">Metodologia SISTUR</p>
+                <p className="font-medium text-foreground mb-1">{tx("Metodologia SISTUR")}</p>
                 <p>
                   Os destinos listados foram avaliados segundo os princípios sistêmicos de Mario Carlos Beni,
                   priorizando sustentabilidade ambiental (RA), governança responsável (AO) e infraestrutura
@@ -83,9 +84,9 @@ export default function PublicDestinations() {
           <Card>
             <CardContent className="py-12 text-center">
               <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">Nenhum destino disponível</h3>
+              <h3 className="text-lg font-medium mb-2">{tx("Nenhum destino disponível")}</h3>
               <p className="text-muted-foreground">
-                Ainda não há destinos com avaliações calculadas e prontos para visitação.
+                {tx("Ainda não há destinos com avaliações calculadas e prontos para visitação.")}
               </p>
             </CardContent>
           </Card>

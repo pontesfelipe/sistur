@@ -19,9 +19,9 @@ import {
 import { cn } from '@/lib/utils';
 
 const ROLE_LABEL: Record<ProjectMemberRole, { label: string; icon: any; color: string }> = {
-  owner:  { label: 'Dono',          icon: Crown,  color: 'text-amber-600' },
-  editor: { label: 'Editor',        icon: Pencil, color: 'text-blue-600' },
-  viewer: { label: 'Visualizador',  icon: Eye,    color: 'text-muted-foreground' },
+  owner:  { label: tx('Dono'),          icon: Crown,  color: 'text-amber-600' },
+  editor: { label: tx('Editor'),        icon: Pencil, color: 'text-blue-600' },
+  viewer: { label: tx('Visualizador'),  icon: Eye,    color: 'text-muted-foreground' },
 };
 
 export function ProjectMembersPanel({ projectId }: { projectId: string }) {
@@ -49,7 +49,7 @@ export function ProjectMembersPanel({ projectId }: { projectId: string }) {
         {canManage && (
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-              <Button size="sm"><UserPlus className="h-4 w-4 mr-1.5" /> Adicionar</Button>
+              <Button size="sm"><UserPlus className="h-4 w-4 mr-1.5" /> {tx("Adicionar")}</Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0" align="end">
               <div className="p-3 border-b space-y-2">

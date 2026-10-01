@@ -401,13 +401,13 @@ const EduCatalogo = () => {
                           <p className="text-xl font-display font-bold">
                             {stats?.byPillar[pillar]?.courses || 0}
                           </p>
-                          <p className="text-xs text-muted-foreground">cursos</p>
+                          <p className="text-xs text-muted-foreground">{tx("cursos")}</p>
                         </div>
                         <div className="text-center">
                           <p className="text-xl font-display font-bold">
                             {stats?.byPillar[pillar]?.lives || 0}
                           </p>
-                          <p className="text-xs text-muted-foreground">lives</p>
+                          <p className="text-xs text-muted-foreground">{tx("lives")}</p>
                         </div>
                       </div>
                     </div>

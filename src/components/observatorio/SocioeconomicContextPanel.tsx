@@ -7,6 +7,7 @@ import { Building2, Users, TrendingUp, RefreshCw, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { tx } from "@/i18n/t";
 interface Props {
   ibgeCode?: string | null;
   canRefresh?: boolean;
@@ -51,10 +52,10 @@ export function SocioeconomicContextPanel({ ibgeCode, canRefresh }: Props) {
       if (error) throw error;
       const r = (res as any)?.results?.[0];
       if (r?.error) throw new Error(r.error);
-      toast.success("Dados socioeconômicos atualizados (IBGE/SIDRA)");
+      toast.success(tx("Dados socioeconômicos atualizados (IBGE/SIDRA)"));
       await queryClient.invalidateQueries({ queryKey: ["municipal-context", ibgeCode] });
     } catch (e: any) {
-      toast.error("Falha ao buscar IBGE/SIDRA: " + (e?.message ?? "erro desconhecido"));
+      toast.error(tx("Falha ao buscar IBGE/SIDRA: ") + (e?.message ?? "erro desconhecido"));
     } finally {
       setLoading(false);
     }
@@ -86,7 +87,7 @@ export function SocioeconomicContextPanel({ ibgeCode, canRefresh }: Props) {
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Carregando…</p>
+          <p className="text-sm text-muted-foreground">{tx("Carregando…")}</p>
         ) : !data ? (
           <p className="text-sm text-muted-foreground">
             Nenhum dado socioeconômico carregado. {canRefresh && 'Clique em "Buscar" para consultar IBGE/SIDRA.'}
@@ -95,21 +96,21 @@ export function SocioeconomicContextPanel({ ibgeCode, canRefresh }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Users className="h-3 w-3" /> População estimada
+                <Users className="h-3 w-3" /> {tx("População estimada")}
               </div>
               <div className="text-2xl font-semibold">{fmtNumber(data.population)}</div>
-              <div className="text-[10px] text-muted-foreground">SIDRA tab. 6579</div>
+              <div className="text-[10px] text-muted-foreground">{tx("SIDRA tab. 6579")}</div>
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <TrendingUp className="h-3 w-3" /> PIB total
+                <TrendingUp className="h-3 w-3" /> {tx("PIB total")}
               </div>
               <div className="text-2xl font-semibold">{fmtBRL(data.pib_total_brl)}</div>
               <div className="text-[10px] text-muted-foreground">SIDRA tab. 5938 (var. 37)</div>
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <TrendingUp className="h-3 w-3" /> PIB per capita
+                <TrendingUp className="h-3 w-3" /> {tx("PIB per capita")}
               </div>
               <div className="text-2xl font-semibold">{fmtBRL(data.pib_per_capita_brl)}</div>
               <div className="text-[10px] text-muted-foreground">SIDRA tab. 5938 (var. 39)</div>

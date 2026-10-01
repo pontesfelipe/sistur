@@ -46,6 +46,7 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+import { tx } from "@/i18n/t";
 const OnDemandRequests = () => {
   const [activeTab, setActiveTab] = useState('my-requests');
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,7 +76,7 @@ const OnDemandRequests = () => {
 
   const handleSubmit = async () => {
     if (!formData.topic.trim()) {
-      toast.error('Informe o tópico desejado');
+      toast.error(tx('Informe o tópico desejado'));
       return;
     }
     
@@ -85,7 +86,7 @@ const OnDemandRequests = () => {
         topic_text: formData.topic,
         learning_goals: formData.learning_goals ? [formData.learning_goals] : undefined,
       });
-      toast.success('Solicitação enviada com sucesso!');
+      toast.success(tx('Solicitação enviada com sucesso!'));
       setIsDialogOpen(false);
       setFormData({
         topic: '',
@@ -94,22 +95,22 @@ const OnDemandRequests = () => {
         urgency: 'normal',
       });
     } catch (error) {
-      toast.error('Erro ao enviar solicitação');
+      toast.error(tx('Erro ao enviar solicitação'));
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'received':
-        return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700"><Clock className="w-3 h-3 mr-1" />Aguardando</Badge>;
+        return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700"><Clock className="w-3 h-3 mr-1" />{tx("Aguardando")}</Badge>;
       case 'validated':
       case 'generating':
-        return <Badge variant="outline" className="bg-blue-500/10 text-blue-700"><Loader2 className="w-3 h-3 mr-1" />Em Produção</Badge>;
+        return <Badge variant="outline" className="bg-blue-500/10 text-blue-700"><Loader2 className="w-3 h-3 mr-1" />{tx("Em Produção")}</Badge>;
       case 'generated':
-        return <Badge className="bg-green-500/20 text-green-700"><CheckCircle className="w-3 h-3 mr-1" />Entregue</Badge>;
+        return <Badge className="bg-green-500/20 text-green-700"><CheckCircle className="w-3 h-3 mr-1" />{tx("Entregue")}</Badge>;
       case 'rejected':
       case 'failed':
-        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Rejeitado</Badge>;
+        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />{tx("Rejeitado")}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -118,11 +119,11 @@ const OnDemandRequests = () => {
   const getGoalTypeBadge = (goalType: string) => {
     switch (goalType) {
       case 'course':
-        return <Badge variant="secondary">Curso</Badge>;
+        return <Badge variant="secondary">{tx("Curso")}</Badge>;
       case 'track':
-        return <Badge variant="secondary">Trilha</Badge>;
+        return <Badge variant="secondary">{tx("Trilha")}</Badge>;
       case 'lesson_plan':
-        return <Badge variant="outline">Plano de Aula</Badge>;
+        return <Badge variant="outline">{tx("Plano de Aula")}</Badge>;
       default:
         return <Badge variant="outline">{goalType}</Badge>;
     }
@@ -130,18 +131,18 @@ const OnDemandRequests = () => {
 
   return (
     <AppLayout 
-      title="Conteúdo Sob Demanda" 
-      subtitle="Solicite conteúdos personalizados para suas necessidades"
+      title={tx("Conteúdo Sob Demanda")} 
+      subtitle={tx("Solicite conteúdos personalizados para suas necessidades")}
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="my-requests" className="gap-2">
             <Inbox className="h-4 w-4" />
-            Minhas Solicitações
+            {tx("Minhas Solicitações")}
           </TabsTrigger>
           <TabsTrigger value="new" className="gap-2">
             <Sparkles className="h-4 w-4" />
-            Nova Solicitação
+            {tx("Nova Solicitação")}
           </TabsTrigger>
         </TabsList>
 
@@ -152,25 +153,25 @@ const OnDemandRequests = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-2xl font-bold">{stats.total}</CardTitle>
-                <CardDescription>Total</CardDescription>
+                <CardDescription>{tx("Total")}</CardDescription>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-2xl font-bold text-yellow-600">{stats.pending}</CardTitle>
-                <CardDescription>Aguardando</CardDescription>
+                <CardDescription>{tx("Aguardando")}</CardDescription>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-2xl font-bold text-blue-600">{stats.approved}</CardTitle>
-                <CardDescription>Em Produção</CardDescription>
+                <CardDescription>{tx("Em Produção")}</CardDescription>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-2xl font-bold text-green-600">{stats.completed}</CardTitle>
-                <CardDescription>Entregues</CardDescription>
+                <CardDescription>{tx("Entregues")}</CardDescription>
               </CardHeader>
             </Card>
           </div>
@@ -180,7 +181,7 @@ const OnDemandRequests = () => {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar solicitações..."
+                placeholder={tx("Buscar solicitações...")}
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -188,7 +189,7 @@ const OnDemandRequests = () => {
             </div>
             <Button onClick={() => setActiveTab('new')}>
               <Plus className="mr-2 h-4 w-4" />
-              Nova Solicitação
+              {tx("Nova Solicitação")}
             </Button>
           </div>
 
@@ -203,13 +204,13 @@ const OnDemandRequests = () => {
             <Card className="py-12">
               <CardContent className="text-center">
                 <Inbox className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-lg font-medium mb-2">Nenhuma solicitação</h3>
+                <h3 className="text-lg font-medium mb-2">{tx("Nenhuma solicitação")}</h3>
                 <p className="text-muted-foreground mb-4">
-                  Você ainda não fez nenhuma solicitação de conteúdo
+                  {tx("Você ainda não fez nenhuma solicitação de conteúdo")}
                 </p>
                 <Button onClick={() => setActiveTab('new')}>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Fazer Primeira Solicitação
+                  {tx("Fazer Primeira Solicitação")}
                 </Button>
               </CardContent>
             </Card>
@@ -268,28 +269,28 @@ const OnDemandRequests = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
-                Nova Solicitação de Conteúdo
+                {tx("Nova Solicitação de Conteúdo")}
               </CardTitle>
               <CardDescription>
-                Descreva o conteúdo que você precisa e nossa equipe irá avaliá-lo
+                {tx("Descreva o conteúdo que você precisa e nossa equipe irá avaliá-lo")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="topic">Tópico / Assunto *</Label>
+                <Label htmlFor="topic">{tx("Tópico / Assunto *")}</Label>
                 <Input
                   id="topic"
-                  placeholder="Ex: Gestão de resíduos sólidos em destinos turísticos"
+                  placeholder={tx("Ex: Gestão de resíduos sólidos em destinos turísticos")}
                   value={formData.topic}
                   onChange={(e) => setFormData(prev => ({ ...prev, topic: e.target.value }))}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="goals">Objetivos de Aprendizagem</Label>
+                <Label htmlFor="goals">{tx("Objetivos de Aprendizagem")}</Label>
                 <Textarea
                   id="goals"
-                  placeholder="Descreva o que você espera aprender com este conteúdo..."
+                  placeholder={tx("Descreva o que você espera aprender com este conteúdo...")}
                   rows={4}
                   value={formData.learning_goals}
                   onChange={(e) => setFormData(prev => ({ ...prev, learning_goals: e.target.value }))}
@@ -298,7 +299,7 @@ const OnDemandRequests = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Formato Preferido</Label>
+                  <Label>{tx("Formato Preferido")}</Label>
                   <Select 
                     value={formData.preferred_format}
                     onValueChange={(v) => setFormData(prev => ({ ...prev, preferred_format: v as any }))}
@@ -307,15 +308,15 @@ const OnDemandRequests = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="video">Vídeo</SelectItem>
-                      <SelectItem value="text">Texto/Artigo</SelectItem>
-                      <SelectItem value="mixed">Misto</SelectItem>
+                      <SelectItem value="video">{tx("Vídeo")}</SelectItem>
+                      <SelectItem value="text">{tx("Texto/Artigo")}</SelectItem>
+                      <SelectItem value="mixed">{tx("Misto")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Urgência</Label>
+                  <Label>{tx("Urgência")}</Label>
                   <Select 
                     value={formData.urgency}
                     onValueChange={(v) => setFormData(prev => ({ ...prev, urgency: v as any }))}
@@ -324,9 +325,9 @@ const OnDemandRequests = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="low">Baixa</SelectItem>
-                      <SelectItem value="normal">Normal</SelectItem>
-                      <SelectItem value="high">Alta</SelectItem>
+                      <SelectItem value="low">{tx("Baixa")}</SelectItem>
+                      <SelectItem value="normal">{tx("Normal")}</SelectItem>
+                      <SelectItem value="high">{tx("Alta")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -341,12 +342,12 @@ const OnDemandRequests = () => {
                   {createRequest.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Enviando...
+                      {tx("Enviando...")}
                     </>
                   ) : (
                     <>
                       <Sparkles className="mr-2 h-4 w-4" />
-                      Enviar Solicitação
+                      {tx("Enviar Solicitação")}
                     </>
                   )}
                 </Button>
@@ -357,12 +358,12 @@ const OnDemandRequests = () => {
           {/* Info Card */}
           <Card className="bg-muted/50">
             <CardContent className="pt-6">
-              <h4 className="font-medium mb-2">Como funciona?</h4>
+              <h4 className="font-medium mb-2">{tx("Como funciona?")}</h4>
               <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                <li>Preencha o formulário descrevendo o conteúdo que você precisa</li>
-                <li>Nossa equipe pedagógica irá avaliar sua solicitação</li>
-                <li>Se aprovado, o conteúdo será produzido e você será notificado</li>
-                <li>O conteúdo ficará disponível no seu catálogo personalizado</li>
+                <li>{tx("Preencha o formulário descrevendo o conteúdo que você precisa")}</li>
+                <li>{tx("Nossa equipe pedagógica irá avaliar sua solicitação")}</li>
+                <li>{tx("Se aprovado, o conteúdo será produzido e você será notificado")}</li>
+                <li>{tx("O conteúdo ficará disponível no seu catálogo personalizado")}</li>
               </ol>
             </CardContent>
           </Card>

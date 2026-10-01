@@ -38,6 +38,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import { tx } from "@/i18n/t";
 const ERPIntegration = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isSyncing, setIsSyncing] = useState(false);
@@ -67,9 +68,9 @@ const ERPIntegration = () => {
         entity_type: null,
         pillar_priority: null,
       });
-      toast.success('Sincronização iniciada!');
+      toast.success(tx('Sincronização iniciada!'));
     } catch (error) {
-      toast.error('Erro ao iniciar sincronização');
+      toast.error(tx('Erro ao iniciar sincronização'));
     } finally {
       setIsSyncing(false);
     }
@@ -78,13 +79,13 @@ const ERPIntegration = () => {
   const getEventTypeBadge = (eventType: string) => {
     switch (eventType) {
       case 'diagnostic_created':
-        return <Badge className="bg-green-500/20 text-green-700">Diagnóstico</Badge>;
+        return <Badge className="bg-green-500/20 text-green-700">{tx("Diagnóstico")}</Badge>;
       case 'manual_sync':
-        return <Badge className="bg-blue-500/20 text-blue-700">Sincronização</Badge>;
+        return <Badge className="bg-blue-500/20 text-blue-700">{tx("Sincronização")}</Badge>;
       case 'warning_generated':
-        return <Badge className="bg-yellow-500/20 text-yellow-700">Alerta</Badge>;
+        return <Badge className="bg-yellow-500/20 text-yellow-700">{tx("Alerta")}</Badge>;
       case 'error':
-        return <Badge variant="destructive">Erro</Badge>;
+        return <Badge variant="destructive">{tx("Erro")}</Badge>;
       default:
         return <Badge variant="secondary">{eventType}</Badge>;
     }
@@ -92,23 +93,23 @@ const ERPIntegration = () => {
 
   return (
     <AppLayout 
-      title="Integração com Sistemas Externos" 
-      subtitle="Monitoramento e sincronização com sistemas externos"
+      title={tx("Integração com Sistemas Externos")} 
+      subtitle={tx("Monitoramento e sincronização com sistemas externos")}
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="flex items-center justify-between">
           <TabsList>
             <TabsTrigger value="overview" className="gap-2">
               <BarChart3 className="h-4 w-4" />
-              Visão Geral
+              {tx("Visão Geral")}
             </TabsTrigger>
             <TabsTrigger value="diagnostics" className="gap-2">
               <FileText className="h-4 w-4" />
-              Diagnósticos
+              {tx("Diagnósticos")}
             </TabsTrigger>
             <TabsTrigger value="events" className="gap-2">
               <Activity className="h-4 w-4" />
-              Eventos
+              {tx("Eventos")}
             </TabsTrigger>
           </TabsList>
 
@@ -116,12 +117,12 @@ const ERPIntegration = () => {
             {isSyncing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sincronizando...
+                {tx("Sincronizando...")}
               </>
             ) : (
               <>
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Sincronizar
+                {tx("Sincronizar")}
               </>
             )}
           </Button>
@@ -138,7 +139,7 @@ const ERPIntegration = () => {
                 </CardTitle>
                 <CardDescription className="flex items-center gap-1">
                   <Database className="h-4 w-4" />
-                  Diagnósticos
+                  {tx("Diagnósticos")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -149,7 +150,7 @@ const ERPIntegration = () => {
                 </CardTitle>
                 <CardDescription className="flex items-center gap-1">
                   <Activity className="h-4 w-4" />
-                  Eventos Recentes
+                  {tx("Eventos Recentes")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -160,7 +161,7 @@ const ERPIntegration = () => {
                 </CardTitle>
                 <CardDescription className="flex items-center gap-1">
                   <AlertTriangle className="h-4 w-4" />
-                  Alertas IGMA
+                  {tx("Alertas IGMA")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -174,7 +175,7 @@ const ERPIntegration = () => {
                 </CardTitle>
                 <CardDescription className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
-                  Última Sincronização
+                  {tx("Última Sincronização")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -186,21 +187,21 @@ const ERPIntegration = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
-                  Status da Conexão
+                  {tx("Status da Conexão")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span>API Principal</span>
-                  <Badge className="bg-green-500/20 text-green-700">Online</Badge>
+                  <span>{tx("API Principal")}</span>
+                  <Badge className="bg-green-500/20 text-green-700">{tx("Online")}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Banco de Dados</span>
-                  <Badge className="bg-green-500/20 text-green-700">Conectado</Badge>
+                  <span>{tx("Banco de Dados")}</span>
+                  <Badge className="bg-green-500/20 text-green-700">{tx("Conectado")}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Serviço de Fila</span>
-                  <Badge className="bg-green-500/20 text-green-700">Ativo</Badge>
+                  <span>{tx("Serviço de Fila")}</span>
+                  <Badge className="bg-green-500/20 text-green-700">{tx("Ativo")}</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -209,20 +210,20 @@ const ERPIntegration = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-primary" />
-                  Processamento
+                  {tx("Processamento")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span>Taxa de Sucesso</span>
+                    <span>{tx("Taxa de Sucesso")}</span>
                     <span className="font-medium">98%</span>
                   </div>
                   <Progress value={98} className="h-2" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span>Uso de Recursos</span>
+                    <span>{tx("Uso de Recursos")}</span>
                     <span className="font-medium">45%</span>
                   </div>
                   <Progress value={45} className="h-2" />
@@ -236,9 +237,9 @@ const ERPIntegration = () => {
         <TabsContent value="diagnostics" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Diagnósticos Externos</CardTitle>
+              <CardTitle>{tx("Diagnósticos Externos")}</CardTitle>
               <CardDescription>
-                Histórico de diagnósticos sincronizados de sistemas externos
+                {tx("Histórico de diagnósticos sincronizados de sistemas externos")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -251,18 +252,18 @@ const ERPIntegration = () => {
               ) : !diagnostics?.length ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Nenhum diagnóstico encontrado</p>
+                  <p>{tx("Nenhum diagnóstico encontrado")}</p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>ID</TableHead>
-                      <TableHead>Entidade</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Pilar Prioritário</TableHead>
-                      <TableHead>Alertas</TableHead>
-                      <TableHead>Data</TableHead>
+                      <TableHead>{tx("Entidade")}</TableHead>
+                      <TableHead>{tx("Tipo")}</TableHead>
+                      <TableHead>{tx("Pilar Prioritário")}</TableHead>
+                      <TableHead>{tx("Alertas")}</TableHead>
+                      <TableHead>{tx("Data")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -288,7 +289,7 @@ const ERPIntegration = () => {
                                 {warnings.length} alerta(s)
                               </Badge>
                             ) : (
-                              <Badge variant="outline">Sem alertas</Badge>
+                              <Badge variant="outline">{tx("Sem alertas")}</Badge>
                             );
                           })()}
                         </TableCell>
@@ -308,9 +309,9 @@ const ERPIntegration = () => {
         <TabsContent value="events" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Log de Eventos</CardTitle>
+              <CardTitle>{tx("Log de Eventos")}</CardTitle>
               <CardDescription>
-                Histórico de eventos de integração
+                {tx("Histórico de eventos de integração")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -323,16 +324,16 @@ const ERPIntegration = () => {
               ) : !events?.length ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Nenhum evento registrado</p>
+                  <p>{tx("Nenhum evento registrado")}</p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>ID</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Payload</TableHead>
-                      <TableHead>Data</TableHead>
+                      <TableHead>{tx("Tipo")}</TableHead>
+                      <TableHead>{tx("Payload")}</TableHead>
+                      <TableHead>{tx("Data")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

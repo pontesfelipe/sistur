@@ -74,7 +74,7 @@ const EduMensagens = () => {
       <div className="container max-w-6xl py-6 space-y-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <MessageCircle className="h-6 w-6" /> Mensagens
+            <MessageCircle className="h-6 w-6" /> {tx("Mensagens")}
           </h1>
           <p className="text-sm text-muted-foreground">
             {tx('Conversas diretas entre alunos e professores.')}

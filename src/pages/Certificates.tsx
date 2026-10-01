@@ -268,7 +268,7 @@ const Certificates = () => {
                       {tx(selectedCertificate.lms_courses?.title)}
                     </h2>
                     <p className="text-muted-foreground">
-                      Certificamos que <strong>{selectedCertificate.profiles?.full_name || profile?.full_name || 'Aluno'}</strong><br />
+                      {tx("Certificamos que")} <strong>{selectedCertificate.profiles?.full_name || profile?.full_name || 'Aluno'}</strong><br />
                       {tx('concluiu com êxito o curso acima')}
                     </p>
                     <div className="pt-4 border-t">

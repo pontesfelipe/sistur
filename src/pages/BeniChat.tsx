@@ -22,32 +22,33 @@ import {
   Info
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 const TOPICS = [
   {
     icon: Leaf,
-    title: 'Relações Ambientais (RA)',
-    description: 'A base do sistema turístico: recursos naturais, patrimônio cultural e sustentabilidade',
+    title: tx('Relações Ambientais (RA)'),
+    description: tx('A base do sistema turístico: recursos naturais, patrimônio cultural e sustentabilidade'),
     color: 'text-emerald-600',
     bgColor: 'bg-emerald-50 dark:bg-emerald-950/30'
   },
   {
     icon: Building2,
-    title: 'Organização Estrutural (OE)',
-    description: 'Infraestrutura turística: hotéis, transporte, sinalização e equipamentos',
+    title: tx('Organização Estrutural (OE)'),
+    description: tx('Infraestrutura turística: hotéis, transporte, sinalização e equipamentos'),
     color: 'text-blue-600',
     bgColor: 'bg-blue-50 dark:bg-blue-950/30'
   },
   {
     icon: Cog,
-    title: 'Ações Operacionais (AO)',
-    description: 'Governança do turismo: políticas públicas, qualificação e marketing',
+    title: tx('Ações Operacionais (AO)'),
+    description: tx('Governança do turismo: políticas públicas, qualificação e marketing'),
     color: 'text-amber-600',
     bgColor: 'bg-amber-50 dark:bg-amber-950/30'
   },
   {
     icon: BookOpen,
-    title: 'Motor IGMA',
-    description: 'As 6 regras sistêmicas que governam recomendações e bloqueios',
+    title: tx('Motor IGMA'),
+    description: tx('As 6 regras sistêmicas que governam recomendações e bloqueios'),
     color: 'text-purple-600',
     bgColor: 'bg-purple-50 dark:bg-purple-950/30'
   }
@@ -74,8 +75,8 @@ export default function BeniChat() {
 
   return (
     <AppLayout
-      title="Professor Beni"
-      subtitle="Assistente virtual baseado na metodologia sistêmica do turismo"
+      title={tx("Professor Beni")}
+      subtitle={tx("Assistente virtual baseado na metodologia sistêmica do turismo")}
     >
       <div className="flex flex-col lg:grid lg:grid-cols-[260px_1fr_280px] gap-4">
         <aside className="hidden lg:block h-[calc(100vh-10rem)] min-h-[480px]">{sidebar}</aside>
@@ -84,7 +85,7 @@ export default function BeniChat() {
           <div className="lg:hidden">
             <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="sm"><PanelLeft className="h-4 w-4 mr-1" />Conversas e pastas</Button>
+                <Button variant="outline" size="sm"><PanelLeft className="h-4 w-4 mr-1" />{tx("Conversas e pastas")}</Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] pt-10">{sidebar}</SheetContent>
             </Sheet>
@@ -105,7 +106,7 @@ export default function BeniChat() {
         <Collapsible open={infoOpen} onOpenChange={setInfoOpen} className="hidden lg:block space-y-4">
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" className="w-full justify-between">
-              Sobre o Professor e tópicos <ChevronDown className={`h-4 w-4 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
+              {tx("Sobre o Professor e tópicos")} <ChevronDown className={`h-4 w-4 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-4">
@@ -114,22 +115,20 @@ export default function BeniChat() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <GraduationCap className="h-4 w-4 text-primary" />
-                Sobre o Professor Beni
+                {tx("Sobre o Professor Beni")}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground space-y-3">
               <p>
-                <strong className="text-foreground">Mario Carlos Beni</strong> é professor emérito da 
-                USP e autor da teoria sistêmica do turismo, base científica do SISTUR.
+                <strong className="text-foreground">{tx("Mario Carlos Beni")}</strong> {tx("é professor emérito da USP e autor da teoria sistêmica do turismo, base científica do SISTUR.")}
               </p>
               <p>
-                Este assistente virtual foi treinado com os princípios e metodologias 
-                desenvolvidos pelo professor ao longo de décadas de pesquisa.
+                {tx("Este assistente virtual foi treinado com os princípios e metodologias desenvolvidos pelo professor ao longo de décadas de pesquisa.")}
               </p>
               <div className="flex flex-wrap gap-1 pt-2">
-                <Badge variant="secondary" className="text-xs">Análise Estrutural</Badge>
-                <Badge variant="secondary" className="text-xs">SISTUR</Badge>
-                <Badge variant="secondary" className="text-xs">Motor IGMA</Badge>
+                <Badge variant="secondary" className="text-xs">{tx("Análise Estrutural")}</Badge>
+                <Badge variant="secondary" className="text-xs">{tx("SISTUR")}</Badge>
+                <Badge variant="secondary" className="text-xs">{tx("Motor IGMA")}</Badge>
               </div>
             </CardContent>
           </Card>
@@ -139,7 +138,7 @@ export default function BeniChat() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Lightbulb className="h-4 w-4 text-primary" />
-                Tópicos que o Professor Domina
+                {tx("Tópicos que o Professor Domina")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -163,37 +162,37 @@ export default function BeniChat() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Info className="h-4 w-4 text-primary" />
-                O que você pode perguntar
+                {tx("O que você pode perguntar")}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground space-y-3">
               <p className="text-foreground font-medium">
-                O Professor Beni pode responder sobre os temas abaixo, sempre com base na metodologia SISTUR:
+                {tx("O Professor Beni pode responder sobre os temas abaixo, sempre com base na metodologia SISTUR:")}
               </p>
               <ul className="space-y-2">
                 <li className="flex gap-2">
                   <span className="shrink-0 text-primary">•</span>
-                  <span><strong className="text-foreground">Seus diagnósticos:</strong> pergunte sobre diagnósticos que você já realizou. O Beni vai confirmar o nome exato antes de analisar.</span>
+                  <span><strong className="text-foreground">{tx("Seus diagnósticos:")}</strong> {tx("pergunte sobre diagnósticos que você já realizou. O Beni vai confirmar o nome exato antes de analisar.")}</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="shrink-0 text-primary">•</span>
-                  <span><strong className="text-foreground">Seus relatórios:</strong> pergunte sobre relatórios gerados no sistema. O Beni vai confirmar o nome exato antes de analisar.</span>
+                  <span><strong className="text-foreground">{tx("Seus relatórios:")}</strong> {tx("pergunte sobre relatórios gerados no sistema. O Beni vai confirmar o nome exato antes de analisar.")}</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="shrink-0 text-primary">•</span>
-                  <span><strong className="text-foreground">Metodologia:</strong> conceitos dos pilares RA, OE e AO, as 6 regras do IGMA, teoria sistêmica do turismo.</span>
+                  <span><strong className="text-foreground">{tx("Metodologia:")}</strong> {tx("conceitos dos pilares RA, OE e AO, as 6 regras do IGMA, teoria sistêmica do turismo.")}</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="shrink-0 text-primary">•</span>
-                  <span><strong className="text-foreground">Prescrições e cursos:</strong> recomendações de formação baseadas em indicadores em Atenção ou Crítico.</span>
+                  <span><strong className="text-foreground">{tx("Prescrições e cursos:")}</strong> {tx("recomendações de formação baseadas em indicadores em Atenção ou Crítico.")}</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="shrink-0 text-primary">•</span>
-                  <span><strong className="text-foreground">Turismo sustentável:</strong> boas práticas, governança, planejamento e gestão de destinos.</span>
+                  <span><strong className="text-foreground">{tx("Turismo sustentável:")}</strong> {tx("boas práticas, governança, planejamento e gestão de destinos.")}</span>
                 </li>
               </ul>
               <div className="pt-1 text-xs border-t border-border pt-2">
-                <strong className="text-foreground">Limites:</strong> o Beni não responde sobre programação, saúde, política, religião ou temas fora do turismo e da metodologia SISTUR.
+                <strong className="text-foreground">{tx("Limites:")}</strong> {tx("o Beni não responde sobre programação, saúde, política, religião ou temas fora do turismo e da metodologia SISTUR.")}
               </div>
             </CardContent>
           </Card>

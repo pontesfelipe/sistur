@@ -13,9 +13,9 @@ interface Props {
 }
 
 const PILLAR_META = {
-  RA: { label: 'Relações Ambientais', icon: Leaf, color: 'text-green-600' },
-  AO: { label: 'Ações Operacionais', icon: Shield, color: 'text-blue-600' },
-  OE: { label: 'Organização Estrutural', icon: Building2, color: 'text-amber-600' },
+  RA: { label: tx('Relações Ambientais'), icon: Leaf, color: 'text-green-600' },
+  AO: { label: tx('Ações Operacionais'), icon: Shield, color: 'text-blue-600' },
+  OE: { label: tx('Organização Estrutural'), icon: Building2, color: 'text-amber-600' },
 };
 
 export function PreCalculationChecklist({ indicators, indicatorValues, tier, isEnterprise }: Props) {

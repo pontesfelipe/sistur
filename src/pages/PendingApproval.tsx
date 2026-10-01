@@ -55,7 +55,7 @@ export default function PendingApproval() {
             <div className="h-10 w-10 rounded-lg gradient-hero flex items-center justify-center">
               <span className="text-primary-foreground font-display font-bold text-lg">S</span>
             </div>
-            <span className="font-display font-bold text-2xl">SISTUR</span>
+            <span className="font-display font-bold text-2xl">{tx("SISTUR")}</span>
           </div>
           <div className="mx-auto h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mb-4">
             <Clock className="h-8 w-8 text-amber-600" />
@@ -82,8 +82,7 @@ export default function PendingApproval() {
 
           <div className="text-center text-sm text-muted-foreground">
             <p>
-              Um administrador irá revisar sua solicitação em breve.
-              Você receberá acesso assim que sua conta for aprovada.
+              {tx("Um administrador irá revisar sua solicitação em breve. Você receberá acesso assim que sua conta for aprovada.")}
             </p>
           </div>
 

@@ -64,7 +64,7 @@ export function SyllabusPanel({ training }: Props) {
         {training.ementa && (
           <section>
             <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
-              <BookOpen className="h-4 w-4" /> Ementa
+              <BookOpen className="h-4 w-4" /> {tx("Ementa")}
             </h4>
             <p className="text-sm text-muted-foreground whitespace-pre-line">{training.ementa}</p>
           </section>
@@ -90,7 +90,7 @@ export function SyllabusPanel({ training }: Props) {
         {competencias.length > 0 && (
           <section>
             <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
-              <Target className="h-4 w-4" /> Competências
+              <Target className="h-4 w-4" /> {tx("Competências")}
             </h4>
             <div className="flex flex-wrap gap-2">
               {competencias.map((c, i) => (
@@ -125,7 +125,7 @@ export function SyllabusPanel({ training }: Props) {
         {training.metodologia && (
           <section>
             <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
-              <Lightbulb className="h-4 w-4" /> Metodologia
+              <Lightbulb className="h-4 w-4" /> {tx("Metodologia")}
             </h4>
             <p className="text-sm text-muted-foreground whitespace-pre-line">{training.metodologia}</p>
           </section>
@@ -134,7 +134,7 @@ export function SyllabusPanel({ training }: Props) {
         {training.criterios_avaliacao && (
           <section>
             <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
-              <ClipboardCheck className="h-4 w-4" /> Critérios de Avaliação
+              <ClipboardCheck className="h-4 w-4" /> {tx("Critérios de Avaliação")}
             </h4>
             <p className="text-sm text-muted-foreground whitespace-pre-line">{training.criterios_avaliacao}</p>
           </section>
@@ -143,7 +143,7 @@ export function SyllabusPanel({ training }: Props) {
         {(bibBasica.length > 0 || bibComp.length > 0) && (
           <section>
             <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
-              <Library className="h-4 w-4" /> Bibliografia
+              <Library className="h-4 w-4" /> {tx("Bibliografia")}
             </h4>
             {bibBasica.length > 0 && (
               <div className="mb-3">

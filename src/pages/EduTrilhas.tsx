@@ -385,8 +385,7 @@ const EduTrilhas = () => {
             </div>
             <CardDescription>
               Para iniciar qualquer trilha formativa é necessário concluir o curso{' '}
-              <strong>{tx(foundation.course.title)}</strong>. Ele apresenta o turismo como sistema aberto
-              e os conjuntos RA, OE e AO — a linguagem comum de todas as demais formações.
+              <strong>{tx(foundation.course.title)}</strong>{tx(". Ele apresenta o turismo como sistema aberto e os conjuntos RA, OE e AO — a linguagem comum de todas as demais formações.")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -408,8 +407,7 @@ const EduTrilhas = () => {
               <CardTitle className="text-lg">{tx('Período de teste concluído')}</CardTitle>
             </div>
             <CardDescription>
-              Você concluiu o curso base incluído no teste gratuito. Para seguir nas trilhas
-              formativas, com certificados e o Professor Beni sem limites, conheça os planos.
+              {tx("Você concluiu o curso base incluído no teste gratuito. Para seguir nas trilhas formativas, com certificados e o Professor Beni sem limites, conheça os planos.")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -664,8 +662,7 @@ export const EduTrilhaDetalhe = () => {
               <CardTitle className="text-lg">{tx('Trilha disponível nos planos')}</CardTitle>
             </div>
             <CardDescription>
-              Você concluiu o curso base do teste gratuito. Para acessar esta e todas as demais
-              trilhas formativas, conheça os planos do SISTUR EDU.
+              {tx("Você concluiu o curso base do teste gratuito. Para acessar esta e todas as demais trilhas formativas, conheça os planos do SISTUR EDU.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
@@ -694,8 +691,7 @@ export const EduTrilhaDetalhe = () => {
               <CardTitle className="text-lg">{tx('Trilha bloqueada')}</CardTitle>
             </div>
             <CardDescription>
-              Conclua primeiro o curso <strong>{tx(foundation.course.title)}</strong> para liberar as
-              trilhas formativas.
+              {tx("Conclua primeiro o curso")} <strong>{tx(foundation.course.title)}</strong> {tx("para liberar as trilhas formativas.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
@@ -763,7 +759,7 @@ export const EduTrilhaDetalhe = () => {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Excluir trilha?</AlertDialogTitle>
+                    <AlertDialogTitle>{tx("Excluir trilha?")}</AlertDialogTitle>
                     <AlertDialogDescription>
                       Esta ação não pode ser desfeita. A trilha "{track.name}" será permanentemente excluída.
                     </AlertDialogDescription>

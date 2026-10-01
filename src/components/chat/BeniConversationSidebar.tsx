@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { BeniConversation, BeniFolder, useBeniConversations } from '@/hooks/useBeniConversations';
 
+import { tx } from "@/i18n/t";
 type Api = ReturnType<typeof useBeniConversations>;
 
 interface Props {
@@ -42,7 +43,7 @@ export function BeniConversationSidebar({ api, activeId, onNew, onNavigate, onDe
       if (folderDialog.id) await api.updateFolder(folderDialog.id, { name: folderDialog.name.trim(), instructions: folderDialog.instructions || null });
       else await api.createFolder(folderDialog.name.trim(), folderDialog.instructions);
       setFolderDialog(null);
-    } catch { toast.error('Erro ao salvar pasta'); }
+    } catch { toast.error(tx('Erro ao salvar pasta')); }
   };
 
   const renderConv = (c: BeniConversation) => (
@@ -53,16 +54,16 @@ export function BeniConversationSidebar({ api, activeId, onNew, onNavigate, onDe
       </Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100" aria-label="Opções">
+          <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100" aria-label={tx("Opções")}>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setRenameDialog({ id: c.id, title: c.title })}>Renomear</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setRenameDialog({ id: c.id, title: c.title })}>{tx("Renomear")}</DropdownMenuItem>
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Mover para</DropdownMenuSubTrigger>
+            <DropdownMenuSubTrigger>{tx("Mover para")}</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
-              <DropdownMenuItem onClick={() => api.updateConversation(c.id, { folder_id: null })}>Sem pasta</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => api.updateConversation(c.id, { folder_id: null })}>{tx("Sem pasta")}</DropdownMenuItem>
               {api.folders.map((f) => (
                 <DropdownMenuItem key={f.id} onClick={() => api.updateConversation(c.id, { folder_id: f.id })}>{f.name}</DropdownMenuItem>
               ))}
@@ -73,7 +74,7 @@ export function BeniConversationSidebar({ api, activeId, onNew, onNavigate, onDe
             if (!confirm('Excluir esta conversa?')) return;
             await api.deleteConversation(c.id);
             if (c.id === activeId) onDeletedActive();
-          }}>Excluir</DropdownMenuItem>
+          }}>{tx("Excluir")}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -93,16 +94,16 @@ export function BeniConversationSidebar({ api, activeId, onNew, onNavigate, onDe
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100" aria-label="Opções da pasta">
+              <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100" aria-label={tx("Opções da pasta")}>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setFolderDialog({ id: f.id, name: f.name, instructions: f.instructions || '' })}>Editar</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFolderDialog({ id: f.id, name: f.name, instructions: f.instructions || '' })}>{tx("Editar")}</DropdownMenuItem>
               <DropdownMenuItem className="text-destructive" onClick={async () => {
                 if (!confirm('Excluir a pasta? As conversas vão para "Sem pasta".')) return;
                 await api.deleteFolder(f.id);
-              }}>Excluir</DropdownMenuItem>
+              }}>{tx("Excluir")}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -116,26 +117,26 @@ export function BeniConversationSidebar({ api, activeId, onNew, onNavigate, onDe
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex gap-2">
-        <Button className="flex-1" onClick={onNew}><Plus className="mr-1 h-4 w-4" />Nova conversa</Button>
-        <Button variant="outline" size="icon" title="Nova pasta" onClick={() => setFolderDialog({ name: '', instructions: '' })}>
+        <Button className="flex-1" onClick={onNew}><Plus className="mr-1 h-4 w-4" />{tx("Nova conversa")}</Button>
+        <Button variant="outline" size="icon" title={tx("Nova pasta")} onClick={() => setFolderDialog({ name: '', instructions: '' })}>
           <FolderPlus className="h-4 w-4" />
         </Button>
       </div>
       <div className="relative">
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input className="pl-8" placeholder="Buscar conversas" value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input className="pl-8" placeholder={tx("Buscar conversas")} value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       <ScrollArea className="flex-1">
         <div className="space-y-1 pr-2">
           {api.folders.map(renderFolder)}
           {loose.length > 0 && (
             <div className="pt-2">
-              <p className="px-2 pb-1 text-xs font-medium uppercase text-muted-foreground">Sem pasta</p>
+              <p className="px-2 pb-1 text-xs font-medium uppercase text-muted-foreground">{tx("Sem pasta")}</p>
               {loose.map(renderConv)}
             </div>
           )}
           {!api.isLoading && api.conversations.length === 0 && (
-            <p className="px-2 py-4 text-sm text-muted-foreground">Nenhuma conversa ainda.</p>
+            <p className="px-2 py-4 text-sm text-muted-foreground">{tx("Nenhuma conversa ainda.")}</p>
           )}
         </div>
       </ScrollArea>
@@ -143,27 +144,27 @@ export function BeniConversationSidebar({ api, activeId, onNew, onNavigate, onDe
       <Dialog open={!!folderDialog} onOpenChange={(o) => !o && setFolderDialog(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>{folderDialog?.id ? 'Editar pasta' : 'Nova pasta'}</DialogTitle></DialogHeader>
-          <Input placeholder="Nome do projeto" value={folderDialog?.name ?? ''} onChange={(e) => setFolderDialog((d) => d && { ...d, name: e.target.value })} />
+          <Input placeholder={tx("Nome do projeto")} value={folderDialog?.name ?? ''} onChange={(e) => setFolderDialog((d) => d && { ...d, name: e.target.value })} />
           <Textarea
-            placeholder="Instruções para o Beni neste projeto (opcional). Ex.: foco no destino Barretos."
+            placeholder={tx("Instruções para o Beni neste projeto (opcional). Ex.: foco no destino Barretos.")}
             value={folderDialog?.instructions ?? ''}
             maxLength={2000}
             onChange={(e) => setFolderDialog((d) => d && { ...d, instructions: e.target.value })}
           />
-          <DialogFooter><Button onClick={saveFolder}>Salvar</Button></DialogFooter>
+          <DialogFooter><Button onClick={saveFolder}>{tx("Salvar")}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={!!renameDialog} onOpenChange={(o) => !o && setRenameDialog(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Renomear conversa</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tx("Renomear conversa")}</DialogTitle></DialogHeader>
           <Input value={renameDialog?.title ?? ''} onChange={(e) => setRenameDialog((d) => d && { ...d, title: e.target.value })} />
           <DialogFooter>
             <Button onClick={async () => {
               if (!renameDialog?.title.trim()) return;
               await api.updateConversation(renameDialog.id, { title: renameDialog.title.trim().slice(0, 120) });
               setRenameDialog(null);
-            }}>Salvar</Button>
+            }}>{tx("Salvar")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

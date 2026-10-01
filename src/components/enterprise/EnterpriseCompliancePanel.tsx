@@ -11,16 +11,17 @@ import { useComplianceItems, ComplianceItem } from '@/hooks/useEnterpriseComplia
 import { useEnterpriseProfile } from '@/hooks/useEnterpriseProfiles';
 import { useProfile } from '@/hooks/useProfile';
 
+import { tx } from "@/i18n/t";
 interface Props {
   destinationId: string;
   destinationName: string;
 }
 
 const STATUS_OPTIONS = [
-  { value: 'pendente', label: 'Pendente' },
-  { value: 'valido', label: 'Válido' },
-  { value: 'vencido', label: 'Vencido' },
-  { value: 'nao_aplicavel', label: 'Não aplicável' },
+  { value: 'pendente', label: tx('Pendente') },
+  { value: 'valido', label: tx('Válido') },
+  { value: 'vencido', label: tx('Vencido') },
+  { value: 'nao_aplicavel', label: tx('Não aplicável') },
 ];
 
 function statusBadge(status: string, expires_at: string | null) {
@@ -28,9 +29,9 @@ function statusBadge(status: string, expires_at: string | null) {
     ? status
     : new Date(expires_at).getTime() < Date.now() ? 'vencido' : 'valido';
   const map: Record<string, { label: string; cls: string }> = {
-    valido: { label: 'Válido', cls: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30' },
-    vencido: { label: 'Vencido', cls: 'bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30' },
-    pendente: { label: 'Pendente', cls: 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30' },
+    valido: { label: tx('Válido'), cls: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30' },
+    vencido: { label: tx('Vencido'), cls: 'bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30' },
+    pendente: { label: tx('Pendente'), cls: 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30' },
     nao_aplicavel: { label: 'N/A', cls: 'bg-muted text-muted-foreground border-border' },
   };
   const m = map[effective] || map.pendente;
@@ -67,8 +68,8 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Conformidade Legal</CardTitle>
-          <CardDescription>Cadastre primeiro o perfil do empreendimento para liberar o checklist de conformidade.</CardDescription>
+          <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> {tx("Conformidade Legal")}</CardTitle>
+          <CardDescription>{tx("Cadastre primeiro o perfil do empreendimento para liberar o checklist de conformidade.")}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -123,27 +124,27 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
         {/* Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="p-3 rounded-lg border bg-card">
-            <div className="text-xs text-muted-foreground flex items-center gap-1"><FileCheck className="h-3 w-3" /> Taxa</div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1"><FileCheck className="h-3 w-3" /> {tx("Taxa")}</div>
             <div className="text-2xl font-semibold">{stats.complianceRate.toFixed(0)}%</div>
             <Progress value={stats.complianceRate} className="h-1.5 mt-1" />
           </div>
           <div className="p-3 rounded-lg border bg-card">
-            <div className="text-xs text-muted-foreground flex items-center gap-1"><ShieldCheck className="h-3 w-3 text-emerald-500" /> Válidos</div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1"><ShieldCheck className="h-3 w-3 text-emerald-500" /> {tx("Válidos")}</div>
             <div className="text-2xl font-semibold text-emerald-600">{stats.validCount}</div>
           </div>
           <div className="p-3 rounded-lg border bg-card">
-            <div className="text-xs text-muted-foreground flex items-center gap-1"><AlertTriangle className="h-3 w-3 text-red-500" /> Vencidos</div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1"><AlertTriangle className="h-3 w-3 text-red-500" /> {tx("Vencidos")}</div>
             <div className="text-2xl font-semibold text-red-600">{stats.expiredCount}</div>
           </div>
           <div className="p-3 rounded-lg border bg-card">
-            <div className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3 text-amber-500" /> Pendentes</div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3 text-amber-500" /> {tx("Pendentes")}</div>
             <div className="text-2xl font-semibold text-amber-600">{stats.pendingCount}</div>
           </div>
         </div>
 
         {/* CNPJ validation */}
         <div className="p-3 rounded-lg border bg-muted/20 space-y-2">
-          <Label className="text-sm font-medium">Validação automática via CNPJ</Label>
+          <Label className="text-sm font-medium">{tx("Validação automática via CNPJ")}</Label>
           <div className="flex gap-2">
             <Input
               placeholder="00.000.000/0000-00"
@@ -156,14 +157,14 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
               disabled={cnpj.replace(/\D/g, '').length !== 14 || validateCnpj.isPending}
             >
               {validateCnpj.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-              <span className="ml-2">Validar</span>
+              <span className="ml-2">{tx("Validar")}</span>
             </Button>
           </div>
           {cnpjResult?.data && (
             <div className="text-xs text-muted-foreground space-y-0.5">
-              <div><strong>Razão social:</strong> {cnpjResult.data.razao_social || '—'}</div>
-              <div><strong>Situação:</strong> {cnpjResult.data.situacao_cadastral || '—'}</div>
-              <div><strong>CADASTUR:</strong> {cnpjResult.data.cadastur_status || 'não verificado'}</div>
+              <div><strong>{tx("Razão social:")}</strong> {cnpjResult.data.razao_social || '—'}</div>
+              <div><strong>{tx("Situação:")}</strong> {cnpjResult.data.situacao_cadastral || '—'}</div>
+              <div><strong>{tx("CADASTUR:")}</strong> {cnpjResult.data.cadastur_status || 'não verificado'}</div>
             </div>
           )}
         </div>
@@ -173,7 +174,7 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
           <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin" /></div>
         ) : items.length === 0 ? (
           <div className="text-center py-6 space-y-3">
-            <p className="text-sm text-muted-foreground">Nenhum item no checklist ainda.</p>
+            <p className="text-sm text-muted-foreground">{tx("Nenhum item no checklist ainda.")}</p>
             <Button onClick={handleSeed} disabled={seedDefaults.isPending}>
               {seedDefaults.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               Criar checklist padrão
@@ -191,7 +192,7 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium text-sm">{it.item_label}</span>
                           {statusBadge(it.status, it.expires_at)}
-                          {it.auto_checked && <Badge variant="secondary" className="text-xs">auto</Badge>}
+                          {it.auto_checked && <Badge variant="secondary" className="text-xs">{tx("auto")}</Badge>}
                         </div>
                       </div>
                       <Button variant="ghost" size="icon" onClick={() => removeItem.mutate(it.id)}>
@@ -200,7 +201,7 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                       <div>
-                        <Label className="text-xs">Status</Label>
+                        <Label className="text-xs">{tx("Status")}</Label>
                         <Select
                           value={it.status}
                           onValueChange={(v) => upsertItem.mutate({ ...it, status: v })}
@@ -212,7 +213,7 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
                         </Select>
                       </div>
                       <div>
-                        <Label className="text-xs">Nº documento</Label>
+                        <Label className="text-xs">{tx("Nº documento")}</Label>
                         <Input
                           className="h-8"
                           value={it.document_number || ''}
@@ -220,7 +221,7 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
                         />
                       </div>
                       <div>
-                        <Label className="text-xs">Vence em</Label>
+                        <Label className="text-xs">{tx("Vence em")}</Label>
                         <Input
                           type="date"
                           className="h-8"
@@ -237,18 +238,18 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
             {/* Add custom item */}
             <div className="p-3 rounded-lg border border-dashed flex gap-2">
               <Input
-                placeholder="Adicionar item customizado…"
+                placeholder={tx("Adicionar item customizado…")}
                 value={newItem.item_label}
                 onChange={(e) => setNewItem({ ...newItem, item_label: e.target.value })}
               />
               <Input
-                placeholder="Categoria"
+                placeholder={tx("Categoria")}
                 className="w-32"
                 value={newItem.category}
                 onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
               />
               <Button onClick={handleAddCustom} disabled={!newItem.item_label.trim()}>
-                <Plus className="h-4 w-4 mr-1" /> Adicionar
+                <Plus className="h-4 w-4 mr-1" /> {tx("Adicionar")}
               </Button>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { tx } from "@/i18n/t";
 interface SplashScreenProps {
   onComplete: () => void;
   minDuration?: number;
@@ -68,10 +69,10 @@ export const SplashScreen = ({ onComplete, minDuration = 1200 }: SplashScreenPro
         {/* Brand Name */}
         <div className="flex flex-col items-center gap-2 animate-[fade-up_0.6s_ease-out_0.3s_forwards]" style={{ opacity: 0 }}>
           <h1 className="text-4xl md:text-5xl font-display font-bold text-primary-foreground tracking-tight">
-            SISTUR
+            {tx("SISTUR")}
           </h1>
           <p className="text-primary-foreground/70 text-sm md:text-base font-medium tracking-widest uppercase">
-            Sistema de Inteligência Territorial
+            {tx("Sistema de Inteligência Territorial")}
           </p>
         </div>
 
@@ -82,14 +83,14 @@ export const SplashScreen = ({ onComplete, minDuration = 1200 }: SplashScreenPro
             <span className="w-2 h-2 bg-accent rounded-full animate-[bounce_1s_ease-in-out_0.2s_infinite]" />
             <span className="w-2 h-2 bg-accent rounded-full animate-[bounce_1s_ease-in-out_0.4s_infinite]" />
           </div>
-          <span className="text-primary-foreground/50 text-sm ml-2">Carregando...</span>
+          <span className="text-primary-foreground/50 text-sm ml-2">{tx("Carregando...")}</span>
         </div>
       </div>
 
       {/* Footer */}
       <div className="absolute bottom-8 text-center animate-[fade-up_0.6s_ease-out_0.9s_forwards]" style={{ opacity: 0 }}>
         <p className="text-primary-foreground/40 text-xs">
-          Transformando indicadores em decisões estratégicas
+          {tx("Transformando indicadores em decisões estratégicas")}
         </p>
       </div>
 

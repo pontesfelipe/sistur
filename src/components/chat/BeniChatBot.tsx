@@ -29,6 +29,7 @@ import { ChatMessageList } from './ChatMessageList';
 import { ChatInput } from './ChatInput';
 import { BeniContextSelector, type BeniContext } from './BeniContextSelector';
 
+import { tx } from "@/i18n/t";
 type Message = {
   id?: string;
   role: 'user' | 'assistant';
@@ -103,7 +104,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
     if (convIdRef.current || !user) return convIdRef.current;
     const title = firstText.replace(/\s+/g, ' ').trim().slice(0, 60) || 'Nova conversa';
     const { data, error } = await supabase.from('beni_conversations').insert({ user_id: user.id, title }).select('id').single();
-    if (error) { console.error(error); toast.error('Não foi possível criar a conversa'); return undefined; }
+    if (error) { console.error(error); toast.error(tx('Não foi possível criar a conversa')); return undefined; }
     convIdRef.current = data.id;
     return data.id;
   };
@@ -131,10 +132,10 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
       const { error } = await supabase.from('beni_chat_messages').delete().eq('id', messageId);
       if (error) throw error;
       setMessages(prev => prev.filter(m => m.id !== messageId));
-      toast.success('Mensagem deletada');
+      toast.success(tx('Mensagem deletada'));
     } catch (error) {
       console.error('Error deleting message:', error);
-      toast.error('Erro ao deletar mensagem');
+      toast.error(tx('Erro ao deletar mensagem'));
     }
   };
 
@@ -182,12 +183,12 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
       audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(audioUrl); audioRef.current = null; };
-      audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(audioUrl); audioRef.current = null; toast.error('Erro ao reproduzir áudio'); };
+      audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(audioUrl); audioRef.current = null; toast.error(tx('Erro ao reproduzir áudio')); };
       await audio.play();
     } catch (error) {
       console.error('TTS error:', error);
       setIsSpeaking(false);
-      toast.error('Erro ao gerar voz');
+      toast.error(tx('Erro ao gerar voz'));
     } finally {
       setIsLoadingAudio(false);
     }
@@ -210,16 +211,16 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
     const safe = file.name.replace(/[^\w.\-]+/g, '_');
     const path = `${user.id}/${crypto.randomUUID()}-${safe}`;
     const { error: upErr } = await supabase.storage.from('beni-attachments').upload(path, file, { contentType: file.type || undefined });
-    if (upErr) { toast.error('Falha ao enviar o anexo'); return null; }
+    if (upErr) { toast.error(tx('Falha ao enviar o anexo')); return null; }
     const { data, error } = await supabase.from('beni_attachments').insert({
       user_id: user.id, conversation_id: convId, file_name: file.name, file_path: path, mime: file.type || null, size: file.size,
     }).select('id').single();
-    if (error) { toast.error('Falha ao registrar o anexo'); return null; }
+    if (error) { toast.error(tx('Falha ao registrar o anexo')); return null; }
     return data.id;
   };
 
   const handleFileSelected = (file: File | null) => {
-    if (file && file.size > MAX_FILE) { toast.error('Arquivo acima de 10 MB'); return; }
+    if (file && file.size > MAX_FILE) { toast.error(tx('Arquivo acima de 10 MB')); return; }
     setPendingFile(file);
   };
 
@@ -271,7 +272,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
         if (response.status === 402 && errorData.code === 'beni_quota_exceeded') {
           beniQuota.refresh();
           toast.error(errorData.error || 'Limite de perguntas ao Professor Beni atingido.', {
-            action: { label: 'Ver planos', onClick: () => { window.location.href = '/assinatura'; } },
+            action: { label: tx('Ver planos'), onClick: () => { window.location.href = '/assinatura'; } },
             duration: 8000,
           });
           setMessages(prev => prev.filter(m => m.content !== ''));
@@ -374,15 +375,15 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
         onActivity?.();
         if (isNew) onConversationCreated?.(convId);
       } else {
-        toast.error('Professor Beni não respondeu. Tente novamente.');
+        toast.error(tx('Professor Beni não respondeu. Tente novamente.'));
         setMessages(prev => prev.filter(m => m.content !== ''));
       }
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error) {
-        if (error.name === 'AbortError') toast.error('Tempo limite excedido. Tente uma pergunta mais curta.');
+        if (error.name === 'AbortError') toast.error(tx('Tempo limite excedido. Tente uma pergunta mais curta.'));
         else toast.error(error.message || 'Erro ao conectar com o Professor Beni');
-      } else toast.error('Erro ao conectar com o Professor Beni');
+      } else toast.error(tx('Erro ao conectar com o Professor Beni'));
       setMessages(prev => prev.filter(m => m.content !== ''));
     } finally {
       setIsLoading(false);
@@ -414,7 +415,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
   // Voice input using Web Speech API
   const toggleVoiceInput = useCallback(() => {
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognitionAPI) { toast.error('Seu navegador não suporta reconhecimento de voz'); return; }
+    if (!SpeechRecognitionAPI) { toast.error(tx('Seu navegador não suporta reconhecimento de voz')); return; }
     if (isListening) { recognitionRef.current?.stop(); setIsListening(false); return; }
 
     const recognition = new SpeechRecognitionAPI();
@@ -427,9 +428,9 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
       setInput(transcript);
     };
     recognition.onerror = (event: any) => {
-      if (event.error === 'no-speech') toast.error('Nenhuma fala detectada. Tente novamente.');
-      else if (event.error === 'not-allowed') toast.error('Permissão de microfone negada');
-      else toast.error('Erro no reconhecimento de voz');
+      if (event.error === 'no-speech') toast.error(tx('Nenhuma fala detectada. Tente novamente.'));
+      else if (event.error === 'not-allowed') toast.error(tx('Permissão de microfone negada'));
+      else toast.error(tx('Erro no reconhecimento de voz'));
       setIsListening(false);
     };
     recognition.onend = () => setIsListening(false);
@@ -450,7 +451,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
       <Card className="h-[calc(100vh-10rem)] min-h-[480px] flex items-center justify-center">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
-          Carregando histórico...
+          {tx("Carregando histórico...")}
         </div>
       </Card>
     );
@@ -471,7 +472,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
             </div>
             <div>
               <CardTitle className="text-lg flex items-center gap-2 flex-wrap">
-                Professor Mario Beni
+                {tx("Professor Mario Beni")}
                 <Badge variant="outline" className="text-xs font-normal">IA</Badge>
                 {!beniQuota.isLoading && !beniQuota.unlimited && beniQuota.balance?.authenticated && (
                   <Badge
@@ -492,11 +493,11 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
                 )}
                 {beniQuota.exhausted && (
                   <Link to="/assinatura" className="text-xs text-primary underline underline-offset-2">
-                    Ver planos
+                    {tx("Ver planos")}
                   </Link>
                 )}
               </CardTitle>
-              <p className="text-sm text-muted-foreground">Especialista em Turismo Sustentável</p>
+              <p className="text-sm text-muted-foreground">{tx("Especialista em Turismo Sustentável")}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -510,7 +511,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
               {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Button>
             {isSpeaking && (
-              <Button variant="destructive" size="sm" onClick={stopSpeaking} className="animate-pulse" title="Parar leitura">
+              <Button variant="destructive" size="sm" onClick={stopSpeaking} className="animate-pulse" title={tx("Parar leitura")}>
                 <Square className="h-4 w-4" />
               </Button>
             )}
@@ -518,7 +519,7 @@ export function BeniChatBot({ initialContext, conversationId, onConversationCrea
             {messages.length > 0 && (
               <Button variant="ghost" size="sm" onClick={handleClearChat} className="text-muted-foreground">
                 <RefreshCw className="h-4 w-4 mr-1" />
-                Nova conversa
+                {tx("Nova conversa")}
               </Button>
             )}
           </div>

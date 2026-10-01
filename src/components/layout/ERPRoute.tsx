@@ -5,6 +5,7 @@ import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { useLicense } from '@/contexts/LicenseContext';
 import { Loader2 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface ERPRouteProps {
   children: React.ReactNode;
 }
@@ -26,7 +27,7 @@ export function ERPRoute({ children }: ERPRouteProps) {
             <span className="text-primary-foreground font-display font-bold text-xl">S</span>
           </div>
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Carregando...</p>
+          <p className="text-sm text-muted-foreground">{tx("Carregando...")}</p>
         </div>
       </div>
     );

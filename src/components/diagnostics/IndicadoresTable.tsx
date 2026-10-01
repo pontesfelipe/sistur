@@ -71,15 +71,15 @@ type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type IndicatorScope = 'territorial' | 'enterprise' | 'both';
 
 const reliabilityIcons = {
-  AUTOMATICA: { icon: ShieldCheck, color: 'text-severity-good', label: 'Automático' },
-  MANUAL: { icon: Shield, color: 'text-severity-moderate', label: 'Manual' },
-  ESTIMADA: { icon: ShieldAlert, color: 'text-severity-critical', label: 'Estimado' },
+  AUTOMATICA: { icon: ShieldCheck, color: 'text-severity-good', label: tx('Automático') },
+  MANUAL: { icon: Shield, color: 'text-severity-moderate', label: tx('Manual') },
+  ESTIMADA: { icon: ShieldAlert, color: 'text-severity-critical', label: tx('Estimado') },
 };
 
 const tierConfig = {
-  COMPLETE: { label: 'Integral', icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
-  MEDIUM: { label: 'Estratégico', icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
-  SMALL: { label: 'Essencial', icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
+  COMPLETE: { label: tx('Integral'), icon: Target, color: 'text-primary', bgClass: 'bg-primary/10 border-primary/30' },
+  MEDIUM: { label: tx('Estratégico'), icon: Gauge, color: 'text-amber-600', bgClass: 'bg-amber-50 dark:bg-amber-950/30 border-amber-500/30' },
+  SMALL: { label: tx('Essencial'), icon: Zap, color: 'text-green-600', bgClass: 'bg-green-50 dark:bg-green-950/30 border-green-500/30' },
 };
 
 const interpretationLabels: Record<string, string> = {
@@ -89,9 +89,9 @@ const interpretationLabels: Record<string, string> = {
 };
 
 const scopeLabels: Record<IndicatorScope, { label: string; color: string; bgColor: string }> = {
-  territorial: { label: 'Territorial', color: 'text-blue-600', bgColor: 'bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800' },
-  enterprise: { label: 'Enterprise', color: 'text-amber-600', bgColor: 'bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800' },
-  both: { label: 'Ambos', color: 'text-purple-600', bgColor: 'bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800' },
+  territorial: { label: tx('Territorial'), color: 'text-blue-600', bgColor: 'bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800' },
+  enterprise: { label: tx('Enterprise'), color: 'text-amber-600', bgColor: 'bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800' },
+  both: { label: tx('Ambos'), color: 'text-purple-600', bgColor: 'bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800' },
 };
 
 // Codes that are auto-fetched via REAL API
@@ -570,7 +570,7 @@ export function IndicadoresTable({
                               ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
                                   <Zap className="h-2.5 w-2.5 mr-0.5" />
-                                  API
+                                  {tx("API")}
                                 </Badge>
                               )}
                             </div>
@@ -610,7 +610,7 @@ export function IndicadoresTable({
                     {isIGMA && (
                       <Badge variant="outline" className="border-primary/50 text-primary">
                         <Database className="h-3 w-3 mr-1" />
-                        IGMA
+                        {tx("IGMA")}
                       </Badge>
                     )}
                     <Badge variant={indicator.pillar.toLowerCase() as 'ra' | 'oe' | 'ao'}>
@@ -737,7 +737,7 @@ export function IndicadoresTable({
                               ) : collectionType === 'AUTOMATICA' && (
                                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-severity-good/50 text-severity-good bg-severity-good/10">
                                   <Zap className="h-3 w-3 mr-0.5" />
-                                  API
+                                  {tx("API")}
                                 </Badge>
                               )}
                             </div>
@@ -754,7 +754,7 @@ export function IndicadoresTable({
                       {isIGMA ? (
                         <Badge variant="outline" className="border-primary/50 text-primary">
                           <Database className="h-3 w-3 mr-1" />
-                          IGMA
+                          {tx("IGMA")}
                         </Badge>
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>

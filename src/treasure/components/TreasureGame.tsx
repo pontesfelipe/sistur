@@ -427,7 +427,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         <ResumeGameDialog open={showResumeDialog} savedAt={resumeSavedAt} onResume={handleResumeGame} onNewGame={handleNewGameFromDialog} />
         <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50">
           <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-slate-200">
-            <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
+            <ArrowLeft className="h-4 w-4 mr-1" /> {tx("Voltar")}
           </Button>
           <h1 className="text-lg font-bold text-amber-300">{tx('🗺️ Caça ao Tesouro Ecológico')}</h1>
         </div>
@@ -734,7 +734,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
         className="relative z-10 pb-safe-bottom pb-3 flex justify-center"
       >
         <p className="text-[10px] text-white/30 flex items-center gap-1">
-          <Sparkles className="h-3 w-3" /> Toque nas células brilhantes para explorar
+          <Sparkles className="h-3 w-3" /> {tx("Toque nas células brilhantes para explorar")}
         </p>
       </motion.div>
 

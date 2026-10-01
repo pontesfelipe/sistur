@@ -5,6 +5,7 @@ import { useLicense } from '@/contexts/LicenseContext';
 import { useTermsAcceptance } from '@/hooks/useTermsAcceptance';
 import { Loader2 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface LicenseRouteProps {
   children: React.ReactNode;
   requiredFeature?: string;
@@ -26,7 +27,7 @@ export function LicenseRoute({ children, requiredFeature, allowExpired = false, 
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Verificando licença...</p>
+          <p className="text-sm text-muted-foreground">{tx("Verificando licença...")}</p>
         </div>
       </div>
     );

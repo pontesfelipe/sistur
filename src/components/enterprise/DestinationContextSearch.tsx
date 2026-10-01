@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Props {
   destinationId: string;
   onAutoFill?: (values: Record<string, number>) => void;
@@ -35,9 +36,9 @@ export function DestinationContextSearch({ destinationId, onAutoFill, onAnalysis
       if (a.telecom_coverage?.score != null) values['ENT_CONECTIVIDADE_TELECOM'] = a.telecom_coverage.score;
       if (a.events_12m?.count != null) values['ENT_EVENTOS_DESTINO_12M'] = a.events_12m.count;
       onAutoFill?.(values);
-      toast.success('Contexto do destino carregado');
+      toast.success(tx('Contexto do destino carregado'));
     } catch (e: any) {
-      toast.error('Erro ao buscar contexto: ' + (e.message || ''));
+      toast.error(tx('Erro ao buscar contexto: ') + (e.message || ''));
     } finally {
       setLoading(false);
     }
@@ -63,19 +64,19 @@ export function DestinationContextSearch({ destinationId, onAutoFill, onAnalysis
         <div className="space-y-3">
           <Separator />
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">Aérea</p><p className="text-2xl font-bold">{analysis.air_connectivity?.score ?? '—'}/5</p></CardContent></Card>
-            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">Telecom</p><p className="text-2xl font-bold">{analysis.telecom_coverage?.score ?? '—'}/5</p></CardContent></Card>
-            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">Eventos 12m</p><p className="text-2xl font-bold">{analysis.events_12m?.count ?? 0}</p></CardContent></Card>
-            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">Mapa MTur</p><p className="text-sm font-medium pt-1">{analysis.mtur?.in_mapa ? (analysis.mtur.category || 'Sim') : 'Fora'}</p></CardContent></Card>
+            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">{tx("Aérea")}</p><p className="text-2xl font-bold">{analysis.air_connectivity?.score ?? '—'}/5</p></CardContent></Card>
+            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">{tx("Telecom")}</p><p className="text-2xl font-bold">{analysis.telecom_coverage?.score ?? '—'}/5</p></CardContent></Card>
+            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">{tx("Eventos 12m")}</p><p className="text-2xl font-bold">{analysis.events_12m?.count ?? 0}</p></CardContent></Card>
+            <Card><CardContent className="p-3 text-center"><p className="text-[10px] text-muted-foreground uppercase">{tx("Mapa MTur")}</p><p className="text-sm font-medium pt-1">{analysis.mtur?.in_mapa ? (analysis.mtur.category || 'Sim') : 'Fora'}</p></CardContent></Card>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Card><CardContent className="p-3 space-y-1.5">
-              <div className="flex items-center gap-2 text-sm font-medium"><Plane className="h-4 w-4" /> Aeroporto</div>
+              <div className="flex items-center gap-2 text-sm font-medium"><Plane className="h-4 w-4" /> {tx("Aeroporto")}</div>
               <p className="text-xs text-muted-foreground">{analysis.air_connectivity?.airport || 'Sem aeroporto associado'}{analysis.air_connectivity?.passengers_total ? ` · ${analysis.air_connectivity.passengers_total.toLocaleString('pt-BR')} pax/${analysis.air_connectivity.ref_year || ''}` : ''}</p>
             </CardContent></Card>
             <Card><CardContent className="p-3 space-y-1.5">
-              <div className="flex items-center gap-2 text-sm font-medium"><Wifi className="h-4 w-4" /> Cobertura Telecom</div>
+              <div className="flex items-center gap-2 text-sm font-medium"><Wifi className="h-4 w-4" /> {tx("Cobertura Telecom")}</div>
               <div className="flex items-center gap-3 text-xs">
                 <span className="inline-flex items-center gap-1">{ok(!!analysis.telecom_coverage?.has_4g)} 4G</span>
                 <span className="inline-flex items-center gap-1">{ok(!!analysis.telecom_coverage?.has_5g)} 5G</span>
@@ -86,7 +87,7 @@ export function DestinationContextSearch({ destinationId, onAutoFill, onAnalysis
 
           {analysis.events_12m?.samples?.length > 0 && (
             <Card><CardContent className="p-3 space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium"><CalendarDays className="h-4 w-4" /> Eventos recentes</div>
+              <div className="flex items-center gap-2 text-sm font-medium"><CalendarDays className="h-4 w-4" /> {tx("Eventos recentes")}</div>
               <div className="flex flex-wrap gap-1.5">
                 {analysis.events_12m.samples.map((e: any) => (
                   <Badge key={e.id} variant="outline" className="text-[10px]">{e.name}</Badge>
@@ -97,7 +98,7 @@ export function DestinationContextSearch({ destinationId, onAutoFill, onAnalysis
 
           {analysis.recommendations?.length > 0 && (
             <Card className="border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/10"><CardContent className="p-3 space-y-1.5">
-              <p className="text-xs font-medium">Recomendações</p>
+              <p className="text-xs font-medium">{tx("Recomendações")}</p>
               <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1">
                 {analysis.recommendations.map((r: string, i: number) => <li key={i}>{r}</li>)}
               </ul>

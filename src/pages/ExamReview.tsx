@@ -137,15 +137,15 @@ const ExamReview = () => {
                       {isEssay && <Badge variant="secondary">{tx('Dissertativa')}</Badge>}
                       {isPendingGrade ? (
                         <Badge variant="secondary" className="bg-amber-500/10 text-amber-700">
-                          <Clock className="w-3 h-3 mr-1" />Aguardando
+                          <Clock className="w-3 h-3 mr-1" />{tx("Aguardando")}
                         </Badge>
                       ) : isCorrect ? (
                         <Badge className="bg-green-500/10 text-green-700 border-green-200">
-                          <CheckCircle className="w-3 h-3 mr-1" />Correta
+                          <CheckCircle className="w-3 h-3 mr-1" />{tx("Correta")}
                         </Badge>
                       ) : isWrong ? (
                         <Badge variant="destructive">
-                          <XCircle className="w-3 h-3 mr-1" />Incorreta
+                          <XCircle className="w-3 h-3 mr-1" />{tx("Incorreta")}
                         </Badge>
                       ) : null}
                     </div>

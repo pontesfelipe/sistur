@@ -1,5 +1,6 @@
 import React from "react";
 
+import { tx } from "@/i18n/t";
 interface State {
   error: Error | null;
 }
@@ -35,20 +36,20 @@ export class ErrorBoundary extends React.Component<
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
         <div className="max-w-lg w-full border border-border rounded-lg p-6 bg-card text-card-foreground space-y-3">
-          <h1 className="text-lg font-semibold">Ocorreu um erro ao carregar a página</h1>
+          <h1 className="text-lg font-semibold">{tx("Ocorreu um erro ao carregar a página")}</h1>
           <p className="text-sm text-muted-foreground break-words">{message}</p>
           <div className="flex gap-2">
             <button
               onClick={this.handleReload}
               className="text-sm px-3 py-1.5 rounded-md bg-primary text-primary-foreground"
             >
-              Recarregar
+              {tx("Recarregar")}
             </button>
             <a
               href="/"
               className="text-sm px-3 py-1.5 rounded-md border border-border"
             >
-              Voltar ao início
+              {tx("Voltar ao início")}
             </a>
           </div>
         </div>

@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Lock, Sparkles, Leaf, Building2, Cog } from 'lucide-react';
 
 const PILLARS = [
-  { key: 'RA', label: 'Relações Ambientais', icon: Leaf, width: '72%' },
-  { key: 'OE', label: 'Organização Estrutural', icon: Building2, width: '48%' },
-  { key: 'AO', label: 'Ações Operacionais', icon: Cog, width: '61%' },
+  { key: 'RA', label: tx('Relações Ambientais'), icon: Leaf, width: '72%' },
+  { key: 'OE', label: tx('Organização Estrutural'), icon: Building2, width: '48%' },
+  { key: 'AO', label: tx('Ações Operacionais'), icon: Cog, width: '61%' },
 ];
 
 /**
@@ -51,9 +51,7 @@ export function TrialResultsTeaser() {
                 {tx('Diagnóstico calculado com sucesso')}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Sua rodada de teste foi concluída. Os resultados completos — scores dos pilares
-                RA, OE e AO, gargalos, prescrições EDU e relatórios — ficam disponíveis
-                ao contratar um plano.
+                {tx("Sua rodada de teste foi concluída. Os resultados completos — scores dos pilares RA, OE e AO, gargalos, prescrições EDU e relatórios — ficam disponíveis ao contratar um plano.")}
               </p>
               <div className="flex flex-col sm:flex-row gap-2 justify-center">
                 <Button asChild>

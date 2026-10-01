@@ -16,6 +16,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface IBGEResult {
   id: number;
   nome: string;
@@ -53,11 +54,11 @@ export function IBGESearch() {
       setResults(data?.municipalities || []);
       
       if (data?.municipalities?.length === 0) {
-        toast.info('Nenhum município encontrado');
+        toast.info(tx('Nenhum município encontrado'));
       }
     } catch (error) {
       console.error('IBGE search error:', error);
-      toast.error('Erro ao buscar municípios');
+      toast.error(tx('Erro ao buscar municípios'));
     } finally {
       setLoading(false);
     }
@@ -74,27 +75,27 @@ export function IBGESearch() {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Search className="h-4 w-4 mr-2" />
-          Buscar no IBGE
+          {tx("Buscar no IBGE")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
-            Buscar Municípios IBGE
+            {tx("Buscar Municípios IBGE")}
           </DialogTitle>
           <DialogDescription>
-            Pesquise municípios brasileiros na base do IBGE
+            {tx("Pesquise municípios brasileiros na base do IBGE")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="flex gap-2">
             <div className="flex-1">
-              <Label htmlFor="search" className="sr-only">Município</Label>
+              <Label htmlFor="search" className="sr-only">{tx("Município")}</Label>
               <Input
                 id="search"
-                placeholder="Digite o nome do município..."
+                placeholder={tx("Digite o nome do município...")}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -145,26 +146,26 @@ export function IBGESearch() {
           ) : query && !loading ? (
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
               <MapPin className="h-12 w-12 mb-4 opacity-20" />
-              <p>Nenhum resultado encontrado</p>
-              <p className="text-sm">Tente um termo diferente</p>
+              <p>{tx("Nenhum resultado encontrado")}</p>
+              <p className="text-sm">{tx("Tente um termo diferente")}</p>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
               <Search className="h-12 w-12 mb-4 opacity-20" />
-              <p>Digite para pesquisar</p>
-              <p className="text-sm">Busque por nome do município</p>
+              <p>{tx("Digite para pesquisar")}</p>
+              <p className="text-sm">{tx("Busque por nome do município")}</p>
             </div>
           )}
 
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <span>Fonte: API IBGE Localidades</span>
+            <span>{tx("Fonte: API IBGE Localidades")}</span>
             <a 
               href="https://servicodados.ibge.gov.br/api/docs/localidades" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-primary hover:underline"
             >
-              Documentação <ExternalLink className="h-3 w-3" />
+              {tx("Documentação")} <ExternalLink className="h-3 w-3" />
             </a>
           </div>
         </div>

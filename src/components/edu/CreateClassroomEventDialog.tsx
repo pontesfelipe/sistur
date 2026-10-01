@@ -38,12 +38,12 @@ function useMyOwnedClassrooms() {
 }
 
 const TYPES: { value: 'aula'|'prova'|'prazo'|'reuniao'|'live'|'evento'; label: string }[] = [
-  { value: 'aula', label: 'Aula' },
-  { value: 'live', label: 'Live' },
-  { value: 'prova', label: 'Prova' },
-  { value: 'prazo', label: 'Prazo' },
-  { value: 'reuniao', label: 'Reunião' },
-  { value: 'evento', label: 'Evento' },
+  { value: 'aula', label: tx('Aula') },
+  { value: 'live', label: tx('Live') },
+  { value: 'prova', label: tx('Prova') },
+  { value: 'prazo', label: tx('Prazo') },
+  { value: 'reuniao', label: tx('Reunião') },
+  { value: 'evento', label: tx('Evento') },
 ];
 
 const ALARMS = [0, 15, 30, 60, 120, 1440];
@@ -103,7 +103,7 @@ export function CreateClassroomEventDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="default">
-          <Plus className="h-4 w-4 mr-2" /> Novo evento
+          <Plus className="h-4 w-4 mr-2" /> {tx("Novo evento")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">

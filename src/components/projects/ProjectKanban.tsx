@@ -46,7 +46,7 @@ export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?
     }
     try {
       await updateTask.mutateAsync({ id: taskId, updates: { status } });
-      toast({ title: 'Tarefa movida', description: `→ ${TASK_STATUS_INFO[status].label}` });
+      toast({ title: tx('Tarefa movida'), description: `→ ${TASK_STATUS_INFO[status].label}` });
     } catch (err: any) {
       toast({ title: tx('Erro ao mover tarefa'), description: err.message, variant: 'destructive' });
     } finally {
@@ -127,7 +127,7 @@ export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?
                             ))}
                             {task.linked_issue_id && (
                               <Badge variant="outline" className="text-[10px] gap-0.5">
-                                <AlertTriangle className="h-2.5 w-2.5" /> gargalo
+                                <AlertTriangle className="h-2.5 w-2.5" /> {tx("gargalo")}
                               </Badge>
                             )}
                           </div>

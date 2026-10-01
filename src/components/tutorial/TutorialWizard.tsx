@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, X, BookOpen, Sparkles } from 'lucide-react';
 import { getTutorialForRole, getUserTutorialRole, type TutorialStep } from '@/data/tutorialData';
 
+import { tx } from "@/i18n/t";
 interface TutorialWizardProps {
   open: boolean;
   onClose: () => void;
@@ -97,13 +98,13 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
         <DialogFooter className="flex-row justify-between sm:justify-between gap-2">
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={handleSkip}>
-              Pular tutorial
+              {tx("Pular tutorial")}
             </Button>
           </div>
           <div className="flex gap-2">
             {step.route && (
               <Button variant="outline" size="sm" onClick={handleGoToPage}>
-                Acessar
+                {tx("Acessar")}
               </Button>
             )}
             {!isFirst && (
@@ -113,11 +114,11 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
             )}
             {isLast ? (
               <Button size="sm" onClick={handleFinish}>
-                Concluir
+                {tx("Concluir")}
               </Button>
             ) : (
               <Button size="sm" onClick={() => setCurrentIndex(i => i + 1)}>
-                Próximo
+                {tx("Próximo")}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             )}

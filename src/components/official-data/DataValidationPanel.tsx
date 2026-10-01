@@ -45,6 +45,7 @@ import {
   parseIndicatorSelectValue,
 } from '@/lib/indicatorFieldConfig';
 
+import { tx } from "@/i18n/t";
 interface DataValidationPanelProps {
   ibgeCode: string;
   orgId: string;
@@ -78,11 +79,11 @@ function isMandalaIndicator(code: string): boolean {
 
 // Confidence level display
 const CONFIDENCE_CRITERIA: Record<number, { label: string; color: string }> = {
-  1: { label: 'Preenchimento manual', color: 'text-destructive' },
-  2: { label: 'Pesquisa local', color: 'text-orange-500' },
-  3: { label: 'Fonte secundária', color: 'text-yellow-600' },
-  4: { label: 'Atualização trimestral', color: 'text-cyan-600' },
-  5: { label: 'API oficial', color: 'text-green-600' },
+  1: { label: tx('Preenchimento manual'), color: 'text-destructive' },
+  2: { label: tx('Pesquisa local'), color: 'text-orange-500' },
+  3: { label: tx('Fonte secundária'), color: 'text-yellow-600' },
+  4: { label: tx('Atualização trimestral'), color: 'text-cyan-600' },
+  5: { label: tx('API oficial'), color: 'text-green-600' },
 };
 
 const OFFICIAL_COLLECTION_METHODS: ExternalIndicatorValue['collection_method'][] = ['AUTOMATIC', 'BATCH'];
@@ -325,7 +326,7 @@ export function DataValidationPanel({
       {/* Header with actions */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-lg font-semibold">Validação de Dados Oficiais</h3>
+          <h3 className="text-lg font-semibold">{tx("Validação de Dados Oficiais")}</h3>
           <p className="text-sm text-muted-foreground">
             {destinationName} • Código IBGE: {ibgeCode}
           </p>
@@ -363,7 +364,7 @@ export function DataValidationPanel({
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <Database className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Total</span>
+              <span className="text-sm text-muted-foreground">{tx("Total")}</span>
             </div>
             <p className="text-2xl font-bold">{values.length}</p>
           </CardContent>
@@ -372,7 +373,7 @@ export function DataValidationPanel({
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-500" />
-              <span className="text-sm text-muted-foreground">Validados</span>
+              <span className="text-sm text-muted-foreground">{tx("Validados")}</span>
             </div>
             <p className="text-2xl font-bold text-green-600">{validatedCount}</p>
           </CardContent>
@@ -381,7 +382,7 @@ export function DataValidationPanel({
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-amber-500" />
-              <span className="text-sm text-muted-foreground">Pendentes</span>
+              <span className="text-sm text-muted-foreground">{tx("Pendentes")}</span>
             </div>
             <p className="text-2xl font-bold text-amber-600">{pendingCount}</p>
           </CardContent>
@@ -390,7 +391,7 @@ export function DataValidationPanel({
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <Edit2 className="h-4 w-4 text-blue-500" />
-              <span className="text-sm text-muted-foreground">Editados</span>
+              <span className="text-sm text-muted-foreground">{tx("Editados")}</span>
             </div>
             <p className="text-2xl font-bold text-blue-600">{Object.keys(editedValues).length}</p>
           </CardContent>
@@ -403,10 +404,10 @@ export function DataValidationPanel({
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              Fontes de Dados Utilizadas
+              {tx("Fontes de Dados Utilizadas")}
             </CardTitle>
             <CardDescription>
-              Detalhamento das bases oficiais que alimentaram o pré-preenchimento automático
+              {tx("Detalhamento das bases oficiais que alimentaram o pré-preenchimento automático")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -502,9 +503,9 @@ export function DataValidationPanel({
         <Card>
           <CardContent className="py-12 text-center">
             <Database className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h4 className="font-medium mb-2">Nenhum dado pré-preenchido</h4>
+            <h4 className="font-medium mb-2">{tx("Nenhum dado pré-preenchido")}</h4>
             <p className="text-sm text-muted-foreground mb-4">
-              Clique em "Buscar Dados" para carregar dados oficiais das bases públicas.
+              {tx("Clique em \"Buscar Dados\" para carregar dados oficiais das bases públicas.")}
             </p>
             <Button onClick={handleFetchData} disabled={fetchOfficialData.isPending}>
               {fetchOfficialData.isPending ? (
@@ -520,7 +521,7 @@ export function DataValidationPanel({
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Indicadores Pré-preenchidos</CardTitle>
+              <CardTitle className="text-base">{tx("Indicadores Pré-preenchidos")}</CardTitle>
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="select-all"
@@ -528,7 +529,7 @@ export function DataValidationPanel({
                   onCheckedChange={handleSelectAll}
                 />
                 <label htmlFor="select-all" className="text-sm text-muted-foreground cursor-pointer">
-                  Selecionar todos
+                  {tx("Selecionar todos")}
                 </label>
               </div>
             </div>
@@ -539,13 +540,13 @@ export function DataValidationPanel({
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-12"></TableHead>
-                    <TableHead>Indicador</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Fonte</TableHead>
-                    <TableHead>Ano</TableHead>
-                    <TableHead>Critério</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-24 text-right">Ações</TableHead>
+                    <TableHead>{tx("Indicador")}</TableHead>
+                    <TableHead>{tx("Valor")}</TableHead>
+                    <TableHead>{tx("Fonte")}</TableHead>
+                    <TableHead>{tx("Ano")}</TableHead>
+                    <TableHead>{tx("Critério")}</TableHead>
+                    <TableHead>{tx("Status")}</TableHead>
+                    <TableHead className="w-24 text-right">{tx("Ações")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -584,7 +585,7 @@ export function DataValidationPanel({
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/50 text-primary bg-primary/10 cursor-help">
-                                      🌀 MST
+                                      {tx("🌀 MST")}
                                     </Badge>
                                   </TooltipTrigger>
                                   <TooltipContent className="max-w-xs">
@@ -618,10 +619,10 @@ export function DataValidationPanel({
                                 'h-8 w-32',
                                 isEdited && 'border-blue-500 bg-blue-50 dark:bg-blue-950'
                               )}>
-                                <SelectValue placeholder="Selecionar" />
+                                <SelectValue placeholder={tx("Selecionar")} />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value={EMPTY_SELECT_VALUE}>Não informado</SelectItem>
+                                <SelectItem value={EMPTY_SELECT_VALUE}>{tx("Não informado")}</SelectItem>
                                 {fieldConfig.options.map((option) => (
                                   <SelectItem key={option.value} value={option.value}>
                                     {option.label}
@@ -660,20 +661,20 @@ export function DataValidationPanel({
                               {sourceInfo?.name || value.source_code}
                             </Badge>
                             {value.collection_method === 'AUTOMATIC' ? (
-                              <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0">API</Badge>
+                              <Badge className="bg-green-600 text-white text-[10px] px-1.5 py-0">{tx("API")}</Badge>
                             ) : value.collection_method === 'BATCH' ? (
-                              <Badge className="bg-cyan-600 text-white text-[10px] px-1.5 py-0">Trimestral</Badge>
+                              <Badge className="bg-cyan-600 text-white text-[10px] px-1.5 py-0">{tx("Trimestral")}</Badge>
                             ) : (
-                              <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Manual</Badge>
+                              <Badge variant="destructive" className="text-[10px] px-1.5 py-0">{tx("Manual")}</Badge>
                             )}
                             {/* Selo de reaproveitamento do cache municipal (fonte oficial indisponível) */}
                             {/Reaproveitado do cache municipal/i.test((value as any).notes || '') && (
                               <Badge
                                 variant="outline"
                                 className="text-[10px] px-1.5 py-0 border-amber-500/60 text-amber-700 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-300"
-                                title="A fonte oficial não respondeu no momento da coleta. Reaproveitamos o último dado oficial validado deste mesmo município."
+                                title={tx("A fonte oficial não respondeu no momento da coleta. Reaproveitamos o último dado oficial validado deste mesmo município.")}
                               >
-                                Reaproveitado
+                                {tx("Reaproveitado")}
                               </Badge>
                             )}
                           </div>
@@ -700,11 +701,11 @@ export function DataValidationPanel({
                                 <TooltipTrigger asChild>
                                   <Badge variant="default" className="bg-green-500 cursor-help">
                                     <CheckCircle2 className="h-3 w-3 mr-1" />
-                                    Confirmado
+                                    {tx("Confirmado")}
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="text-xs">Dado revisado, salvo e confirmado</p>
+                                  <p className="text-xs">{tx("Dado revisado, salvo e confirmado")}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -714,11 +715,11 @@ export function DataValidationPanel({
                                 <TooltipTrigger asChild>
                                   <Badge variant="secondary" className="cursor-help">
                                     <AlertCircle className="h-3 w-3 mr-1" />
-                                    Aguardando revisão
+                                    {tx("Aguardando revisão")}
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p className="text-xs">Selecione e clique "Validar" para confirmar este dado</p>
+                                  <p className="text-xs">{tx("Selecione e clique \"Validar\" para confirmar este dado")}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -732,7 +733,7 @@ export function DataValidationPanel({
                               onClick={() => handleUnvalidate(value.id)}
                               disabled={unvalidateValues.isPending}
                             >
-                              Desvalidar
+                              {tx("Desvalidar")}
                             </Button>
                           )}
                         </TableCell>

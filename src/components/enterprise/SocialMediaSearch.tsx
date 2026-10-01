@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface PlatformData { handle: string | null; url: string; followers: number | null; sample: string }
 interface Analysis {
   presence_score: number;
@@ -37,7 +38,7 @@ export function SocialMediaSearch({ businessName, location, onAutoFill, onAnalys
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
 
   const run = async () => {
-    if (!businessName?.trim()) { toast.error('Informe o nome'); return; }
+    if (!businessName?.trim()) { toast.error(tx('Informe o nome')); return; }
     setLoading(true); setAnalysis(null);
     try {
       const { data, error } = await supabase.functions.invoke('search-social-media', { body: { businessName, location } });
@@ -47,7 +48,7 @@ export function SocialMediaSearch({ businessName, location, onAutoFill, onAnalys
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, businessName, location, searchedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_PRESENCA_DIGITAL: a.presence_score });
-      toast.success('Presença digital analisada');
+      toast.success(tx('Presença digital analisada'));
     } catch (e: any) {
       console.error(e); toast.error(e?.message || 'Falha ao analisar redes');
     } finally { setLoading(false); }
@@ -68,20 +69,20 @@ export function SocialMediaSearch({ businessName, location, onAutoFill, onAnalys
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Instagram className="h-3 w-3" /> Presença</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Instagram className="h-3 w-3" /> {tx("Presença")}</div>
               <div className="text-2xl font-bold">{analysis.presence_score}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
               <Progress value={analysis.presence_score} className="h-1 mt-2" />
               <Badge variant="outline" className={`mt-2 text-[10px] capitalize ${TIER_COLOR[analysis.presence_tier]}`}>{analysis.presence_tier}</Badge>
             </div>
             <div className="p-3 rounded-lg border bg-card text-xs space-y-1">
-              <div className="flex justify-between"><span className="text-muted-foreground">Plataformas ativas</span><span className="font-bold">{analysis.active_platforms.length}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{tx("Plataformas ativas")}</span><span className="font-bold">{analysis.active_platforms.length}</span></div>
               <div className="flex justify-between pt-1 border-t"><span className="text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" />Seguidores (est.)</span><span className="font-bold">{analysis.total_followers_estimated.toLocaleString('pt-BR')}</span></div>
             </div>
           </div>
 
           {Object.keys(analysis.platforms).length > 0 && (
             <div className="space-y-1">
-              <div className="text-xs font-medium">Perfis detectados</div>
+              <div className="text-xs font-medium">{tx("Perfis detectados")}</div>
               <div className="space-y-1">
                 {Object.entries(analysis.platforms).map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between p-2 rounded border bg-card text-xs">
@@ -101,7 +102,7 @@ export function SocialMediaSearch({ businessName, location, onAutoFill, onAnalys
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

@@ -6,6 +6,7 @@ import { TrendingUp, Loader2, Search, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Analysis {
   seasonality_score: number; // 0-100 (quão pronunciada é a sazonalidade)
   amplitude_pct: number; // diferença pico vs baixa
@@ -127,9 +128,9 @@ export function TariffSeasonalitySearch({ pricingData, demandData, eventsData, o
       onAnalysisCapture?.({ ...a, derivedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_SAZONALIDADE_TARIFARIA: a.seasonality_score });
       if (a.pattern === 'sem_dados') {
-        toast.warning('Sazonalidade: fontes upstream ausentes — rode Demanda/Eventos/Preço primeiro');
+        toast.warning(tx('Sazonalidade: fontes upstream ausentes — rode Demanda/Eventos/Preço primeiro'));
       } else {
-        toast.success('Sazonalidade tarifária derivada');
+        toast.success(tx('Sazonalidade tarifária derivada'));
       }
     } catch (e: any) {
       console.error(e); toast.error(e?.message || 'Falha ao derivar sazonalidade');
@@ -151,20 +152,20 @@ export function TariffSeasonalitySearch({ pricingData, demandData, eventsData, o
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> Amplitude</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><TrendingUp className="h-3 w-3" /> {tx("Amplitude")}</div>
               <div className="text-2xl font-bold">{analysis.amplitude_pct}<span className="text-sm font-normal text-muted-foreground">%</span></div>
               <Progress value={analysis.amplitude_pct} className="h-1 mt-2" />
               <Badge variant="outline" className={`mt-2 text-[10px] capitalize ${PATTERN_COLOR[analysis.pattern]}`}>{analysis.pattern.replace(/_/g, ' ')}</Badge>
             </div>
             <div className="p-3 rounded-lg border bg-card space-y-2 text-xs">
               <div>
-                <div className="text-muted-foreground flex items-center gap-1 mb-1"><Calendar className="h-3 w-3" /> Picos</div>
+                <div className="text-muted-foreground flex items-center gap-1 mb-1"><Calendar className="h-3 w-3" /> {tx("Picos")}</div>
                 <div className="flex flex-wrap gap-1">
                   {analysis.peak_months.length ? analysis.peak_months.map((m) => <Badge key={m} variant="secondary" className="text-[10px] capitalize">{m}</Badge>) : <span className="text-muted-foreground">—</span>}
                 </div>
               </div>
               <div>
-                <div className="text-muted-foreground mb-1">Baixas</div>
+                <div className="text-muted-foreground mb-1">{tx("Baixas")}</div>
                 <div className="flex flex-wrap gap-1">
                   {analysis.low_months.length ? analysis.low_months.map((m) => <Badge key={m} variant="outline" className="text-[10px] capitalize">{m}</Badge>) : <span className="text-muted-foreground">—</span>}
                 </div>
@@ -174,7 +175,7 @@ export function TariffSeasonalitySearch({ pricingData, demandData, eventsData, o
 
           {analysis.sources.length > 0 && (
             <div>
-              <div className="text-xs font-medium mb-1">Fontes cruzadas</div>
+              <div className="text-xs font-medium mb-1">{tx("Fontes cruzadas")}</div>
               <div className="flex flex-wrap gap-1">
                 {analysis.sources.map((s) => <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>)}
               </div>
@@ -183,7 +184,7 @@ export function TariffSeasonalitySearch({ pricingData, demandData, eventsData, o
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

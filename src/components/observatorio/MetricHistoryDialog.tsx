@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Loader2, LineChart as LineIcon } from "lucide-react";
 
+import { tx } from "@/i18n/t";
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 interface Props {
@@ -49,7 +50,7 @@ export function MetricHistoryDialog({ metricId, metricName, unit }: Props) {
       <Button
         size="sm"
         variant="ghost"
-        title="Ver histórico"
+        title={tx("Ver histórico")}
         onClick={() => setOpen(true)}
       >
         <LineIcon className="h-3 w-3" />
@@ -66,7 +67,7 @@ export function MetricHistoryDialog({ metricId, metricName, unit }: Props) {
             </div>
           ) : series.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Nenhum dado registrado ainda para este indicador.
+              {tx("Nenhum dado registrado ainda para este indicador.")}
             </p>
           ) : (
             <div className="h-72 w-full">

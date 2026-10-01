@@ -105,7 +105,7 @@ export function ProjectTimeline({ project, phases, milestones }: Props) {
         {milestones.length > 0 && (
           <div className="pt-2 border-t">
             <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-              <MilestoneIcon className="h-3 w-3" /> Marcos
+              <MilestoneIcon className="h-3 w-3" /> {tx("Marcos")}
             </p>
             <div className="relative h-10">
               <div className="absolute top-1/2 left-0 right-0 border-t border-dashed" />

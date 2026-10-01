@@ -161,7 +161,7 @@ function ModuleCard({ m }: { m: ModuleManifest }) {
               }
             >
               <ClipboardCopy className="h-3.5 w-3.5" />
-              JSON
+              {tx("JSON")}
             </Button>
             <Button
               variant="outline"
@@ -441,8 +441,7 @@ export function ModuleLibrary() {
               {tx("Biblioteca de Módulos")}
             </CardTitle>
             <CardDescription>
-              Catálogo interno dos blocos funcionais do SISTUR — copie paths, tabelas ou o
-              manifesto JSON completo para reutilizar em outros projetos.
+              {tx("Catálogo interno dos blocos funcionais do SISTUR — copie paths, tabelas ou o manifesto JSON completo para reutilizar em outros projetos.")}
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">

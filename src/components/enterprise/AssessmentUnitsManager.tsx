@@ -24,6 +24,7 @@ import {
 import { MapPin, Plus, Trash2, Check, ChevronsUpDown, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { tx } from "@/i18n/t";
 export interface DraftUnit {
   destination_id: string;
   destination_name: string;
@@ -96,12 +97,10 @@ export function AssessmentUnitsManager({
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <MapPin className="h-4 w-4 text-primary" />
-          Unidades do diagnóstico
+          {tx("Unidades do diagnóstico")}
         </CardTitle>
         <CardDescription>
-          Adicione um município por unidade do empreendimento. O diagnóstico
-          será <strong>único</strong>, mas a coleta e a análise serão feitas
-          por unidade — refletindo as diferenças de contexto de cada localidade.
+          {tx("Adicione um município por unidade do empreendimento. O diagnóstico será")} <strong>{tx("único")}</strong>{tx(", mas a coleta e a análise serão feitas por unidade — refletindo as diferenças de contexto de cada localidade.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -118,7 +117,7 @@ export function AssessmentUnitsManager({
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
               <Command>
-                <CommandInput placeholder="Buscar município..." />
+                <CommandInput placeholder={tx("Buscar município...")} />
                 <CommandList>
                   <CommandEmpty>
                     {available.length === 0
@@ -149,15 +148,15 @@ export function AssessmentUnitsManager({
 
         {value.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-6">
-            Nenhuma unidade adicionada ainda. Clique em <strong>Adicionar unidade</strong> para começar.
+            {tx("Nenhuma unidade adicionada ainda. Clique em")} <strong>{tx("Adicionar unidade")}</strong> {tx("para começar.")}
           </p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Município</TableHead>
-                <TableHead>Nome da unidade</TableHead>
-                <TableHead className="text-center w-24">Principal</TableHead>
+                <TableHead>{tx("Município")}</TableHead>
+                <TableHead>{tx("Nome da unidade")}</TableHead>
+                <TableHead className="text-center w-24">{tx("Principal")}</TableHead>
                 <TableHead className="text-right w-16"></TableHead>
               </TableRow>
             </TableHeader>
@@ -182,7 +181,7 @@ export function AssessmentUnitsManager({
                     <button
                       type="button"
                       onClick={() => updateUnit(idx, { is_primary: true })}
-                      aria-label="Marcar como principal"
+                      aria-label={tx("Marcar como principal")}
                       className={cn(
                         'inline-flex items-center justify-center w-7 h-7 rounded-full transition-colors',
                         u.is_primary ? 'bg-amber-100 text-amber-600' : 'text-muted-foreground hover:bg-muted',

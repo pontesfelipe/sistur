@@ -6,6 +6,7 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
+import { tx } from "@/i18n/t";
 interface ModuleRouteProps {
   module: ModuleKey;
   children: React.ReactNode;
@@ -25,22 +26,21 @@ export function ModuleRoute({ module, children, fallbackTo }: ModuleRouteProps) 
   if (!isModuleEnabled(module)) {
     if (fallbackTo) return <Navigate to={fallbackTo} replace />;
     return (
-      <AppLayout title="Módulo indisponível">
+      <AppLayout title={tx("Módulo indisponível")}>
         <div className="max-w-xl mx-auto py-12">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="h-5 w-5 text-muted-foreground" />
-                Módulo não habilitado
+                {tx("Módulo não habilitado")}
               </CardTitle>
               <CardDescription>
-                Este módulo não está incluído no pacote contratado pela sua organização.
-                Entre em contato com o administrador para solicitar a ativação.
+                {tx("Este módulo não está incluído no pacote contratado pela sua organização. Entre em contato com o administrador para solicitar a ativação.")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="outline">
-                <Link to="/">Voltar ao Dashboard</Link>
+                <Link to="/">{tx("Voltar ao Dashboard")}</Link>
               </Button>
             </CardContent>
           </Card>

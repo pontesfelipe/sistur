@@ -322,7 +322,7 @@ const EduDashboard = () => {
                   </div>
                   <Button variant="ghost" size="sm" className="w-full mt-2" asChild>
                     <Link to={`/edu/catalogo?pillar=${pillar}`}>
-                      Explorar <ChevronRight className="h-3 w-3 ml-1" />
+                      {tx("Explorar")} <ChevronRight className="h-3 w-3 ml-1" />
                     </Link>
                   </Button>
                 </CardContent>

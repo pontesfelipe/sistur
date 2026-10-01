@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner, NoDataError } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Analysis {
   telecom_score: number;
   telecom_tier: string;
@@ -54,7 +55,7 @@ export function TelecomCoverageSearch({ destinationId, onAutoFill, onAnalysisCap
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, destinationId, searchedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_CONECTIVIDADE_TELECOM: a.telecom_score });
-      toast.success('Conectividade telecom analisada');
+      toast.success(tx('Conectividade telecom analisada'));
     } catch (e: any) {
       if (e?.name !== 'NoDataError') {
         console.error(e);
@@ -85,7 +86,7 @@ export function TelecomCoverageSearch({ destinationId, onAutoFill, onAnalysisCap
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Signal className="h-3 w-3" /> Score Telecom</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Signal className="h-3 w-3" /> {tx("Score Telecom")}</div>
               <div className="text-2xl font-bold">{analysis.telecom_score}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
               <Progress value={analysis.telecom_score} className="h-1 mt-2" />
               <Badge variant="outline" className={`mt-2 text-[10px] capitalize ${TIER_COLOR[analysis.telecom_tier] ?? ''}`}>{analysis.telecom_tier}</Badge>
@@ -93,13 +94,13 @@ export function TelecomCoverageSearch({ destinationId, onAutoFill, onAnalysisCap
             <div className="p-3 rounded-lg border bg-card space-y-1 text-xs">
               <div className="flex items-center justify-between"><span className="text-muted-foreground">4G</span><span className="font-bold">{analysis.coverage_4g_pct.toFixed(0)}%</span></div>
               <div className="flex items-center justify-between"><span className="text-muted-foreground">5G</span><span className="font-bold">{analysis.coverage_5g_pct.toFixed(0)}%</span></div>
-              <div className="flex items-center justify-between pt-1 border-t"><span className="text-muted-foreground flex items-center gap-1"><Wifi className="h-3 w-3" /> Wi-Fi público</span><span className="font-bold">{analysis.wifi_public_score.toFixed(0)}/100</span></div>
+              <div className="flex items-center justify-between pt-1 border-t"><span className="text-muted-foreground flex items-center gap-1"><Wifi className="h-3 w-3" /> {tx("Wi-Fi público")}</span><span className="font-bold">{analysis.wifi_public_score.toFixed(0)}/100</span></div>
             </div>
           </div>
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

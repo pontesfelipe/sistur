@@ -43,12 +43,12 @@ interface OrgUser {
 }
 
 const ROLE_INFO: Record<string, { label: string; color: string }> = {
-  ADMIN: { label: 'Administrador', color: 'bg-red-500/20 text-red-700 dark:text-red-400' },
-  ORG_ADMIN: { label: 'Admin Org', color: 'bg-orange-500/20 text-orange-700 dark:text-orange-400' },
-  ANALYST: { label: 'Analista', color: 'bg-blue-500/20 text-blue-700 dark:text-blue-400' },
-  VIEWER: { label: 'Visualizador', color: 'bg-muted text-muted-foreground' },
-  ESTUDANTE: { label: 'Estudante', color: 'bg-green-500/20 text-green-700 dark:text-green-400' },
-  PROFESSOR: { label: 'Professor', color: 'bg-purple-500/20 text-purple-700 dark:text-purple-400' },
+  ADMIN: { label: tx('Administrador'), color: 'bg-red-500/20 text-red-700 dark:text-red-400' },
+  ORG_ADMIN: { label: tx('Admin Org'), color: 'bg-orange-500/20 text-orange-700 dark:text-orange-400' },
+  ANALYST: { label: tx('Analista'), color: 'bg-blue-500/20 text-blue-700 dark:text-blue-400' },
+  VIEWER: { label: tx('Visualizador'), color: 'bg-muted text-muted-foreground' },
+  ESTUDANTE: { label: tx('Estudante'), color: 'bg-green-500/20 text-green-700 dark:text-green-400' },
+  PROFESSOR: { label: tx('Professor'), color: 'bg-purple-500/20 text-purple-700 dark:text-purple-400' },
 };
 
 // Roles that ORG_ADMIN can assign

@@ -24,6 +24,7 @@ import { useDestinations } from '@/hooks/useDestinations';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+import { tx } from "@/i18n/t";
 const fileIcon = (type: string) => {
   if (type.includes('pdf')) return <FileText className="h-5 w-5 text-destructive" />;
   if (type.includes('spreadsheet') || type.includes('csv') || type.includes('excel'))
@@ -62,16 +63,16 @@ export default function KnowledgeBase() {
   const destsWithFiles = (destinations as any[]).filter((d: any) => filesByDest.has(d.id));
 
   return (
-    <AppLayout title="Base de Conhecimento">
+    <AppLayout title={tx("Base de Conhecimento")}>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <BookOpen className="h-6 w-6 text-primary" />
-              Base de Conhecimento
+              {tx("Base de Conhecimento")}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Documentos de referência organizados por destino — usados automaticamente em diagnósticos e relatórios
+              {tx("Documentos de referência organizados por destino — usados automaticamente em diagnósticos e relatórios")}
             </p>
           </div>
           <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} destinations={destinations} />
@@ -80,7 +81,7 @@ export default function KnowledgeBase() {
         {/* Search */}
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar arquivo..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+          <Input placeholder={tx("Buscar arquivo...")} value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
         </div>
 
         {isLoading ? (
@@ -91,10 +92,10 @@ export default function KnowledgeBase() {
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <FolderOpen className="h-12 w-12 mb-3 opacity-50" />
-              <p className="text-lg font-medium">Nenhum arquivo encontrado</p>
-              <p className="text-sm">Faça upload de documentos para criar sua base de conhecimento</p>
+              <p className="text-lg font-medium">{tx("Nenhum arquivo encontrado")}</p>
+              <p className="text-sm">{tx("Faça upload de documentos para criar sua base de conhecimento")}</p>
               <Button variant="outline" className="mt-4" onClick={() => setUploadOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" /> Upload de arquivo
+                <Plus className="h-4 w-4 mr-2" /> {tx("Upload de arquivo")}
               </Button>
             </CardContent>
           </Card>
@@ -103,7 +104,7 @@ export default function KnowledgeBase() {
             {/* Global files */}
             {globalFiles.length > 0 && (
               <DestinationGroup
-                label="Global (toda organização)"
+                label={tx("Global (toda organização)")}
                 icon={<Globe className="h-4 w-4 text-primary" />}
                 files={globalFiles}
                 destinations={destinations}
@@ -197,15 +198,15 @@ function FileCard({ file, destinations }: { file: KBFile; destinations: any[] })
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Remover arquivo?</AlertDialogTitle>
+                <AlertDialogTitle>{tx("Remover arquivo?")}</AlertDialogTitle>
                 <AlertDialogDescription>
                   O arquivo "{file.file_name}" será removido da base de conhecimento.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogCancel>{tx("Cancelar")}</AlertDialogCancel>
                 <AlertDialogAction onClick={() => deleteFile.mutate(file)} className="bg-destructive text-destructive-foreground">
-                  Remover
+                  {tx("Remover")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -301,11 +302,11 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
       onOpenChange(v);
     }}>
       <DialogTrigger asChild>
-        <Button><Upload className="h-4 w-4 mr-2" /> Upload de arquivo</Button>
+        <Button><Upload className="h-4 w-4 mr-2" /> {tx("Upload de arquivo")}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Upload para Base de Conhecimento</DialogTitle>
+          <DialogTitle>{tx("Upload para Base de Conhecimento")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -326,7 +327,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
               ) : (
                 <div className="flex flex-col items-center gap-1 text-muted-foreground">
                   <Upload className="h-6 w-6" />
-                  <span className="text-sm">Clique para selecionar</span>
+                  <span className="text-sm">{tx("Clique para selecionar")}</span>
                   <span className="text-xs">PDF, DOCX, XLSX, CSV, TXT (máx. 20MB)</span>
                 </div>
               )}
@@ -338,7 +339,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
             <div className="flex items-center justify-between text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Verificando relevância do arquivo...
+                {tx("Verificando relevância do arquivo...")}
               </div>
               <Button
                 variant="ghost"
@@ -349,7 +350,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
                   setModerationResult({ approved: true, reason: 'Moderação cancelada — upload permitido', relevance_score: 50 });
                 }}
               >
-                Cancelar verificação
+                {tx("Cancelar verificação")}
               </Button>
             </div>
           )}
@@ -363,7 +364,7 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
             <div className="flex items-start gap-2 text-sm bg-destructive/5 border border-destructive/20 rounded-lg p-3">
               <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-destructive">Arquivo rejeitado</p>
+                <p className="font-medium text-destructive">{tx("Arquivo rejeitado")}</p>
                 <p className="text-destructive/80">{moderationResult.reason}</p>
               </div>
             </div>
@@ -372,23 +373,23 @@ function UploadDialog({ open, onOpenChange, destinations }: { open: boolean; onO
           <Select value={destId || 'global'} onValueChange={v => setDestId(v === 'global' ? '' : v)}>
             <SelectTrigger>
               <MapPin className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Destino" />
+              <SelectValue placeholder={tx("Destino")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="global">Global (toda organização)</SelectItem>
               {(destinations as any[]).map((d: any) => <SelectItem key={d.id} value={d.id}>{d.name}{d.uf ? ` — ${d.uf}` : ''}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Textarea placeholder="Descrição (opcional)" value={description} onChange={e => setDescription(e.target.value)} rows={2} />
+          <Textarea placeholder={tx("Descrição (opcional)")} value={description} onChange={e => setDescription(e.target.value)} rows={2} />
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger><SelectValue placeholder="Categoria" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={tx("Categoria")} /></SelectTrigger>
             <SelectContent>
               {KB_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{tx("Cancelar")}</Button>
           <Button onClick={handleSubmit} disabled={!file || !isApproved || moderating || uploadFile.isPending}>
             {uploadFile.isPending ? 'Enviando...' : 'Upload'}
           </Button>

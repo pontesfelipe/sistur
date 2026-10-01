@@ -45,12 +45,12 @@ function ReplyList({ discussion, isInstructor }: { discussion: CourseDiscussion;
               <span className="text-sm font-medium">{r.author_name}</span>
               {r.is_instructor_reply && (
                 <Badge variant="secondary" className="text-xs">
-                  <GraduationCap className="h-3 w-3 mr-1" /> Instrutor
+                  <GraduationCap className="h-3 w-3 mr-1" /> {tx("Instrutor")}
                 </Badge>
               )}
               {r.is_accepted && (
                 <Badge variant="default" className="text-xs bg-success">
-                  <CheckCircle2 className="h-3 w-3 mr-1" /> Aceita
+                  <CheckCircle2 className="h-3 w-3 mr-1" /> {tx("Aceita")}
                 </Badge>
               )}
             </div>
@@ -66,7 +66,7 @@ function ReplyList({ discussion, isInstructor }: { discussion: CourseDiscussion;
               className="mt-2 h-7 text-xs"
               onClick={() => acceptReply.mutate(r.id)}
             >
-              <CheckCircle2 className="h-3 w-3 mr-1" /> Marcar como aceita
+              <CheckCircle2 className="h-3 w-3 mr-1" /> {tx("Marcar como aceita")}
             </Button>
           )}
         </div>
@@ -110,14 +110,14 @@ export function CourseDiscussionsPanel({ trainingId, isInstructor = false }: Pro
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-base flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" /> Fórum de Dúvidas
+              <MessageSquare className="h-4 w-4" /> {tx("Fórum de Dúvidas")}
             </CardTitle>
             <CardDescription>
               {discussions.length} {discussions.length === 1 ? 'tópico' : 'tópicos'} neste curso
             </CardDescription>
           </div>
           <Button size="sm" variant="outline" onClick={() => setShowForm((v) => !v)}>
-            <Plus className="h-4 w-4 mr-1" /> Nova pergunta
+            <Plus className="h-4 w-4 mr-1" /> {tx("Nova pergunta")}
           </Button>
         </div>
       </CardHeader>

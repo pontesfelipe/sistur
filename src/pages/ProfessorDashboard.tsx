@@ -38,6 +38,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+import { tx } from "@/i18n/t";
 // ─── Convite por e-mail ───
 function InviteStudentsDialog() {
   const [open, setOpen] = useState(false);
@@ -62,11 +63,11 @@ function InviteStudentsDialog() {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Mail className="h-4 w-4 mr-2" />
-          Convidar por e-mail
+          {tx("Convidar por e-mail")}
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Convidar estudantes</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{tx("Convidar estudantes")}</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <div className="space-y-2">
             <Label>E-mails (separados por vírgula, ponto e vírgula ou linha)</Label>
@@ -74,7 +75,7 @@ function InviteStudentsDialog() {
               rows={4}
               value={emails}
               onChange={e => setEmails(e.target.value)}
-              placeholder="aluno1@email.com, aluno2@email.com"
+              placeholder={tx("aluno1@email.com, aluno2@email.com")}
             />
             <p className="text-xs text-muted-foreground">
               {parsed.length} e-mail(s) válido(s). Máximo de 30 por envio.
@@ -86,7 +87,7 @@ function InviteStudentsDialog() {
               rows={3}
               value={message}
               onChange={e => setMessage(e.target.value)}
-              placeholder="Ex.: Turma de Planejamento Turístico — 2º semestre."
+              placeholder={tx("Ex.: Turma de Planejamento Turístico — 2º semestre.")}
             />
           </div>
           <p className="text-xs text-muted-foreground">
@@ -113,7 +114,7 @@ function ReferralPanel() {
   const copyCode = () => {
     if (referralCode?.code) {
       navigator.clipboard.writeText(referralCode.code);
-      toast.success('Código copiado!');
+      toast.success(tx('Código copiado!'));
     }
   };
 
@@ -121,7 +122,7 @@ function ReferralPanel() {
     if (referralCode?.code) {
       const link = `${window.location.origin}/auth?ref=${referralCode.code}`;
       navigator.clipboard.writeText(link);
-      toast.success('Link copiado!');
+      toast.success(tx('Link copiado!'));
     }
   };
 
@@ -131,10 +132,10 @@ function ReferralPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Gift className="h-5 w-5 text-primary" />
-            Programa de Referência
+            {tx("Programa de Referência")}
           </CardTitle>
           <CardDescription>
-            Convide 5 estudantes e ganhe isenção na mensalidade enquanto mantiver 5+ alunos ativos.
+            {tx("Convide 5 estudantes e ganhe isenção na mensalidade enquanto mantiver 5+ alunos ativos.")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -146,13 +147,13 @@ function ReferralPanel() {
                 <div className="flex-1 bg-muted rounded-lg px-4 py-3 font-mono text-lg font-bold tracking-widest text-center">
                   {referralCode.code}
                 </div>
-                <Button variant="outline" size="icon" onClick={copyCode} title="Copiar código">
+                <Button variant="outline" size="icon" onClick={copyCode} title={tx("Copiar código")}>
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
               <Button variant="secondary" className="w-full" onClick={copyLink}>
                 <Copy className="h-4 w-4 mr-2" />
-                Copiar link de convite
+                {tx("Copiar link de convite")}
               </Button>
               <InviteStudentsDialog />
             </>
@@ -167,8 +168,8 @@ function ReferralPanel() {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Alunos indicados ativos</p>
-              <p className="text-3xl font-bold">{count || 0} <span className="text-sm text-muted-foreground font-normal">/ 5 necessários</span></p>
+              <p className="text-sm font-medium">{tx("Alunos indicados ativos")}</p>
+              <p className="text-3xl font-bold">{count || 0} <span className="text-sm text-muted-foreground font-normal">{tx("/ 5 necessários")}</span></p>
             </div>
             <Badge variant={qualifies ? 'default' : 'secondary'} className={qualifies ? 'bg-green-600' : ''}>
               {qualifies ? '✓ Isenção ativa' : 'Em progresso'}
@@ -194,15 +195,15 @@ function ReferralPanel() {
         <CardContent>
           {!students?.length ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Nenhum aluno indicado ainda. Compartilhe seu código!
+              {tx("Nenhum aluno indicado ainda. Compartilhe seu código!")}
             </p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Data</TableHead>
+                  <TableHead>{tx("Nome")}</TableHead>
+                  <TableHead>{tx("Status")}</TableHead>
+                  <TableHead>{tx("Data")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -315,7 +316,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={onBack}>← Voltar</Button>
+      <Button variant="ghost" onClick={onBack}>{tx("← Voltar")}</Button>
 
       <ClassroomDiaryPanel classroomId={classroomId} />
 
@@ -326,19 +327,19 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Membros</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> {tx("Membros")}</CardTitle>
             <CardDescription>{students?.length || 0} membros</CardDescription>
           </div>
           <Dialog open={showAddMember} onOpenChange={setShowAddMember}>
             <DialogTrigger asChild>
-              <Button size="sm"><UserPlus className="h-4 w-4 mr-2" />Adicionar</Button>
+              <Button size="sm"><UserPlus className="h-4 w-4 mr-2" />{tx("Adicionar")}</Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Adicionar membro</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{tx("Adicionar membro")}</DialogTitle></DialogHeader>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {allAvailable.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-4 text-center">
-                    Nenhum usuário disponível. Convide pessoas com seu código de referência ou código da organização.
+                    {tx("Nenhum usuário disponível. Convide pessoas com seu código de referência ou código da organização.")}
                   </p>
                 ) : (
                   allAvailable.map(p => (
@@ -366,13 +367,13 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
         <CardContent>
           {loadingStudents ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> :
             !students?.length ? (
-              <p className="text-sm text-muted-foreground text-center py-4">Nenhum membro.</p>
+              <p className="text-sm text-muted-foreground text-center py-4">{tx("Nenhum membro.")}</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Adicionado em</TableHead>
+                    <TableHead>{tx("Nome")}</TableHead>
+                    <TableHead>{tx("Adicionado em")}</TableHead>
                     <TableHead className="w-16" />
                   </TableRow>
                 </TableHeader>
@@ -398,16 +399,16 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2"><ClipboardList className="h-5 w-5" /> Atividades</CardTitle>
-            <CardDescription>Trilhas, treinamentos, provas e conteúdo atribuídos</CardDescription>
+            <CardTitle className="flex items-center gap-2"><ClipboardList className="h-5 w-5" /> {tx("Atividades")}</CardTitle>
+            <CardDescription>{tx("Trilhas, treinamentos, provas e conteúdo atribuídos")}</CardDescription>
           </div>
           <Button size="sm" onClick={() => setShowAddAssignment(true)}>
-            <Plus className="h-4 w-4 mr-2" />Nova Atividade
+            <Plus className="h-4 w-4 mr-2" />{tx("Nova Atividade")}
           </Button>
         </CardHeader>
         <CardContent>
           {!assignments?.length ? (
-            <p className="text-sm text-muted-foreground text-center py-4">Nenhuma atividade criada.</p>
+            <p className="text-sm text-muted-foreground text-center py-4">{tx("Nenhuma atividade criada.")}</p>
           ) : (
             <div className="space-y-3">
               {assignments.map(a => {
@@ -452,7 +453,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                               {targetCount} aluno(s)
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-xs">Toda a turma</Badge>
+                            <Badge variant="outline" className="text-xs">{tx("Toda a turma")}</Badge>
                           )}
                           {overrides.length > 0 && (
                             <Badge variant="outline" className="text-xs">
@@ -471,7 +472,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                           className="gap-1"
                         >
                           <Eye className="h-3.5 w-3.5" />
-                          Acompanhar
+                          {tx("Acompanhar")}
                         </Button>
                       )}
                       <Button size="icon" variant="ghost" onClick={() => confirmDeleteAssignment(a)}>
@@ -504,7 +505,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
       <DeleteConfirmDialog
         open={showDeleteAssignment}
         onOpenChange={setShowDeleteAssignment}
-        title="Excluir Atividade"
+        title={tx("Excluir Atividade")}
         description={`Tem certeza que deseja excluir a atividade "${deletingAssignment?.title}"?`}
         onConfirm={() => {
           deleteAssignment.mutate(deletingAssignment.id, {
@@ -538,7 +539,7 @@ function ClassroomsPanel() {
   }
 
   const handleCreate = () => {
-    if (!form.name.trim()) { toast.error('Nome obrigatório'); return; }
+    if (!form.name.trim()) { toast.error(tx('Nome obrigatório')); return; }
     createClassroom.mutate({
       name: form.name,
       description: form.description || undefined,
@@ -567,7 +568,7 @@ function ClassroomsPanel() {
   };
 
   const handleEdit = () => {
-    if (!editForm.name.trim()) { toast.error('Nome obrigatório'); return; }
+    if (!editForm.name.trim()) { toast.error(tx('Nome obrigatório')); return; }
     updateClassroom.mutate({
       id: editingClassroom.id,
       name: editForm.name,
@@ -596,35 +597,35 @@ function ClassroomsPanel() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Minhas Salas</h3>
-          <p className="text-sm text-muted-foreground">Gerencie turmas, alunos e atividades</p>
+          <h3 className="text-lg font-semibold">{tx("Minhas Salas")}</h3>
+          <p className="text-sm text-muted-foreground">{tx("Gerencie turmas, alunos e atividades")}</p>
         </div>
         <Dialog open={showCreate} onOpenChange={setShowCreate}>
           <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />Nova Sala</Button>
+            <Button><Plus className="h-4 w-4 mr-2" />{tx("Nova Sala")}</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Criar Nova Sala</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{tx("Criar Nova Sala")}</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Nome da sala *</Label>
-                <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Ex: Turismo Sustentável 2026.1" />
+                <Label>{tx("Nome da sala *")}</Label>
+                <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder={tx("Ex: Turismo Sustentável 2026.1")} />
               </div>
               <div className="space-y-2">
-                <Label>Disciplina</Label>
-                <Input value={form.discipline} onChange={e => setForm(p => ({ ...p, discipline: e.target.value }))} placeholder="Ex: Gestão de Destinos" />
+                <Label>{tx("Disciplina")}</Label>
+                <Input value={form.discipline} onChange={e => setForm(p => ({ ...p, discipline: e.target.value }))} placeholder={tx("Ex: Gestão de Destinos")} />
               </div>
               <div className="space-y-2">
-                <Label>Descrição</Label>
+                <Label>{tx("Descrição")}</Label>
                 <Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Início do período</Label>
+                  <Label>{tx("Início do período")}</Label>
                   <Input type="date" value={form.period_start} onChange={e => setForm(p => ({ ...p, period_start: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Fim do período</Label>
+                  <Label>{tx("Fim do período")}</Label>
                   <Input type="date" value={form.period_end} onChange={e => setForm(p => ({ ...p, period_end: e.target.value }))} />
                 </div>
               </div>
@@ -643,8 +644,8 @@ function ClassroomsPanel() {
         <Card>
           <CardContent className="py-12 text-center">
             <School className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Nenhuma sala criada</p>
-            <p className="text-sm text-muted-foreground">Crie sua primeira sala para organizar alunos e atividades.</p>
+            <p className="text-lg font-medium">{tx("Nenhuma sala criada")}</p>
+            <p className="text-sm text-muted-foreground">{tx("Crie sua primeira sala para organizar alunos e atividades.")}</p>
           </CardContent>
         </Card>
       ) : (
@@ -666,10 +667,10 @@ function ClassroomsPanel() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openEdit(c); }}>
-                          <Pencil className="h-4 w-4 mr-2" /> Editar
+                          <Pencil className="h-4 w-4 mr-2" /> {tx("Editar")}
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); openDelete(c); }}>
-                          <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                          <Trash2 className="h-4 w-4 mr-2" /> {tx("Excluir")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -697,37 +698,37 @@ function ClassroomsPanel() {
       {/* Edit Dialog */}
       <Dialog open={showEdit} onOpenChange={setShowEdit}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Editar Sala</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tx("Editar Sala")}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Nome da sala *</Label>
+              <Label>{tx("Nome da sala *")}</Label>
               <Input value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} />
             </div>
             <div className="space-y-2">
-              <Label>Disciplina</Label>
+              <Label>{tx("Disciplina")}</Label>
               <Input value={editForm.discipline} onChange={e => setEditForm(p => ({ ...p, discipline: e.target.value }))} />
             </div>
             <div className="space-y-2">
-              <Label>Descrição</Label>
+              <Label>{tx("Descrição")}</Label>
               <Textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Início do período</Label>
+                <Label>{tx("Início do período")}</Label>
                 <Input type="date" value={editForm.period_start} onChange={e => setEditForm(p => ({ ...p, period_start: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label>Fim do período</Label>
+                <Label>{tx("Fim do período")}</Label>
                 <Input type="date" value={editForm.period_end} onChange={e => setEditForm(p => ({ ...p, period_end: e.target.value }))} />
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label>{tx("Status")}</Label>
               <Select value={editForm.status} onValueChange={v => setEditForm(p => ({ ...p, status: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Ativa</SelectItem>
-                  <SelectItem value="archived">Arquivada</SelectItem>
+                  <SelectItem value="active">{tx("Ativa")}</SelectItem>
+                  <SelectItem value="archived">{tx("Arquivada")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -743,7 +744,7 @@ function ClassroomsPanel() {
       <DeleteConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
-        title="Excluir Sala"
+        title={tx("Excluir Sala")}
         description={`Tem certeza que deseja excluir a sala "${editingClassroom?.name}"? Todos os alunos e atividades associados serão removidos.`}
         onConfirm={handleDelete}
         isPending={deleteClassroom.isPending}
@@ -761,10 +762,10 @@ export default function ProfessorDashboard() {
   const groupLabel = isEduOnly ? 'Salas de Aula' : 'Grupos / Salas';
 
   return (
-    <AppLayout title="Painel do Professor">
+    <AppLayout title={tx("Painel do Professor")}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-display font-bold">Painel do Professor</h1>
+          <h1 className="text-3xl font-display font-bold">{tx("Painel do Professor")}</h1>
           <p className="text-muted-foreground">
             Gerencie {isEduOnly ? 'salas de aula, alunos e atividades' : 'grupos de capacitação, salas e atividades'}
           </p>
@@ -773,32 +774,32 @@ export default function ProfessorDashboard() {
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="flex-wrap">
             <TabsTrigger value="overview" className="flex items-center gap-2">
-              <LayoutDashboard className="h-4 w-4" /> Visão Geral
+              <LayoutDashboard className="h-4 w-4" /> {tx("Visão Geral")}
             </TabsTrigger>
             {canManageContent && (
               <TabsTrigger value="content" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" /> Gestão de Conteúdo
+                <Settings className="h-4 w-4" /> {tx("Gestão de Conteúdo")}
               </TabsTrigger>
             )}
             <TabsTrigger value="groups" className="flex items-center gap-2">
               <School className="h-4 w-4" /> {groupLabel}
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" /> Analytics
+              <BarChart3 className="h-4 w-4" /> {tx("Analytics")}
             </TabsTrigger>
             {canManageContent && (
               <TabsTrigger value="exams" className="flex items-center gap-2">
-                <ClipboardList className="h-4 w-4" /> Gestão de Provas
+                <ClipboardList className="h-4 w-4" /> {tx("Gestão de Provas")}
               </TabsTrigger>
             )}
             {(isProfessor || isAdmin) && (
               <TabsTrigger value="referral" className="flex items-center gap-2">
-                <Gift className="h-4 w-4" /> Referências
+                <Gift className="h-4 w-4" /> {tx("Referências")}
               </TabsTrigger>
             )}
             {canManageContent && (
               <TabsTrigger value="compliance" className="flex items-center gap-2">
-                <Shield className="h-4 w-4" /> Compliance
+                <Shield className="h-4 w-4" /> {tx("Compliance")}
               </TabsTrigger>
             )}
           </TabsList>

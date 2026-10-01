@@ -397,13 +397,11 @@ const ExamTaking = () => {
               </div>
               <div className="pt-4 border-t space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Número de questões: <strong>{exam.question_ids?.length || 0}</strong>
+                  {tx("Número de questões:")} <strong>{exam.question_ids?.length || 0}</strong>
                 </p>
                 <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
                   <p className="text-xs text-blue-700 dark:text-blue-300">
-                    <strong>{tx('Aviso de Privacidade:')}</strong> Para fins de integridade acadêmica, 
-                    registramos informações básicas do dispositivo durante o exame. Esses dados 
-                    são automaticamente removidos após 90 dias conforme nossa política de retenção.
+                    <strong>{tx('Aviso de Privacidade:')}</strong> {tx("Para fins de integridade acadêmica, registramos informações básicas do dispositivo durante o exame. Esses dados são automaticamente removidos após 90 dias conforme nossa política de retenção.")}
                   </p>
                 </div>
               </div>
@@ -574,7 +572,7 @@ const ExamTaking = () => {
       <AlertDialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Enviar Exame?</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Enviar Exame?")}</AlertDialogTitle>
             <AlertDialogDescription>
               Você respondeu {Object.keys(answers).length} de {totalQuestions} questões.
               {Object.keys(answers).length < totalQuestions && (

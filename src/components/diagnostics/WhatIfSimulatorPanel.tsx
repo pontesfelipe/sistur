@@ -79,8 +79,7 @@ export function WhatIfSimulatorPanel({ indicatorScores, pillarScores }: Props) {
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription>
-          Simulação local: ajuste os indicadores para estimar o efeito no índice de cada pilar. Nada é salvo e o
-          diagnóstico oficial permanece inalterado.
+          {tx("Simulação local: ajuste os indicadores para estimar o efeito no índice de cada pilar. Nada é salvo e o diagnóstico oficial permanece inalterado.")}
         </AlertDescription>
       </Alert>
 

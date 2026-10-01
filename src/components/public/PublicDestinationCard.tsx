@@ -6,6 +6,7 @@ import { CERTIFICATION_LABELS, CERTIFICATION_COLORS, CertificationLevel } from '
 import { Award, MapPin, CheckCircle, AlertTriangle, ExternalLink, Info } from 'lucide-react';
 import { getSeverityLabel as canonicalSeverityLabel, type Severity } from '@/types/sistur';
 
+import { tx } from "@/i18n/t";
 interface PublicDestinationCardProps {
   destination: PublicDestinationSummary;
   onViewDetails?: (id: string) => void;
@@ -66,7 +67,7 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
         {destination.territorial_impact_index !== null && (
           <div className="p-4 rounded-lg bg-primary/5">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-sm text-muted-foreground">Índice de Impacto Territorial</span>
+              <span className="text-sm text-muted-foreground">{tx("Índice de Impacto Territorial")}</span>
               <span className="text-2xl font-bold">
                 {(destination.territorial_impact_index * 100).toFixed(0)}%
               </span>
@@ -115,12 +116,12 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
         {destination.ready_for_visitors ? (
           <div className="flex items-center gap-2 p-2 rounded-lg bg-severity-good/10 text-severity-good text-sm">
             <CheckCircle className="w-4 h-4" />
-            Destino pronto para visitação consciente
+            {tx("Destino pronto para visitação consciente")}
           </div>
         ) : (
           <div className="flex items-center gap-2 p-2 rounded-lg bg-severity-moderate/10 text-severity-moderate text-sm">
             <AlertTriangle className="w-4 h-4" />
-            Destino com limitações identificadas
+            {tx("Destino com limitações identificadas")}
           </div>
         )}
 
@@ -128,7 +129,7 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
         {destination.sdg_alignments && destination.sdg_alignments.length > 0 && (
           <div className="pt-2 border-t">
             <div className="text-xs font-medium text-muted-foreground mb-2">
-              Alinhamento com ODS da ONU
+              {tx("Alinhamento com ODS da ONU")}
             </div>
             <div className="flex flex-wrap gap-1">
               {destination.sdg_alignments.map((sdg) => (
@@ -155,7 +156,7 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
             onClick={() => onViewDetails(destination.destination_id)}
           >
             <ExternalLink className="w-4 h-4 mr-2" />
-            Ver Detalhes
+            {tx("Ver Detalhes")}
           </Button>
         </CardFooter>
       )}

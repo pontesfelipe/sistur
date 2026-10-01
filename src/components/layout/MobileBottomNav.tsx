@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useEffect } from 'react';
 
+import { tx } from "@/i18n/t";
 interface NavItem {
   name: string;
   href: string;
@@ -72,7 +73,7 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   };
 
   return (
-    <nav aria-label="Navegação principal" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-2xl backdrop-saturate-150 border-t border-border/50 safe-bottom">
+    <nav aria-label={tx("Navegação principal")} className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-2xl backdrop-saturate-150 border-t border-border/50 safe-bottom">
       <div className="flex items-center justify-around h-16 px-2">
         {displayItems.map((item) => {
           const isActive = location.pathname === item.href || 
@@ -114,7 +115,7 @@ export function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
         {/* Menu button */}
         <button
           onClick={handleMenuClick}
-          aria-label="Abrir menu de navegação"
+          aria-label={tx("Abrir menu de navegação")}
           className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 touch-target no-tap-highlight mobile-active text-muted-foreground"
         >
           <Menu className="h-5 w-5" />

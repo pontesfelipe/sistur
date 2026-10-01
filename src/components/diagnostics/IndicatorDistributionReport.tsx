@@ -32,21 +32,21 @@ type DiagnosisTier = 'COMPLETE' | 'MEDIUM' | 'SMALL';
 type Pillar = 'RA' | 'OE' | 'AO';
 
 const scopeConfig: Record<IndicatorScope, { label: string; color: string; icon: typeof Landmark }> = {
-  territorial: { label: 'Territorial', color: 'hsl(217, 91%, 60%)', icon: Landmark },
-  enterprise: { label: 'Empresarial', color: 'hsl(38, 92%, 50%)', icon: Hotel },
-  both: { label: 'Ambos', color: 'hsl(270, 50%, 60%)', icon: Globe },
+  territorial: { label: tx('Territorial'), color: 'hsl(217, 91%, 60%)', icon: Landmark },
+  enterprise: { label: tx('Empresarial'), color: 'hsl(38, 92%, 50%)', icon: Hotel },
+  both: { label: tx('Ambos'), color: 'hsl(270, 50%, 60%)', icon: Globe },
 };
 
 const tierConfig: Record<DiagnosisTier, { label: string; color: string; icon: typeof Target }> = {
-  SMALL: { label: 'Essencial', color: 'hsl(142, 71%, 45%)', icon: Zap },
-  MEDIUM: { label: 'Estratégico', color: 'hsl(38, 92%, 50%)', icon: Gauge },
-  COMPLETE: { label: 'Integral', color: 'hsl(221, 83%, 53%)', icon: Target },
+  SMALL: { label: tx('Essencial'), color: 'hsl(142, 71%, 45%)', icon: Zap },
+  MEDIUM: { label: tx('Estratégico'), color: 'hsl(38, 92%, 50%)', icon: Gauge },
+  COMPLETE: { label: tx('Integral'), color: 'hsl(221, 83%, 53%)', icon: Target },
 };
 
 const pillarConfig: Record<Pillar, { label: string; fullName: string; color: string }> = {
-  RA: { label: 'I-RA', fullName: 'Relações Ambientais', color: 'hsl(142, 71%, 45%)' },
-  OE: { label: 'I-OE', fullName: 'Organização Estrutural', color: 'hsl(217, 91%, 60%)' },
-  AO: { label: 'I-AO', fullName: 'Ações Operacionais', color: 'hsl(38, 92%, 50%)' },
+  RA: { label: tx('I-RA'), fullName: 'Relações Ambientais', color: 'hsl(142, 71%, 45%)' },
+  OE: { label: tx('I-OE'), fullName: 'Organização Estrutural', color: 'hsl(217, 91%, 60%)' },
+  AO: { label: tx('I-AO'), fullName: 'Ações Operacionais', color: 'hsl(38, 92%, 50%)' },
 };
 
 export function IndicatorDistributionReport() {

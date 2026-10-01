@@ -4,6 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Send, Loader2, Mic, MicOff, Paperclip, X, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { tx } from "@/i18n/t";
 interface ChatInputProps {
   input: string;
   onInputChange: (value: string) => void;
@@ -40,7 +41,7 @@ export function ChatInput({
             <span className="inline-flex items-center gap-2 rounded-md bg-muted px-2 py-1 text-xs">
               <FileText className="h-3 w-3" />
               <span className="max-w-[220px] truncate">{pendingFile.name}</span>
-              <button type="button" onClick={() => onFileSelected?.(null)} aria-label="Remover anexo">
+              <button type="button" onClick={() => onFileSelected?.(null)} aria-label={tx("Remover anexo")}>
                 <X className="h-3 w-3" />
               </button>
             </span>
@@ -68,7 +69,7 @@ export function ChatInput({
                   onChange={(e) => { onFileSelected(e.target.files?.[0] ?? null); e.target.value = ''; }}
                 />
                 <Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={isLoading}
-                  onClick={() => fileRef.current?.click()} title="Anexar arquivo (até 10 MB)">
+                  onClick={() => fileRef.current?.click()} title={tx("Anexar arquivo (até 10 MB)")}>
                   <Paperclip className="h-4 w-4" />
                 </Button>
               </>
@@ -85,7 +86,7 @@ export function ChatInput({
               {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
           </div>
-          <Button type="submit" size="icon" className="h-8 w-8" disabled={isLoading || (!input.trim() && !pendingFile)} title="Enviar">
+          <Button type="submit" size="icon" className="h-8 w-8" disabled={isLoading || (!input.trim() && !pendingFile)} title={tx("Enviar")}>
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </div>

@@ -19,6 +19,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+import { tx } from "@/i18n/t";
 interface Props {
   entityType: CommentEntityType;
   entityId: string;
@@ -125,7 +126,7 @@ export function CommentsPanel({ entityType, entityId, orgId, title, description 
           </div>
         ) : (comments?.length ?? 0) === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">
-            Nenhum comentário ainda. Seja a primeira pessoa a comentar.
+            {tx("Nenhum comentário ainda. Seja a primeira pessoa a comentar.")}
           </p>
         ) : (
           <ul className="space-y-4">
@@ -141,7 +142,7 @@ export function CommentsPanel({ entityType, entityId, orgId, title, description 
                       {formatDistanceToNow(new Date(c.created_at), { addSuffix: true, locale: getDateLocale() })}
                     </span>
                     {c.edited_at && (
-                      <Badge variant="outline" className="text-[10px] px-1 py-0">editado</Badge>
+                      <Badge variant="outline" className="text-[10px] px-1 py-0">{tx("editado")}</Badge>
                     )}
                     {(c.author_id === user?.id) && (
                       <Button
@@ -149,7 +150,7 @@ export function CommentsPanel({ entityType, entityId, orgId, title, description 
                         variant="ghost"
                         className="h-6 w-6 ml-auto"
                         onClick={() => del.mutate(c.id)}
-                        title="Remover"
+                        title={tx("Remover")}
                       >
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
                       </Button>
@@ -165,7 +166,7 @@ export function CommentsPanel({ entityType, entityId, orgId, title, description 
         {/* Composer */}
         {canLoading ? null : !canComment ? (
           <p className="text-xs text-muted-foreground border-t pt-4">
-            Você não tem permissão para comentar aqui. Contas pendentes de aprovação ou em organização padrão não podem participar de discussões.
+            {tx("Você não tem permissão para comentar aqui. Contas pendentes de aprovação ou em organização padrão não podem participar de discussões.")}
           </p>
         ) : (
           <div className="border-t pt-4 space-y-2 relative">
@@ -173,7 +174,7 @@ export function CommentsPanel({ entityType, entityId, orgId, title, description 
               ref={taRef}
               value={body}
               onChange={handleChange}
-              placeholder="Escreva um comentário. Use @ para mencionar alguém da sua organização."
+              placeholder={tx("Escreva um comentário. Use @ para mencionar alguém da sua organização.")}
               rows={3}
               maxLength={4000}
             />
@@ -203,7 +204,7 @@ export function CommentsPanel({ entityType, entityId, orgId, title, description 
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <>
-                    <Send className="h-4 w-4 mr-2" /> Enviar
+                    <Send className="h-4 w-4 mr-2" /> {tx("Enviar")}
                   </>
                 )}
               </Button>

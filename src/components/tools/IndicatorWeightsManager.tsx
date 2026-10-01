@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AlertTriangle, RotateCcw, Save, Scale, Sparkles } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 type Pillar = 'RA' | 'OE' | 'AO';
 
 const PILLAR_NAMES: Record<Pillar, string> = {
@@ -91,7 +92,7 @@ export function IndicatorWeightsManager() {
       reset[i.id] = Number(i.weight) || 0;
     });
     setDrafts(reset);
-    toast.info('Alterações descartadas neste pilar');
+    toast.info(tx('Alterações descartadas neste pilar'));
   };
 
   const handleNormalizePillar = () => {
@@ -102,7 +103,7 @@ export function IndicatorWeightsManager() {
     }, 0);
 
     if (sum === 0) {
-      toast.error('Soma dos pesos é zero — não é possível normalizar');
+      toast.error(tx('Soma dos pesos é zero — não é possível normalizar'));
       setNormalizing(false);
       return;
     }
@@ -141,7 +142,7 @@ export function IndicatorWeightsManager() {
       });
 
       if (dirtyIndicators.length === 0) {
-        toast.info('Nenhuma alteração para salvar');
+        toast.info(tx('Nenhuma alteração para salvar'));
         setSaving(false);
         return;
       }
@@ -164,7 +165,7 @@ export function IndicatorWeightsManager() {
       window.dispatchEvent(new Event('indicator-weights-saved'));
     } catch (err: any) {
       console.error('Error saving weights:', err);
-      toast.error('Erro ao salvar pesos: ' + (err.message || 'desconhecido'));
+      toast.error(tx('Erro ao salvar pesos: ') + (err.message || 'desconhecido'));
     } finally {
       setSaving(false);
     }
@@ -174,7 +175,7 @@ export function IndicatorWeightsManager() {
     return (
       <Card>
         <CardContent className="py-8 text-center text-muted-foreground text-sm">
-          Carregando indicadores...
+          {tx("Carregando indicadores...")}
         </CardContent>
       </Card>
     );
@@ -185,17 +186,17 @@ export function IndicatorWeightsManager() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Scale className="h-5 w-5 text-primary" />
-          Ajuste de Pesos dos Indicadores
+          {tx("Ajuste de Pesos dos Indicadores")}
         </CardTitle>
         <CardDescription>
-          Calibre os pesos relativos dos indicadores em cada pilar. A soma por pilar deve ser 100%.
+          {tx("Calibre os pesos relativos dos indicadores em cada pilar. A soma por pilar deve ser 100%.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="text-xs">
-            Alterações afetam <strong>todos os diagnósticos futuros</strong>. Use "Normalizar" para forçar a soma a 100% mantendo proporções.
+            {tx("Alterações afetam")} <strong>{tx("todos os diagnósticos futuros")}</strong>{tx(". Use \"Normalizar\" para forçar a soma a 100% mantendo proporções.")}
           </AlertDescription>
         </Alert>
 
@@ -215,7 +216,7 @@ export function IndicatorWeightsManager() {
               >
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-sm">{p}</span>
-                  {t.dirty && <Badge variant="secondary" className="text-[10px] h-4">editado</Badge>}
+                  {t.dirty && <Badge variant="secondary" className="text-[10px] h-4">{tx("editado")}</Badge>}
                 </div>
                 <div className={`text-lg font-bold ${valid ? 'text-emerald-600' : 'text-amber-600'}`}>
                   {(t.sum * 100).toFixed(2)}%
@@ -239,7 +240,7 @@ export function IndicatorWeightsManager() {
                 <div>
                   <p className="text-sm font-medium">{PILLAR_NAMES[p]}</p>
                   <p className="text-xs text-muted-foreground">
-                    Soma atual: <span className={isPillarValid ? 'text-emerald-600 font-semibold' : 'text-amber-600 font-semibold'}>
+                    {tx("Soma atual:")} <span className={isPillarValid ? 'text-emerald-600 font-semibold' : 'text-amber-600 font-semibold'}>
                       {(currentTotal * 100).toFixed(2)}%
                     </span>
                     {' • '}
@@ -249,15 +250,15 @@ export function IndicatorWeightsManager() {
                 <div className="flex gap-2 flex-wrap">
                   <Button size="sm" variant="outline" onClick={handleEqualizePillar}>
                     <Sparkles className="h-3.5 w-3.5 mr-1" />
-                    Igualar
+                    {tx("Igualar")}
                   </Button>
                   <Button size="sm" variant="outline" onClick={handleNormalizePillar} disabled={normalizing}>
                     <Scale className="h-3.5 w-3.5 mr-1" />
-                    Normalizar 100%
+                    {tx("Normalizar 100%")}
                   </Button>
                   <Button size="sm" variant="outline" onClick={handleResetPillar}>
                     <RotateCcw className="h-3.5 w-3.5 mr-1" />
-                    Reverter
+                    {tx("Reverter")}
                   </Button>
                   <Button size="sm" onClick={handleSavePillar} disabled={saving || !isPillarValid || dirtyCount === 0}>
                     <Save className="h-3.5 w-3.5 mr-1" />
@@ -270,9 +271,9 @@ export function IndicatorWeightsManager() {
                 <Table>
                   <TableHeader className="sticky top-0 bg-background z-10">
                     <TableRow>
-                      <TableHead className="w-[120px]">Código</TableHead>
-                      <TableHead>Indicador</TableHead>
-                      <TableHead className="w-[140px]">Tema</TableHead>
+                      <TableHead className="w-[120px]">{tx("Código")}</TableHead>
+                      <TableHead>{tx("Indicador")}</TableHead>
+                      <TableHead className="w-[140px]">{tx("Tema")}</TableHead>
                       <TableHead className="w-[140px] text-right">Peso (%)</TableHead>
                     </TableRow>
                   </TableHeader>

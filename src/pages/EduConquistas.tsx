@@ -95,7 +95,7 @@ export default function EduConquistas() {
                 {xp?.current_streak ? (
                   <div className="flex items-center gap-2 text-sm">
                     <Flame className="w-4 h-4 text-orange-500" />
-                    <span>{tx('Streak atual:')} <strong>{xp.current_streak}</strong> dias</span>
+                    <span>{tx('Streak atual:')} <strong>{xp.current_streak}</strong> {tx("dias")}</span>
                     {xp.longest_streak ? (
                       <span className="text-muted-foreground">· recorde {xp.longest_streak}d</span>
                     ) : null}
@@ -113,7 +113,7 @@ export default function EduConquistas() {
                       })
                     }
                   >
-                    <Share2 className="w-4 h-4 mr-2" /> Compartilhar progresso
+                    <Share2 className="w-4 h-4 mr-2" /> {tx("Compartilhar progresso")}
                   </Button>
                 </div>
               </>
@@ -150,7 +150,7 @@ export default function EduConquistas() {
                           className="mt-2 h-7 px-2 text-xs"
                           onClick={() => shareAchievementImage({ title: b.title, subtitle: b.description ?? undefined, emoji: '🏆' })}
                         >
-                          <Share2 className="w-3 h-3 mr-1" /> Compartilhar
+                          <Share2 className="w-3 h-3 mr-1" /> {tx("Compartilhar")}
                         </Button>
                       )}
                     </div>

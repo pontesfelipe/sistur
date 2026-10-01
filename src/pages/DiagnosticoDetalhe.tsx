@@ -670,10 +670,9 @@ const DiagnosticoDetalhe = () => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Voltar para edição?</AlertDialogTitle>
+                  <AlertDialogTitle>{tx("Voltar para edição?")}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Isso irá mudar o status do diagnóstico para "Rascunho" e você poderá editar os dados dos indicadores. 
-                    Após as alterações, será necessário recalcular os índices.
+                    {tx("Isso irá mudar o status do diagnóstico para \"Rascunho\" e você poderá editar os dados dos indicadores. Após as alterações, será necessário recalcular os índices.")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -800,10 +799,9 @@ const DiagnosticoDetalhe = () => {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Adicionar mais dados?</AlertDialogTitle>
+                      <AlertDialogTitle>{tx("Adicionar mais dados?")}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Para adicionar mais dados, o diagnóstico voltará ao status de rascunho e você poderá preencher os indicadores faltantes.
-                        Após as alterações, será necessário recalcular os índices.
+                        {tx("Para adicionar mais dados, o diagnóstico voltará ao status de rascunho e você poderá preencher os indicadores faltantes. Após as alterações, será necessário recalcular os índices.")}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -933,8 +931,7 @@ const DiagnosticoDetalhe = () => {
                   {ignoredIndicators.length} indicador{ignoredIndicators.length !== 1 ? 'es' : ''} ignorado{ignoredIndicators.length !== 1 ? 's' : ''} nesta análise
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Os seguintes indicadores foram marcados como ignorados e não participam do cálculo dos scores, gargalos ou prescrições. 
-                  Isso pode impactar a abrangência da análise.
+                  {tx("Os seguintes indicadores foram marcados como ignorados e não participam do cálculo dos scores, gargalos ou prescrições. Isso pode impactar a abrangência da análise.")}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {ignoredIndicators.map((ind, idx) => (
@@ -997,7 +994,7 @@ const DiagnosticoDetalhe = () => {
               <Target className="h-4 w-4 text-primary" />
               <AlertTitle>{tx('Modo Prescrição ativo')}</AlertTitle>
               <AlertDescription>
-                Exibindo apenas indicadores em <strong>{tx('Atenção')}</strong> ou <strong>{tx('Crítico')}</strong> (score ≤ 66%).
+                {tx("Exibindo apenas indicadores em")} <strong>{tx('Atenção')}</strong> ou <strong>{tx('Crítico')}</strong> (score ≤ 66%).
                 Afeta as abas <strong>{tx('Indicadores')}</strong>, <strong>{tx('Gargalos')}</strong> e <strong>{tx('Tratamento')}</strong>.
                 As demais abas (Radiografia, Normalização, Projeto, Comentários, Linhagem) não são filtradas.
               </AlertDescription>
@@ -1104,7 +1101,7 @@ const DiagnosticoDetalhe = () => {
               </h3>
               <div className="prose prose-sm max-w-none text-muted-foreground">
                 <p>
-                  O destino <strong>{assessmentDestination?.name}</strong>{' '}
+                  {tx("O destino")} <strong>{assessmentDestination?.name}</strong>{' '}
                   apresenta como <strong>{tx('ponto crítico')}</strong> o pilar{' '}
                   <strong className="text-severity-critical">
                     {criticalPillar?.pillar === 'RA'
@@ -1117,7 +1114,7 @@ const DiagnosticoDetalhe = () => {
                   <strong>{Math.round((criticalPillar?.score || 0) * 100)}%</strong>.
                 </p>
                 <p>
-                  Foram identificados <strong>{issues.length} gargalos</strong>{' '}
+                  {tx("Foram identificados")} <strong>{issues.length} gargalos</strong>{' '}
                   principais, dos quais{' '}
                   <strong>
                     {issues.filter((i) => i.severity === 'CRITICO').length} são

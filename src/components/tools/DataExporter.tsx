@@ -17,11 +17,12 @@ import {
   Users
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 type ExportType = 'assessments' | 'destinations' | 'indicators' | 'courses' | 'issues' | 'users';
 
 function downloadCsv(data: Record<string, unknown>[], filename: string) {
   if (data.length === 0) {
-    toast.error('Nenhum dado encontrado para exportar');
+    toast.error(tx('Nenhum dado encontrado para exportar'));
     return;
   }
 
@@ -269,7 +270,7 @@ export function DataExporter() {
       downloadCsv(data, filename);
     } catch (error) {
       console.error('Export error:', error);
-      toast.error('Erro ao exportar dados');
+      toast.error(tx('Erro ao exportar dados'));
     } finally {
       setLoading(false);
     }
@@ -315,23 +316,23 @@ export function DataExporter() {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Download className="h-4 w-4 mr-2" />
-          Exportar Dados
+          {tx("Exportar Dados")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Download className="h-5 w-5 text-primary" />
-            Exportar Dados
+            {tx("Exportar Dados")}
           </DialogTitle>
           <DialogDescription>
-            Exporte dados do SISTUR em formato CSV compatível com Excel
+            {tx("Exporte dados do SISTUR em formato CSV compatível com Excel")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Tipo de Dados</Label>
+            <Label>{tx("Tipo de Dados")}</Label>
             <Select value={exportType} onValueChange={(v) => setExportType(v as ExportType)}>
               <SelectTrigger>
                 <SelectValue />
@@ -340,37 +341,37 @@ export function DataExporter() {
                 <SelectItem value="users">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    Usuários
+                    {tx("Usuários")}
                   </div>
                 </SelectItem>
                 <SelectItem value="assessments">
                   <div className="flex items-center gap-2">
                     <Calculator className="h-4 w-4" />
-                    Diagnósticos
+                    {tx("Diagnósticos")}
                   </div>
                 </SelectItem>
                 <SelectItem value="destinations">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
-                    Destinos
+                    {tx("Destinos")}
                   </div>
                 </SelectItem>
                 <SelectItem value="indicators">
                   <div className="flex items-center gap-2">
                     <FileSpreadsheet className="h-4 w-4" />
-                    Indicadores
+                    {tx("Indicadores")}
                   </div>
                 </SelectItem>
                 <SelectItem value="courses">
                   <div className="flex items-center gap-2">
                     <GraduationCap className="h-4 w-4" />
-                    Cursos
+                    {tx("Cursos")}
                   </div>
                 </SelectItem>
                 <SelectItem value="issues">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4" />
-                    Gargalos
+                    {tx("Gargalos")}
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -395,19 +396,18 @@ export function DataExporter() {
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Exportando...
+                {tx("Exportando...")}
               </>
             ) : (
               <>
                 <Download className="h-4 w-4 mr-2" />
-                Exportar CSV
+                {tx("Exportar CSV")}
               </>
             )}
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">
-            O arquivo será salvo em formato CSV com separador ponto-e-vírgula, 
-            compatível com Excel em português.
+            {tx("O arquivo será salvo em formato CSV com separador ponto-e-vírgula, compatível com Excel em português.")}
           </p>
         </div>
       </DialogContent>

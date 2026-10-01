@@ -11,6 +11,7 @@ import { useReviewSnapshots, useCompetitors } from '@/hooks/useEnterpriseReputat
 import { useEnterpriseProfile } from '@/hooks/useEnterpriseProfiles';
 import { useProfile } from '@/hooks/useProfile';
 
+import { tx } from "@/i18n/t";
 const SOURCES = ['Google', 'TripAdvisor', 'Booking', 'Expedia', 'Decolar', 'Airbnb', 'Outro'];
 
 interface Props {
@@ -78,7 +79,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
               <Award className="h-5 w-5 text-indigo-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">Reputação Competitiva</CardTitle>
+              <CardTitle className="text-lg">{tx("Reputação Competitiva")}</CardTitle>
               <CardDescription>{destinationName} — histórico de reviews e benchmarking</CardDescription>
             </div>
           </div>
@@ -90,15 +91,15 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
       <CardContent>
         <Tabs defaultValue="historico" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="historico" className="gap-2"><History className="h-4 w-4" />Histórico de Reviews</TabsTrigger>
-            <TabsTrigger value="concorrentes" className="gap-2"><Trophy className="h-4 w-4" />Concorrentes</TabsTrigger>
+            <TabsTrigger value="historico" className="gap-2"><History className="h-4 w-4" />{tx("Histórico de Reviews")}</TabsTrigger>
+            <TabsTrigger value="concorrentes" className="gap-2"><Trophy className="h-4 w-4" />{tx("Concorrentes")}</TabsTrigger>
           </TabsList>
 
           {/* HISTÓRICO */}
           <TabsContent value="historico" className="space-y-4">
             {snapshots.length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-6 border border-dashed rounded-lg">
-                Nenhum snapshot. Registre periodicamente as notas e volumes para acompanhar a evolução.
+                {tx("Nenhum snapshot. Registre periodicamente as notas e volumes para acompanhar a evolução.")}
               </div>
             )}
 
@@ -115,10 +116,10 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
                     <div className="text-xs text-muted-foreground">{s.review_volume} reviews</div>
                   )}
                   {s.response_rate != null && (
-                    <div className="text-xs">Resposta: <span className="font-semibold">{Number(s.response_rate).toFixed(0)}%</span></div>
+                    <div className="text-xs">{tx("Resposta:")} <span className="font-semibold">{Number(s.response_rate).toFixed(0)}%</span></div>
                   )}
                   {s.sentiment_positive_pct != null && (
-                    <div className="text-xs">Pos.: <span className="font-semibold text-emerald-600">{Number(s.sentiment_positive_pct).toFixed(0)}%</span></div>
+                    <div className="text-xs">{tx("Pos.:")} <span className="font-semibold text-emerald-600">{Number(s.sentiment_positive_pct).toFixed(0)}%</span></div>
                   )}
                   <div className="ml-auto" />
                   <Button variant="ghost" size="icon" onClick={() => removeSnapshot.mutate(s.id)}>
@@ -129,7 +130,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
             </div>
 
             <div className="border-t pt-4 space-y-3">
-              <Label>Novo snapshot</Label>
+              <Label>{tx("Novo snapshot")}</Label>
               <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
                 <div className="md:col-span-2">
                   <Select value={newSnapshot.source} onValueChange={(v) => setNewSnapshot((p) => ({ ...p, source: v }))}>
@@ -139,16 +140,16 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
                     </SelectContent>
                   </Select>
                 </div>
-                <Input className="md:col-span-2" type="number" step="0.01" placeholder="Nota (0-10)"
+                <Input className="md:col-span-2" type="number" step="0.01" placeholder={tx("Nota (0-10)")}
                   value={newSnapshot.rating} onChange={(e) => setNewSnapshot((p) => ({ ...p, rating: e.target.value }))} />
-                <Input className="md:col-span-2" type="number" placeholder="Volume"
+                <Input className="md:col-span-2" type="number" placeholder={tx("Volume")}
                   value={newSnapshot.review_volume} onChange={(e) => setNewSnapshot((p) => ({ ...p, review_volume: e.target.value }))} />
-                <Input className="md:col-span-2" type="number" placeholder="% Resposta"
+                <Input className="md:col-span-2" type="number" placeholder={tx("% Resposta")}
                   value={newSnapshot.response_rate} onChange={(e) => setNewSnapshot((p) => ({ ...p, response_rate: e.target.value }))} />
-                <Input className="md:col-span-2" type="number" placeholder="% Positivo"
+                <Input className="md:col-span-2" type="number" placeholder={tx("% Positivo")}
                   value={newSnapshot.sentiment_positive_pct} onChange={(e) => setNewSnapshot((p) => ({ ...p, sentiment_positive_pct: e.target.value }))} />
                 <Button className="md:col-span-2" onClick={handleAddSnapshot} disabled={!newSnapshot.rating}>
-                  <Plus className="h-4 w-4 mr-1" />Salvar
+                  <Plus className="h-4 w-4 mr-1" />{tx("Salvar")}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -168,7 +169,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
                 </div>
               </div>
               <div className="rounded-lg border p-3 bg-muted/30">
-                <div className="text-xs text-muted-foreground">Média dos concorrentes</div>
+                <div className="text-xs text-muted-foreground">{tx("Média dos concorrentes")}</div>
                 <div className="text-2xl font-bold">{avgCompetitorRating > 0 ? avgCompetitorRating.toFixed(2) : '—'}</div>
                 <div className="text-xs text-muted-foreground mt-1">{competitors.length} capturados</div>
               </div>
@@ -196,7 +197,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
             <div className="space-y-2">
               {competitors.length === 0 && (
                 <div className="text-sm text-muted-foreground text-center py-6 border border-dashed rounded-lg">
-                  Nenhum concorrente. Use a busca acima ou adicione manualmente abaixo.
+                  {tx("Nenhum concorrente. Use a busca acima ou adicione manualmente abaixo.")}
                 </div>
               )}
               {competitors.map((c) => (
@@ -230,13 +231,13 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
             </div>
 
             <div className="border-t pt-4 space-y-3">
-              <Label>Adicionar concorrente manualmente</Label>
+              <Label>{tx("Adicionar concorrente manualmente")}</Label>
               <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
-                <Input className="md:col-span-6" placeholder="Nome do concorrente"
+                <Input className="md:col-span-6" placeholder={tx("Nome do concorrente")}
                   value={newCompetitor.name} onChange={(e) => setNewCompetitor((p) => ({ ...p, name: e.target.value }))} />
-                <Input className="md:col-span-2" type="number" step="0.01" placeholder="Nota (0-10)"
+                <Input className="md:col-span-2" type="number" step="0.01" placeholder={tx("Nota (0-10)")}
                   value={newCompetitor.rating} onChange={(e) => setNewCompetitor((p) => ({ ...p, rating: e.target.value }))} />
-                <Input className="md:col-span-2" type="number" placeholder="Volume"
+                <Input className="md:col-span-2" type="number" placeholder={tx("Volume")}
                   value={newCompetitor.review_volume} onChange={(e) => setNewCompetitor((p) => ({ ...p, review_volume: e.target.value }))} />
                 <Button className="md:col-span-2"
                   disabled={!newCompetitor.name.trim()}
@@ -251,7 +252,7 @@ export function EnterpriseReputationPanel({ destinationId, destinationName, onCl
                     });
                     setNewCompetitor({ name: '', rating: '', review_volume: '' });
                   }}>
-                  <Plus className="h-4 w-4 mr-1" />Adicionar
+                  <Plus className="h-4 w-4 mr-1" />{tx("Adicionar")}
                 </Button>
               </div>
             </div>

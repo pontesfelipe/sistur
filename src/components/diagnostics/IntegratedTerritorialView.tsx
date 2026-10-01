@@ -21,9 +21,9 @@ const PILLAR_LABELS: Record<string, string> = {
 };
 
 const SEVERITY_STYLE: Record<string, { color: string; label: string }> = {
-  CRITICO: { color: 'text-severity-critical', label: 'Crítico' },
-  MODERADO: { color: 'text-severity-moderate', label: 'Atenção' },
-  BOM: { color: 'text-severity-good', label: 'Adequado' },
+  CRITICO: { color: 'text-severity-critical', label: tx('Crítico') },
+  MODERADO: { color: 'text-severity-moderate', label: tx('Atenção') },
+  BOM: { color: 'text-severity-good', label: tx('Adequado') },
 };
 
 function pct(score: number | undefined) {
@@ -189,9 +189,7 @@ export function IntegratedTerritorialView({
               {tx('Gargalos críticos no município')}
             </CardTitle>
             <CardDescription>
-              Esses gargalos territoriais podem afetar o desempenho do empreendimento mesmo
-              quando a gestão interna está adequada — considere ações conjuntas com a
-              secretaria de turismo, consórcio ou trade local.
+              {tx("Esses gargalos territoriais podem afetar o desempenho do empreendimento mesmo quando a gestão interna está adequada — considere ações conjuntas com a secretaria de turismo, consórcio ou trade local.")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">

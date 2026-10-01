@@ -283,7 +283,7 @@ export function PostCard({ post, onClick, onEdit }: PostCardProps) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir post?</AlertDialogTitle>
+            <AlertDialogTitle>{tx("Excluir post?")}</AlertDialogTitle>
             <AlertDialogDescription>
               {tx('Esta ação não pode ser desfeita. O post e todas as respostas serão permanentemente excluídos.')}
             </AlertDialogDescription>

@@ -24,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 import { useEnterpriseBrands, BrandType } from '@/hooks/useEnterpriseBrands';
 
+import { tx } from "@/i18n/t";
 interface BrandSelectorProps {
   value: string | null;
   onChange: (brandId: string | null, brandName: string | null) => void;
@@ -81,7 +82,7 @@ export function BrandSelector({
       {showLabel && (
         <Label className="flex items-center gap-2">
           <Building2 className="h-4 w-4 text-primary" />
-          Marca / Rede de Hotéis
+          {tx("Marca / Rede de Hotéis")}
         </Label>
       )}
       <div className="flex gap-2">
@@ -98,7 +99,7 @@ export function BrandSelector({
                 {isLoading ? (
                   <span className="flex items-center gap-2 text-muted-foreground">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    Carregando marcas...
+                    {tx("Carregando marcas...")}
                   </span>
                 ) : selected ? (
                   <span className="flex items-center gap-2">
@@ -109,7 +110,7 @@ export function BrandSelector({
                   </span>
                 ) : (
                   <span className="text-muted-foreground">
-                    Selecione uma marca existente ou crie uma nova
+                    {tx("Selecione uma marca existente ou crie uma nova")}
                   </span>
                 )}
               </span>
@@ -121,10 +122,10 @@ export function BrandSelector({
             align="start"
           >
             <Command>
-              <CommandInput placeholder="Buscar marca..." />
+              <CommandInput placeholder={tx("Buscar marca...")} />
               <CommandList>
                 <CommandEmpty>
-                  Nenhuma marca encontrada. Clique em <strong>Nova marca</strong>.
+                  {tx("Nenhuma marca encontrada. Clique em")} <strong>{tx("Nova marca")}</strong>.
                 </CommandEmpty>
                 <CommandGroup>
                   {brands.map((b) => (
@@ -160,7 +161,7 @@ export function BrandSelector({
           className="shrink-0"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Nova marca
+          {tx("Nova marca")}
         </Button>
       </div>
       {helperText && (
@@ -170,34 +171,32 @@ export function BrandSelector({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nova marca / rede</DialogTitle>
+            <DialogTitle>{tx("Nova marca / rede")}</DialogTitle>
             <DialogDescription>
-              Uma marca agrupa unidades do mesmo empreendimento em municípios
-              diferentes. Cada unidade mantém seu próprio diagnóstico, e a marca
-              permite análises consolidadas da rede.
+              {tx("Uma marca agrupa unidades do mesmo empreendimento em municípios diferentes. Cada unidade mantém seu próprio diagnóstico, e a marca permite análises consolidadas da rede.")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="brand-name">Nome da marca</Label>
+              <Label htmlFor="brand-name">{tx("Nome da marca")}</Label>
               <Input
                 id="brand-name"
                 value={draftName}
                 onChange={(e) => setDraftName(e.target.value)}
-                placeholder="Ex.: Rede Atlântica, Accor, Hotel da Família"
+                placeholder={tx("Ex.: Rede Atlântica, Accor, Hotel da Família")}
               />
             </div>
             <div className="space-y-2">
-              <Label>Tipo</Label>
+              <Label>{tx("Tipo")}</Label>
               <Select value={draftType} onValueChange={(v) => setDraftType(v as BrandType)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="independent">Independente (1 unidade)</SelectItem>
-                  <SelectItem value="chain">Rede própria</SelectItem>
-                  <SelectItem value="franchise">Franquia</SelectItem>
-                  <SelectItem value="collection">Coleção / soft brand</SelectItem>
+                  <SelectItem value="chain">{tx("Rede própria")}</SelectItem>
+                  <SelectItem value="franchise">{tx("Franquia")}</SelectItem>
+                  <SelectItem value="collection">{tx("Coleção / soft brand")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -213,7 +212,7 @@ export function BrandSelector({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancelar
+              {tx("Cancelar")}
             </Button>
             <Button onClick={handleCreate} disabled={!draftName.trim() || createBrand.isPending}>
               {createBrand.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}

@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Mail, Send, Users, Building2, User, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { tx } from "@/i18n/t";
 interface UserOption {
   user_id: string;
   full_name: string | null;
@@ -29,9 +30,9 @@ type SendMode = 'template' | 'custom';
 type RecipientType = 'user' | 'org';
 
 const TEMPLATE_OPTIONS = [
-  { value: 'access-approved', label: 'Acesso Aprovado', description: 'Notifica que o acesso foi liberado' },
-  { value: 'access-requested', label: 'Solicitação Recebida', description: 'Confirma recebimento de solicitação' },
-  { value: 'custom-message', label: 'Mensagem Personalizada', description: 'E-mail customizado com branding SISTUR' },
+  { value: 'access-approved', label: tx('Acesso Aprovado'), description: tx('Notifica que o acesso foi liberado') },
+  { value: 'access-requested', label: tx('Solicitação Recebida'), description: tx('Confirma recebimento de solicitação') },
+  { value: 'custom-message', label: tx('Mensagem Personalizada'), description: tx('E-mail customizado com branding SISTUR') },
 ];
 
 export function EmailDispatchPanel() {
@@ -110,7 +111,7 @@ export function EmailDispatchPanel() {
       );
     } catch (err) {
       console.error('Failed to fetch users/orgs:', err);
-      toast.error('Erro ao carregar usuários e organizações');
+      toast.error(tx('Erro ao carregar usuários e organizações'));
     } finally {
       setLoading(false);
     }
@@ -156,22 +157,22 @@ export function EmailDispatchPanel() {
   const handleSend = async () => {
     const template = getEffectiveTemplate();
     if (!template) {
-      toast.error('Selecione um template de e-mail');
+      toast.error(tx('Selecione um template de e-mail'));
       return;
     }
 
     if (sendMode === 'custom' && (!customSubject.trim() || !customBody.trim())) {
-      toast.error('Preencha o assunto e o conteúdo do e-mail');
+      toast.error(tx('Preencha o assunto e o conteúdo do e-mail'));
       return;
     }
 
     if (customSubject.length > 200) {
-      toast.error('O assunto deve ter no máximo 200 caracteres');
+      toast.error(tx('O assunto deve ter no máximo 200 caracteres'));
       return;
     }
 
     if (customBody.length > 5000) {
-      toast.error('O conteúdo deve ter no máximo 5000 caracteres');
+      toast.error(tx('O conteúdo deve ter no máximo 5000 caracteres'));
       return;
     }
 
@@ -180,36 +181,36 @@ export function EmailDispatchPanel() {
     try {
       if (recipientType === 'user') {
         if (!selectedUserId) {
-          toast.error('Selecione um usuário');
+          toast.error(tx('Selecione um usuário'));
           setSending(false);
           return;
         }
         const user = users.find(u => u.user_id === selectedUserId);
         if (!user?.email) {
-          toast.error('Usuário sem e-mail cadastrado');
+          toast.error(tx('Usuário sem e-mail cadastrado'));
           setSending(false);
           return;
         }
 
         const success = await sendToUser(user);
         if (success) {
-          toast.success('E-mail enviado com sucesso', {
+          toast.success(tx('E-mail enviado com sucesso'), {
             description: `Para: ${user.email}`,
           });
         } else {
-          toast.error('Falha ao enviar e-mail');
+          toast.error(tx('Falha ao enviar e-mail'));
         }
       } else {
         // Send to org
         if (!selectedOrgId) {
-          toast.error('Selecione uma organização');
+          toast.error(tx('Selecione uma organização'));
           setSending(false);
           return;
         }
 
         const orgUsers = users.filter(u => u.org_id === selectedOrgId && u.email);
         if (orgUsers.length === 0) {
-          toast.error('Nenhum usuário com e-mail nesta organização');
+          toast.error(tx('Nenhum usuário com e-mail nesta organização'));
           setSending(false);
           return;
         }
@@ -245,7 +246,7 @@ export function EmailDispatchPanel() {
       }
     } catch (err) {
       console.error('Send error:', err);
-      toast.error('Erro ao enviar e-mail');
+      toast.error(tx('Erro ao enviar e-mail'));
     } finally {
       setSending(false);
     }
@@ -258,10 +259,10 @@ export function EmailDispatchPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Mail className="h-5 w-5 text-primary" />
-          Disparar E-mails
+          {tx("Disparar E-mails")}
         </CardTitle>
         <CardDescription>
-          Envie templates existentes ou mensagens personalizadas com o visual SISTUR
+          {tx("Envie templates existentes ou mensagens personalizadas com o visual SISTUR")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -273,7 +274,7 @@ export function EmailDispatchPanel() {
           <>
             {/* Mode Selection */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Tipo de E-mail</Label>
+              <Label className="text-sm font-medium">{tx("Tipo de E-mail")}</Label>
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant={sendMode === 'template' ? 'default' : 'outline'}
@@ -282,7 +283,7 @@ export function EmailDispatchPanel() {
                   className="justify-start"
                 >
                   <Mail className="h-4 w-4 mr-2" />
-                  Template Existente
+                  {tx("Template Existente")}
                 </Button>
                 <Button
                   variant={sendMode === 'custom' ? 'default' : 'outline'}
@@ -291,7 +292,7 @@ export function EmailDispatchPanel() {
                   className="justify-start"
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  Mensagem Personalizada
+                  {tx("Mensagem Personalizada")}
                 </Button>
               </div>
             </div>
@@ -299,10 +300,10 @@ export function EmailDispatchPanel() {
             {/* Template Selection */}
             {sendMode === 'template' && (
               <div className="space-y-2">
-                <Label>Template</Label>
+                <Label>{tx("Template")}</Label>
                 <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione um template..." />
+                    <SelectValue placeholder={tx("Selecione um template...")} />
                   </SelectTrigger>
                   <SelectContent>
                     {TEMPLATE_OPTIONS.filter(t => t.value !== 'custom-message').map(t => (
@@ -323,12 +324,12 @@ export function EmailDispatchPanel() {
               <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle2 className="h-4 w-4 text-primary" />
-                  O e-mail será enviado com logo, cores e layout do SISTUR automaticamente
+                  {tx("O e-mail será enviado com logo, cores e layout do SISTUR automaticamente")}
                 </div>
                 <div className="space-y-2">
-                  <Label>Assunto</Label>
+                  <Label>{tx("Assunto")}</Label>
                   <Input
-                    placeholder="Ex: Atualização importante do SISTUR"
+                    placeholder={tx("Ex: Atualização importante do SISTUR")}
                     value={customSubject}
                     onChange={e => setCustomSubject(e.target.value)}
                     maxLength={200}
@@ -336,9 +337,9 @@ export function EmailDispatchPanel() {
                   <span className="text-xs text-muted-foreground">{customSubject.length}/200</span>
                 </div>
                 <div className="space-y-2">
-                  <Label>Conteúdo</Label>
+                  <Label>{tx("Conteúdo")}</Label>
                   <Textarea
-                    placeholder="Escreva o conteúdo do e-mail aqui. Use quebras de linha para separar parágrafos."
+                    placeholder={tx("Escreva o conteúdo do e-mail aqui. Use quebras de linha para separar parágrafos.")}
                     value={customBody}
                     onChange={e => setCustomBody(e.target.value)}
                     rows={6}
@@ -353,7 +354,7 @@ export function EmailDispatchPanel() {
 
             {/* Recipient Selection */}
             <div className="space-y-4">
-              <Label className="text-sm font-medium">Destinatário</Label>
+              <Label className="text-sm font-medium">{tx("Destinatário")}</Label>
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant={recipientType === 'user' ? 'default' : 'outline'}
@@ -362,7 +363,7 @@ export function EmailDispatchPanel() {
                   className="justify-start"
                 >
                   <User className="h-4 w-4 mr-2" />
-                  Usuário Específico
+                  {tx("Usuário Específico")}
                 </Button>
                 <Button
                   variant={recipientType === 'org' ? 'default' : 'outline'}
@@ -371,16 +372,16 @@ export function EmailDispatchPanel() {
                   className="justify-start"
                 >
                   <Building2 className="h-4 w-4 mr-2" />
-                  Organização
+                  {tx("Organização")}
                 </Button>
               </div>
 
               {recipientType === 'user' ? (
                 <div className="space-y-2">
-                  <Label>Usuário</Label>
+                  <Label>{tx("Usuário")}</Label>
                   <Select value={selectedUserId} onValueChange={setSelectedUserId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione um usuário..." />
+                      <SelectValue placeholder={tx("Selecione um usuário...")} />
                     </SelectTrigger>
                     <SelectContent>
                       {users.filter(u => u.email).map(u => (
@@ -396,10 +397,10 @@ export function EmailDispatchPanel() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Label>Organização</Label>
+                  <Label>{tx("Organização")}</Label>
                   <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma organização..." />
+                      <SelectValue placeholder={tx("Selecione uma organização...")} />
                     </SelectTrigger>
                     <SelectContent>
                       {orgs.map(o => (
@@ -426,7 +427,7 @@ export function EmailDispatchPanel() {
             {sendProgress.total > 0 && (
               <div className="p-3 bg-muted/50 rounded-lg">
                 <div className="flex items-center justify-between text-sm">
-                  <span>Enviando...</span>
+                  <span>{tx("Enviando...")}</span>
                   <span>{sendProgress.sent}/{sendProgress.total}</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2 mt-2">
@@ -451,12 +452,12 @@ export function EmailDispatchPanel() {
               {sending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Enviando...
+                  {tx("Enviando...")}
                 </>
               ) : (
                 <>
                   <Send className="h-4 w-4 mr-2" />
-                  Enviar E-mail
+                  {tx("Enviar E-mail")}
                 </>
               )}
             </Button>

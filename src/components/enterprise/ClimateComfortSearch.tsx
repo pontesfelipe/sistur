@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 const MONTH_LABELS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 interface MonthSummary { month: number; label: string; temperature_c: number; precipitation_mm: number; rainy_days: number }
@@ -42,7 +43,7 @@ export function ClimateComfortSearch({ destinationId, onAutoFill, onAnalysisCapt
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, searchedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_CONFORTO_CLIMATICO: a.climate_comfort_score });
-      toast.success('Clima analisado');
+      toast.success(tx('Clima analisado'));
     } catch (e: any) {
       console.error(e); toast.error(e?.message || 'Falha ao analisar clima');
     } finally { setLoading(false); }
@@ -62,7 +63,7 @@ export function ClimateComfortSearch({ destinationId, onAutoFill, onAnalysisCapt
           <p className="text-muted-foreground">{analysis.summary}</p>
 
           <div className="p-3 rounded-lg border bg-card">
-            <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Sun className="h-3 w-3" /> Conforto Climático</div>
+            <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Sun className="h-3 w-3" /> {tx("Conforto Climático")}</div>
             <div className="text-2xl font-bold">{analysis.climate_comfort_score}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
             <Progress value={analysis.climate_comfort_score} className="h-1 mt-2" />
           </div>
@@ -87,18 +88,18 @@ export function ClimateComfortSearch({ destinationId, onAutoFill, onAnalysisCapt
 
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div>
-              <div className="font-medium mb-1 flex items-center gap-1"><Sun className="h-3 w-3 text-emerald-600" /> Melhores meses</div>
+              <div className="font-medium mb-1 flex items-center gap-1"><Sun className="h-3 w-3 text-emerald-600" /> {tx("Melhores meses")}</div>
               <div className="flex gap-1 flex-wrap">{analysis.best_months.map((m) => <Badge key={m} variant="secondary" className="text-[10px]">{MONTH_LABELS[m - 1]}</Badge>)}</div>
             </div>
             <div>
-              <div className="font-medium mb-1 flex items-center gap-1"><CloudRain className="h-3 w-3 text-rose-600" /> Meses chuvosos</div>
+              <div className="font-medium mb-1 flex items-center gap-1"><CloudRain className="h-3 w-3 text-rose-600" /> {tx("Meses chuvosos")}</div>
               <div className="flex gap-1 flex-wrap">{analysis.rainy_months.length === 0 ? <span className="text-muted-foreground">—</span> : analysis.rainy_months.map((m) => <Badge key={m} variant="outline" className="text-[10px]">{MONTH_LABELS[m - 1]}</Badge>)}</div>
             </div>
           </div>
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

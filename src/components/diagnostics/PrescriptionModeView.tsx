@@ -161,8 +161,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
           <ListChecks className="h-4 w-4" />
           <AlertTitle>{tx('Nenhum gatilho prescritivo')}</AlertTitle>
           <AlertDescription>
-            Todos os indicadores estão com status Adequado. Não há prescrições
-            corretivas necessárias neste momento.
+            {tx("Todos os indicadores estão com status Adequado. Não há prescrições corretivas necessárias neste momento.")}
           </AlertDescription>
         </Alert>
       )}
@@ -188,7 +187,7 @@ export function PrescriptionModeView({ assessmentId, indicatorScores }: Props) {
                 {tx('Limpar')}
               </Button>
               <Button size="sm" onClick={goToCreateProject}>
-                <FolderKanban className="h-4 w-4 mr-1" /> Criar projeto
+                <FolderKanban className="h-4 w-4 mr-1" /> {tx("Criar projeto")}
               </Button>
             </div>
           </CardContent>

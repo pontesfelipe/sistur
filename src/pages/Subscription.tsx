@@ -25,14 +25,14 @@ import { useTrialState } from '@/hooks/useTrialState';
 import { useBeniQuota } from '@/hooks/useBeniQuota';
 
 const FEATURE_GRID: { key: string; label: string; icon: string }[] = [
-  { key: 'erp', label: 'Analítico territorial', icon: '📊' },
-  { key: 'enterprise', label: 'Diagnóstico empresarial', icon: '🏨' },
-  { key: 'edu', label: 'EDU', icon: '📚' },
-  { key: 'projects', label: 'Projetos', icon: '🗂️' },
-  { key: 'reports', label: 'Relatórios', icon: '📈' },
-  { key: 'observatory', label: 'Observatório', icon: '🛰️' },
-  { key: 'consortia', label: 'Consórcios', icon: '🤝' },
-  { key: 'beni', label: 'Professor Beni', icon: '🤖' },
+  { key: 'erp', label: tx('Analítico territorial'), icon: '📊' },
+  { key: 'enterprise', label: tx('Diagnóstico empresarial'), icon: '🏨' },
+  { key: 'edu', label: tx('EDU'), icon: '📚' },
+  { key: 'projects', label: tx('Projetos'), icon: '🗂️' },
+  { key: 'reports', label: tx('Relatórios'), icon: '📈' },
+  { key: 'observatory', label: tx('Observatório'), icon: '🛰️' },
+  { key: 'consortia', label: tx('Consórcios'), icon: '🤝' },
+  { key: 'beni', label: tx('Professor Beni'), icon: '🤖' },
 ];
 
 const FAQ: { q: string; a: string }[] = [
@@ -203,7 +203,7 @@ export default function Subscription() {
               <div className="flex items-center gap-3 mb-2">
                 {isCancelled ? <Ban className="h-6 w-6 text-muted-foreground" />
                   : hasSubscription || isPaidPlan ? <Crown className="h-6 w-6 text-emerald-400" />
-                  : inTrial ? <Sparkles className="h-6 w-6 text-amber-400" />
+                  {tx(": inTrial ?")} <Sparkles className="h-6 w-6 text-amber-400" />
                   : <AlertTriangle className="h-6 w-6 text-primary" />}
                 <h2 className="text-xl font-bold">{headline}</h2>
                 <span className={cn(

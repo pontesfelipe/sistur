@@ -30,19 +30,19 @@ const PILLAR_LABEL: Record<string, string> = {
 
 const SOURCE_META: Record<SourceKind, { label: string; icon: any; tone: string; ring: string }> = {
   OFFICIAL: {
-    label: 'Fontes Oficiais',
+    label: tx('Fontes Oficiais'),
     icon: Database,
     tone: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
     ring: 'ring-emerald-500/40',
   },
   DERIVED: {
-    label: 'Indicadores Derivados',
+    label: tx('Indicadores Derivados'),
     icon: Calculator,
     tone: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30',
     ring: 'ring-blue-500/40',
   },
   MANUAL: {
-    label: 'Preenchimento Manual',
+    label: tx('Preenchimento Manual'),
     icon: PenLine,
     tone: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
     ring: 'ring-amber-500/40',

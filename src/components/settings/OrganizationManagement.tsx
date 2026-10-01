@@ -272,8 +272,7 @@ export function OrganizationManagement() {
                 <div className="space-y-3">
                   <Label>{tx("Acessos Habilitados")}</Label>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Configure quais tipos de diagnóstico esta organização pode executar.
-                    Ambos podem ser habilitados simultaneamente.
+                    {tx("Configure quais tipos de diagnóstico esta organização pode executar. Ambos podem ser habilitados simultaneamente.")}
                   </p>
                   
                   {/* Toggle Territorial */}

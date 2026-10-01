@@ -15,21 +15,21 @@ interface EduReportProps {
 function getTendency(metrics: EduMetrics): { label: string; emoji: string; description: string } {
   const { proNatureDecisions, proInfraDecisions, proGovDecisions, excessiveBuilding, turnsInGreen, smartChoices, riskyChoices } = metrics;
   const total = proNatureDecisions + proInfraDecisions + proGovDecisions;
-  if (total === 0) return { label: 'Iniciante', emoji: '🌱', description: 'Ainda começando a explorar!' };
+  if (total === 0) return { label: tx('Iniciante'), emoji: '🌱', description: tx('Ainda começando a explorar!') };
 
   const naturePct = proNatureDecisions / total;
   const infraPct = proInfraDecisions / total;
   const govPct = proGovDecisions / total;
 
-  if (excessiveBuilding > 5) return { label: 'Constrói Demais', emoji: '🏗️', description: 'Cuidado! Muita construção polui a natureza.' };
-  if (naturePct > 0.5 && turnsInGreen > 5) return { label: 'Guardião da Natureza', emoji: '🌿', description: 'Você prioriza o meio ambiente! Excelente!' };
-  if (govPct > 0.4 && smartChoices > riskyChoices) return { label: 'Líder Organizado', emoji: '👑', description: 'Boa governança e decisões inteligentes!' };
-  if (infraPct > 0.5) return { label: 'Urbanista', emoji: '🏙️', description: 'Foca em infraestrutura. Lembre da natureza!' };
+  if (excessiveBuilding > 5) return { label: tx('Constrói Demais'), emoji: '🏗️', description: tx('Cuidado! Muita construção polui a natureza.') };
+  if (naturePct > 0.5 && turnsInGreen > 5) return { label: tx('Guardião da Natureza'), emoji: '🌿', description: tx('Você prioriza o meio ambiente! Excelente!') };
+  if (govPct > 0.4 && smartChoices > riskyChoices) return { label: tx('Líder Organizado'), emoji: '👑', description: tx('Boa governança e decisões inteligentes!') };
+  if (infraPct > 0.5) return { label: tx('Urbanista'), emoji: '🏙️', description: tx('Foca em infraestrutura. Lembre da natureza!') };
 
   const variance = Math.abs(naturePct - 0.33) + Math.abs(infraPct - 0.33) + Math.abs(govPct - 0.33);
-  if (variance < 0.3) return { label: 'Equilibrado', emoji: '⚖️', description: 'Parabéns! Você mantém o equilíbrio!' };
+  if (variance < 0.3) return { label: tx('Equilibrado'), emoji: '⚖️', description: tx('Parabéns! Você mantém o equilíbrio!') };
 
-  return { label: 'Estrategista', emoji: '🧠', description: 'Você analisa antes de decidir. Continue assim!' };
+  return { label: tx('Estrategista'), emoji: '🧠', description: tx('Você analisa antes de decidir. Continue assim!') };
 }
 
 export function EduReport({ metrics, profileScores, dominantProfile, turn, unlockedSkins, state }: EduReportProps) {
@@ -54,9 +54,9 @@ export function EduReport({ metrics, profileScores, dominantProfile, turn, unloc
         <p className="text-xs font-bold mb-2">📊 Suas Decisões ({totalDecisions} total)</p>
         <div className="space-y-1.5">
           {[
-            { label: '🌳 Pró-Natureza', value: metrics.proNatureDecisions, color: '#22c55e' },
-            { label: '🏗️ Pró-Infraestrutura', value: metrics.proInfraDecisions, color: '#3b82f6' },
-            { label: '🤝 Pró-Governança', value: metrics.proGovDecisions, color: '#a855f7' },
+            { label: tx('🌳 Pró-Natureza'), value: metrics.proNatureDecisions, color: '#22c55e' },
+            { label: tx('🏗️ Pró-Infraestrutura'), value: metrics.proInfraDecisions, color: '#3b82f6' },
+            { label: tx('🤝 Pró-Governança'), value: metrics.proGovDecisions, color: '#a855f7' },
           ].map(item => {
             const pct = totalDecisions > 0 ? (item.value / totalDecisions) * 100 : 0;
             return (

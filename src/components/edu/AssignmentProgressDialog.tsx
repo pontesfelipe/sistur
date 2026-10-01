@@ -31,12 +31,12 @@ interface Props {
 }
 
 const STATUS_META: Record<StudentAssignmentStatus, { label: string; icon: any; cls: string }> = {
-  not_started:      { label: 'Não iniciou',      icon: MinusCircle,   cls: 'bg-muted text-muted-foreground' },
-  in_progress:      { label: 'Em andamento',     icon: Clock,         cls: 'bg-blue-500/10 text-blue-700 border-blue-200' },
-  pending_grading:  { label: 'Aguarda correção', icon: Hourglass,     cls: 'bg-amber-500/10 text-amber-700 border-amber-200' },
-  failed_can_retry: { label: 'Reprovado (pode refazer)', icon: AlertTriangle, cls: 'bg-orange-500/10 text-orange-700 border-orange-200' },
-  exhausted:        { label: 'Esgotou tentativas', icon: XCircle,     cls: 'bg-red-500/10 text-red-700 border-red-200' },
-  passed:           { label: 'Aprovado',         icon: CheckCircle2,  cls: 'bg-green-500/10 text-green-700 border-green-200' },
+  not_started:      { label: tx('Não iniciou'),      icon: MinusCircle,   cls: 'bg-muted text-muted-foreground' },
+  in_progress:      { label: tx('Em andamento'),     icon: Clock,         cls: 'bg-blue-500/10 text-blue-700 border-blue-200' },
+  pending_grading:  { label: tx('Aguarda correção'), icon: Hourglass,     cls: 'bg-amber-500/10 text-amber-700 border-amber-200' },
+  failed_can_retry: { label: tx('Reprovado (pode refazer)'), icon: AlertTriangle, cls: 'bg-orange-500/10 text-orange-700 border-orange-200' },
+  exhausted:        { label: tx('Esgotou tentativas'), icon: XCircle,     cls: 'bg-red-500/10 text-red-700 border-red-200' },
+  passed:           { label: tx('Aprovado'),         icon: CheckCircle2,  cls: 'bg-green-500/10 text-green-700 border-green-200' },
 };
 
 export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: Props) {
@@ -79,7 +79,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               <Card><CardContent className="pt-4 pb-3 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground text-xs mb-1">
-                  <Users className="h-3 w-3" /> Alunos
+                  <Users className="h-3 w-3" /> {tx("Alunos")}
                 </div>
                 <p className="text-2xl font-bold">{data.kpis.total_students}</p>
               </CardContent></Card>
@@ -90,13 +90,13 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
               </CardContent></Card>
               <Card><CardContent className="pt-4 pb-3 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground text-xs mb-1">
-                  <Award className="h-3 w-3" /> Aprovação
+                  <Award className="h-3 w-3" /> {tx("Aprovação")}
                 </div>
                 <p className="text-2xl font-bold text-green-600">{data.kpis.pass_rate}%</p>
               </CardContent></Card>
               <Card><CardContent className="pt-4 pb-3 text-center">
                 <div className="flex items-center justify-center gap-1 text-muted-foreground text-xs mb-1">
-                  <TrendingUp className="h-3 w-3" /> Nota média
+                  <TrendingUp className="h-3 w-3" /> {tx("Nota média")}
                 </div>
                 <p className="text-2xl font-bold">{data.kpis.avg_score || 0}%</p>
               </CardContent></Card>
@@ -139,7 +139,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
               <Popover>
                 <PopoverTrigger asChild>
                   <Button size="sm" variant="outline">
-                    <Bell className="h-4 w-4 mr-2" />Enviar lembrete
+                    <Bell className="h-4 w-4 mr-2" />{tx("Enviar lembrete")}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 space-y-3">
@@ -168,7 +168,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
               <Popover>
                 <PopoverTrigger asChild>
                   <Button size="sm" variant="outline">
-                    <CalendarPlus className="h-4 w-4 mr-2" />Prorrogar prazo
+                    <CalendarPlus className="h-4 w-4 mr-2" />{tx("Prorrogar prazo")}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 space-y-3">
@@ -200,7 +200,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button size="sm" variant="outline">
-                      <Plus className="h-4 w-4 mr-2" />Tentativas extras
+                      <Plus className="h-4 w-4 mr-2" />{tx("Tentativas extras")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-72 space-y-3">

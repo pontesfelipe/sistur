@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Analysis {
   safety_score: number;
   safety_level: 'alto' | 'medio' | 'baixo';
@@ -28,9 +29,9 @@ interface Props {
 }
 
 const LEVEL_MAP: Record<string, { color: string; icon: any; label: string }> = {
-  alto: { color: 'text-emerald-600', icon: ShieldCheck, label: 'Alto' },
-  medio: { color: 'text-amber-600', icon: Shield, label: 'Médio' },
-  baixo: { color: 'text-rose-600', icon: ShieldAlert, label: 'Baixo' },
+  alto: { color: 'text-emerald-600', icon: ShieldCheck, label: tx('Alto') },
+  medio: { color: 'text-amber-600', icon: Shield, label: tx('Médio') },
+  baixo: { color: 'text-rose-600', icon: ShieldAlert, label: tx('Baixo') },
 };
 
 export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnalysisCapture }: Props) {
@@ -39,7 +40,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
 
   const run = async () => {
     if (!destinationName?.trim()) {
-      toast.error('Informe o destino.');
+      toast.error(tx('Informe o destino.'));
       return;
     }
     setLoading(true);
@@ -54,7 +55,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, destinationName, state, searchedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_SEGURANCA_SCORE: a.safety_score });
-      toast.success('Segurança turística analisada');
+      toast.success(tx('Segurança turística analisada'));
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || 'Falha ao analisar segurança');
@@ -81,7 +82,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1">Score de Segurança</div>
+              <div className="text-xs text-muted-foreground mb-1">{tx("Score de Segurança")}</div>
               <div className="text-2xl font-bold">{analysis.safety_score}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
               <Progress value={analysis.safety_score} className="h-1 mt-2" />
               {lvl && LvlIcon && (
@@ -92,19 +93,19 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
             </div>
             <div className="p-3 rounded-lg border bg-card space-y-1 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Sinais negativos</span>
+                <span className="text-muted-foreground">{tx("Sinais negativos")}</span>
                 <span className="font-bold text-rose-600">{analysis.negative_signals.count}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Sinais positivos</span>
+                <span className="text-muted-foreground">{tx("Sinais positivos")}</span>
                 <span className="font-bold text-emerald-600">{analysis.positive_signals.count}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Alertas</span>
+                <span className="text-muted-foreground">{tx("Alertas")}</span>
                 <span className="font-bold text-amber-600">{analysis.alerts.count}</span>
               </div>
               <div className="flex items-center justify-between pt-1 border-t">
-                <span className="text-muted-foreground">Polícia turística</span>
+                <span className="text-muted-foreground">{tx("Polícia turística")}</span>
                 <span className="font-medium">{analysis.tourist_police_presence ? 'Sim' : 'Não detectada'}</span>
               </div>
             </div>
@@ -114,7 +115,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
             <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-xs flex items-start gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium text-amber-700 dark:text-amber-400">Alertas detectados</div>
+                <div className="font-medium text-amber-700 dark:text-amber-400">{tx("Alertas detectados")}</div>
                 <div className="text-amber-700/80 dark:text-amber-400/80">{analysis.alerts.terms.join(', ')}</div>
               </div>
             </div>
@@ -122,7 +123,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
 
           {analysis.sample_news.length > 0 && (
             <div className="space-y-1">
-              <div className="text-xs font-medium">Amostras de notícias</div>
+              <div className="text-xs font-medium">{tx("Amostras de notícias")}</div>
               {analysis.sample_news.slice(0, 4).map((n, i) => (
                 <a key={i} href={n.url} target="_blank" rel="noreferrer" className="flex items-start gap-1 text-xs text-muted-foreground hover:text-primary">
                   <ExternalLink className="h-3 w-3 mt-0.5 shrink-0" />
@@ -134,7 +135,7 @@ export function TourismSafetySearch({ destinationName, state, onAutoFill, onAnal
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

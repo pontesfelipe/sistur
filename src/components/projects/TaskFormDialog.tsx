@@ -46,12 +46,12 @@ interface TaskFormDialogProps {
 }
 
 const TASK_TYPE_OPTIONS: { value: TaskType; label: string }[] = [
-  { value: 'task', label: 'Tarefa' },
-  { value: 'feature', label: 'Funcionalidade' },
-  { value: 'story', label: 'História' },
-  { value: 'epic', label: 'Épico' },
-  { value: 'bug', label: 'Bug' },
-  { value: 'milestone', label: 'Marco' },
+  { value: 'task', label: tx('Tarefa') },
+  { value: 'feature', label: tx('Funcionalidade') },
+  { value: 'story', label: tx('História') },
+  { value: 'epic', label: tx('Épico') },
+  { value: 'bug', label: tx('Bug') },
+  { value: 'milestone', label: tx('Marco') },
 ];
 
 export function TaskFormDialog({

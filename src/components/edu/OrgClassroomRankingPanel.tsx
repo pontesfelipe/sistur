@@ -16,7 +16,7 @@ export function OrgClassroomRankingPanel() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-amber-500" /> Ranking de Turmas
+          <Trophy className="h-5 w-5 text-amber-500" /> {tx("Ranking de Turmas")}
         </CardTitle>
         <CardDescription>
           {tx('Comparativo entre todas as turmas ativas da organização, ordenadas por XP médio. Inclui taxa de conclusão e alunos em risco para apoiar decisões pedagógicas.')}

@@ -73,7 +73,7 @@ const EduMinhasTurmas = () => {
       <div className="container max-w-5xl py-6 space-y-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Users className="h-6 w-6" /> Minhas Turmas
+            <Users className="h-6 w-6" /> {tx("Minhas Turmas")}
           </h1>
           <p className="text-sm text-muted-foreground">
             {tx('Turmas em que você está matriculado e anúncios dos professores.')}
@@ -94,7 +94,7 @@ const EduMinhasTurmas = () => {
         {active ? (
           <div className="space-y-4">
             <Button variant="ghost" size="sm" onClick={() => setActiveId(null)}>
-              <ArrowLeft className="h-4 w-4 mr-1" /> Voltar para turmas
+              <ArrowLeft className="h-4 w-4 mr-1" /> {tx("Voltar para turmas")}
             </Button>
             <Card>
               <CardHeader>

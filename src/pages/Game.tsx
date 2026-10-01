@@ -400,13 +400,13 @@ export default function Game() {
                 onClick={() => setMobilePanel(mobilePanel === 'log' ? null : 'log')}
                 className="px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-slate-100 text-xs transition-colors border border-slate-700/50"
               >
-                <ScrollText className="h-4 w-4 inline mr-1" /> Log
+                <ScrollText className="h-4 w-4 inline mr-1" /> {tx("Log")}
               </button>
               <button
                 onClick={() => setMobilePanel(mobilePanel === 'edu' ? null : 'edu')}
                 className="px-3 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-slate-100 text-xs transition-colors border border-slate-700/50"
               >
-                <GraduationCap className="h-4 w-4 inline mr-1" /> Relatório
+                <GraduationCap className="h-4 w-4 inline mr-1" /> {tx("Relatório")}
               </button>
             </div>
           )}

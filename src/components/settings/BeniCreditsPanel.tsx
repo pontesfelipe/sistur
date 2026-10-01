@@ -300,8 +300,7 @@ export function BeniCreditsPanel() {
             {tx("Créditos do Professor Beni")}
           </CardTitle>
           <CardDescription>
-            Acompanhe as perguntas usadas por pessoa, conceda créditos promocionais para um usuário ou para toda a
-            organização e libere acesso ilimitado por um período ou por tempo indeterminado.
+            {tx("Acompanhe as perguntas usadas por pessoa, conceda créditos promocionais para um usuário ou para toda a organização e libere acesso ilimitado por um período ou por tempo indeterminado.")}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -312,8 +311,7 @@ export function BeniCreditsPanel() {
             <Gift className="h-4 w-4 text-primary" /> {tx("Nova concessão")}
           </CardTitle>
           <CardDescription>
-            Créditos entram depois que a cota mensal do plano acaba. O acesso ilimitado ignora qualquer cota enquanto
-            estiver válido.
+            {tx("Créditos entram depois que a cota mensal do plano acaba. O acesso ilimitado ignora qualquer cota enquanto estiver válido.")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -428,8 +426,7 @@ export function BeniCreditsPanel() {
           <div>
             <CardTitle className="text-base">{tx("Créditos por usuário")}</CardTitle>
             <CardDescription>
-              Consumo do mês atual, créditos disponíveis e liberações ilimitadas. Clique nos títulos das colunas para
-              ordenar, filtre por organização e adicione créditos direto na linha ou para vários de uma vez.
+              {tx("Consumo do mês atual, créditos disponíveis e liberações ilimitadas. Clique nos títulos das colunas para ordenar, filtre por organização e adicione créditos direto na linha ou para vários de uma vez.")}
             </CardDescription>
           </div>
           <div className="flex flex-col md:flex-row gap-2">
@@ -496,7 +493,7 @@ export function BeniCreditsPanel() {
                         aria-label={tx("Selecionar todos")}
                       />
                     </TableHead>
-                    <SortHead field="name" label="Pessoa" sort={sort} onSort={toggleSort} />
+                    <SortHead field="name" label={tx("Pessoa")} sort={sort} onSort={toggleSort} />
                     <SortHead field="org" label={tx("Organização")} sort={sort} onSort={toggleSort} />
                     <SortHead field="used" label={tx("Uso no mês")} sort={sort} onSort={toggleSort} />
                     <SortHead field="user_credits" label={tx("Créditos próprios")} sort={sort} onSort={toggleSort} />

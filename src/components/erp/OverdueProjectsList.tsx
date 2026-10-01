@@ -109,7 +109,7 @@ export function OverdueProjectsList({ projects, isLoading }: OverdueProjectsList
                   </div>
                   <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
                     <Link to="/projetos">
-                      Ver <ExternalLink className="h-3 w-3 ml-1" />
+                      {tx("Ver")} <ExternalLink className="h-3 w-3 ml-1" />
                     </Link>
                   </Button>
                 </div>

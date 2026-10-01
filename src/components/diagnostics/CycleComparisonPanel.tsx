@@ -45,7 +45,7 @@ function DeltaBadge({ value }: { value: number | null }) {
     );
   return (
     <span className="inline-flex items-center gap-1 text-muted-foreground">
-      <ArrowRight className="h-3 w-3" />0 pp
+      <ArrowRight className="h-3 w-3" />{tx("0 pp")}
     </span>
   );
 }

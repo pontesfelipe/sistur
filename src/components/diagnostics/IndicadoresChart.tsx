@@ -45,8 +45,7 @@ export function IndicadoresChart({
               <Badge variant="outline" className="ml-auto text-xs">{tierCounts.SMALL} ind.</Badge>
             </div>
             <p className="text-xs text-green-600/80 dark:text-green-400/80">
-              Indicadores essenciais para municípios menores ou análises rápidas. 
-              Ideal para primeira avaliação ou destinos com dados limitados.
+              {tx("Indicadores essenciais para municípios menores ou análises rápidas. Ideal para primeira avaliação ou destinos com dados limitados.")}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
@@ -56,8 +55,7 @@ export function IndicadoresChart({
               <Badge variant="outline" className="ml-auto text-xs">{tierCounts.MEDIUM} ind.</Badge>
             </div>
             <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
-              Adiciona indicadores de profundidade intermediária. 
-              Recomendado para cidades médias ou diagnósticos de acompanhamento.
+              {tx("Adiciona indicadores de profundidade intermediária. Recomendado para cidades médias ou diagnósticos de acompanhamento.")}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
@@ -67,8 +65,7 @@ export function IndicadoresChart({
               <Badge variant="outline" className="ml-auto text-xs">{tierCounts.COMPLETE} ind.</Badge>
             </div>
             <p className="text-xs text-primary/80">
-              Análise mais abrangente com todos os indicadores. 
-              Ideal para capitais, polos turísticos ou planejamento estratégico.
+              {tx("Análise mais abrangente com todos os indicadores. Ideal para capitais, polos turísticos ou planejamento estratégico.")}
             </p>
           </div>
         </div>
@@ -120,7 +117,7 @@ export function IndicadoresChart({
                 <span className="text-2xl font-display font-bold">
                   {pillarIndicators.length}
                 </span>
-                <span className="text-sm text-muted-foreground">indicadores</span>
+                <span className="text-sm text-muted-foreground">{tx("indicadores")}</span>
               </div>
               <div className="mt-2">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
@@ -154,7 +151,7 @@ export function IndicadoresChart({
             <span className="text-2xl font-display font-bold text-primary">
               {igmaCount}
             </span>
-            <span className="text-sm text-muted-foreground">indicadores</span>
+            <span className="text-sm text-muted-foreground">{tx("indicadores")}</span>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             {tx('Indicadores oficiais do IGMA integrados ao SISTUR')}
@@ -166,8 +163,7 @@ export function IndicadoresChart({
       <div className="p-3 bg-muted/50 rounded-lg border flex items-center gap-3">
         <Edit className="h-4 w-4 text-muted-foreground shrink-0" />
         <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">{tx('Edição de pesos, tiers e escopo:')}</span> Clique no peso, tier ou escopo de qualquer indicador para editá-lo.
-          A soma dos pesos por pilar deve totalizar 100% para um cálculo correto.
+          <span className="font-medium text-foreground">{tx('Edição de pesos, tiers e escopo:')}</span> {tx("Clique no peso, tier ou escopo de qualquer indicador para editá-lo. A soma dos pesos por pilar deve totalizar 100% para um cálculo correto.")}
         </p>
       </div>
     </>

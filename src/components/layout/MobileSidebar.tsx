@@ -51,6 +51,7 @@ import { useMemo, useCallback, useEffect } from 'react';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
+import { tx } from "@/i18n/t";
 interface NavItem {
   name: string;
   href: string;
@@ -70,7 +71,7 @@ interface NavSection {
 
 const navigationSections: NavSection[] = [
   {
-    label: 'Analítico',
+    label: tx('Analítico'),
     items: [
       { name: 'Dashboard', href: '/', icon: LayoutDashboard, requiresERP: true },
       { name: 'Diagnósticos', href: '/diagnosticos', icon: ClipboardList, requiresERP: true, module: 'diagnostico' },
@@ -81,14 +82,14 @@ const navigationSections: NavSection[] = [
     ],
   },
   {
-    label: 'Gerenciamento de Projeto',
+    label: tx('Gerenciamento de Projeto'),
     items: [
       { name: 'Projetos', href: '/projetos', icon: FolderKanban, requiresERP: true, module: 'projetos' },
       { name: 'Minhas tarefas', href: '/minhas-tarefas', icon: FolderKanban, requiresERP: true },
     ],
   },
   {
-    label: 'Educação',
+    label: tx('Educação'),
     items: [
       { name: 'Minha Jornada', href: '/edu', icon: GraduationCap, requiresEDU: true, module: 'edu' },
       { name: 'Aprender', href: '/edu/catalogo', icon: BookOpen, requiresEDU: true, module: 'edu' },
@@ -99,7 +100,7 @@ const navigationSections: NavSection[] = [
     ],
   },
   {
-    label: 'Recursos',
+    label: tx('Recursos'),
     items: [
       { name: 'Professor Beni', href: '/professor-beni', icon: Bot },
       { name: 'Social Turismo', href: '/forum', icon: MessageSquare },
@@ -260,7 +261,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
               <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
                 <span className="text-primary-foreground font-display font-bold text-sm">S</span>
               </div>
-              <span className="font-display font-bold text-lg">SISTUR</span>
+              <span className="font-display font-bold text-lg">{tx("SISTUR")}</span>
             </Link>
           </SheetClose>
         </SheetHeader>
@@ -324,7 +325,7 @@ export function MobileMenuTrigger({ onClick }: { onClick: () => void }) {
       size="icon"
       className="md:hidden"
       onClick={onClick}
-      aria-label="Abrir menu"
+      aria-label={tx("Abrir menu")}
     >
       <Menu className="h-5 w-5" />
     </Button>

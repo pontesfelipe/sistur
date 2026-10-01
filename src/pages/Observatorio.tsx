@@ -37,12 +37,13 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { useDestinations } from "@/hooks/useDestinations";
 import { MapPin, Info } from "lucide-react";
 
+import { tx } from "@/i18n/t";
 const CATEGORY_META: Record<string, { label: string; icon: any; color: string }> = {
-  fluxo: { label: "Fluxo Turístico", icon: Activity, color: "text-blue-600" },
-  ocupacao: { label: "Ocupação", icon: Bed, color: "text-purple-600" },
-  eventos: { label: "Eventos", icon: CalendarDays, color: "text-orange-600" },
-  receita: { label: "Receita", icon: DollarSign, color: "text-green-600" },
-  empregos: { label: "Empregos", icon: Briefcase, color: "text-amber-600" },
+  fluxo: { label: tx("Fluxo Turístico"), icon: Activity, color: "text-blue-600" },
+  ocupacao: { label: tx("Ocupação"), icon: Bed, color: "text-purple-600" },
+  eventos: { label: tx("Eventos"), icon: CalendarDays, color: "text-orange-600" },
+  receita: { label: tx("Receita"), icon: DollarSign, color: "text-green-600" },
+  empregos: { label: tx("Empregos"), icon: Briefcase, color: "text-amber-600" },
 };
 
 function formatValue(value: number, unit: string) {
@@ -75,11 +76,11 @@ function buildPeriodLabel(rows: Array<{ reference_month: number | null; referenc
 
 
 const MONTHS = [
-  { v: null as number | null, label: "Anual" },
-  { v: 1, label: "Jan" }, { v: 2, label: "Fev" }, { v: 3, label: "Mar" },
-  { v: 4, label: "Abr" }, { v: 5, label: "Mai" }, { v: 6, label: "Jun" },
-  { v: 7, label: "Jul" }, { v: 8, label: "Ago" }, { v: 9, label: "Set" },
-  { v: 10, label: "Out" }, { v: 11, label: "Nov" }, { v: 12, label: "Dez" },
+  { v: null as number | null, label: tx("Anual") },
+  { v: 1, label: tx("Jan") }, { v: 2, label: tx("Fev") }, { v: 3, label: tx("Mar") },
+  { v: 4, label: tx("Abr") }, { v: 5, label: tx("Mai") }, { v: 6, label: tx("Jun") },
+  { v: 7, label: tx("Jul") }, { v: 8, label: tx("Ago") }, { v: 9, label: tx("Set") },
+  { v: 10, label: tx("Out") }, { v: 11, label: tx("Nov") }, { v: 12, label: tx("Dez") },
 ];
 
 export default function Observatorio() {
@@ -128,7 +129,7 @@ export default function Observatorio() {
       toast.success(`Ingestão concluída — ${data?.processed ?? 0} medições atualizadas`);
       queryClient.invalidateQueries({ queryKey: ["observatory"] });
     } catch (e: any) {
-      toast.error("Falha na ingestão: " + (e.message ?? "erro desconhecido"));
+      toast.error(tx("Falha na ingestão: ") + (e.message ?? "erro desconhecido"));
     } finally {
       setIngesting(false);
     }
@@ -220,7 +221,7 @@ export default function Observatorio() {
       summary,
     });
     downloadCsv(`observatorio-${year}.csv`, csv);
-    toast.success("CSV exportado");
+    toast.success(tx("CSV exportado"));
   };
 
   const handlePrintPdf = () => {
@@ -229,30 +230,29 @@ export default function Observatorio() {
   };
 
   return (
-    <AppLayout title="Observatório Turístico" subtitle="Monitoramento permanente de fluxo, ocupação, eventos, receita e empregos">
+    <AppLayout title={tx("Observatório Turístico")} subtitle={tx("Monitoramento permanente de fluxo, ocupação, eventos, receita e empregos")}>
     <div className="container mx-auto py-8 space-y-6">
       {/* Cabeçalho com destino e ações */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
             <MapPin className="h-4 w-4" />
-            <span>Observatório do destino</span>
+            <span>{tx("Observatório do destino")}</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight truncate">
             {currentDestination ? `${currentDestination.name}${currentDestination.uf ? " / " + currentDestination.uf : ""}` : "Destino não vinculado"}
           </h1>
           <p className="text-muted-foreground mt-1 max-w-2xl">
-            Painel contínuo deste destino — séries de fluxo, ocupação, eventos, receita e empregos.
-            Distinto do diagnóstico cíclico: aqui acompanha-se o que está acontecendo agora.
+            {tx("Painel contínuo deste destino — séries de fluxo, ocupação, eventos, receita e empregos. Distinto do diagnóstico cíclico: aqui acompanha-se o que está acontecendo agora.")}
           </p>
           {orgDestinations.length > 1 && (
             <div className="mt-3 flex items-center gap-2">
-              <Label className="text-xs text-muted-foreground">Visualizar destino:</Label>
+              <Label className="text-xs text-muted-foreground">{tx("Visualizar destino:")}</Label>
               <Select
                 value={viewingOrgId ?? ""}
                 onValueChange={(v) => setSelectedOrgId(v === effectiveOrgId ? undefined : v)}
               >
-                <SelectTrigger className="w-64 h-8 text-sm"><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                <SelectTrigger className="w-64 h-8 text-sm"><SelectValue placeholder={tx("Selecionar...")} /></SelectTrigger>
                 <SelectContent>
                   {orgDestinations.map((d) => (
                     <SelectItem key={d.org_id} value={d.org_id}>{d.label}</SelectItem>
@@ -260,7 +260,7 @@ export default function Observatorio() {
                 </SelectContent>
               </Select>
               {!isViewingOwn && (
-                <Badge variant="outline" className="text-xs">Modo visualização</Badge>
+                <Badge variant="outline" className="text-xs">{tx("Modo visualização")}</Badge>
               )}
             </div>
           )}
@@ -276,12 +276,12 @@ export default function Observatorio() {
             </>
           )}
           <Button size="sm" variant="outline" onClick={handleExportCsv}>
-            <FileSpreadsheet className="h-4 w-4 mr-2" /> CSV
+            <FileSpreadsheet className="h-4 w-4 mr-2" /> {tx("CSV")}
           </Button>
           <Button size="sm" variant="outline" onClick={handlePrintPdf}>
-            <Printer className="h-4 w-4 mr-2" /> PDF
+            <Printer className="h-4 w-4 mr-2" /> {tx("PDF")}
           </Button>
-          <Label className="text-sm">Ano de referência</Label>
+          <Label className="text-sm">{tx("Ano de referência")}</Label>
           <Select value={String(year)} onValueChange={(v) => setYear(parseInt(v))}>
             <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -298,9 +298,9 @@ export default function Observatorio() {
         <CardContent className="py-3 flex items-start gap-3 text-sm text-muted-foreground">
           <Info className="h-4 w-4 mt-0.5 shrink-0" />
           <p>
-            O Observatório é o <strong>monitor permanente</strong> deste destino: alimenta-se de fontes oficiais
+            {tx("O Observatório é o")} <strong>{tx("monitor permanente")}</strong> deste destino: alimenta-se de fontes oficiais
             (Cadastur, ANAC, CAGED, IGMA) e de registros manuais. Complementa o Diagnóstico (que avalia capacidade
-            estrutural em ciclos) acompanhando os <strong>resultados operacionais contínuos</strong>.
+            estrutural em ciclos) acompanhando os <strong>{tx("resultados operacionais contínuos")}</strong>.
           </p>
         </CardContent>
       </Card>
@@ -346,8 +346,8 @@ export default function Observatorio() {
 
       <Tabs defaultValue="indicadores" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="indicadores">Indicadores</TabsTrigger>
-          <TabsTrigger value="eventos">Calendário de Eventos</TabsTrigger>
+          <TabsTrigger value="indicadores">{tx("Indicadores")}</TabsTrigger>
+          <TabsTrigger value="eventos">{tx("Calendário de Eventos")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="indicadores" className="space-y-4">
@@ -391,7 +391,7 @@ export default function Observatorio() {
                             <div className="flex items-center gap-1 shrink-0">
                               <MetricHistoryDialog metricId={m.id} metricName={m.name} unit={m.unit} />
                               <Button size="sm" variant="outline" disabled={!isViewingOwn} onClick={() => setMeasureDialog({ metricId: m.id, name: m.name, unit: m.unit })}>
-                                <Plus className="h-3 w-3 mr-1" /> Registrar
+                                <Plus className="h-3 w-3 mr-1" /> {tx("Registrar")}
                               </Button>
                             </div>
                           </div>
@@ -410,41 +410,41 @@ export default function Observatorio() {
             <DiscoverEventsDialog orgId={viewingOrgId} year={year} disabled={!isViewingOwn} destinationId={currentDestination?.id} />
             <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
               <DialogTrigger asChild>
-                <Button disabled={!isViewingOwn}><Plus className="h-4 w-4 mr-2" /> Novo Evento</Button>
+                <Button disabled={!isViewingOwn}><Plus className="h-4 w-4 mr-2" /> {tx("Novo Evento")}</Button>
               </DialogTrigger>
               <DialogContent>
-                <DialogHeader><DialogTitle>Novo Evento Turístico</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle>{tx("Novo Evento Turístico")}</DialogTitle></DialogHeader>
                 <div className="space-y-3">
                   <div>
-                    <Label>Nome *</Label>
+                    <Label>{tx("Nome *")}</Label>
                     <Input value={newEvent.name} onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })} />
                   </div>
                   <div>
-                    <Label>Categoria</Label>
+                    <Label>{tx("Categoria")}</Label>
                     <Select value={newEvent.category} onValueChange={(v) => setNewEvent({ ...newEvent, category: v })}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="cultural">Cultural</SelectItem>
-                        <SelectItem value="esportivo">Esportivo</SelectItem>
-                        <SelectItem value="gastronomico">Gastronômico</SelectItem>
-                        <SelectItem value="religioso">Religioso</SelectItem>
-                        <SelectItem value="corporativo">Corporativo</SelectItem>
+                        <SelectItem value="cultural">{tx("Cultural")}</SelectItem>
+                        <SelectItem value="esportivo">{tx("Esportivo")}</SelectItem>
+                        <SelectItem value="gastronomico">{tx("Gastronômico")}</SelectItem>
+                        <SelectItem value="religioso">{tx("Religioso")}</SelectItem>
+                        <SelectItem value="corporativo">{tx("Corporativo")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label>Data início *</Label>
+                      <Label>{tx("Data início *")}</Label>
                       <Input type="date" value={newEvent.start_date} onChange={(e) => setNewEvent({ ...newEvent, start_date: e.target.value })} />
                     </div>
                     <div>
-                      <Label>Data fim *</Label>
+                      <Label>{tx("Data fim *")}</Label>
                       <Input type="date" value={newEvent.end_date} onChange={(e) => setNewEvent({ ...newEvent, end_date: e.target.value })} />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label>Público estimado</Label>
+                      <Label>{tx("Público estimado")}</Label>
                       <Input type="number" value={newEvent.estimated_attendance} onChange={(e) => setNewEvent({ ...newEvent, estimated_attendance: e.target.value })} />
                     </div>
                     <div>
@@ -453,12 +453,12 @@ export default function Observatorio() {
                     </div>
                   </div>
                   <div>
-                    <Label>Descrição</Label>
+                    <Label>{tx("Descrição")}</Label>
                     <Textarea value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })} />
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setEventDialogOpen(false)}>Cancelar</Button>
+                  <Button variant="outline" onClick={() => setEventDialogOpen(false)}>{tx("Cancelar")}</Button>
                   <Button onClick={handleCreateEvent} disabled={createEvent.isPending}>
                     {createEvent.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Salvar
                   </Button>
@@ -492,11 +492,11 @@ export default function Observatorio() {
                     {ev.description && <p className="text-sm text-muted-foreground mb-3">{ev.description}</p>}
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-xs text-muted-foreground">Público estimado</p>
+                        <p className="text-xs text-muted-foreground">{tx("Público estimado")}</p>
                         <p className="font-medium">{ev.estimated_attendance ? new Intl.NumberFormat("pt-BR").format(ev.estimated_attendance) : "—"}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Receita estimada</p>
+                        <p className="text-xs text-muted-foreground">{tx("Receita estimada")}</p>
                         <p className="font-medium">{ev.estimated_revenue ? formatValue(Number(ev.estimated_revenue), "BRL") : "—"}</p>
                       </div>
                     </div>
@@ -516,13 +516,13 @@ export default function Observatorio() {
       {/* Dialog para registrar medição */}
       <Dialog open={!!measureDialog} onOpenChange={(o) => !o && setMeasureDialog(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Registrar Medição</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tx("Registrar Medição")}</DialogTitle></DialogHeader>
           {measureDialog && (
             <div className="space-y-3">
               <div className="text-sm text-muted-foreground">{measureDialog.name} ({measureDialog.unit})</div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label>Período</Label>
+                  <Label>{tx("Período")}</Label>
                   <Select value={measureMonth} onValueChange={setMeasureMonth}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -533,18 +533,18 @@ export default function Observatorio() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Valor</Label>
+                  <Label>{tx("Valor")}</Label>
                   <Input type="number" value={measureValue} onChange={(e) => setMeasureValue(e.target.value)} />
                 </div>
               </div>
               <div>
                 <Label>Fonte (opcional)</Label>
-                <Input placeholder="ex: CAGED, IBGE, levantamento próprio" value={measureSource} onChange={(e) => setMeasureSource(e.target.value)} />
+                <Input placeholder={tx("ex: CAGED, IBGE, levantamento próprio")} value={measureSource} onChange={(e) => setMeasureSource(e.target.value)} />
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setMeasureDialog(null)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setMeasureDialog(null)}>{tx("Cancelar")}</Button>
             <Button onClick={handleSaveMeasurement} disabled={upsert.isPending || !measureValue}>
               {upsert.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Salvar
             </Button>

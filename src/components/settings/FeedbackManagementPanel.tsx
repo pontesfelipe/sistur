@@ -36,19 +36,19 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const statusConfig: Record<UserFeedback['status'], { label: string; icon: React.ElementType; color: string }> = {
-  pending: { label: 'Pendente', icon: Clock, color: 'bg-gray-500/20 text-gray-700 border-gray-500/30' },
-  reviewing: { label: 'Em Análise', icon: AlertCircle, color: 'bg-blue-500/20 text-blue-700 border-blue-500/30' },
-  planned: { label: 'Planejado', icon: Clock, color: 'bg-purple-500/20 text-purple-700 border-purple-500/30' },
-  in_progress: { label: 'Em Progresso', icon: Loader2, color: 'bg-yellow-500/20 text-yellow-700 border-yellow-500/30' },
-  completed: { label: 'Concluído', icon: CheckCircle2, color: 'bg-green-500/20 text-green-700 border-green-500/30' },
-  rejected: { label: 'Rejeitado', icon: XCircle, color: 'bg-red-500/20 text-red-700 border-red-500/30' },
+  pending: { label: tx('Pendente'), icon: Clock, color: 'bg-gray-500/20 text-gray-700 border-gray-500/30' },
+  reviewing: { label: tx('Em Análise'), icon: AlertCircle, color: 'bg-blue-500/20 text-blue-700 border-blue-500/30' },
+  planned: { label: tx('Planejado'), icon: Clock, color: 'bg-purple-500/20 text-purple-700 border-purple-500/30' },
+  in_progress: { label: tx('Em Progresso'), icon: Loader2, color: 'bg-yellow-500/20 text-yellow-700 border-yellow-500/30' },
+  completed: { label: tx('Concluído'), icon: CheckCircle2, color: 'bg-green-500/20 text-green-700 border-green-500/30' },
+  rejected: { label: tx('Rejeitado'), icon: XCircle, color: 'bg-red-500/20 text-red-700 border-red-500/30' },
 };
 
 const priorityConfig: Record<UserFeedback['priority'], { label: string; color: string }> = {
-  low: { label: 'Baixa', color: 'bg-gray-100 text-gray-600' },
-  medium: { label: 'Média', color: 'bg-blue-100 text-blue-600' },
-  high: { label: 'Alta', color: 'bg-orange-100 text-orange-600' },
-  critical: { label: 'Crítica', color: 'bg-red-100 text-red-600' },
+  low: { label: tx('Baixa'), color: 'bg-gray-100 text-gray-600' },
+  medium: { label: tx('Média'), color: 'bg-blue-100 text-blue-600' },
+  high: { label: tx('Alta'), color: 'bg-orange-100 text-orange-600' },
+  critical: { label: tx('Crítica'), color: 'bg-red-100 text-red-600' },
 };
 
 const categoryLabels: Record<string, string> = {

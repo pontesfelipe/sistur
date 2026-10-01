@@ -346,7 +346,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
         <ResumeGameDialog open={showResumeDialog} savedAt={resumeSavedAt} onResume={handleResumeGame} onNewGame={handleNewGameFromDialog} />
         <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50">
           <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-slate-200">
-            <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
+            <ArrowLeft className="h-4 w-4 mr-1" /> {tx("Voltar")}
           </Button>
           <h1 className="text-lg font-bold text-amber-300">{tx('🧠 Memória Ecológica')}</h1>
         </div>
@@ -435,7 +435,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
           <div className={cn('flex items-center gap-1 px-1.5 py-0.5 rounded-md border', 'bg-emerald-500/10 border-emerald-500/20')}>
             <Sparkles className={cn('h-3.5 w-3.5', visuals.accentColor)} />
             <span className="font-bold tabular-nums text-emerald-200">{state.matchedPairs}/{state.totalPairs}</span>
-            <span className="text-white/40">pares</span>
+            <span className="text-white/40">{tx("pares")}</span>
           </div>
         </div>
         <div className="flex items-center gap-x-2 gap-y-1.5 flex-wrap">
@@ -539,7 +539,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
                       ) : (
                         <span className="text-2xl sm:text-3xl opacity-60">🌍</span>
                       )}
-                      <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider">ECO</span>
+                      <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider">{tx("ECO")}</span>
                     </div>
                     <div className="absolute inset-0 opacity-[0.08]" style={{
                       backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 8px, currentColor 8px, currentColor 9px)',
@@ -590,7 +590,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="relative z-10 pb-safe-bottom pb-3 flex justify-center">
         <p className="text-[10px] text-white/30 flex items-center gap-1">
-          <Brain className="h-3 w-3" /> Associe a imagem à descrição correta
+          <Brain className="h-3 w-3" /> {tx("Associe a imagem à descrição correta")}
         </p>
       </motion.div>
 

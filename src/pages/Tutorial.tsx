@@ -11,6 +11,7 @@ import { ExternalLink, CheckCircle2, BookOpen, ChevronRight, Clock } from 'lucid
 import { tutorialCategories, getTutorialForRole, getUserTutorialRole, type TutorialRole, type TutorialCategory } from '@/data/tutorialData';
 import { getDetailedTopicIds, getTopicDetail } from '@/data/tutorialSteps';
 
+import { tx } from "@/i18n/t";
 const ROLE_LABELS: Record<TutorialRole, string> = {
   ADMIN: 'Administrador',
   PROFESSOR: 'Professor',
@@ -54,17 +55,17 @@ export default function Tutorial() {
     : [userRole];
 
   return (
-    <AppLayout title="Tutorial" subtitle="Aprenda a usar o SISTUR">
+    <AppLayout title={tx("Tutorial")} subtitle={tx("Aprenda a usar o SISTUR")}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
               <BookOpen className="h-6 w-6 text-primary" />
-              Tutorial do SISTUR
+              {tx("Tutorial do SISTUR")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Aprenda a usar todas as funcionalidades da plataforma
+              {tx("Aprenda a usar todas as funcionalidades da plataforma")}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -159,7 +160,7 @@ export default function Tutorial() {
                                 navigate(`/tutorial/${step.id}`);
                               }}
                             >
-                              Ver tutorial completo
+                              {tx("Ver tutorial completo")}
                               <ChevronRight className="h-3 w-3 ml-1" />
                             </Button>
                           )}
@@ -174,7 +175,7 @@ export default function Tutorial() {
                               }}
                             >
                               <ExternalLink className="h-3 w-3 mr-1" />
-                              Acessar
+                              {tx("Acessar")}
                             </Button>
                           )}
                           <Button

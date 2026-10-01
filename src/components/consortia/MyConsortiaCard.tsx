@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Network, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { tx } from "@/i18n/t";
 /**
  * Card compacto para o Dashboard listando consórcios em que o usuário/org participa.
  * Visível apenas quando há pelo menos 1 consórcio (RLS já filtra).
@@ -31,10 +32,10 @@ export function MyConsortiaCard() {
           <div className="min-w-0">
             <CardTitle className="text-base flex items-center gap-2">
               <Network className="h-4 w-4 text-primary" />
-              Consórcios em que participo
+              {tx("Consórcios em que participo")}
             </CardTitle>
             <CardDescription className="mt-1">
-              Benchmarking regional privado entre municípios membros.
+              {tx("Benchmarking regional privado entre municípios membros.")}
             </CardDescription>
           </div>
           <Badge variant="secondary">{data.length}</Badge>

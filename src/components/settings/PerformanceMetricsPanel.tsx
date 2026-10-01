@@ -134,7 +134,7 @@ export function PerformanceMetricsPanel() {
     // Query latency
     const queryStatus = metrics.avgQueryTimeMs < 200 ? 'ok' : metrics.avgQueryTimeMs < 500 ? 'warning' : 'critical';
     checks.push({
-      label: 'Latência de Consultas',
+      label: tx('Latência de Consultas'),
       status: queryStatus,
       value: `${metrics.avgQueryTimeMs}ms`,
       detail: queryStatus === 'ok' ? 'Tempo de resposta saudável' :
@@ -146,7 +146,7 @@ export function PerformanceMetricsPanel() {
     // DB size
     const dbStatus = metrics.dbUsagePercent < 60 ? 'ok' : metrics.dbUsagePercent < 85 ? 'warning' : 'critical';
     checks.push({
-      label: 'Uso do Banco de Dados',
+      label: tx('Uso do Banco de Dados'),
       status: dbStatus,
       value: `${metrics.dbSizeMB.toFixed(1)} MB / ${DB_SIZE_LIMIT_MB} MB`,
       detail: dbStatus === 'ok' ? 'Espaço suficiente' :
@@ -158,7 +158,7 @@ export function PerformanceMetricsPanel() {
     // Connections
     const connStatus = metrics.connectionUsagePercent < 50 ? 'ok' : metrics.connectionUsagePercent < 80 ? 'warning' : 'critical';
     checks.push({
-      label: 'Conexões Estimadas',
+      label: tx('Conexões Estimadas'),
       status: connStatus,
       value: `~${Math.ceil(metrics.totalUsers * 0.1)} / ${MAX_CONNECTIONS}`,
       detail: connStatus === 'ok' ? 'Capacidade confortável' :
@@ -171,7 +171,7 @@ export function PerformanceMetricsPanel() {
     const userRatio = metrics.totalUsers > 0 ? (metrics.activeUsersLast7d / metrics.totalUsers) * 100 : 0;
     const userStatus = metrics.totalUsers < 50 ? 'ok' : metrics.totalUsers < 200 ? 'warning' : 'critical';
     checks.push({
-      label: 'Volume de Usuários',
+      label: tx('Volume de Usuários'),
       status: userStatus,
       value: `${metrics.totalUsers} total (${metrics.activeUsersLast7d} ativos)`,
       detail: userStatus === 'ok' ? 'Volume adequado para instância atual' :
@@ -183,7 +183,7 @@ export function PerformanceMetricsPanel() {
     // Data volume
     const dataStatus = metrics.totalRows < 5000 ? 'ok' : metrics.totalRows < 20000 ? 'warning' : 'critical';
     checks.push({
-      label: 'Volume de Dados',
+      label: tx('Volume de Dados'),
       status: dataStatus,
       value: `${metrics.totalRows.toLocaleString('pt-BR')} registros`,
       detail: dataStatus === 'ok' ? 'Volume de dados leve' :
@@ -275,8 +275,7 @@ export function PerformanceMetricsPanel() {
                   : 'O sistema está crescendo. Considere aumentar a instância se a tendência continuar.'}
               </p>
               <p className="text-xs text-muted-foreground">
-                {tx("Acesse")} <strong>{tx("Backend → Configurações Avançadas → Upgrade de Instância")}</strong> para 
-                ajustar os recursos de CPU, memória e I/O do banco de dados.
+                {tx("Acesse")} <strong>{tx("Backend → Configurações Avançadas → Upgrade de Instância")}</strong> {tx("para ajustar os recursos de CPU, memória e I/O do banco de dados.")}
               </p>
             </AlertDescription>
           </Alert>

@@ -97,7 +97,7 @@ export default function Precos() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg">
             <MapPin className="h-5 w-5 text-primary" />
-            SISTUR
+            {tx("SISTUR")}
           </Link>
           <div className="flex items-center gap-2">
             <Button variant="ghost" asChild>

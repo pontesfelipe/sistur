@@ -92,8 +92,7 @@ export function DemoModeToggle() {
         {isViewingDemoData && (
           <div className="mt-4 p-3 bg-amber-100/50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              <strong>{tx("Atenção:")}</strong> Os dados exibidos são de demonstração. 
-              Para criar seus próprios diagnósticos, desative o modo demo.
+              <strong>{tx("Atenção:")}</strong> {tx("Os dados exibidos são de demonstração. Para criar seus próprios diagnósticos, desative o modo demo.")}
             </p>
           </div>
         )}

@@ -201,7 +201,7 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
               )}
             </Button>
           </div>
-          <Input placeholder="Descrição (ex: Plano Nacional de Turismo 2024-2027)" value={description} onChange={e => setDescription(e.target.value)} />
+          <Input placeholder={tx("Descrição (ex: Plano Nacional de Turismo 2024-2027)")} value={description} onChange={e => setDescription(e.target.value)} />
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger><SelectValue placeholder={tx("Categoria")} /></SelectTrigger>
             <SelectContent>
@@ -209,13 +209,13 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
             </SelectContent>
           </Select>
           <Textarea
-            placeholder="Resumo do documento (será injetado nos prompts de geração de relatórios)"
+            placeholder={tx("Resumo do documento (será injetado nos prompts de geração de relatórios)")}
             value={summary}
             onChange={e => setSummary(e.target.value)}
             rows={4}
           />
           <p className="text-xs text-muted-foreground">
-            💡 O resumo é fundamental: ele será incluído automaticamente no contexto da IA ao gerar relatórios e diagnósticos.
+            {tx("💡 O resumo é fundamental: ele será incluído automaticamente no contexto da IA ao gerar relatórios e diagnósticos.")}
           </p>
         </div>
         <DialogFooter>
@@ -248,13 +248,13 @@ function EditDialog({ file, open, onOpenChange }: { file: GlobalReferenceFile; o
         <div className="space-y-4">
           <Input placeholder={tx("Descrição")} value={description} onChange={e => setDescription(e.target.value)} />
           <Textarea
-            placeholder="Resumo do documento (injetado nos relatórios via IA)"
+            placeholder={tx("Resumo do documento (injetado nos relatórios via IA)")}
             value={summary}
             onChange={e => setSummary(e.target.value)}
             rows={6}
           />
           <p className="text-xs text-muted-foreground">
-            💡 Inclua os pontos-chave: metas quantitativas, princípios, eixos de atuação, tendências e diretrizes que devem contextualizar os relatórios.
+            {tx("💡 Inclua os pontos-chave: metas quantitativas, princípios, eixos de atuação, tendências e diretrizes que devem contextualizar os relatórios.")}
           </p>
         </div>
         <DialogFooter>

@@ -123,7 +123,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" /> Geomarketing</CardTitle>
+        <CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" /> {tx("Geomarketing")}</CardTitle>
         <CardDescription>Oferta e demanda no entorno de {dest?.name ?? 'destino'}. Posições de concorrentes são aproximadas pela distância informada. Sem comparação entre municípios.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -176,7 +176,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
               </div>
             </div>
             {demand > 0 && supply > 0 && (
-              <p className="text-sm text-muted-foreground">{tx('Relação demanda/oferta no raio:')} <b>{Math.round(demand / supply).toLocaleString('pt-BR')}</b> visitantes por avaliação de concorrente — quanto maior, mais espaço de mercado.</p>
+              <p className="text-sm text-muted-foreground">{tx('Relação demanda/oferta no raio:')} <b>{Math.round(demand / supply).toLocaleString('pt-BR')}</b> {tx("visitantes por avaliação de concorrente — quanto maior, mais espaço de mercado.")}</p>
             )}
           </>
         )}

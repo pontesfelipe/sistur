@@ -37,21 +37,21 @@ const DEFAULTS: Record<SectionKey, string> = {
 
 const SECTION_META: Record<SectionKey, { title: string; description?: string; icon: any }> = {
   persona: { title: tx("Persona"), icon: BookOpen },
-  output_format: { title: 'Formato de saída (TTS-friendly)', description: tx("Respostas lidas em voz alta pelo ElevenLabs."), icon: Volume2 },
+  output_format: { title: tx('Formato de saída (TTS-friendly)'), description: tx("Respostas lidas em voz alta pelo ElevenLabs."), icon: Volume2 },
   base_theory: { title: tx("Base teórica injetada no contexto"), icon: BookOpen },
   dynamic_context: { title: tx("Contexto dinâmico enviado a cada chamada"), icon: Bot },
-  scope_guardrails: { title: 'Escopo & Guardrails', icon: ShieldAlert },
+  scope_guardrails: { title: tx('Escopo & Guardrails'), icon: ShieldAlert },
 };
 
 const MODEL_OPTIONS: { value: string; label: string; hint: string }[] = [
-  { value: 'openai/gpt-6-astra', label: 'GPT-6 Astra', hint: 'Padrão — o mais capaz (OpenAI)' },
-  { value: 'openai/gpt-5.6-sol', label: 'GPT-5.6 Sol', hint: 'Topo de linha GPT-5.6' },
-  { value: 'openai/gpt-5.6-terra', label: 'GPT-5.6 Terra', hint: 'Equilibrado, menor custo' },
-  { value: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna', hint: 'Rápido e barato' },
-  { value: 'google/gemini-3.8-flash', label: 'Gemini 3.8 Flash', hint: 'Mais novo Gemini — rápido' },
-  { value: 'google/gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro (Preview)', hint: 'Raciocínio profundo' },
-  { value: 'google/gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash Lite', hint: 'Custo-eficiente, alto volume' },
-  { value: 'google/gemini-3-flash-preview', label: 'Gemini 3 Flash (Preview)', hint: 'Modelo anterior' },
+  { value: 'openai/gpt-6-astra', label: tx('GPT-6 Astra'), hint: tx('Padrão — o mais capaz (OpenAI)') },
+  { value: 'openai/gpt-5.6-sol', label: tx('GPT-5.6 Sol'), hint: tx('Topo de linha GPT-5.6') },
+  { value: 'openai/gpt-5.6-terra', label: tx('GPT-5.6 Terra'), hint: tx('Equilibrado, menor custo') },
+  { value: 'openai/gpt-5.6-luna', label: tx('GPT-5.6 Luna'), hint: tx('Rápido e barato') },
+  { value: 'google/gemini-3.8-flash', label: tx('Gemini 3.8 Flash'), hint: tx('Mais novo Gemini — rápido') },
+  { value: 'google/gemini-3.1-pro-preview', label: tx('Gemini 3.1 Pro (Preview)'), hint: tx('Raciocínio profundo') },
+  { value: 'google/gemini-3.1-flash-lite', label: tx('Gemini 3.1 Flash Lite'), hint: tx('Custo-eficiente, alto volume') },
+  { value: 'google/gemini-3-flash-preview', label: tx('Gemini 3 Flash (Preview)'), hint: tx('Modelo anterior') },
 ];
 
 export function BeniContextPanel() {
@@ -175,7 +175,7 @@ export function BeniContextPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
-            Professor Beni — Regras de Conversa & Contexto
+            {tx("Professor Beni — Regras de Conversa & Contexto")}
           </CardTitle>
           <CardDescription>
             Configuração de persona, escopo e diretrizes aplicadas ao chat do Professor Beni.
@@ -190,7 +190,7 @@ export function BeniContextPanel() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Modelo & Infraestrutura</CardTitle>
+          <CardTitle className="text-base">{tx("Modelo & Infraestrutura")}</CardTitle>
           <CardDescription>
             {tx("Escolha qual modelo de IA o Professor Beni usará para responder. A alteração entra em vigor na próxima mensagem.")}
           </CardDescription>

@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAutoFillRunner, NoDataError } from '@/lib/autoFillRunner';
 
+import { tx } from "@/i18n/t";
 interface Analysis {
   health_score: number;
   health_tier: string;
@@ -56,7 +57,7 @@ export function HealthInfrastructureSearch({ destinationId, onAutoFill, onAnalys
       setAnalysis(a);
       onAnalysisCapture?.({ ...a, destinationId, searchedAt: new Date().toISOString() });
       onAutoFill?.({ ENT_SAUDE_ENTORNO: a.health_score });
-      toast.success('Infraestrutura de saúde analisada');
+      toast.success(tx('Infraestrutura de saúde analisada'));
     } catch (e: any) {
       if (e?.name !== 'NoDataError') {
         console.error(e);
@@ -87,24 +88,24 @@ export function HealthInfrastructureSearch({ destinationId, onAutoFill, onAnalys
 
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3 rounded-lg border bg-card">
-              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Heart className="h-3 w-3" /> Score</div>
+              <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Heart className="h-3 w-3" /> {tx("Score")}</div>
               <div className="text-2xl font-bold">{analysis.health_score}<span className="text-sm font-normal text-muted-foreground">/100</span></div>
               <Progress value={analysis.health_score} className="h-1 mt-2" />
               <Badge variant="outline" className={`mt-2 text-[10px] capitalize ${TIER_COLOR[analysis.health_tier] ?? ''}`}>{analysis.health_tier}</Badge>
             </div>
             <div className="p-3 rounded-lg border bg-card space-y-1 text-xs">
-              <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Hospital className="h-3 w-3" /> Hospitais</span><span className="font-bold">{analysis.total_hospitals}</span></div>
-              <div className="flex items-center justify-between"><span className="text-muted-foreground">Leitos totais</span><span className="font-bold">{analysis.total_beds.toLocaleString('pt-BR')}</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground flex items-center gap-1"><Hospital className="h-3 w-3" /> {tx("Hospitais")}</span><span className="font-bold">{analysis.total_hospitals}</span></div>
+              <div className="flex items-center justify-between"><span className="text-muted-foreground">{tx("Leitos totais")}</span><span className="font-bold">{analysis.total_beds.toLocaleString('pt-BR')}</span></div>
               {analysis.beds_per_1k_inhabitants != null && (
-                <div className="flex items-center justify-between"><span className="text-muted-foreground">Leitos / 1k hab</span><span className="font-bold">{analysis.beds_per_1k_inhabitants.toFixed(2)}</span></div>
+                <div className="flex items-center justify-between"><span className="text-muted-foreground">{tx("Leitos / 1k hab")}</span><span className="font-bold">{analysis.beds_per_1k_inhabitants.toFixed(2)}</span></div>
               )}
-              <div className="flex items-center justify-between pt-1 border-t"><span className="text-muted-foreground">PS 24h</span><span className="font-bold">{analysis.has_24h_emergency === true ? 'Sim' : analysis.has_24h_emergency === false ? 'Não' : '—'}</span></div>
+              <div className="flex items-center justify-between pt-1 border-t"><span className="text-muted-foreground">{tx("PS 24h")}</span><span className="font-bold">{analysis.has_24h_emergency === true ? 'Sim' : analysis.has_24h_emergency === false ? 'Não' : '—'}</span></div>
             </div>
           </div>
 
           {analysis.recommendations.length > 0 && (
             <div className="p-3 rounded-lg bg-muted/50">
-              <div className="text-xs font-medium mb-1">Recomendações</div>
+              <div className="text-xs font-medium mb-1">{tx("Recomendações")}</div>
               <ul className="list-disc pl-4 space-y-1 text-xs text-muted-foreground">
                 {analysis.recommendations.map((r, i) => <li key={i}>{r}</li>)}
               </ul>

@@ -98,21 +98,21 @@ const PILLAR_COLORS: Record<PillarType, string> = {
 };
 
 const STATUS_LABELS: Record<TrainingStatus, { label: string; color: string }> = {
-  draft: { label: 'Rascunho', color: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20' },
-  published: { label: 'Publicado', color: 'bg-green-500/10 text-green-700 border-green-500/20' },
-  archived: { label: 'Arquivado', color: 'bg-gray-500/10 text-gray-700 border-gray-500/20' },
+  draft: { label: tx('Rascunho'), color: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20' },
+  published: { label: tx('Publicado'), color: 'bg-green-500/10 text-green-700 border-green-500/20' },
+  archived: { label: tx('Arquivado'), color: 'bg-gray-500/10 text-gray-700 border-gray-500/20' },
 };
 
 const LEVEL_OPTIONS = [
-  { value: 'Básico', label: 'Básico' },
-  { value: 'Intermediário', label: 'Intermediário' },
-  { value: 'Avançado', label: 'Avançado' },
+  { value: 'Básico', label: tx('Básico') },
+  { value: 'Intermediário', label: tx('Intermediário') },
+  { value: 'Avançado', label: tx('Avançado') },
 ];
 
 const TARGET_AUDIENCE_OPTIONS = [
-  { value: 'GESTORES', label: 'Gestores Públicos' },
-  { value: 'TECNICOS', label: 'Técnicos' },
-  { value: 'TRADE', label: 'Trade Turístico' },
+  { value: 'GESTORES', label: tx('Gestores Públicos') },
+  { value: 'TECNICOS', label: tx('Técnicos') },
+  { value: 'TRADE', label: tx('Trade Turístico') },
 ];
 
 interface FormData {

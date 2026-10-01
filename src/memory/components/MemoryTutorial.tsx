@@ -12,31 +12,31 @@ interface TutorialStep {
 
 const STEPS: TutorialStep[] = [
   {
-    title: 'Jogo da Memória Ecológico!',
+    title: tx('Jogo da Memória Ecológico!'),
     emoji: '🧠',
     text: 'Encontre os pares entre imagens e suas descrições ambientais! Cada carta-imagem tem uma carta-texto correspondente.',
     tip: 'Exercite a memória enquanto aprende sobre ecologia!',
   },
   {
-    title: 'Como Jogar',
+    title: tx('Como Jogar'),
     emoji: '👆',
     text: 'Toque em uma carta para virá-la. Depois toque em outra carta. Se a imagem e a descrição combinarem, o par é revelado!',
     tip: 'Você só pode virar 2 cartas por vez.',
   },
   {
-    title: 'Pares',
+    title: tx('Pares'),
     emoji: '🔗',
     text: 'Cada par tem uma carta com emoji/nome e outra com a explicação sobre o tema ambiental. Associe a imagem ao conceito correto!',
     tip: 'Preste atenção ao virar — memorize as posições!',
   },
   {
-    title: 'Erros',
+    title: tx('Erros'),
     emoji: '❌',
     text: 'Você tem um número limitado de erros. Se errar demais, o jogo acaba! Pense bem antes de virar a segunda carta.',
     tip: 'Concentre-se e vá com calma!',
   },
   {
-    title: 'Objetivo',
+    title: tx('Objetivo'),
     emoji: '🏆',
     text: 'Encontre todos os pares antes do tempo acabar e sem exceder o limite de erros. Quanto menos erros e mais rápido, maior a pontuação!',
     tip: 'Boa sorte, ecologista! 🌍',

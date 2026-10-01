@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+import { tx } from "@/i18n/t";
 const UF_LIST = [
   'AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT',
   'PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'
@@ -61,7 +62,7 @@ export default function MapaTurismoPanel() {
               <MapPin className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-2xl font-bold">{stats?.totalMunicipios || 0}</p>
-                <p className="text-sm text-muted-foreground">Municípios Mapeados</p>
+                <p className="text-sm text-muted-foreground">{tx("Municípios Mapeados")}</p>
               </div>
             </div>
           </CardContent>
@@ -72,7 +73,7 @@ export default function MapaTurismoPanel() {
               <BarChart3 className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-2xl font-bold">{stats ? Object.keys(stats.byUF).length : 0}</p>
-                <p className="text-sm text-muted-foreground">UFs com Dados</p>
+                <p className="text-sm text-muted-foreground">{tx("UFs com Dados")}</p>
               </div>
             </div>
           </CardContent>
@@ -81,7 +82,7 @@ export default function MapaTurismoPanel() {
           <CardContent className="pt-6">
             <div>
               <p className="text-2xl font-bold">{stats?.latestYear || '—'}</p>
-              <p className="text-sm text-muted-foreground">Ano Mais Recente</p>
+              <p className="text-sm text-muted-foreground">{tx("Ano Mais Recente")}</p>
             </div>
           </CardContent>
         </Card>
@@ -89,7 +90,7 @@ export default function MapaTurismoPanel() {
           <CardContent className="pt-6">
             <div>
               <p className="text-2xl font-bold">{stats ? Object.keys(stats.byCategoria).length : 0}</p>
-              <p className="text-sm text-muted-foreground">Categorias</p>
+              <p className="text-sm text-muted-foreground">{tx("Categorias")}</p>
             </div>
           </CardContent>
         </Card>
@@ -99,7 +100,7 @@ export default function MapaTurismoPanel() {
       {stats && Object.keys(stats.byCategoria).length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Distribuição por Categoria</CardTitle>
+            <CardTitle className="text-base">{tx("Distribuição por Categoria")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">
@@ -128,9 +129,9 @@ export default function MapaTurismoPanel() {
 
       <Tabs defaultValue="dados">
         <TabsList>
-          <TabsTrigger value="dados">Dados</TabsTrigger>
-          <TabsTrigger value="importar">Importar</TabsTrigger>
-          <TabsTrigger value="historico">Histórico</TabsTrigger>
+          <TabsTrigger value="dados">{tx("Dados")}</TabsTrigger>
+          <TabsTrigger value="importar">{tx("Importar")}</TabsTrigger>
+          <TabsTrigger value="historico">{tx("Histórico")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="dados" className="space-y-4">
@@ -138,10 +139,10 @@ export default function MapaTurismoPanel() {
           <div className="flex gap-3 flex-wrap">
             <Select value={filterUF} onValueChange={setFilterUF}>
               <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="UF" />
+                <SelectValue placeholder={tx("UF")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas UFs</SelectItem>
+                <SelectItem value="all">{tx("Todas UFs")}</SelectItem>
                 {UF_LIST.map(uf => (
                   <SelectItem key={uf} value={uf}>{uf}</SelectItem>
                 ))}
@@ -151,10 +152,10 @@ export default function MapaTurismoPanel() {
             {stats?.availableYears && (
               <Select value={filterAno?.toString() || ''} onValueChange={(v) => setFilterAno(v ? Number(v) : undefined)}>
                 <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Ano" />
+                  <SelectValue placeholder={tx("Ano")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="all">{tx("Todos")}</SelectItem>
                   {stats.availableYears.map(y => (
                     <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
                   ))}
@@ -172,8 +173,8 @@ export default function MapaTurismoPanel() {
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
                 <MapPin className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                <p>Nenhum dado importado ainda.</p>
-                <p className="text-sm">Use a aba "Importar" para buscar dados do Mapa do Turismo.</p>
+                <p>{tx("Nenhum dado importado ainda.")}</p>
+                <p className="text-sm">{tx("Use a aba \"Importar\" para buscar dados do Mapa do Turismo.")}</p>
               </CardContent>
             </Card>
           ) : (
@@ -182,12 +183,12 @@ export default function MapaTurismoPanel() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Município</TableHead>
+                      <TableHead>{tx("Município")}</TableHead>
                       <TableHead>UF</TableHead>
-                      <TableHead>Região Turística</TableHead>
-                      <TableHead>Categoria</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Ano</TableHead>
+                      <TableHead>{tx("Região Turística")}</TableHead>
+                      <TableHead>{tx("Categoria")}</TableHead>
+                      <TableHead>{tx("Tipo")}</TableHead>
+                      <TableHead>{tx("Ano")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -221,10 +222,10 @@ export default function MapaTurismoPanel() {
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <Download className="h-5 w-5" />
-                Importar do Mapa do Turismo Brasileiro
+                {tx("Importar do Mapa do Turismo Brasileiro")}
               </CardTitle>
               <CardDescription>
-                Dados importados via <strong>API REST</strong> (mapa.turismo.gov.br) com fallback para <strong>dados.turismo.gov.br</strong> (CKAN CSV).
+                {tx("Dados importados via")} <strong>{tx("API REST")}</strong> (mapa.turismo.gov.br) com fallback para <strong>{tx("dados.turismo.gov.br")}</strong> (CKAN CSV).
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -236,7 +237,7 @@ export default function MapaTurismoPanel() {
                     Usar Firecrawl (Scraping Inteligente)
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Busca dados mais recentes via scraping do portal oficial. Se falhar, usa CSVs do CKAN como fallback.
+                    {tx("Busca dados mais recentes via scraping do portal oficial. Se falhar, usa CSVs do CKAN como fallback.")}
                   </p>
                 </div>
                 <Switch
@@ -248,20 +249,20 @@ export default function MapaTurismoPanel() {
 
               <div className="flex gap-3 items-end flex-wrap">
                 <div>
-                  <label className="text-sm font-medium block mb-1">Tipo de Dados</label>
+                  <label className="text-sm font-medium block mb-1">{tx("Tipo de Dados")}</label>
                   <Select value={syncType} onValueChange={(v: any) => setSyncType(v)}>
                     <SelectTrigger className="w-[200px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="mapa_turismo">Mapa do Turismo</SelectItem>
-                      <SelectItem value="categorizacao">Categorização</SelectItem>
+                      <SelectItem value="mapa_turismo">{tx("Mapa do Turismo")}</SelectItem>
+                      <SelectItem value="categorizacao">{tx("Categorização")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 {!useFirecrawl && (
                   <div>
-                    <label className="text-sm font-medium block mb-1">Ano</label>
+                    <label className="text-sm font-medium block mb-1">{tx("Ano")}</label>
                     <Select value={syncYear.toString()} onValueChange={(v) => setSyncYear(Number(v))}>
                       <SelectTrigger className="w-[120px]">
                         <SelectValue />
@@ -299,12 +300,12 @@ export default function MapaTurismoPanel() {
               </div>
 
               <div className="text-sm text-muted-foreground space-y-1 bg-muted/50 rounded-lg p-4">
-                <p><strong>Estratégia de coleta:</strong></p>
+                <p><strong>{tx("Estratégia de coleta:")}</strong></p>
                 <ul className="list-disc ml-4 space-y-1">
-                  <li><strong>🔥 Firecrawl (primário):</strong> Scraping inteligente do portal oficial para dados mais recentes</li>
+                  <li><strong>🔥 Firecrawl (primário):</strong> {tx("Scraping inteligente do portal oficial para dados mais recentes")}</li>
                   <li><strong>📊 CKAN (fallback):</strong> CSVs estáticos de dados.turismo.gov.br (2013-2017)</li>
                 </ul>
-                <p className="mt-2">Os dados importados são vinculados automaticamente aos destinos cadastrados no SISTUR.</p>
+                <p className="mt-2">{tx("Os dados importados são vinculados automaticamente aos destinos cadastrados no SISTUR.")}</p>
               </div>
             </CardContent>
           </Card>
@@ -313,20 +314,20 @@ export default function MapaTurismoPanel() {
         <TabsContent value="historico" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Histórico de Sincronização</CardTitle>
+              <CardTitle className="text-base">{tx("Histórico de Sincronização")}</CardTitle>
             </CardHeader>
             <CardContent>
               {!syncLogs || syncLogs.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">Nenhuma sincronização realizada.</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{tx("Nenhuma sincronização realizada.")}</p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Ano</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Registros</TableHead>
+                      <TableHead>{tx("Data")}</TableHead>
+                      <TableHead>{tx("Tipo")}</TableHead>
+                      <TableHead>{tx("Ano")}</TableHead>
+                      <TableHead>{tx("Status")}</TableHead>
+                      <TableHead>{tx("Registros")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -345,9 +346,9 @@ export default function MapaTurismoPanel() {
                           {log.status === 'success' ? (
                             <Badge className="bg-green-100 text-green-800"><CheckCircle2 className="h-3 w-3 mr-1" /> OK</Badge>
                           ) : log.status === 'error' ? (
-                            <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" /> Erro</Badge>
+                            <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" /> {tx("Erro")}</Badge>
                           ) : (
-                            <Badge variant="secondary"><Clock className="h-3 w-3 mr-1 animate-spin" /> Executando</Badge>
+                            <Badge variant="secondary"><Clock className="h-3 w-3 mr-1 animate-spin" /> {tx("Executando")}</Badge>
                           )}
                         </TableCell>
                         <TableCell>{log.records_inserted}</TableCell>

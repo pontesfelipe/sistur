@@ -80,7 +80,7 @@ const EXAMPLE_DRAFT: Partial<Entry> = {
   key: "classification.scale_5_levels",
   category: "classification",
   scope: "global",
-  title: "Régua oficial de classificação (5 níveis)",
+  title: tx("Régua oficial de classificação (5 níveis)"),
   section_header: "CLASSIFICAÇÃO (régua oficial 5 níveis)",
   applies_to: "both",
   injection_order: 200,
@@ -101,7 +101,7 @@ Regras:
 const FIELD_HELP: Record<string, string> = {
   key: "Identificador único e estável. Use snake_case com prefixo da categoria. Ex.: methodology.beni_3_pilares, anti_hallucination.no_rankings.",
   category: "Tipo da regra. 'methodology' = base teórica; 'classification' = réguas/limiares; 'anti_hallucination' = regras de proibição; 'formatting' = formato de saída; 'sources' = fontes oficiais; 'glossary' = definições.",
-  title: "Nome curto para a UI. Ex.: 'Régua oficial 5 níveis', 'Proibição de rankings'.",
+  title: tx("Nome curto para a UI. Ex.: 'Régua oficial 5 níveis', 'Proibição de rankings'."),
   section_header: "Cabeçalho impresso no prompt do LLM antes do conteúdo. Opcional. Ex.: 'REGRAS ANTI-ALUCINAÇÃO:'.",
   content: "Texto/markdown injetado no prompt do gerador de relatórios. Seja imperativo e direto (use 'sempre', 'nunca', listas numeradas).",
   applies_to: "Em qual fluxo de relatório a regra entra: 'territorial' (destinos/municípios), 'enterprise' (empresas) ou 'both'.",
@@ -482,7 +482,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
     }
     const valid = rows.filter((r) => r.key && r.title && r.content && r.category);
     if (valid.length === 0) {
-      toast.error("Nenhuma entrada válida encontrada (campos obrigatórios: key, title, content, category).");
+      toast.error(tx("Nenhuma entrada válida encontrada (campos obrigatórios: key, title, content, category)."));
       return;
     }
     setImportPreview({ rows: valid, format, filename: file.name });
@@ -759,7 +759,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     <Input
                       value={draft.section_header ?? ""}
                       onChange={(e) => setDraft({ ...draft, section_header: e.target.value })}
-                      placeholder="ex.: CLASSIFICAÇÃO (régua oficial 5 níveis)"
+                      placeholder={tx("ex.: CLASSIFICAÇÃO (régua oficial 5 níveis)")}
                     />
                     <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.section_header}</p>
                   </div>
@@ -980,7 +980,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   value={auditText}
                   onChange={(e) => { setAuditText(e.target.value); if (!e.target.value) setAuditFileName(""); }}
                   rows={12}
-                  placeholder="Cole aqui o conteúdo bruto do relatório (markdown, texto extraído de PDF, etc.)…"
+                  placeholder={tx("Cole aqui o conteúdo bruto do relatório (markdown, texto extraído de PDF, etc.)…")}
                   className="font-mono text-xs mt-1"
                 />
               </div>
@@ -1120,7 +1120,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
           {importPreview && (
             <div className="space-y-4">
               <div className="text-sm text-muted-foreground">
-                {tx("Arquivo")} <code className="text-foreground">{importPreview.filename}</code> — formato <b>{importPreview.format.toUpperCase()}</b> — {importPreview.rows.length} entrada(s) válida(s).
+                {tx("Arquivo")} <code className="text-foreground">{importPreview.filename}</code> {tx("— formato")} <b>{importPreview.format.toUpperCase()}</b> — {importPreview.rows.length} entrada(s) válida(s).
               </div>
 
               <div className="rounded-md border max-h-64 overflow-y-auto">
@@ -1157,13 +1157,13 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   <div className="flex items-start gap-2">
                     <RadioGroupItem value="merge" id="imp-merge" className="mt-1" />
                     <Label htmlFor="imp-merge" className="font-normal cursor-pointer">
-                      <span className="font-medium">Merge (recomendado)</span> — insere novas chaves e atualiza existentes. Entradas atuais não presentes no arquivo são mantidas.
+                      <span className="font-medium">Merge (recomendado)</span> {tx("— insere novas chaves e atualiza existentes. Entradas atuais não presentes no arquivo são mantidas.")}
                     </Label>
                   </div>
                   <div className="flex items-start gap-2">
                     <RadioGroupItem value="replace" id="imp-replace" className="mt-1" />
                     <Label htmlFor="imp-replace" className="font-normal cursor-pointer">
-                      <span className="font-medium">{tx("Substituir")}</span> — insere/atualiza do arquivo e <b>{tx("desativa")}</b> entradas ativas que não estão no arquivo (não exclui, permite reverter).
+                      <span className="font-medium">{tx("Substituir")}</span> {tx("— insere/atualiza do arquivo e")} <b>{tx("desativa")}</b> entradas ativas que não estão no arquivo (não exclui, permite reverter).
                     </Label>
                   </div>
                 </RadioGroup>

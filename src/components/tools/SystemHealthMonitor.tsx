@@ -18,6 +18,7 @@ import {
   Loader2
 } from 'lucide-react';
 
+import { tx } from "@/i18n/t";
 interface SystemStats {
   destinations: number;
   assessments: number;
@@ -84,13 +85,13 @@ export function SystemHealthMonitor() {
   }, [open]);
 
   const getHealthStatus = () => {
-    if (!stats) return { status: 'loading', label: 'Carregando...', color: 'bg-muted' };
+    if (!stats) return { status: 'loading', label: tx('Carregando...'), color: 'bg-muted' };
     
     if (stats.pendingApprovals > 5) {
-      return { status: 'warning', label: 'Atenção Necessária', color: 'bg-yellow-500' };
+      return { status: 'warning', label: tx('Atenção Necessária'), color: 'bg-yellow-500' };
     }
     
-    return { status: 'healthy', label: 'Sistema Operacional', color: 'bg-green-500' };
+    return { status: 'healthy', label: tx('Sistema Operacional'), color: 'bg-green-500' };
   };
 
   const health = getHealthStatus();
@@ -100,17 +101,17 @@ export function SystemHealthMonitor() {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Activity className="h-4 w-4 mr-2" />
-          Monitorar Sistema
+          {tx("Monitorar Sistema")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" />
-            Monitor de Saúde do Sistema
+            {tx("Monitor de Saúde do Sistema")}
           </DialogTitle>
           <DialogDescription>
-            Visão geral do estado atual do SISTUR
+            {tx("Visão geral do estado atual do SISTUR")}
           </DialogDescription>
         </DialogHeader>
 
@@ -149,7 +150,7 @@ export function SystemHealthMonitor() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-primary" />
-                      Destinos
+                      {tx("Destinos")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -161,7 +162,7 @@ export function SystemHealthMonitor() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <FileText className="h-4 w-4 text-primary" />
-                      Diagnósticos
+                      {tx("Diagnósticos")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -173,7 +174,7 @@ export function SystemHealthMonitor() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <Users className="h-4 w-4 text-primary" />
-                      Usuários
+                      {tx("Usuários")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -185,7 +186,7 @@ export function SystemHealthMonitor() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                       <Clock className="h-4 w-4 text-yellow-500" />
-                      Pendentes
+                      {tx("Pendentes")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -202,19 +203,19 @@ export function SystemHealthMonitor() {
               {/* EDU Stats */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">SISTUR EDU</CardTitle>
+                  <CardTitle className="text-sm font-medium">{tx("SISTUR EDU")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Cursos Cadastrados</span>
+                    <span className="text-sm text-muted-foreground">{tx("Cursos Cadastrados")}</span>
                     <span className="font-medium">{stats.courses}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Treinamentos</span>
+                    <span className="text-sm text-muted-foreground">{tx("Treinamentos")}</span>
                     <span className="font-medium">{stats.trainings}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Gargalos Detectados</span>
+                    <span className="text-sm text-muted-foreground">{tx("Gargalos Detectados")}</span>
                     <span className="font-medium">{stats.issues}</span>
                   </div>
                 </CardContent>
@@ -224,7 +225,7 @@ export function SystemHealthMonitor() {
               {stats.lastAssessment && (
                 <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg text-sm">
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  <span className="text-muted-foreground">Último diagnóstico calculado em:</span>
+                  <span className="text-muted-foreground">{tx("Último diagnóstico calculado em:")}</span>
                   <span className="font-medium">
                     {new Date(stats.lastAssessment).toLocaleDateString('pt-BR', {
                       day: '2-digit',

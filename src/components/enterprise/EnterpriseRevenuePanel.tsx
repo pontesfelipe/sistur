@@ -16,13 +16,14 @@ import { useProfile } from '@/hooks/useProfile';
 import { DynamicPricingPanel, LtvPanel } from './DynamicPricingPanel';
 import { RevenueIntelligenceGate } from '@/components/layout/RevenueIntelligenceGate';
 
+import { tx } from "@/i18n/t";
 const CHANNEL_TYPES: { value: EnterpriseChannelType; label: string; defaultCommission: number }[] = [
-  { value: 'DIRETO', label: 'Direto (site/telefone/walk-in)', defaultCommission: 0 },
-  { value: 'OTA', label: 'OTA (Booking, Expedia, Airbnb…)', defaultCommission: 18 },
-  { value: 'AGENCIA', label: 'Agência / Operadora', defaultCommission: 12 },
-  { value: 'CORPORATIVO', label: 'Corporativo / Convênio', defaultCommission: 5 },
-  { value: 'EVENTOS', label: 'Eventos / Grupos', defaultCommission: 8 },
-  { value: 'OUTRO', label: 'Outro', defaultCommission: 0 },
+  { value: 'DIRETO', label: tx('Direto (site/telefone/walk-in)'), defaultCommission: 0 },
+  { value: 'OTA', label: tx('OTA (Booking, Expedia, Airbnb…)'), defaultCommission: 18 },
+  { value: 'AGENCIA', label: tx('Agência / Operadora'), defaultCommission: 12 },
+  { value: 'CORPORATIVO', label: tx('Corporativo / Convênio'), defaultCommission: 5 },
+  { value: 'EVENTOS', label: tx('Eventos / Grupos'), defaultCommission: 8 },
+  { value: 'OUTRO', label: tx('Outro'), defaultCommission: 0 },
 ];
 
 const MONTH_NAMES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -76,11 +77,11 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
   };
 
   const seasonalityLabel =
-    seasonalityIndex < 0.15 ? { label: 'Muito estável', color: 'bg-emerald-500/15 text-emerald-700' } :
-    seasonalityIndex < 0.30 ? { label: 'Estável', color: 'bg-emerald-500/15 text-emerald-700' } :
-    seasonalityIndex < 0.45 ? { label: 'Moderada', color: 'bg-amber-500/15 text-amber-700' } :
-    seasonalityIndex < 0.60 ? { label: 'Alta', color: 'bg-orange-500/15 text-orange-700' } :
-    { label: 'Muito alta', color: 'bg-red-500/15 text-red-700' };
+    seasonalityIndex < 0.15 ? { label: tx('Muito estável'), color: 'bg-emerald-500/15 text-emerald-700' } :
+    seasonalityIndex < 0.30 ? { label: tx('Estável'), color: 'bg-emerald-500/15 text-emerald-700' } :
+    seasonalityIndex < 0.45 ? { label: tx('Moderada'), color: 'bg-amber-500/15 text-amber-700' } :
+    seasonalityIndex < 0.60 ? { label: tx('Alta'), color: 'bg-orange-500/15 text-orange-700' } :
+    { label: tx('Muito alta'), color: 'bg-red-500/15 text-red-700' };
 
   return (
     <Card>
@@ -91,7 +92,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
               <BarChart3 className="h-5 w-5 text-emerald-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">Receita & Canais</CardTitle>
+              <CardTitle className="text-lg">{tx("Receita & Canais")}</CardTitle>
               <CardDescription>{destinationName} — mix de distribuição e sazonalidade real</CardDescription>
             </div>
           </div>
@@ -107,39 +108,39 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
             <TabsTrigger value="canais" className="gap-2">
               <TrendingUp className="h-4 w-4" />
-              Canais de Distribuição
+              {tx("Canais de Distribuição")}
             </TabsTrigger>
             <TabsTrigger value="sazonalidade" className="gap-2">
               <Calendar className="h-4 w-4" />
-              Sazonalidade Mensal
+              {tx("Sazonalidade Mensal")}
             </TabsTrigger>
-            <TabsTrigger value="precificacao">Precificação</TabsTrigger>
-            <TabsTrigger value="ltv">LTV do hóspede</TabsTrigger>
+            <TabsTrigger value="precificacao">{tx("Precificação")}</TabsTrigger>
+            <TabsTrigger value="ltv">{tx("LTV do hóspede")}</TabsTrigger>
           </TabsList>
 
           {/* CANAIS */}
           <TabsContent value="canais" className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-lg border p-3 bg-muted/30">
-                <div className="text-xs text-muted-foreground">Total declarado</div>
+                <div className="text-xs text-muted-foreground">{tx("Total declarado")}</div>
                 <div className={`text-2xl font-bold ${Math.abs(totalShare - 100) > 1 ? 'text-amber-600' : 'text-emerald-600'}`}>
                   {totalShare.toFixed(1)}%
                 </div>
                 {Math.abs(totalShare - 100) > 1 && (
                   <div className="flex items-center gap-1 mt-1 text-xs text-amber-600">
-                    <AlertCircle className="h-3 w-3" /> Soma deve totalizar 100%
+                    <AlertCircle className="h-3 w-3" /> {tx("Soma deve totalizar 100%")}
                   </div>
                 )}
               </div>
               <div className="rounded-lg border p-3 bg-muted/30">
-                <div className="text-xs text-muted-foreground">Comissão média ponderada</div>
+                <div className="text-xs text-muted-foreground">{tx("Comissão média ponderada")}</div>
                 <div className="text-2xl font-bold">{weightedCommission.toFixed(1)}%</div>
-                <div className="text-xs text-muted-foreground mt-1">Quanto menor, melhor</div>
+                <div className="text-xs text-muted-foreground mt-1">{tx("Quanto menor, melhor")}</div>
               </div>
               <div className="rounded-lg border p-3 bg-muted/30">
-                <div className="text-xs text-muted-foreground">% Vendas diretas</div>
+                <div className="text-xs text-muted-foreground">{tx("% Vendas diretas")}</div>
                 <div className="text-2xl font-bold text-emerald-600">{directShare.toFixed(1)}%</div>
-                <div className="text-xs text-muted-foreground mt-1">Alvo: ≥ 30%</div>
+                <div className="text-xs text-muted-foreground mt-1">{tx("Alvo: ≥ 30%")}</div>
               </div>
             </div>
 
@@ -147,15 +148,15 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
             <div className="space-y-2">
               {channels.length === 0 && (
                 <div className="text-sm text-muted-foreground text-center py-6 border border-dashed rounded-lg">
-                  Nenhum canal cadastrado. Adicione abaixo o mix real de reservas.
+                  {tx("Nenhum canal cadastrado. Adicione abaixo o mix real de reservas.")}
                 </div>
               )}
               {channels.map((c) => (
                 <div key={c.id} className="flex items-center gap-2 p-3 border rounded-lg">
                   <Badge variant="outline">{CHANNEL_TYPES.find((t) => t.value === c.channel_type)?.label.split(' ')[0]}</Badge>
                   <div className="flex-1 font-medium">{c.channel_name}</div>
-                  <div className="text-sm text-muted-foreground">Share: <span className="font-semibold text-foreground">{Number(c.share_pct).toFixed(1)}%</span></div>
-                  <div className="text-sm text-muted-foreground">Com.: <span className="font-semibold text-foreground">{Number(c.commission_pct).toFixed(1)}%</span></div>
+                  <div className="text-sm text-muted-foreground">{tx("Share:")} <span className="font-semibold text-foreground">{Number(c.share_pct).toFixed(1)}%</span></div>
+                  <div className="text-sm text-muted-foreground">{tx("Com.:")} <span className="font-semibold text-foreground">{Number(c.commission_pct).toFixed(1)}%</span></div>
                   <Button variant="ghost" size="icon" onClick={() => remove.mutate(c.id)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
@@ -165,11 +166,11 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
 
             {/* Add new */}
             <div className="border-t pt-4 space-y-3">
-              <Label>Adicionar canal</Label>
+              <Label>{tx("Adicionar canal")}</Label>
               <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
                 <div className="md:col-span-4">
                   <Input
-                    placeholder="Nome do canal (ex: Booking.com)"
+                    placeholder={tx("Nome do canal (ex: Booking.com)")}
                     value={newChannel.channel_name}
                     onChange={(e) => setNewChannel((p) => ({ ...p, channel_name: e.target.value }))}
                   />
@@ -193,7 +194,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
                 <div className="md:col-span-2">
                   <Input
                     type="number" min="0" max="100" step="0.1"
-                    placeholder="Share %"
+                    placeholder={tx("Share %")}
                     value={newChannel.share_pct || ''}
                     onChange={(e) => setNewChannel((p) => ({ ...p, share_pct: Number(e.target.value) }))}
                   />
@@ -201,7 +202,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
                 <div className="md:col-span-2">
                   <Input
                     type="number" min="0" max="100" step="0.1"
-                    placeholder="Comissão %"
+                    placeholder={tx("Comissão %")}
                     value={newChannel.commission_pct || ''}
                     onChange={(e) => setNewChannel((p) => ({ ...p, commission_pct: Number(e.target.value) }))}
                   />
@@ -218,7 +219,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
           {/* SAZONALIDADE */}
           <TabsContent value="sazonalidade" className="space-y-4">
             <div className="flex items-center gap-3">
-              <Label>Ano de referência</Label>
+              <Label>{tx("Ano de referência")}</Label>
               <Select value={year.toString()} onValueChange={(v) => setYear(Number(v))}>
                 <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -228,7 +229,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
                 </SelectContent>
               </Select>
               <div className="ml-auto flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Índice de sazonalidade:</span>
+                <span className="text-sm text-muted-foreground">{tx("Índice de sazonalidade:")}</span>
                 <Badge className={seasonalityLabel.color}>
                   {seasonalityIndex.toFixed(3)} — {seasonalityLabel.label}
                 </Badge>
@@ -245,7 +246,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
                     <div className="col-span-5">
                       <Input
                         type="number" min="0" max="100" step="0.1"
-                        placeholder="Ocupação %"
+                        placeholder={tx("Ocupação %")}
                         defaultValue={data?.occupancy_rate ?? ''}
                         onBlur={(e) => {
                           const v = e.target.value;
@@ -258,7 +259,7 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
                     <div className="col-span-5">
                       <Input
                         type="number" min="0" step="0.01"
-                        placeholder="ADR R$"
+                        placeholder={tx("ADR R$")}
                         defaultValue={data?.adr ?? ''}
                         onBlur={(e) => {
                           const v = e.target.value;
@@ -275,11 +276,11 @@ export function EnterpriseRevenuePanel({ destinationId, destinationName, onClose
             <p className="text-xs text-muted-foreground">
               Preencha ao menos 3 meses para que o índice de sazonalidade seja calculado.
               O índice (coeficiente de variação da ocupação) alimenta automaticamente o indicador
-              <strong> ENT_SEASONALITY_INDEX</strong> no próximo cálculo do diagnóstico.
+              <strong> {tx("ENT_SEASONALITY_INDEX")}</strong> {tx("no próximo cálculo do diagnóstico.")}
             </p>
           </TabsContent>
-          <TabsContent value="precificacao"><RevenueIntelligenceGate title="A Precificação dinâmica"><DynamicPricingPanel months={months} /></RevenueIntelligenceGate></TabsContent>
-          <TabsContent value="ltv"><RevenueIntelligenceGate title="O LTV do hóspede"><LtvPanel commissionPct={weightedCommission} /></RevenueIntelligenceGate></TabsContent>
+          <TabsContent value="precificacao"><RevenueIntelligenceGate title={tx("A Precificação dinâmica")}><DynamicPricingPanel months={months} /></RevenueIntelligenceGate></TabsContent>
+          <TabsContent value="ltv"><RevenueIntelligenceGate title={tx("O LTV do hóspede")}><LtvPanel commissionPct={weightedCommission} /></RevenueIntelligenceGate></TabsContent>
         </Tabs>
       </CardContent>
     </Card>

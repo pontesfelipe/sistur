@@ -14,7 +14,7 @@ export function DailyMissionsPanel() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" /> Missões diárias
+            <Target className="h-5 w-5 text-primary" /> {tx("Missões diárias")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -33,12 +33,12 @@ export function DailyMissionsPanel() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" /> Missões diárias
+              <Target className="h-5 w-5 text-primary" /> {tx("Missões diárias")}
             </CardTitle>
             <CardDescription>3 desafios novos a cada dia. Concluídos: {completed}/{list.length}</CardDescription>
           </div>
           <Badge variant="secondary" className="gap-1">
-            <Sparkles className="h-3 w-3" /> Bônus XP
+            <Sparkles className="h-3 w-3" /> {tx("Bônus XP")}
           </Badge>
         </div>
       </CardHeader>

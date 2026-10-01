@@ -47,11 +47,11 @@ type MturFreshness = {
 };
 
 const HEALTH_STYLE: Record<HealthRow['health'], { label: string; cls: string; icon: typeof CheckCircle2 }> = {
-  healthy:   { label: 'Saudável',     cls: 'bg-severity-good/15 text-severity-good border-severity-good/30', icon: CheckCircle2 },
-  partial:   { label: 'Parcial',      cls: 'bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30', icon: AlertTriangle },
-  failed:    { label: 'Falhou',       cls: 'bg-severity-critical/15 text-severity-critical border-severity-critical/30', icon: XCircle },
-  stale:     { label: 'Defasado',     cls: 'bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30', icon: CalendarClock },
-  never_run: { label: 'Nunca rodou',  cls: 'bg-muted text-muted-foreground border-border', icon: Activity },
+  healthy:   { label: tx('Saudável'),     cls: 'bg-severity-good/15 text-severity-good border-severity-good/30', icon: CheckCircle2 },
+  partial:   { label: tx('Parcial'),      cls: 'bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30', icon: AlertTriangle },
+  failed:    { label: tx('Falhou'),       cls: 'bg-severity-critical/15 text-severity-critical border-severity-critical/30', icon: XCircle },
+  stale:     { label: tx('Defasado'),     cls: 'bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30', icon: CalendarClock },
+  never_run: { label: tx('Nunca rodou'),  cls: 'bg-muted text-muted-foreground border-border', icon: Activity },
 };
 
 const FN_DISPLAY: Record<string, string> = {

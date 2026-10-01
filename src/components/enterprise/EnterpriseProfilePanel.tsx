@@ -30,6 +30,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+import { tx } from "@/i18n/t";
 interface EnterpriseProfilePanelProps {
   destinationId: string;
   destinationName: string;
@@ -37,20 +38,20 @@ interface EnterpriseProfilePanelProps {
 }
 
 const PROPERTY_TYPES = [
-  { value: 'hotel', label: 'Hotel' },
-  { value: 'resort', label: 'Resort' },
-  { value: 'pousada', label: 'Pousada' },
-  { value: 'hostel', label: 'Hostel' },
-  { value: 'apart_hotel', label: 'Apart-Hotel' },
-  { value: 'flat', label: 'Flat' },
-  { value: 'camping', label: 'Camping/Glamping' },
+  { value: 'hotel', label: tx('Hotel') },
+  { value: 'resort', label: tx('Resort') },
+  { value: 'pousada', label: tx('Pousada') },
+  { value: 'hostel', label: tx('Hostel') },
+  { value: 'apart_hotel', label: tx('Apart-Hotel') },
+  { value: 'flat', label: tx('Flat') },
+  { value: 'camping', label: tx('Camping/Glamping') },
 ];
 
 const SEASONALITY_OPTIONS = [
-  { value: 'alta', label: 'Alta (predominantemente alta temporada)' },
-  { value: 'media', label: 'Média (equilibrado)' },
-  { value: 'baixa', label: 'Baixa (predominantemente baixa temporada)' },
-  { value: 'uniforme', label: 'Uniforme (sem sazonalidade)' },
+  { value: 'alta', label: tx('Alta (predominantemente alta temporada)') },
+  { value: 'media', label: tx('Média (equilibrado)') },
+  { value: 'baixa', label: tx('Baixa (predominantemente baixa temporada)') },
+  { value: 'uniforme', label: tx('Uniforme (sem sazonalidade)') },
 ];
 
 const MONTHS = [
@@ -59,42 +60,42 @@ const MONTHS = [
 ];
 
 const TARGET_MARKETS = [
-  { value: 'corporativo', label: 'Corporativo' },
-  { value: 'lazer', label: 'Lazer' },
-  { value: 'familia', label: 'Família' },
-  { value: 'eventos', label: 'Eventos' },
-  { value: 'eco', label: 'Ecoturismo' },
-  { value: 'terceira_idade', label: 'Terceira Idade' },
-  { value: 'lua_de_mel', label: 'Lua de Mel' },
+  { value: 'corporativo', label: tx('Corporativo') },
+  { value: 'lazer', label: tx('Lazer') },
+  { value: 'familia', label: tx('Família') },
+  { value: 'eventos', label: tx('Eventos') },
+  { value: 'eco', label: tx('Ecoturismo') },
+  { value: 'terceira_idade', label: tx('Terceira Idade') },
+  { value: 'lua_de_mel', label: tx('Lua de Mel') },
 ];
 
 const CERTIFICATIONS = [
-  { value: 'iso_9001', label: 'ISO 9001' },
-  { value: 'iso_14001', label: 'ISO 14001' },
-  { value: 'green_key', label: 'Green Key' },
-  { value: 'leed', label: 'LEED' },
-  { value: 'rainforest', label: 'Rainforest Alliance' },
-  { value: 'cadastur', label: 'CADASTUR' },
-  { value: 'selo_turismo', label: 'Selo Turismo Responsável' },
+  { value: 'iso_9001', label: tx('ISO 9001') },
+  { value: 'iso_14001', label: tx('ISO 14001') },
+  { value: 'green_key', label: tx('Green Key') },
+  { value: 'leed', label: tx('LEED') },
+  { value: 'rainforest', label: tx('Rainforest Alliance') },
+  { value: 'cadastur', label: tx('CADASTUR') },
+  { value: 'selo_turismo', label: tx('Selo Turismo Responsável') },
 ];
 
 const SUSTAINABILITY_INITIATIVES = [
-  { value: 'energia_solar', label: 'Energia Solar' },
-  { value: 'reuso_agua', label: 'Reuso de Água' },
-  { value: 'compostagem', label: 'Compostagem' },
-  { value: 'amenities_sustentaveis', label: 'Amenities Sustentáveis' },
-  { value: 'fornecedores_locais', label: 'Fornecedores Locais' },
-  { value: 'reducao_plastico', label: 'Redução de Plástico' },
-  { value: 'horta_organica', label: 'Horta Orgânica' },
+  { value: 'energia_solar', label: tx('Energia Solar') },
+  { value: 'reuso_agua', label: tx('Reuso de Água') },
+  { value: 'compostagem', label: tx('Compostagem') },
+  { value: 'amenities_sustentaveis', label: tx('Amenities Sustentáveis') },
+  { value: 'fornecedores_locais', label: tx('Fornecedores Locais') },
+  { value: 'reducao_plastico', label: tx('Redução de Plástico') },
+  { value: 'horta_organica', label: tx('Horta Orgânica') },
 ];
 
 const ACCESSIBILITY_FEATURES = [
-  { value: 'cadeirante', label: 'Acesso para Cadeirante' },
-  { value: 'deficiencia_visual', label: 'Recursos para Deficientes Visuais' },
-  { value: 'deficiencia_auditiva', label: 'Recursos para Deficientes Auditivos' },
-  { value: 'elevadores', label: 'Elevadores Acessíveis' },
-  { value: 'banheiros_adaptados', label: 'Banheiros Adaptados' },
-  { value: 'sinalizacao_braile', label: 'Sinalização em Braille' },
+  { value: 'cadeirante', label: tx('Acesso para Cadeirante') },
+  { value: 'deficiencia_visual', label: tx('Recursos para Deficientes Visuais') },
+  { value: 'deficiencia_auditiva', label: tx('Recursos para Deficientes Auditivos') },
+  { value: 'elevadores', label: tx('Elevadores Acessíveis') },
+  { value: 'banheiros_adaptados', label: tx('Banheiros Adaptados') },
+  { value: 'sinalizacao_braile', label: tx('Sinalização em Braille') },
 ];
 
 export function EnterpriseProfilePanel({ destinationId, destinationName, onClose }: EnterpriseProfilePanelProps) {
@@ -169,11 +170,11 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enterprise-profile', destinationId] });
       queryClient.invalidateQueries({ queryKey: ['enterprise-profiles'] });
-      toast.success('Perfil do empreendimento salvo com sucesso');
+      toast.success(tx('Perfil do empreendimento salvo com sucesso'));
     },
     onError: (error) => {
       console.error('Error saving profile:', error);
-      toast.error('Erro ao salvar perfil');
+      toast.error(tx('Erro ao salvar perfil'));
     }
   });
 
@@ -198,7 +199,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
         <CardContent className="py-12">
           <div className="flex items-center justify-center gap-2">
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Carregando perfil...</span>
+            <span>{tx("Carregando perfil...")}</span>
           </div>
         </CardContent>
       </Card>
@@ -214,7 +215,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <Hotel className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <CardTitle className="text-lg">Perfil do Empreendimento</CardTitle>
+              <CardTitle className="text-lg">{tx("Perfil do Empreendimento")}</CardTitle>
               <CardDescription>{destinationName}</CardDescription>
             </div>
           </div>
@@ -230,19 +231,19 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="tipo" className="gap-2">
               <Building2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Tipo e Porte</span>
+              <span className="hidden sm:inline">{tx("Tipo e Porte")}</span>
             </TabsTrigger>
             <TabsTrigger value="operacao" className="gap-2">
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Operação</span>
+              <span className="hidden sm:inline">{tx("Operação")}</span>
             </TabsTrigger>
             <TabsTrigger value="mercado" className="gap-2">
               <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Mercado</span>
+              <span className="hidden sm:inline">{tx("Mercado")}</span>
             </TabsTrigger>
             <TabsTrigger value="certificacoes" className="gap-2">
               <Award className="h-4 w-4" />
-              <span className="hidden sm:inline">Certificações</span>
+              <span className="hidden sm:inline">{tx("Certificações")}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -250,13 +251,13 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
           <TabsContent value="tipo" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="property_type">Tipo de Empreendimento</Label>
+                <Label htmlFor="property_type">{tx("Tipo de Empreendimento")}</Label>
                 <Select 
                   value={formData.property_type} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, property_type: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione..." />
+                    <SelectValue placeholder={tx("Selecione...")} />
                   </SelectTrigger>
                   <SelectContent>
                     {PROPERTY_TYPES.map(type => (
@@ -273,7 +274,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                   onValueChange={(value) => setFormData(prev => ({ ...prev, star_rating: value ? parseInt(value) : null }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione..." />
+                    <SelectValue placeholder={tx("Selecione...")} />
                   </SelectTrigger>
                   <SelectContent>
                     {[1, 2, 3, 4, 5].map(rating => (
@@ -300,31 +301,31 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                   min="0"
                   value={formData.room_count || ''}
                   onChange={(e) => handleNumberChange('room_count', e.target.value)}
-                  placeholder="Ex: 120"
+                  placeholder={tx("Ex: 120")}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="suite_count">Número de Suítes</Label>
+                <Label htmlFor="suite_count">{tx("Número de Suítes")}</Label>
                 <Input
                   id="suite_count"
                   type="number"
                   min="0"
                   value={formData.suite_count || ''}
                   onChange={(e) => handleNumberChange('suite_count', e.target.value)}
-                  placeholder="Ex: 20"
+                  placeholder={tx("Ex: 20")}
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="total_capacity">Capacidade Total de Hóspedes</Label>
+                <Label htmlFor="total_capacity">{tx("Capacidade Total de Hóspedes")}</Label>
                 <Input
                   id="total_capacity"
                   type="number"
                   min="0"
                   value={formData.total_capacity || ''}
                   onChange={(e) => handleNumberChange('total_capacity', e.target.value)}
-                  placeholder="Ex: 300"
+                  placeholder={tx("Ex: 300")}
                 />
               </div>
             </div>
@@ -336,7 +337,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2">
                 <Label htmlFor="employee_count" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Número de Funcionários
+                  {tx("Número de Funcionários")}
                 </Label>
                 <Input
                   id="employee_count"
@@ -344,14 +345,14 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                   min="0"
                   value={formData.employee_count || ''}
                   onChange={(e) => handleNumberChange('employee_count', e.target.value)}
-                  placeholder="Ex: 50"
+                  placeholder={tx("Ex: 50")}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="years_in_operation" className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  Anos de Operação
+                  {tx("Anos de Operação")}
                 </Label>
                 <Input
                   id="years_in_operation"
@@ -359,18 +360,18 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                   min="0"
                   value={formData.years_in_operation || ''}
                   onChange={(e) => handleNumberChange('years_in_operation', e.target.value)}
-                  placeholder="Ex: 15"
+                  placeholder={tx("Ex: 15")}
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="seasonality">Perfil de Sazonalidade</Label>
+                <Label htmlFor="seasonality">{tx("Perfil de Sazonalidade")}</Label>
                 <Select 
                   value={formData.seasonality || ''} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, seasonality: value || null }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione..." />
+                    <SelectValue placeholder={tx("Selecione...")} />
                   </SelectTrigger>
                   <SelectContent>
                     {SEASONALITY_OPTIONS.map(opt => (
@@ -381,7 +382,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label>Meses de Alta Temporada</Label>
+                <Label>{tx("Meses de Alta Temporada")}</Label>
                 <div className="flex flex-wrap gap-2">
                   {MONTHS.map((month, idx) => {
                     const monthValue = (idx + 1).toString().padStart(2, '0');
@@ -418,7 +419,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                   step="0.1"
                   value={formData.average_occupancy_rate || ''}
                   onChange={(e) => handleNumberChange('average_occupancy_rate', e.target.value)}
-                  placeholder="Ex: 72.5"
+                  placeholder={tx("Ex: 72.5")}
                 />
               </div>
 
@@ -431,12 +432,12 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                   step="0.01"
                   value={formData.average_daily_rate || ''}
                   onChange={(e) => handleNumberChange('average_daily_rate', e.target.value)}
-                  placeholder="Ex: 450.00"
+                  placeholder={tx("Ex: 450.00")}
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label>Público-Alvo</Label>
+                <Label>{tx("Público-Alvo")}</Label>
                 <div className="flex flex-wrap gap-2">
                   {TARGET_MARKETS.map(market => {
                     const isSelected = (formData.target_market || []).includes(market.value);
@@ -457,7 +458,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="primary_source_markets" className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  Principais Mercados Emissores
+                  {tx("Principais Mercados Emissores")}
                 </Label>
                 <Input
                   id="primary_source_markets"
@@ -466,9 +467,9 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                     ...prev, 
                     primary_source_markets: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
                   }))}
-                  placeholder="Ex: São Paulo, Rio Grande do Sul, Argentina"
+                  placeholder={tx("Ex: São Paulo, Rio Grande do Sul, Argentina")}
                 />
-                <p className="text-xs text-muted-foreground">Separe os mercados por vírgula</p>
+                <p className="text-xs text-muted-foreground">{tx("Separe os mercados por vírgula")}</p>
               </div>
             </div>
           </TabsContent>
@@ -479,7 +480,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Award className="h-4 w-4" />
-                  Certificações
+                  {tx("Certificações")}
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   {CERTIFICATIONS.map(cert => {
@@ -501,7 +502,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Leaf className="h-4 w-4 text-green-600" />
-                  Iniciativas de Sustentabilidade
+                  {tx("Iniciativas de Sustentabilidade")}
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   {SUSTAINABILITY_INITIATIVES.map(init => {
@@ -523,7 +524,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Accessibility className="h-4 w-4 text-blue-600" />
-                  Recursos de Acessibilidade
+                  {tx("Recursos de Acessibilidade")}
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   {ACCESSIBILITY_FEATURES.map(feat => {
@@ -543,12 +544,12 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="notes">Observações Adicionais</Label>
+                <Label htmlFor="notes">{tx("Observações Adicionais")}</Label>
                 <Textarea
                   id="notes"
                   value={formData.notes || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value || null }))}
-                  placeholder="Informações adicionais sobre o empreendimento..."
+                  placeholder={tx("Informações adicionais sobre o empreendimento...")}
                   rows={3}
                 />
               </div>

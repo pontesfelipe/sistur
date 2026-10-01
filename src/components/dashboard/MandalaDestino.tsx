@@ -266,7 +266,7 @@ export function MandalaDestino({
             fontWeight="600"
             fill="hsl(var(--muted-foreground))"
           >
-            SISTUR
+            {tx("SISTUR")}
           </text>
           <text
             x={cx}

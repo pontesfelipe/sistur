@@ -39,8 +39,7 @@ export function JoinProfessorCard() {
           {tx('Vínculo com professor')}
         </CardTitle>
         <CardDescription>
-          Recebeu um código de um professor? Informe abaixo para entrar na lista de estudantes dele.
-          Depois, o professor adiciona você às turmas.
+          {tx("Recebeu um código de um professor? Informe abaixo para entrar na lista de estudantes dele. Depois, o professor adiciona você às turmas.")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -49,7 +48,7 @@ export function JoinProfessorCard() {
         ) : myLink ? (
           <div className="flex items-center gap-2">
             <Badge className="bg-green-600 gap-1">
-              <CheckCircle2 className="h-3 w-3" /> Vinculado
+              <CheckCircle2 className="h-3 w-3" /> {tx("Vinculado")}
             </Badge>
             <span className="text-sm text-muted-foreground">
               {myLink.professor_name ? `Professor: ${myLink.professor_name}` : 'Você já está vinculado a um professor.'}

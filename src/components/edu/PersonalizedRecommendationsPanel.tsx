@@ -127,7 +127,7 @@ function RecommendationCard({
                 }
               >
                 <Button size="sm" variant="ghost" className="h-7 text-xs">
-                  Ver <ArrowRight className="ml-1 h-3 w-3" />
+                  {tx("Ver")} <ArrowRight className="ml-1 h-3 w-3" />
                 </Button>
               </Link>
             </div>
@@ -207,8 +207,7 @@ export function PersonalizedRecommendationsPanel({
           <UserCircle className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
           <h3 className="font-semibold mb-1">{tx('Complete seu Perfil de Aprendizado')}</h3>
           <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-            Preencha seu perfil para receber recomendações de cursos e trilhas 
-            personalizadas de acordo com seus interesses e objetivos.
+            {tx("Preencha seu perfil para receber recomendações de cursos e trilhas personalizadas de acordo com seus interesses e objetivos.")}
           </p>
           <Link to="/edu/perfil">
             <Button>
@@ -394,7 +393,7 @@ export function PersonalizedRecommendationsPanel({
 
                     <Button variant="outline" size="sm" asChild>
                       <Link to={href}>
-                        Ver <ArrowRight className="ml-2 h-4 w-4" />
+                        {tx("Ver")} <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
                   </CardContent>

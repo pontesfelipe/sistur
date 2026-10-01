@@ -27,27 +27,27 @@ interface ProjectsOverviewCardProps {
 
 const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; color: string }> = {
   planning: {
-    label: 'Planejamento',
+    label: tx('Planejamento'),
     variant: 'secondary',
     color: 'text-muted-foreground',
   },
   in_progress: {
-    label: 'Em Andamento',
+    label: tx('Em Andamento'),
     variant: 'default',
     color: 'text-severity-moderate',
   },
   on_hold: {
-    label: 'Pausado',
+    label: tx('Pausado'),
     variant: 'outline',
     color: 'text-muted-foreground',
   },
   completed: {
-    label: 'Concluído',
+    label: tx('Concluído'),
     variant: 'default',
     color: 'text-severity-good',
   },
   cancelled: {
-    label: 'Cancelado',
+    label: tx('Cancelado'),
     variant: 'destructive',
     color: 'text-muted-foreground',
   },

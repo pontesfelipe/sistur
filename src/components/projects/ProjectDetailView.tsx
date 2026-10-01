@@ -285,7 +285,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             title={tx('Exportar calendário (.ics)')}
           >
             <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">.ics</span>
+            <span className="hidden sm:inline">{tx(".ics")}</span>
           </Button>
           <Select value={project.status} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-40">
@@ -865,9 +865,7 @@ function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; 
           <TrendingUp className="h-10 w-10 text-muted-foreground/50 mb-3" />
           <p className="font-medium">{tx('Nenhum indicador vinculado')}</p>
           <p className="text-sm text-muted-foreground max-w-md mt-1">
-            Projetos criados pelo Modo Prescrição do diagnóstico já trazem os indicadores-alvo
-            com baseline registrado. Para projetos antigos, recrie a partir do diagnóstico para
-            ativar a trilha de impacto.
+            {tx("Projetos criados pelo Modo Prescrição do diagnóstico já trazem os indicadores-alvo com baseline registrado. Para projetos antigos, recrie a partir do diagnóstico para ativar a trilha de impacto.")}
           </p>
         </CardContent>
       </Card>

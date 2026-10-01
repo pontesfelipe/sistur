@@ -29,19 +29,19 @@ const TOOLS = [
     icon: MapPin,
     name: 'list_destinations',
     title: tx("Listar destinos"),
-    description: 'Destinos turísticos acessíveis ao usuário (com unidade/brand quando aplicável).',
+    description: tx('Destinos turísticos acessíveis ao usuário (com unidade/brand quando aplicável).'),
   },
   {
     icon: Gauge,
     name: 'list_assessments',
     title: tx("Listar diagnósticos"),
-    description: 'Rodadas de avaliação com nota final e classificação (Adequado, Atenção, Crítico).',
+    description: tx('Rodadas de avaliação com nota final e classificação (Adequado, Atenção, Crítico).'),
   },
   {
     icon: ListTree,
     name: 'get_assessment',
     title: tx("Detalhar diagnóstico"),
-    description: 'Diagnóstico completo: notas por pilar (RA, OE, AO) e indicadores relevantes.',
+    description: tx('Diagnóstico completo: notas por pilar (RA, OE, AO) e indicadores relevantes.'),
   },
   {
     icon: ClipboardList,
@@ -81,7 +81,7 @@ const EXAMPLES = [
 
 const CONNECTORS: { label: string; steps: string[] }[] = [
   {
-    label: 'ChatGPT (Conectores / Developer Mode)',
+    label: tx('ChatGPT (Conectores / Developer Mode)'),
     steps: [
       'Em Configurações → Conectores, escolha "Criar" ou "Adicionar conector personalizado".',
       `Informe a URL do servidor: ${MCP_URL}`,
@@ -90,7 +90,7 @@ const CONNECTORS: { label: string; steps: string[] }[] = [
     ],
   },
   {
-    label: 'Claude (Claude.ai / Claude Desktop)',
+    label: tx('Claude (Claude.ai / Claude Desktop)'),
     steps: [
       'Em Configurações → Connectors → "Add custom connector".',
       `Cole a URL: ${MCP_URL}`,
@@ -99,7 +99,7 @@ const CONNECTORS: { label: string; steps: string[] }[] = [
     ],
   },
   {
-    label: 'Cursor / Claude Code',
+    label: tx('Cursor / Claude Code'),
     steps: [
       'Adicione um servidor MCP do tipo HTTP (streamable) na configuração de MCP do editor.',
       `Use a URL ${MCP_URL} — a autenticação OAuth será aberta no navegador na primeira vez.`,
@@ -148,10 +148,7 @@ export function McpGuidePanel() {
             <div className="text-sm space-y-1">
               <p className="font-medium">{tx("Seguro por padrão")}</p>
               <p className="text-muted-foreground">
-                Cada pessoa autoriza com a própria conta SISTUR em uma tela de consentimento, e o
-                assistente só enxerga os mesmos dados que essa pessoa vê dentro do sistema — nada de
-                chaves fixas ou acesso cruzado entre organizações. É possível revogar o acesso a
-                qualquer momento desconectando o conector no assistente de IA.
+                {tx("Cada pessoa autoriza com a própria conta SISTUR em uma tela de consentimento, e o assistente só enxerga os mesmos dados que essa pessoa vê dentro do sistema — nada de chaves fixas ou acesso cruzado entre organizações. É possível revogar o acesso a qualquer momento desconectando o conector no assistente de IA.")}
               </p>
             </div>
           </div>
@@ -165,8 +162,7 @@ export function McpGuidePanel() {
             {tx("Como conectar")}
           </CardTitle>
           <CardDescription>
-            Escolha o assistente que você usa e siga os passos. Em todos eles, o login é feito na
-            tela de autorização do SISTUR — nunca compartilhe sua senha com o assistente.
+            {tx("Escolha o assistente que você usa e siga os passos. Em todos eles, o login é feito na tela de autorização do SISTUR — nunca compartilhe sua senha com o assistente.")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -232,8 +228,7 @@ export function McpGuidePanel() {
             {tx("Exemplos de uso")}
           </CardTitle>
           <CardDescription>
-            Depois de conectado, basta conversar naturalmente. Exemplos de pedidos que o assistente
-            consegue atender:
+            {tx("Depois de conectado, basta conversar naturalmente. Exemplos de pedidos que o assistente consegue atender:")}
           </CardDescription>
         </CardHeader>
         <CardContent>

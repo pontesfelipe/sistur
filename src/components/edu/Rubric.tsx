@@ -89,10 +89,10 @@ export function RubricEditor({
       <div className="flex items-center justify-between">
         <div>
           <Label className="text-base font-semibold flex items-center gap-2">
-            <ClipboardCheck className="h-4 w-4" /> Rubrica de Avaliação
+            <ClipboardCheck className="h-4 w-4" /> {tx("Rubrica de Avaliação")}
           </Label>
           <p className="text-xs text-muted-foreground">
-            Critérios com pontuação e descritores por nível. Total: <strong>{value.total_max_points || rubricTotal(value)} pontos</strong>.
+            {tx("Critérios com pontuação e descritores por nível. Total:")} <strong>{value.total_max_points || rubricTotal(value)} pontos</strong>.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export function RubricEditor({
                 </div>
               ))}
               <Button type="button" variant="outline" size="sm" onClick={() => addDescriptor(ci)}>
-                <Plus className="h-3 w-3 mr-1" /> Nível
+                <Plus className="h-3 w-3 mr-1" /> {tx("Nível")}
               </Button>
             </div>
           </div>
@@ -145,7 +145,7 @@ export function RubricEditor({
       </div>
 
       <Button type="button" variant="outline" size="sm" onClick={addCriterion}>
-        <Plus className="h-3 w-3 mr-1" /> Adicionar critério
+        <Plus className="h-3 w-3 mr-1" /> {tx("Adicionar critério")}
       </Button>
     </div>
   );
