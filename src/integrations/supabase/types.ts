@@ -9370,6 +9370,7 @@ export type Database = {
           forum_show_identity: boolean | null
           full_name: string | null
           id: string
+          language: string | null
           org_id: string
           pending_approval: boolean | null
           system_access:
@@ -9388,6 +9389,7 @@ export type Database = {
           forum_show_identity?: boolean | null
           full_name?: string | null
           id?: string
+          language?: string | null
           org_id: string
           pending_approval?: boolean | null
           system_access?:
@@ -9406,6 +9408,7 @@ export type Database = {
           forum_show_identity?: boolean | null
           full_name?: string | null
           id?: string
+          language?: string | null
           org_id?: string
           pending_approval?: boolean | null
           system_access?:
