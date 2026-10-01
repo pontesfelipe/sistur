@@ -1,3 +1,4 @@
+import { tx } from '@/i18n/t';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -81,12 +82,12 @@ export function usePlans() {
 }
 
 export function formatPlanPrice(plan: Plan): string {
-  if (plan.quote_only || plan.price_cents === null) return 'Sob consulta';
-  if (plan.price_cents === 0) return 'Gratuito';
+  if (plan.quote_only || plan.price_cents === null) return tx('Sob consulta');
+  if (plan.price_cents === 0) return tx('Gratuito');
   const value = (plan.price_cents / 100).toLocaleString('pt-BR', {
     style: 'currency',
     currency: plan.currency || 'BRL',
   });
-  const period = plan.billing_period === 'annual' ? '/ano' : '/mês';
-  return plan.seat_based ? `${value} por usuário ${period}` : `${value} ${period}`;
+  const period = plan.billing_period === 'annual' ? tx('/ano') : tx('/mês');
+  return plan.seat_based ? `${value} ${tx('por usuário')} ${period}` : `${value} ${period}`;
 }

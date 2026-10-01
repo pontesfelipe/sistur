@@ -116,9 +116,7 @@ export default function Precos() {
             {tx("Planos para cada perfil do turismo")}
           </h1>
           <p className="text-muted-foreground">
-            Diagnósticos sistêmicos, formação certificada e o Professor Beni — do município
-            ao empreendimento. Comece com o teste gratuito: curso base, 10 perguntas ao Beni
-            e 1 diagnóstico de experimentação.
+            {tx('Diagnósticos sistêmicos, formação certificada e o Professor Beni — do município ao empreendimento. Comece com o teste gratuito: curso base, 10 perguntas ao Beni e 1 diagnóstico de experimentação.')}
           </p>
         </section>
 
@@ -126,7 +124,7 @@ export default function Precos() {
 
         <section className="text-center text-sm text-muted-foreground">
           <p>
-            Gestão pública (plano Territorial): contratação por contrato/empenho —{' '}
+            {tx('Gestão pública (plano Territorial): contratação por contrato/empenho —')}{' '}
             <button
               className="text-primary underline-offset-2 hover:underline"
               onClick={() => handleSelectPlan({ code: 'territorial', name: 'Territorial' })}
