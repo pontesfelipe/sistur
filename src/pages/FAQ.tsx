@@ -244,7 +244,7 @@ export const faqItems: FAQItem[] = [
   // Relatórios IA — pipeline, providers e observabilidade (v1.38.x)
   {
     question: 'Qual modelo de IA gera os relatórios do SISTUR?',
-    answer: 'A geração usa três provedores em ordem de prioridade: (1) Claude Sonnet 4.5 (Anthropic) como padrão, escolhido pela qualidade narrativa e respeito rigoroso a fontes; (2) GPT-5 (OpenAI) como fallback primário; (3) Gemini 2.5 Pro (Google) como fallback final. Se o provider escolhido falhar (timeout, abort, conteúdo vazio mid-stream), o pipeline cai automaticamente para o próximo, mantendo o mesmo prompt e os mesmos dados auditados. Administradores podem ver o modelo usado em cada relatório do histórico através do badge ao lado do título.',
+    answer: 'A geração usa três provedores em ordem de prioridade: (1) Claude Sonnet 5.5 (Anthropic) como padrão, escolhido pela qualidade narrativa e respeito rigoroso a fontes; (2) GPT-5 (OpenAI) como fallback primário; (3) Gemini 2.5 Pro (Google) como fallback final. Se o provider escolhido falhar (timeout, abort, conteúdo vazio mid-stream), o pipeline cai automaticamente para o próximo, mantendo o mesmo prompt e os mesmos dados auditados. Administradores podem ver o modelo usado em cada relatório do histórico através do badge ao lado do título.',
     category: 'erp',
   },
   {

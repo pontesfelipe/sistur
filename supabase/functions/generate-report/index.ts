@@ -1906,7 +1906,7 @@ async function callProviderNonStreaming(args: {
           accept: 'text/event-stream',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5-20250929',
+          model: 'claude-sonnet-5-5',
           max_tokens: maxTokens,
           stream: true,
           system: systemPrompt,
@@ -2539,7 +2539,7 @@ ${reportText.slice(0, 18000)}`;
             'content-type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-5-20250929',
+            model: 'claude-sonnet-5-5',
             max_tokens: 2000,
             system: sys + '\n\nIMPORTANTE: devolva ESTRITAMENTE um JSON válido no formato {"issues": ["...", "..."]} — nada antes, nada depois.',
             messages: [{ role: 'user', content: usr }],
@@ -3723,7 +3723,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
                 "content-type": "application/json",
               },
               body: JSON.stringify({
-                model: "claude-sonnet-4-5-20250929",
+                model: "claude-sonnet-5-5",
                 max_tokens: claudeBudget.maxTokens,
                 stream: true,
                 system: systemPrompt,
@@ -3773,21 +3773,21 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
               });
               response = new Response(adapted, { status: 200, headers: { "Content-Type": "text/event-stream" } });
               usedProvider = 'claude';
-              console.log("Report generation using provider: claude (claude-sonnet-4-5)");
-              logger.setProvider('claude', 'anthropic/claude-sonnet-4-5-20250929');
-              logger.stage('provider_selected', { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
+              console.log("Report generation using provider: claude (claude-sonnet-5-5)");
+              logger.setProvider('claude', 'anthropic/claude-sonnet-5-5');
+              logger.stage('provider_selected', { provider: 'claude', model: 'anthropic/claude-sonnet-5-5' });
             } else {
               const errBody = await claudeResp.text().catch(() => "");
               const reason = `status ${claudeResp.status}: ${errBody.slice(0, 200)}`;
               fallbackTrail.push({ provider: 'claude', reason });
               console.warn(`Claude unavailable. ${reason}`);
-              logger.error('provider_failed', new Error(reason), { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
+              logger.error('provider_failed', new Error(reason), { provider: 'claude', model: 'anthropic/claude-sonnet-5-5' });
             }
           } catch (e) {
             const reason = e instanceof Error ? e.message : String(e);
             fallbackTrail.push({ provider: 'claude', reason });
             console.warn(`Claude request threw: ${reason}`);
-            logger.error('provider_failed', e, { provider: 'claude', model: 'anthropic/claude-sonnet-4-5-20250929' });
+            logger.error('provider_failed', e, { provider: 'claude', model: 'anthropic/claude-sonnet-5-5' });
           }
         };
 
@@ -4114,7 +4114,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
         const kbFileIds = kbFiles.map((f: any) => f.id);
         let savedReportId: string | null = null;
         const modelLabelForPersist = usedProvider === 'claude'
-          ? 'anthropic/claude-sonnet-4-5-20250929'
+          ? 'anthropic/claude-sonnet-5-5'
           : usedProvider === 'gpt5'
           ? 'openai/gpt-6-astra'
           : usedProvider === 'gemini'
@@ -4166,7 +4166,7 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
 
         try {
           const modelLabel = usedProvider === 'claude'
-            ? 'anthropic/claude-sonnet-4-5-20250929'
+            ? 'anthropic/claude-sonnet-5-5'
             : usedProvider === 'gpt5'
             ? 'openai/gpt-6-astra'
             : 'google/gemini-3.1-pro-preview';
