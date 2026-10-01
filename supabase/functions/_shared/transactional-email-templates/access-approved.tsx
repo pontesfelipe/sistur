@@ -4,6 +4,7 @@ import {
   Body, Button, Container, Head, Heading, Html, Preview, Section, Text, Hr,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { tt, trAmount, normalizeLang } from './i18n.ts'
 
 const SITE_NAME = 'SISTUR'
 const SITE_URL = 'https://sistur.lovable.app'
@@ -27,10 +28,10 @@ const systemLabels: Record<string, string> = {
   EDU: 'EDU — Educação e Capacitação',
 }
 
-const AccessApprovedEmail = ({ userName, role, systemAccess }: AccessApprovedProps) => (
-  <Html lang="pt-BR" dir="ltr">
+const AccessApprovedEmail = ({ userName, role, systemAccess, language }: AccessApprovedProps & { language?: string }) => (
+  <Html lang={normalizeLang(language)} dir="ltr">
     <Head />
-    <Preview>Seu acesso ao {SITE_NAME} foi aprovado!</Preview>
+    <Preview>{tt(language, 'Seu acesso ao SISTUR foi aprovado!')}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
@@ -38,36 +39,36 @@ const AccessApprovedEmail = ({ userName, role, systemAccess }: AccessApprovedPro
         </Section>
         <Hr style={divider} />
         <Heading style={h1}>
-          {userName ? `Olá, ${userName}!` : 'Olá!'}
+          {userName ? tt(language, 'Olá, {name}!', { name: userName }) : tt(language, 'Olá!')}
         </Heading>
         <Text style={text}>
-          Temos boas notícias — sua solicitação de acesso ao <strong>{SITE_NAME}</strong> foi <strong>aprovada</strong>.
+          {tt(language, 'Temos boas notícias — sua solicitação de acesso ao SISTUR foi aprovada.')}
         </Text>
         {(role || systemAccess) && (
           <Section style={detailsBox}>
             {systemAccess && (
               <Text style={detailLine}>
-                <strong>Sistema:</strong> {systemLabels[systemAccess] || systemAccess}
+                <strong>{tt(language, 'Sistema:')}</strong> {systemLabels[systemAccess] ? tt(language, systemLabels[systemAccess]) : systemAccess}
               </Text>
             )}
             {role && (
               <Text style={detailLine}>
-                <strong>Perfil:</strong> {roleLabels[role] || role}
+                <strong>{tt(language, 'Perfil:')}</strong> {roleLabels[role] ? tt(language, roleLabels[role]) : role}
               </Text>
             )}
           </Section>
         )}
         <Text style={text}>
-          Você já pode acessar a plataforma e começar a utilizar todas as funcionalidades disponíveis para o seu perfil.
+          {tt(language, 'Você já pode acessar a plataforma e começar a utilizar todas as funcionalidades disponíveis para o seu perfil.')}
         </Text>
         <Section style={buttonContainer}>
           <Button style={button} href={SITE_URL}>
-            Acessar o {SITE_NAME}
+            {tt(language, 'Acessar o SISTUR')}
           </Button>
         </Section>
         <Hr style={divider} />
         <Text style={footer}>
-          Equipe {SITE_NAME} — Sistema Integrado de Suporte para Turismo em Regiões
+          {tt(language, 'Equipe SISTUR — Sistema Integrado de Suporte para Turismo em Regiões')}
         </Text>
       </Container>
     </Body>
@@ -76,7 +77,7 @@ const AccessApprovedEmail = ({ userName, role, systemAccess }: AccessApprovedPro
 
 export const template = {
   component: AccessApprovedEmail,
-  subject: `Seu acesso ao ${SITE_NAME} foi aprovado!`,
+  subject: (d: Record<string, any>) => tt(d?.language, 'Seu acesso ao SISTUR foi aprovado!'),
   displayName: 'Aprovação de acesso',
   previewData: { userName: 'Maria Silva', role: 'ANALYST', systemAccess: 'ERP' },
 } satisfies TemplateEntry

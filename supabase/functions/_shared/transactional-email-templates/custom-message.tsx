@@ -4,6 +4,7 @@ import {
   Body, Button, Container, Head, Heading, Html, Preview, Section, Text, Hr,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { tt, trAmount, normalizeLang } from './i18n.ts'
 
 const SITE_NAME = 'SISTUR'
 const SITE_URL = 'https://sistur.lovable.app'
@@ -14,10 +15,10 @@ interface CustomMessageProps {
   messageBody?: string
 }
 
-const CustomMessageEmail = ({ userName, subject, messageBody }: CustomMessageProps) => (
-  <Html lang="pt-BR" dir="ltr">
+const CustomMessageEmail = ({ userName, subject, messageBody, language }: CustomMessageProps & { language?: string }) => (
+  <Html lang={normalizeLang(language)} dir="ltr">
     <Head />
-    <Preview>{subject || `Comunicado do ${SITE_NAME}`}</Preview>
+    <Preview>{subject || tt(language, 'Comunicado do SISTUR')}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
@@ -25,23 +26,23 @@ const CustomMessageEmail = ({ userName, subject, messageBody }: CustomMessagePro
         </Section>
         <Hr style={divider} />
         <Heading style={h1}>
-          {userName ? `Olá, ${userName}!` : 'Olá!'}
+          {userName ? tt(language, 'Olá, {name}!', { name: userName }) : tt(language, 'Olá!')}
         </Heading>
         {messageBody ? (
           messageBody.split('\n').filter(Boolean).map((paragraph, i) => (
             <Text key={i} style={text}>{paragraph}</Text>
           ))
         ) : (
-          <Text style={text}>Você recebeu uma comunicação da equipe {SITE_NAME}.</Text>
+          <Text style={text}>{tt(language, 'Você recebeu uma comunicação da equipe SISTUR.')}</Text>
         )}
         <Section style={buttonContainer}>
           <Button style={button} href={SITE_URL}>
-            Acessar o {SITE_NAME}
+            {tt(language, 'Acessar o SISTUR')}
           </Button>
         </Section>
         <Hr style={divider} />
         <Text style={footer}>
-          Equipe {SITE_NAME} — Sistema Integrado de Suporte para Turismo em Regiões
+          {tt(language, 'Equipe SISTUR — Sistema Integrado de Suporte para Turismo em Regiões')}
         </Text>
       </Container>
     </Body>
@@ -50,7 +51,7 @@ const CustomMessageEmail = ({ userName, subject, messageBody }: CustomMessagePro
 
 export const template = {
   component: CustomMessageEmail,
-  subject: ((data: Record<string, any>) => data.subject || `Comunicado do ${SITE_NAME}`) as (data: Record<string, any>) => string,
+  subject: ((data: Record<string, any>) => data.subject || tt(data?.language, 'Comunicado do SISTUR')) as (data: Record<string, any>) => string,
   displayName: 'Mensagem personalizada',
   previewData: { userName: 'Maria Silva', subject: 'Atualização importante', messageBody: 'Gostaríamos de informar sobre uma atualização importante na plataforma.\nContinuamos trabalhando para melhorar sua experiência.' },
 } satisfies TemplateEntry

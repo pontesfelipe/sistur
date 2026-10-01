@@ -4,30 +4,31 @@ import {
   Body, Container, Head, Heading, Html, Preview, Section, Text, Hr, Button,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { tt, trAmount, normalizeLang } from './i18n.ts'
 
 const SITE_NAME = 'SISTUR'
 const SITE_URL = 'https://sistur.lovable.app'
 
 interface LevelUpProps { level?: number; totalXp?: number }
 
-const EduLevelUpEmail = ({ level, totalXp }: LevelUpProps) => (
-  <Html lang="pt-BR" dir="ltr">
+const EduLevelUpEmail = ({ level, totalXp, language }: LevelUpProps & { language?: string }) => (
+  <Html lang={normalizeLang(language)} dir="ltr">
     <Head />
-    <Preview>Parabéns! Você subiu para o nível {level ?? '?'} no {SITE_NAME}</Preview>
+    <Preview>{tt(language, 'Parabéns! Você subiu para o nível {level} no SISTUR', { level: level ?? '?' })}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}><Text style={logoText}>{SITE_NAME} EDU</Text></Section>
         <Hr style={divider} />
-        <Heading style={h1}>🎉 Você subiu de nível!</Heading>
+        <Heading style={h1}>{tt(language, '🎉 Você subiu de nível!')}</Heading>
         <Text style={text}>
-          Excelente trabalho — você acaba de alcançar o <strong>Nível {level ?? '—'}</strong>
-          {typeof totalXp === 'number' ? <> com <strong>{totalXp} XP</strong> acumulados</> : null}.
+          {tt(language, 'Excelente trabalho — você acaba de alcançar o')} <strong>{tt(language, 'Nível')} {level ?? '—'}</strong>
+          {typeof totalXp === 'number' ? <> {tt(language, 'com')} <strong>{totalXp} XP</strong> {tt(language, 'acumulados')}</> : null}.
         </Text>
         <Text style={text}>
-          Continue evoluindo na sua trilha de aprendizado e desbloqueie novas recompensas.
+          {tt(language, 'Continue evoluindo na sua trilha de aprendizado e desbloqueie novas recompensas.')}
         </Text>
         <Section style={buttonContainer}>
-          <Button style={button} href={`${SITE_URL}/edu/conquistas`}>Ver minhas conquistas</Button>
+          <Button style={button} href={`${SITE_URL}/edu/conquistas`}>{tt(language, 'Ver minhas conquistas')}</Button>
         </Section>
         <Hr style={divider} />
         <Text style={footer}>Equipe {SITE_NAME} — Sistema Integrado de Suporte para Turismo em Regiões</Text>
@@ -38,7 +39,7 @@ const EduLevelUpEmail = ({ level, totalXp }: LevelUpProps) => (
 
 export const template = {
   component: EduLevelUpEmail,
-  subject: (d: Record<string, any>) => `🎉 Nível ${d?.level ?? ''} desbloqueado no ${SITE_NAME}`,
+  subject: (d: Record<string, any>) => tt(d?.language, '🎉 Nível {level} desbloqueado no SISTUR', { level: d?.level ?? '' }),
   displayName: 'EDU — Subiu de nível',
   previewData: { level: 5, totalXp: 1250 },
 } satisfies TemplateEntry
