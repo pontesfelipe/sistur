@@ -90,9 +90,9 @@ interface ParsedRow {
 const officialSources = ['IBGE', 'IBGE_CENSO', 'DATASUS', 'INEP', 'STN', 'CADASTUR', 'MAPA_TURISMO', 'Pré-preenchido'];
 
 const pillarNames = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProps) {

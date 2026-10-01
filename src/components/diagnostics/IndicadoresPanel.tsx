@@ -60,9 +60,9 @@ export function IndicadoresPanel() {
   const isMobile = useIsMobile();
 
   const pillarNames: Record<string, string> = {
-    RA: 'Relações Ambientais',
-    OE: 'Organização Estrutural',
-    AO: 'Ações Operacionais',
+    RA: tx('Relações Ambientais'),
+    OE: tx('Organização Estrutural'),
+    AO: tx('Ações Operacionais'),
   };
 
   // Get unique themes

@@ -52,9 +52,9 @@ function usePreviousAssessment(destinationId: string, currentAssessmentId: strin
 }
 
 const PILLAR_LABELS: Record<string, string> = {
-  RA: 'Relações Ambientais',
-  AO: 'Ações Operacionais',
-  OE: 'Organização Estrutural',
+  RA: tx('Relações Ambientais'),
+  AO: tx('Ações Operacionais'),
+  OE: tx('Organização Estrutural'),
 };
 
 export function RoundComparisonView({ assessmentId, destinationId, currentPillarScores }: Props) {

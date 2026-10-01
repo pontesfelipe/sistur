@@ -15,9 +15,9 @@ import { tx } from "@/i18n/t";
 type Pillar = 'RA' | 'OE' | 'AO';
 
 const PILLAR_NAMES: Record<Pillar, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 export function IndicatorWeightsManager() {

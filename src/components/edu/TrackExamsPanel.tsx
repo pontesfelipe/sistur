@@ -18,9 +18,9 @@ import { useTrackExams, useGenerateTrackExams } from '@/hooks/useTrackExams';
 import { ClipboardList, Sparkles, Clock, CheckCircle2, RefreshCcw } from 'lucide-react';
 
 const PILLAR_LABELS: Record<string, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 interface TrackExamsPanelProps {

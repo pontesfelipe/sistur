@@ -35,9 +35,9 @@ const PILLAR_COLORS: Record<string, string> = {
 };
 
 const PILLAR_LABELS: Record<string, string> = {
-  RA: 'Relações Ambientais',
+  RA: tx('Relações Ambientais'),
   OE: 'Org. Estrutural',
-  AO: 'Ações Operacionais',
+  AO: tx('Ações Operacionais'),
 };
 
 function RecommendationCard({ 

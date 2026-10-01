@@ -170,9 +170,9 @@ export function NormalizationView({ indicatorScores, indicatorValues = [] }: Nor
   };
 
   const pillarNames = {
-    RA: 'Relações Ambientais (IRA)',
-    OE: 'Organização Estrutural (IOE)',
-    AO: 'Ações Operacionais (IAO)',
+    RA: tx('Relações Ambientais (IRA)'),
+    OE: tx('Organização Estrutural (IOE)'),
+    AO: tx('Ações Operacionais (IAO)'),
   };
 
   // Group filtered scores by pillar

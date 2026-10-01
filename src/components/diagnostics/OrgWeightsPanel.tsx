@@ -27,9 +27,9 @@ type IndicatorWeight = {
 };
 
 const PILLAR_LABEL: Record<string, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 export function OrgWeightsPanel() {
