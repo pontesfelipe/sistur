@@ -302,8 +302,8 @@ export default function MapaTurismoPanel() {
               <div className="text-sm text-muted-foreground space-y-1 bg-muted/50 rounded-lg p-4">
                 <p><strong>{tx("Estratégia de coleta:")}</strong></p>
                 <ul className="list-disc ml-4 space-y-1">
-                  <li><strong>{tx("🔥 Firecrawl (primário):")}</strong> {tx("Scraping inteligente do portal oficial para dados mais recentes")}</li>
-                  <li><strong>{tx("📊 CKAN (fallback):")}</strong> {tx("CSVs estáticos de dados.turismo.gov.br (2013-2017)")}</li>
+                  <li><strong>🔥 Firecrawl (primário):</strong> {tx("Scraping inteligente do portal oficial para dados mais recentes")}</li>
+                  <li><strong>📊 CKAN (fallback):</strong> {tx("CSVs estáticos de dados.turismo.gov.br (2013-2017)")}</li>
                 </ul>
                 <p className="mt-2">{tx("Os dados importados são vinculados automaticamente aos destinos cadastrados no SISTUR.")}</p>
               </div>

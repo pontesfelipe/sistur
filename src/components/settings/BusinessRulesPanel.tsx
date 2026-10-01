@@ -192,7 +192,7 @@ export function BusinessRulesPanel() {
             <FlowStep icon={CreditCard} title={tx("Conversão")} desc="Assinatura (online ou manual pelo admin)" tone="accent" />
           </div>
           <p className="text-xs text-muted-foreground">
-            {tx("Toda a base anterior foi convertida automaticamente (grandfathering): usuários e organizações existentes não passam pelo trial.")}
+            Toda a base anterior foi convertida automaticamente (grandfathering): usuários e organizações existentes não passam pelo trial.
           </p>
         </CardContent>
       </Card>

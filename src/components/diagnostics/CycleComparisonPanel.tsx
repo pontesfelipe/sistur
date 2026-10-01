@@ -30,7 +30,7 @@ const deltaPts = (a?: number | null, b?: number | null) =>
 
 function DeltaBadge({ value }: { value: number | null }) {
   if (value === null) return <span className="text-muted-foreground">—</span>;
-  if (value > {tx("0) return (")}
+  if (value > 0) return (
       <span className="inline-flex items-center gap-1 text-severity-good">
         <ArrowUp className="h-3 w-3" />+{value} pp
       </span>

@@ -489,7 +489,7 @@ export function ReportValidationBanner({
                   </p>
                   <p className="text-xs text-muted-foreground mb-2">
                     <span className="font-medium text-foreground">{tx("O que é a \"tabela oficial\":")}</span>{' '}
-                    é a tabela de auditoria do diagnóstico (<code>{tx("indicator_values")}</code>{tx(") — onde ficam os valores numéricos confirmados por você ou importados das fontes oficiais (IBGE, CADASTUR, STN, DATASUS, INEP etc.). Quando a IA cita um número diferente do que está nessa tabela, o sistema substitui pelo valor oficial automaticamente.")}
+                    é a tabela de auditoria do diagnóstico (<code>{tx("indicator_values")}</code>) — onde ficam os valores numéricos confirmados por você ou importados das fontes oficiais (IBGE, CADASTUR, STN, DATASUS, INEP etc.). Quando a IA cita um número diferente do que está nessa tabela, o sistema substitui pelo valor oficial automaticamente.
                   </p>
                   <ul className="space-y-2 text-sm">
                     {corrections.map((c, idx) => {

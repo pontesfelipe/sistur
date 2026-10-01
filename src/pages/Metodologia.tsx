@@ -1246,7 +1246,7 @@ export default function Metodologia() {
           <CardContent className="space-y-4">
             <div className="prose prose-sm max-w-none dark:prose-invert">
               <p>
-                {tx("O SISTUR gera três templates distintos a partir do mesmo diagnóstico validado. Todos compartilham a mesma base de dados auditados (")}<code>{tx("assessment_indicator_audit")}</code>{tx("), a política")} <strong>{tx("Zero Alucinação")}</strong> {tx("e o pipeline de validação cruzada, mas diferem em público-alvo, tamanho, estrutura e tom.")}
+                {tx("O SISTUR gera três templates distintos a partir do mesmo diagnóstico validado. Todos compartilham a mesma base de dados auditados (")}<code>{tx("assessment_indicator_audit")}</code>), a política <strong>{tx("Zero Alucinação")}</strong> {tx("e o pipeline de validação cruzada, mas diferem em público-alvo, tamanho, estrutura e tom.")}
               </p>
 
               <h4>{tx("📘 Completo (técnico-acadêmico)")}</h4>
@@ -1254,7 +1254,7 @@ export default function Metodologia() {
                 <li><strong>{tx("Público:")}</strong> {tx("equipe técnica e gestores públicos.")}</li>
                 <li><strong>{tx("Tamanho:")}</strong> {tx("mínimo de 2.500 palavras.")}</li>
                 <li><strong>{tx("Norma:")}</strong> {tx("integral MEC/ABNT (NBR 14724, 6024, 6023, 6028, 10520).")}</li>
-                <li><strong>{tx("Estrutura (12 seções):")}</strong> {tx("Resumo + palavras-chave, Introdução, Contextualização do município, Metodologia, Análise por pilar (RA/OE/AO), Indicadores críticos, Recomendações, Plano de ação, Conclusão e Referências.")}</li>
+                <li><strong>Estrutura (12 seções):</strong> {tx("Resumo + palavras-chave, Introdução, Contextualização do município, Metodologia, Análise por pilar (RA/OE/AO), Indicadores críticos, Recomendações, Plano de ação, Conclusão e Referências.")}</li>
                 <li><strong>{tx("Tom:")}</strong> {tx("técnico, fundamentado, com citações diretas a Beni (1997/2007), IGMA, IBGE, MTur, IGMA-IBT e demais fontes oficiais.")}</li>
               </ul>
 
@@ -1262,7 +1262,7 @@ export default function Metodologia() {
               <ul>
                 <li><strong>{tx("Público:")}</strong> {tx("alta gestão, secretários, prefeitos, comitês gestores.")}</li>
                 <li><strong>{tx("Tamanho:")}</strong> {tx("800–1.200 palavras.")}</li>
-                <li><strong>{tx("Estrutura (5 blocos):")}</strong> {tx("Sumário executivo, Diagnóstico consolidado por pilar, Top 5 indicadores críticos, Recomendações priorizadas e Próximos passos.")}</li>
+                <li><strong>Estrutura (5 blocos):</strong> {tx("Sumário executivo, Diagnóstico consolidado por pilar, Top 5 indicadores críticos, Recomendações priorizadas e Próximos passos.")}</li>
                 <li><strong>{tx("Tom:")}</strong> {tx("direto, orientado a decisão, com destaque para riscos e oportunidades. Reduz citações acadêmicas, mantém apenas o essencial para legitimidade.")}</li>
               </ul>
 
@@ -1306,7 +1306,7 @@ export default function Metodologia() {
                 <code>{tx("max_tokens")}</code> {tx("e a janela de contexto são calibrados dinamicamente por tier (essencial / estratégico / integral), template e quantidade real de indicadores, evitando tanto respostas truncadas em diagnósticos integrais quanto reservas excessivas em diagnósticos pequenos. Templates Executivo e Investidor mantêm pipeline monolítico (estrutura curta sem subseções por pilar).")}
               </p>
               <p>
-                {tx("Para resistir a timeouts do proxy em gerações longas, o pedido é enfileirado em")} <code>{tx("report_jobs")}</code> {tx("e processado por um worker dedicado (")}<code>{tx("process-report-job")}</code>{tx(") acionado por trigger de banco. O cliente recebe o")} <code>{tx("jobId")}</code> {tx("imediatamente (HTTP 202) e faz polling. Mesmo se o usuário fechar a aba ou navegar para outra página, o")} <code>{tx("useReportJobWatcher")}</code> {tx("global mantém o acompanhamento via")} <code>{tx("localStorage")}</code> {tx("e dispara toast + Notification do navegador quando o relatório fica pronto.")}
+                {tx("Para resistir a timeouts do proxy em gerações longas, o pedido é enfileirado em")} <code>{tx("report_jobs")}</code> {tx("e processado por um worker dedicado (")}<code>{tx("process-report-job")}</code>) acionado por trigger de banco. O cliente recebe o <code>{tx("jobId")}</code> {tx("imediatamente (HTTP 202) e faz polling. Mesmo se o usuário fechar a aba ou navegar para outra página, o")} <code>{tx("useReportJobWatcher")}</code> {tx("global mantém o acompanhamento via")} <code>{tx("localStorage")}</code> {tx("e dispara toast + Notification do navegador quando o relatório fica pronto.")}
               </p>
               <p>
                 {tx("Durante a geração, o card \"Plano de Desenvolvimento\" exibe")}
@@ -1327,7 +1327,7 @@ export default function Metodologia() {
                   <code> {tx("phase1_pillars_start")}</code>, <code>{tx("claude_budget_pillar")}</code>,
                   <code> {tx("phase2_envelope_done")}</code>,
                   <code> {tx("validation_agent_done")}</code>, <code>{tx("persist_inserted")}</code>,
-                  <code> {tx("stream_closed_ok")}</code>{tx(") cobrem cada tentativa de Claude / GPT-5 / Gemini, permitindo auditar quando e por que o fallback foi acionado.")}
+                  <code> {tx("stream_closed_ok")}</code>) cobrem cada tentativa de Claude / GPT-5 / Gemini, permitindo auditar quando e por que o fallback foi acionado.
                 </li>
                 <li>
                   {tx("Painel administrativo em")} <code>{tx("/admin/report-logs")}</code> {tx("exibe os logs com filtros por provider, busca livre, dialog de detalhes e auto-refresh a 15s, além do bloco \"Pipeline Claude — Tempo Real\" com as 4 fases mapeadas (Pilares, Envelope, Validação, Persistência) e barra de progresso geral.")}

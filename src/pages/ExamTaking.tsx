@@ -332,7 +332,7 @@ const ExamTaking = () => {
             <CardContent className="text-center space-y-6">
               {needsGrading ? (
                 <div className="text-lg text-muted-foreground">
-                  <p>{tx("Pontuação parcial (questões objetivas):")}</p>
+                  <p>Pontuação parcial (questões objetivas):</p>
                   <div className="text-4xl font-bold mt-2">{finalScore.toFixed(0)}%</div>
                   <p className="text-sm mt-3 text-amber-600 dark:text-amber-400">
                     {tx('A nota final será calculada após a correção das questões dissertativas.')}

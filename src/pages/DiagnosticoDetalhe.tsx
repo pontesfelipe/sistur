@@ -1330,7 +1330,7 @@ const DiagnosticoDetalhe = () => {
             {assessment.destination_id && <RevenueIntelligenceGate title={tx('O Geomarketing')}><GeomarketingPanel destinationId={assessment.destination_id} /></RevenueIntelligenceGate>}
           </TabsContent>
         </Tabs>
-        {tx(")) : ( /* Pre-calculation state */")}
+        )) : ( /* Pre-calculation state */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-card rounded-xl border p-8 text-center">
             <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">

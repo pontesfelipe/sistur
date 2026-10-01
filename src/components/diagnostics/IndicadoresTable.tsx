@@ -660,7 +660,7 @@ export function IndicadoresTable({
                   <Tooltip>
                     <TooltipTrigger className="cursor-help">{tx('Confiab.')}</TooltipTrigger>
                     <TooltipContent>
-                      {tx("Confiabilidade da fonte (1-5):")}<br/>
+                      Confiabilidade da fonte (1-5):<br/>
                       {tx("5★ Automático (API oficial)")}<br/>
                       {tx("4★ Calculado (derivado oficial)")}<br/>
                       {tx("3★ Manual (entrada do usuário)")}<br/>

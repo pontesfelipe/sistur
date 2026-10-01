@@ -18,7 +18,7 @@ function fmtMinutes(min: number) {
 }
 
 function statusBadge(r: DiaryRow) {
-  if (r.fraud_flags > {tx("0) return")} <Badge variant="destructive">{tx('Alerta')}</Badge>;
+  if (r.fraud_flags > 0) return <Badge variant="destructive">{tx('Alerta')}</Badge>;
   if (!r.last_seen_at) return <Badge variant="outline">{tx('Sem acesso')}</Badge>;
   const days = (Date.now() - new Date(r.last_seen_at).getTime()) / 86400000;
   if (days <= 7) return <Badge className="bg-emerald-500/15 text-emerald-700 border-emerald-500/30">{tx('Ativo')}</Badge>;

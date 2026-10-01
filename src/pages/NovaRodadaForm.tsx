@@ -631,7 +631,7 @@ export function NovaRodadaForm({
                         </Badge>
                       </Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {tx("Adiciona 9 indicadores complementares baseados em Tasso, Silva & Nascimento (2024): acessibilidade NBR 9050, comparecimento eleitoral, qualificação PNQT, conectividade 5G/Wi-Fi, promoção digital, Big Data turístico, TBC, inclusão na gestão e sensibilização.")}
+                        Adiciona 9 indicadores complementares baseados em Tasso, Silva & Nascimento (2024): acessibilidade NBR 9050, comparecimento eleitoral, qualificação PNQT, conectividade 5G/Wi-Fi, promoção digital, Big Data turístico, TBC, inclusão na gestão e sensibilização.
                       </p>
                     </div>
                     <Switch

@@ -1377,7 +1377,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm">
-                    <p className="text-muted-foreground mb-2">{tx("# Linha de cabeçalho (obrigatória):")}</p>
+                    <p className="text-muted-foreground mb-2"># Linha de cabeçalho (obrigatória):</p>
                     <p className="text-foreground">{tx('codigo,valor,fonte')}</p>
                     <p className="text-muted-foreground mt-3 mb-2">{tx("# Linhas de dados:")}</p>
                     <p className="text-foreground">{tx('RA001,75,IBGE')}</p>

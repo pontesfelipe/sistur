@@ -1449,7 +1449,7 @@ export function EnterpriseProfileStep({ destinationId, destinationName, onComple
                 {tx("Conforto Climático")}
                 <Badge variant="secondary" className="text-[10px]"><Sparkles className="h-3 w-3 mr-1" />{tx("Auto")}</Badge>
               </CardTitle>
-              <CardDescription>{tx("Open-Meteo (5 anos): temperatura, chuva e melhores meses do destino")}</CardDescription>
+              <CardDescription>Open-Meteo (5 anos): temperatura, chuva e melhores meses do destino</CardDescription>
             </div>
             {climateAutoFilled && (
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"><CheckCircle2 className="h-3 w-3 mr-1" />{tx("Preenchido")}</Badge>

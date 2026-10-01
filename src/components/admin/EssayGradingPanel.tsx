@@ -334,7 +334,7 @@ export function EssayGradingPanel() {
                 {/* Current auto-graded score */}
                 <div className="flex items-center justify-between pt-4 border-t">
                   <p className="text-sm text-muted-foreground">
-                    {tx("Pontuação parcial (objetivas):")} <strong>{(attempt.score_pct || 0).toFixed(0)}%</strong>
+                    Pontuação parcial (objetivas): <strong>{(attempt.score_pct || 0).toFixed(0)}%</strong>
                   </p>
                   <Button
                     onClick={() => saveGrading.mutate(attempt)}

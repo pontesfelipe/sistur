@@ -487,7 +487,7 @@ const EduCatalogo = () => {
                         </div>
                       )}
                     </div>
-                  {tx(") : ( // Flat view when filtered by specific level")}
+                  ) : ( // Flat view when filtered by specific level
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       {filteredTrainings.map((training, index) => renderTrainingCard(training as EduTraining & { curriculum_level?: number | null }, index))}
                     </div>
