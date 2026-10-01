@@ -40,6 +40,14 @@ export async function sendTemplateEmailWithLog(
     }
   }
 
+  // Idioma do destinatário: o informado pelo chamador ou o salvo no perfil.
+  if (!options.templateData?.language) {
+    try {
+      const { data: lang } = await supabase.rpc('get_user_language_by_email', { _email: to })
+      if (lang) options = { ...options, templateData: { ...(options.templateData ?? {}), language: lang } }
+    } catch (_) { /* mantém português */ }
+  }
+
   try {
     const result = await sendTemplateEmail(templateName, to, options)
     await log(result.sent ? 'sent' : 'suppressed')

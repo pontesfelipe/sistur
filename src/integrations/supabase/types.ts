@@ -12620,6 +12620,7 @@ export type Database = {
           training_id: string
         }[]
       }
+      get_user_language_by_email: { Args: { _email: string }; Returns: string }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       grant_extra_attempts: {
         Args: { p_assignment_id: string; p_extra_count?: number }

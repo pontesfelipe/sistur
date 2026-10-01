@@ -4,6 +4,7 @@ import {
   Body, Container, Head, Heading, Html, Preview, Section, Text, Hr,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { tt, trAmount, normalizeLang } from './i18n.ts'
 
 const SITE_NAME = 'SISTUR'
 
@@ -26,10 +27,10 @@ const systemLabels: Record<string, string> = {
   EDU: 'EDU — Educação e Capacitação',
 }
 
-const AccessRequestedEmail = ({ userName, role, systemAccess }: AccessRequestedProps) => (
-  <Html lang="pt-BR" dir="ltr">
+const AccessRequestedEmail = ({ userName, role, systemAccess, language }: AccessRequestedProps & { language?: string }) => (
+  <Html lang={normalizeLang(language)} dir="ltr">
     <Head />
-    <Preview>Recebemos sua solicitação de acesso ao {SITE_NAME}</Preview>
+    <Preview>{tt(language, 'Recebemos sua solicitação de acesso ao SISTUR')}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
@@ -37,46 +38,45 @@ const AccessRequestedEmail = ({ userName, role, systemAccess }: AccessRequestedP
         </Section>
         <Hr style={divider} />
         <Heading style={h1}>
-          {userName ? `Olá, ${userName}!` : 'Olá!'}
+          {userName ? tt(language, 'Olá, {name}!', { name: userName }) : tt(language, 'Olá!')}
         </Heading>
         <Text style={text}>
-          Recebemos sua solicitação de acesso ao <strong>{SITE_NAME}</strong>. Obrigado pelo seu interesse!
+          {tt(language, 'Recebemos sua solicitação de acesso ao SISTUR. Obrigado pelo seu interesse!')}
         </Text>
 
         {(role || systemAccess) && (
           <Section style={detailsBox}>
             {systemAccess && (
               <Text style={detailLine}>
-                <strong>Sistema solicitado:</strong> {systemLabels[systemAccess] || systemAccess}
+                <strong>{tt(language, 'Sistema solicitado:')}</strong> {systemLabels[systemAccess] ? tt(language, systemLabels[systemAccess]) : systemAccess}
               </Text>
             )}
             {role && (
               <Text style={detailLine}>
-                <strong>Perfil solicitado:</strong> {roleLabels[role] || role}
+                <strong>{tt(language, 'Perfil solicitado:')}</strong> {roleLabels[role] ? tt(language, roleLabels[role]) : role}
               </Text>
             )}
           </Section>
         )}
 
         <Section style={noticeBox}>
-          <Text style={noticeTitle}>🚧 Plataforma em Construção</Text>
+          <Text style={noticeTitle}>{tt(language, '🚧 Plataforma em Construção')}</Text>
           <Text style={noticeText}>
-            O {SITE_NAME} está em fase de desenvolvimento ativo. Algumas funcionalidades podem estar em construção ou sofrer alterações.
-            Estamos trabalhando para oferecer a melhor experiência possível.
+            {tt(language, 'O SISTUR está em fase de desenvolvimento ativo. Algumas funcionalidades podem estar em construção ou sofrer alterações. Estamos trabalhando para oferecer a melhor experiência possível.')}
           </Text>
         </Section>
 
         <Text style={text}>
-          Sua solicitação será analisada pela nossa equipe. Assim que seu acesso for liberado, você receberá um e-mail de confirmação com os próximos passos.
+          {tt(language, 'Sua solicitação será analisada pela nossa equipe. Assim que seu acesso for liberado, você receberá um e-mail de confirmação com os próximos passos.')}
         </Text>
 
         <Text style={text}>
-          Enquanto isso, fique à vontade para explorar nosso conteúdo público ou entrar em contato caso tenha alguma dúvida.
+          {tt(language, 'Enquanto isso, fique à vontade para explorar nosso conteúdo público ou entrar em contato caso tenha alguma dúvida.')}
         </Text>
 
         <Hr style={divider} />
         <Text style={footer}>
-          Equipe {SITE_NAME} — Sistema Integrado de Suporte para Turismo em Regiões
+          {tt(language, 'Equipe SISTUR — Sistema Integrado de Suporte para Turismo em Regiões')}
         </Text>
       </Container>
     </Body>
@@ -85,7 +85,7 @@ const AccessRequestedEmail = ({ userName, role, systemAccess }: AccessRequestedP
 
 export const template = {
   component: AccessRequestedEmail,
-  subject: `Recebemos sua solicitação de acesso ao ${SITE_NAME}`,
+  subject: (d: Record<string, any>) => tt(d?.language, 'Recebemos sua solicitação de acesso ao SISTUR'),
   displayName: 'Solicitação de acesso recebida',
   previewData: { userName: 'Maria Silva', role: 'ESTUDANTE', systemAccess: 'EDU' },
 } satisfies TemplateEntry

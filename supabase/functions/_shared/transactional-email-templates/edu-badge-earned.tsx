@@ -4,28 +4,29 @@ import {
   Body, Container, Head, Heading, Html, Preview, Section, Text, Hr, Button,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { tt, trAmount, normalizeLang } from './i18n.ts'
 
 const SITE_NAME = 'SISTUR'
 const SITE_URL = 'https://sistur.lovable.app'
 
 interface BadgeEarnedProps { badgeTitle?: string; xpReward?: number }
 
-const EduBadgeEarnedEmail = ({ badgeTitle, xpReward }: BadgeEarnedProps) => (
-  <Html lang="pt-BR" dir="ltr">
+const EduBadgeEarnedEmail = ({ badgeTitle, xpReward, language }: BadgeEarnedProps & { language?: string }) => (
+  <Html lang={normalizeLang(language)} dir="ltr">
     <Head />
-    <Preview>Você conquistou uma nova badge no {SITE_NAME}</Preview>
+    <Preview>{tt(language, 'Você conquistou uma nova badge no SISTUR')}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}><Text style={logoText}>{SITE_NAME} EDU</Text></Section>
         <Hr style={divider} />
-        <Heading style={h1}>🏆 Nova badge conquistada!</Heading>
+        <Heading style={h1}>{tt(language, '🏆 Nova badge conquistada!')}</Heading>
         <Text style={text}>
-          Você acaba de conquistar a badge <strong>{badgeTitle ?? 'Conquista'}</strong>
-          {typeof xpReward === 'number' && xpReward > 0 ? <> e ganhou <strong>+{xpReward} XP</strong></> : null}.
+          {tt(language, 'Você acaba de conquistar a badge')} <strong>{badgeTitle ?? tt(language, 'Conquista')}</strong>
+          {typeof xpReward === 'number' && xpReward > 0 ? <> {tt(language, 'e ganhou')} <strong>+{xpReward} XP</strong></> : null}.
         </Text>
-        <Text style={text}>Continue assim — cada badge é um marco da sua jornada.</Text>
+        <Text style={text}>{tt(language, 'Continue assim — cada badge é um marco da sua jornada.')}</Text>
         <Section style={buttonContainer}>
-          <Button style={button} href={`${SITE_URL}/edu/conquistas`}>Ver minhas conquistas</Button>
+          <Button style={button} href={`${SITE_URL}/edu/conquistas`}>{tt(language, 'Ver minhas conquistas')}</Button>
         </Section>
         <Hr style={divider} />
         <Text style={footer}>Equipe {SITE_NAME} — Sistema Integrado de Suporte para Turismo em Regiões</Text>
@@ -36,7 +37,7 @@ const EduBadgeEarnedEmail = ({ badgeTitle, xpReward }: BadgeEarnedProps) => (
 
 export const template = {
   component: EduBadgeEarnedEmail,
-  subject: (d: Record<string, any>) => `🏆 Você conquistou a badge "${d?.badgeTitle ?? ''}"`,
+  subject: (d: Record<string, any>) => tt(d?.language, '🏆 Você conquistou a badge "{badge}"', { badge: d?.badgeTitle ?? '' }),
   displayName: 'EDU — Badge conquistada',
   previewData: { badgeTitle: 'Maratonista', xpReward: 100 },
 } satisfies TemplateEntry

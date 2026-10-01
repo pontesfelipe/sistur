@@ -64,6 +64,13 @@
       "when": 1790778871156,
       "tag": "0008_plans_annual_prices",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790820320747,
+      "tag": "0009_email_language_lookup",
+      "breakpoints": true
     }
   ]
 }

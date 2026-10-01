@@ -4,6 +4,7 @@ import {
   Body, Button, Container, Head, Heading, Hr, Html, Preview, Section, Text,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { tt, trAmount, normalizeLang } from './i18n.ts'
 
 const SITE_NAME = 'SISTUR'
 const SITE_URL = 'https://sistur.lovable.app'
@@ -20,25 +21,25 @@ interface ObservatoryCriticalAlertProps {
 }
 
 const ObservatoryCriticalAlertEmail = ({
-  orgName, metricName, unit, previousValue, currentValue, deltaPct, period, message,
-}: ObservatoryCriticalAlertProps) => (
-  <Html lang="pt-BR" dir="ltr">
+  orgName, metricName, unit, previousValue, currentValue, deltaPct, period, message, language,
+}: ObservatoryCriticalAlertProps & { language?: string }) => (
+  <Html lang={normalizeLang(language)} dir="ltr">
     <Head />
-    <Preview>Alerta crítico no Observatório: {metricName ?? 'indicador'}</Preview>
+    <Preview>{tt(language, 'Alerta crítico no Observatório: {metric}', { metric: metricName ?? tt(language, 'indicador') })}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Section style={logoSection}><Text style={logoText}>{SITE_NAME} — Observatório</Text></Section>
+        <Section style={logoSection}><Text style={logoText}>{tt(language, 'SISTUR — Observatório')}</Text></Section>
         <Hr style={divider} />
-        <Heading style={h1}>⚠️ Alerta crítico detectado</Heading>
+        <Heading style={h1}>{tt(language, '⚠️ Alerta crítico detectado')}</Heading>
         <Text style={text}>
-          O Observatório Turístico identificou uma variação crítica em <strong>{orgName ?? 'seu destino'}</strong>.
+          {tt(language, 'O Observatório Turístico identificou uma variação crítica em')} <strong>{orgName ?? tt(language, 'seu destino')}</strong>.
         </Text>
         <Section style={card}>
-          <Text style={cardLabel}>Indicador</Text>
+          <Text style={cardLabel}>{tt(language, 'Indicador')}</Text>
           <Text style={cardValue}>{metricName ?? '—'}</Text>
-          <Text style={cardLabel}>Período</Text>
+          <Text style={cardLabel}>{tt(language, 'Período')}</Text>
           <Text style={cardValue}>{period ?? '—'}</Text>
-          <Text style={cardLabel}>Variação</Text>
+          <Text style={cardLabel}>{tt(language, 'Variação')}</Text>
           <Text style={cardValueAlert}>
             {typeof deltaPct === 'number' ? deltaPct.toFixed(1) : deltaPct}%
             {' '}({previousValue} → {currentValue} {unit ?? ''})
@@ -46,11 +47,11 @@ const ObservatoryCriticalAlertEmail = ({
         </Section>
         {message && <Text style={text}>{message}</Text>}
         <Section style={buttonContainer}>
-          <Button style={button} href={`${SITE_URL}/observatorio`}>Abrir Observatório</Button>
+          <Button style={button} href={`${SITE_URL}/observatorio`}>{tt(language, 'Abrir Observatório')}</Button>
         </Section>
         <Hr style={divider} />
         <Text style={footer}>
-          Você está recebendo este alerta porque administra um destino monitorado no {SITE_NAME}.
+          {tt(language, 'Você está recebendo este alerta porque administra um destino monitorado no SISTUR.')}
         </Text>
       </Container>
     </Body>
@@ -60,7 +61,7 @@ const ObservatoryCriticalAlertEmail = ({
 export const template = {
   component: ObservatoryCriticalAlertEmail,
   subject: (d: Record<string, any>) =>
-    `⚠️ Alerta crítico — ${d?.metricName ?? 'Observatório'} (${d?.orgName ?? 'destino'})`,
+    tt(d?.language, '⚠️ Alerta crítico — {metric} ({org})', { metric: d?.metricName ?? tt(d?.language, 'Observatório'), org: d?.orgName ?? tt(d?.language, 'destino') }),
   displayName: 'Observatório — Alerta crítico',
   previewData: {
     orgName: 'Município Demo',

@@ -4,6 +4,7 @@ import {
   Body, Button, Container, Head, Heading, Html, Preview, Section, Text, Hr,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { tt, trAmount, normalizeLang } from './i18n.ts'
 
 const SITE_NAME = 'SISTUR'
 const SITE_URL = 'https://sistur.lovable.app'
@@ -16,10 +17,10 @@ interface PurchaseConfirmationProps {
   credits?: number
 }
 
-const PurchaseConfirmationEmail = ({ userName, itemName, amountLabel, kind, credits }: PurchaseConfirmationProps) => (
-  <Html lang="pt-BR" dir="ltr">
+const PurchaseConfirmationEmail = ({ userName, itemName, amountLabel, kind, credits, language }: PurchaseConfirmationProps & { language?: string }) => (
+  <Html lang={normalizeLang(language)} dir="ltr">
     <Head />
-    <Preview>Compra confirmada no {SITE_NAME}!</Preview>
+    <Preview>{tt(language, 'Compra confirmada no SISTUR!')}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoSection}>
@@ -27,41 +28,41 @@ const PurchaseConfirmationEmail = ({ userName, itemName, amountLabel, kind, cred
         </Section>
         <Hr style={divider} />
         <Heading style={h1}>
-          {userName ? `Obrigado, ${userName}!` : 'Obrigado!'}
+          {userName ? tt(language, 'Obrigado, {name}!', { name: userName }) : tt(language, 'Obrigado!')}
         </Heading>
         <Text style={text}>
-          Sua compra foi <strong>confirmada</strong> e já está disponível na sua conta.
+          {tt(language, 'Sua compra foi confirmada e já está disponível na sua conta.')}
         </Text>
         <Section style={detailsBox}>
           {itemName && (
             <Text style={detailLine}>
-              <strong>Item:</strong> {itemName}
+              <strong>{tt(language, 'Item:')}</strong> {itemName}
             </Text>
           )}
           {amountLabel && (
             <Text style={detailLine}>
-              <strong>Valor:</strong> {amountLabel}
+              <strong>{tt(language, 'Valor:')}</strong> {trAmount(language, amountLabel)}
             </Text>
           )}
           {kind === 'credits' && credits ? (
             <Text style={detailLine}>
-              <strong>Créditos:</strong> {credits} perguntas ao Professor Beni
+              <strong>{tt(language, 'Créditos:')}</strong> {credits} {tt(language, 'perguntas ao Professor Beni')}
             </Text>
           ) : null}
         </Section>
         <Text style={text}>
           {kind === 'credits'
-            ? 'Seus créditos já foram adicionados e serão usados automaticamente quando a cota mensal do seu plano terminar.'
-            : 'Sua assinatura está ativa e todos os recursos do plano já foram liberados. Você pode gerenciar pagamento e faturas a qualquer momento na página de assinatura.'}
+            ? tt(language, 'Seus créditos já foram adicionados e serão usados automaticamente quando a cota mensal do seu plano terminar.')
+            : tt(language, 'Sua assinatura está ativa e todos os recursos do plano já foram liberados. Você pode gerenciar pagamento e faturas a qualquer momento na página de assinatura.')}
         </Text>
         <Section style={buttonContainer}>
           <Button style={button} href={SITE_URL}>
-            Acessar o {SITE_NAME}
+            {tt(language, 'Acessar o SISTUR')}
           </Button>
         </Section>
         <Hr style={divider} />
         <Text style={footer}>
-          Equipe {SITE_NAME} — Sistema Integrado de Suporte para Turismo em Regiões
+          {tt(language, 'Equipe SISTUR — Sistema Integrado de Suporte para Turismo em Regiões')}
         </Text>
       </Container>
     </Body>
@@ -70,7 +71,7 @@ const PurchaseConfirmationEmail = ({ userName, itemName, amountLabel, kind, cred
 
 export const template = {
   component: PurchaseConfirmationEmail,
-  subject: `Compra confirmada no ${SITE_NAME}`,
+  subject: (d: Record<string, any>) => tt(d?.language, 'Compra confirmada no SISTUR'),
   displayName: 'Confirmação de compra',
   previewData: { userName: 'Maria Silva', itemName: 'SISTUR Empresarial', amountLabel: 'R$ 149,00/mês', kind: 'subscription' },
 } satisfies TemplateEntry

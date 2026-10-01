@@ -4,6 +4,7 @@ import {
   Body, Button, Container, Head, Heading, Hr, Html, Preview, Section, Text,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { tt, trAmount, normalizeLang } from './i18n.ts'
 
 const SITE_NAME = 'SISTUR'
 const SITE_URL = 'https://sistur.lovable.app'
@@ -24,38 +25,37 @@ interface Props {
 }
 
 const EnterpriseRegressionAlertEmail = ({
-  destinationName, diagnosticType, drops, assessmentId,
-}: Props) => (
-  <Html lang="pt-BR" dir="ltr">
+  destinationName, diagnosticType, drops, assessmentId, language,
+}: Props & { language?: string }) => (
+  <Html lang={normalizeLang(language)} dir="ltr">
     <Head />
-    <Preview>Regressão detectada em {destinationName ?? 'seu diagnóstico'}</Preview>
+    <Preview>{tt(language, 'Regressão detectada em {name}', { name: destinationName ?? tt(language, 'seu diagnóstico') })}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Section style={logoSection}><Text style={logoText}>{SITE_NAME} — Diagnóstico</Text></Section>
+        <Section style={logoSection}><Text style={logoText}>{tt(language, 'SISTUR — Diagnóstico')}</Text></Section>
         <Hr style={divider} />
-        <Heading style={h1}>⚠️ Regressão detectada</Heading>
+        <Heading style={h1}>{tt(language, '⚠️ Regressão detectada')}</Heading>
         <Text style={text}>
-          Identificamos quedas superiores a 2 pontos percentuais em 2 rodadas consecutivas
-          {destinationName ? <> em <strong>{destinationName}</strong></> : null}
-          {diagnosticType === 'enterprise' ? ' (modo Enterprise).' : ' (modo Territorial).'}
+          {tt(language, 'Identificamos quedas superiores a 2 pontos percentuais em 2 rodadas consecutivas')}
+          {destinationName ? <> {tt(language, 'em')} <strong>{destinationName}</strong></> : null}
+          {tt(language, diagnosticType === 'enterprise' ? ' (modo Enterprise).' : ' (modo Territorial).')}
         </Text>
         {(drops ?? []).map((d) => (
           <Section key={d.pillar} style={card}>
-            <Text style={cardLabel}>Pilar</Text>
+            <Text style={cardLabel}>{tt(language, 'Pilar')}</Text>
             <Text style={cardValue}>I-{d.pillar}</Text>
-            <Text style={cardLabel}>Variação acumulada</Text>
+            <Text style={cardLabel}>{tt(language, 'Variação acumulada')}</Text>
             <Text style={cardValueAlert}>{d.from}% → {d.to}% (−{(d.drop1 + d.drop2).toFixed(1)} pp)</Text>
           </Section>
         ))}
         <Section style={buttonContainer}>
           <Button style={button} href={`${SITE_URL}/diagnosticos/${assessmentId ?? ''}`}>
-            Abrir diagnóstico
+            {tt(language, 'Abrir diagnóstico')}
           </Button>
         </Section>
         <Hr style={divider} />
         <Text style={footer}>
-          Você recebeu este alerta porque é responsável por um diagnóstico monitorado no {SITE_NAME}.
-          Comparação estritamente interna — sem ranking entre destinos.
+          {tt(language, 'Você recebeu este alerta porque é responsável por um diagnóstico monitorado no SISTUR. Comparação estritamente interna — sem ranking entre destinos.')}
         </Text>
       </Container>
     </Body>
@@ -65,7 +65,7 @@ const EnterpriseRegressionAlertEmail = ({
 export const template = {
   component: EnterpriseRegressionAlertEmail,
   subject: (d: Record<string, any>) =>
-    `⚠️ Regressão detectada — ${d?.destinationName ?? 'Diagnóstico'}`,
+    tt(d?.language, '⚠️ Regressão detectada — {name}', { name: d?.destinationName ?? tt(d?.language, 'Diagnóstico') }),
   displayName: 'Diagnóstico — Alerta de regressão',
   previewData: {
     destinationName: 'Hotel Demonstração',
