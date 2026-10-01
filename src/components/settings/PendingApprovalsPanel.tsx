@@ -160,9 +160,6 @@ export function PendingApprovalsPanel() {
                   <p className="font-medium">{user.full_name || 'Sem nome'}</p>
                   <p className="text-sm text-muted-foreground">{user.email}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="outline">
-                      {user.system_access || 'Não definido'}
-                    </Badge>
                     <span className="text-xs text-muted-foreground">
                       Solicitado em {new Date(user.approval_requested_at).toLocaleDateString(getIntlLocale())}
                     </span>

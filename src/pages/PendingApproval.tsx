@@ -27,8 +27,8 @@ export default function PendingApproval() {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!profile?.pending_approval && profile?.system_access) {
-    return <Navigate to={profile.system_access === 'ERP' ? '/' : '/edu'} replace />;
+  if (!profile?.pending_approval) {
+    return <Navigate to="/" replace />;
   }
 
   const handleLogout = async () => {
@@ -73,11 +73,6 @@ export default function PendingApproval() {
             <p className="text-sm text-muted-foreground">
               <strong>{tx('Email:')}</strong> {user?.email}
             </p>
-            {profile?.system_access && (
-              <p className="text-sm text-muted-foreground">
-                <strong>{tx('Acesso Solicitado:')}</strong> {tx("SISTUR {{v0}}", { v0: profile.system_access })}
-              </p>
-            )}
           </div>
 
           <div className="text-center text-sm text-muted-foreground">
