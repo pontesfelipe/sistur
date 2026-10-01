@@ -126,7 +126,7 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
           onClick={() => discoverAndValidate(false).catch(() => {})}
           disabled={discovering || loading || !businessName?.trim()}
           size="sm"
-          title={businessName?.trim() ? 'Buscar CNPJ a partir do nome do empreendimento' : 'Informe o nome do empreendimento no bloco Reviews'}
+          title={businessName?.trim() ? tx('Buscar CNPJ a partir do nome do empreendimento') : tx('Informe o nome do empreendimento no bloco Reviews')}
         >
           {discovering ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
           Buscar online
@@ -155,13 +155,13 @@ export function CnpjValidationSearch({ initialCnpj, onValidated, businessName, l
           <Separator />
           <Card><CardContent className="p-3 space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium"><Building2 className="h-4 w-4" /> {data.razao_social}</div>
-            {data.nome_fantasia && <p className="text-xs text-muted-foreground">Nome fantasia: {data.nome_fantasia}</p>}
+            {data.nome_fantasia && <p className="text-xs text-muted-foreground">{tx("Nome fantasia: {{v0}}", { v0: data.nome_fantasia })}</p>}
             <div className="flex flex-wrap gap-1.5">
               <Badge variant={/ativ/i.test(data.situacao_cadastral || '') ? 'default' : 'destructive'} className="text-[10px] gap-1">
                 {/ativ/i.test(data.situacao_cadastral || '') ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
                 {data.situacao_cadastral}
               </Badge>
-              {data.cnae_principal && <Badge variant="outline" className="text-[10px]">CNAE {data.cnae_principal}</Badge>}
+              {data.cnae_principal && <Badge variant="outline" className="text-[10px]">{tx("CNAE {{v0}}", { v0: data.cnae_principal })}</Badge>}
               {data.cadastur_status === 'requer_verificacao_manual' && (
                 <Badge variant="secondary" className="text-[10px]">{tx("CADASTUR relevante")}</Badge>
               )}

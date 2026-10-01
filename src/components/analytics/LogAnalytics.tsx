@@ -170,7 +170,7 @@ export function LogAnalytics() {
       'destination_created': 'Destino Criado',
       'user_login': 'Login de Usuário',
       'data_updated': 'Dados Atualizados',
-      'report_generated': 'Relatório Gerado'
+      'report_generated': tx('Relatório Gerado')
     };
     return translations[eventType] || eventType;
   };
@@ -310,7 +310,7 @@ export function LogAnalytics() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalAssessments}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.calculatedAssessments} calculados no período
+              {tx("{{v0}} calculados no período", { v0: stats.calculatedAssessments })}
             </p>
           </CardContent>
         </Card>
@@ -368,7 +368,7 @@ export function LogAnalytics() {
               {tx("Eventos do Sistema")}
             </CardTitle>
             <CardDescription>
-              {auditEvents.length} eventos no período selecionado
+              {tx("{{v0}} eventos no período selecionado", { v0: auditEvents.length })}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -420,10 +420,10 @@ export function LogAnalytics() {
                               >
                                 <Sparkles className="h-2.5 w-2.5" />
                                 {(event.metadata as any).provider === 'claude'
-                                  ? 'Claude Sonnet 4.5'
+                                  ? tx('Claude Sonnet 4.5')
                                   : (event.metadata as any).provider === 'gemini'
-                                  ? 'Gemini 2.5 Pro'
-                                  : 'Modelo não registrado'}
+                                  ? tx('Gemini 2.5 Pro')
+                                  : tx('Modelo não registrado')}
                               </Badge>
                             )}
                             {(event.metadata as any).model_audit_status === 'not_available_before_logging_fix' && (

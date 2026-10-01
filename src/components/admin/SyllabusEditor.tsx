@@ -95,12 +95,12 @@ export function SyllabusEditor({ value, onChange }: Props) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Carga horária teórica (h)</Label>
+          <Label>{tx("Carga horária teórica (h)")}</Label>
           <Input type="number" value={value.carga_horaria_teorica ?? ''} onChange={(e) =>
             onChange({ carga_horaria_teorica: e.target.value === '' ? undefined : Number(e.target.value) })} />
         </div>
         <div className="space-y-2">
-          <Label>Carga horária prática (h)</Label>
+          <Label>{tx("Carga horária prática (h)")}</Label>
           <Input type="number" value={value.carga_horaria_pratica ?? ''} onChange={(e) =>
             onChange({ carga_horaria_pratica: e.target.value === '' ? undefined : Number(e.target.value) })} />
         </div>

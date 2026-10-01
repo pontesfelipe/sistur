@@ -196,7 +196,7 @@ export function EssayGradingPanel() {
 
     },
     onError: (err) => {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar correção');
+      toast.error(err instanceof Error ? err.message : tx('Erro ao salvar correção'));
     },
   });
 
@@ -316,7 +316,7 @@ export function EssayGradingPanel() {
                             />
                           </div>
                           <div className="space-y-1.5">
-                            <Label htmlFor={`cmt-${key}`} className="text-xs">Comentário (opcional)</Label>
+                            <Label htmlFor={`cmt-${key}`} className="text-xs">{tx("Comentário (opcional)")}</Label>
                             <Textarea
                               id={`cmt-${key}`}
                               rows={2}

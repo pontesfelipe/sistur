@@ -93,7 +93,7 @@ export function TreasureTutorial({ onComplete }: { onComplete: () => void }) {
             </button>
           )}
           <button onClick={next} className={cn('flex-1 py-3 font-bold rounded-xl text-white text-sm shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform min-h-[48px]', isLast ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-gradient-to-r from-amber-500 to-yellow-600')}>
-            {isLast ? '🗺️ Explorar!' : 'Próximo ➡️'}
+            {isLast ? '🗺️ Explorar!' : tx('Próximo ➡️')}
           </button>
         </div>
         {!isLast && (

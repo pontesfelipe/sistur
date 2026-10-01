@@ -116,10 +116,10 @@ export function EnterpriseSectorBenchmark({ currentDestinationId }: Props) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Globe2 className="h-5 w-5 text-primary" />
-            Benchmark setorial — {data.segment}
+            {tx("Benchmark setorial — {{v0}}", { v0: data.segment })}
           </CardTitle>
           <CardDescription>
-            Mínimo de {MIN_N} pares no segmento para exibir o comparativo (atualmente {data.peers}). Comparação 100% anônima — sem nomes nem ranking.
+            {tx("Mínimo de {{v0}} pares no segmento para exibir o comparativo (atualmente {{v1}}). Comparação 100% anônima — sem nomes nem ranking.", { v0: MIN_N, v1: data.peers })}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -131,10 +131,10 @@ export function EnterpriseSectorBenchmark({ currentDestinationId }: Props) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Globe2 className="h-5 w-5 text-primary" />
-          Benchmark setorial — {data.segment}
+          {tx("Benchmark setorial — {{v0}}", { v0: data.segment })}
         </CardTitle>
         <CardDescription>
-          Comparação anônima contra {data.peers} empreendimentos do mesmo segmento (categoria + faixa de classificação ±1). Sem nomes, sem ranking.
+          {tx("Comparação anônima contra {{v0}} empreendimentos do mesmo segmento (categoria + faixa de classificação ±1). Sem nomes, sem ranking.", { v0: data.peers })}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -157,10 +157,10 @@ export function EnterpriseSectorBenchmark({ currentDestinationId }: Props) {
                 </div>
                 <div className="text-2xl font-bold">{mine}%</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Média: {avg}% · Mediana: {med}%
+                  {tx("Média: {{v0}}% · Mediana: {{v1}}%", { v0: avg, v1: med })}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Faixa interquartil: {q1}%–{q3}%
+                  {tx("Faixa interquartil: {{v0}}%–{{v1}}%", { v0: q1, v1: q3 })}
                 </div>
               </div>
             );

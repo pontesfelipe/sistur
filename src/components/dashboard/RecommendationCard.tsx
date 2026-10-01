@@ -112,7 +112,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
             </div>
             
             <p className="text-xs text-muted-foreground">
-              {recommendation.reason}
+              {tx(String(recommendation.reason ?? ""))}
             </p>
 
             {/* Issue Link with Interpretation */}

@@ -171,7 +171,7 @@ export default function Subscription() {
   const statusLabel = isCancelled ? 'Cancelado' : hasSubscription || isPaidPlan ? 'Ativo' : inTrial ? 'Avaliação' : 'Sem plano';
   const headline = hasSubscription || isPaidPlan
     ? planLabel
-    : inTrial ? 'Avaliação por uso' : 'Nenhum plano ativo';
+    : inTrial ? tx('Avaliação por uso') : 'Nenhum plano ativo';
 
   return (
     <AppLayout title={tx("Planos e assinatura")} subtitle={tx("Escolha o plano certo e gerencie sua contratação")}>
@@ -213,17 +213,17 @@ export default function Subscription() {
                     : inTrial ? 'bg-amber-500/20 text-amber-300'
                     : 'bg-primary/20 text-primary',
                 )}>
-                  {statusLabel}
+                  {tx(String(statusLabel ?? ""))}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground max-w-xl">
                 {isCancelled
                   ? `Seu plano ${planLabel} foi cancelado.${license?.expires_at ? ` O acesso segue até ${new Date(license.expires_at).toLocaleDateString('pt-BR')}.` : ''} Escolha um novo plano abaixo.`
                   : hasSubscription || isPaidPlan
-                  ? 'Sua assinatura está ativa. Use Gerenciar conta para ajustar usuários, forma de pagamento e faturas.'
+                  ? tx('Sua assinatura está ativa. Use Gerenciar conta para ajustar usuários, forma de pagamento e faturas.')
                   : inTrial
-                  ? 'Você está na avaliação por uso: sem prazo, liberada até você consumir os itens de cortesia abaixo.'
-                  : 'Escolha um dos planos abaixo para liberar os módulos do SISTUR.'}
+                  ? tx('Você está na avaliação por uso: sem prazo, liberada até você consumir os itens de cortesia abaixo.')
+                  : tx('Escolha um dos planos abaixo para liberar os módulos do SISTUR.')}
               </p>
             </div>
 
@@ -291,7 +291,7 @@ export default function Subscription() {
                     : 'border-dashed border-border bg-muted/20 text-muted-foreground',
                 )}>
                   <span className={cn('text-lg', !enabled && 'grayscale opacity-60')}>{f.icon}</span>
-                  <p className="text-xs font-medium flex-1 min-w-0 truncate">{f.label}</p>
+                  <p className="text-xs font-medium flex-1 min-w-0 truncate">{tx(String(f.label ?? ""))}</p>
                   {enabled
                     ? <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                     : <XCircle className="h-4 w-4 text-muted-foreground/60 shrink-0" />}
@@ -333,7 +333,7 @@ export default function Subscription() {
               </p>
             </div>
             <Button variant="outline" onClick={handleOpenPortal} disabled={openingPortal}>
-              {openingPortal ? 'Abrindo...' : 'Gerenciar conta'}
+              {openingPortal ? 'Abrindo...' : tx('Gerenciar conta')}
             </Button>
           </div>
         )}

@@ -37,7 +37,7 @@ export function PendingConsortiumInvitesPanel() {
         <Alert>
           <Info className="h-4 w-4" />
           <AlertDescription className="text-xs">
-            Ao aceitar, o resumo do diagnóstico (pontuação por pilar RA/OE/AO) do seu município passa a ser visível para os demais membros aceitos deste consórcio. Não há ranking público — a comparação é restrita ao grupo.
+            {tx("Ao aceitar, o resumo do diagnóstico (pontuação por pilar RA/OE/AO) do seu município passa a ser visível para os demais membros aceitos deste consórcio. Não há ranking público — a comparação é restrita ao grupo.")}
           </AlertDescription>
         </Alert>
 

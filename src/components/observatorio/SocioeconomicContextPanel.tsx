@@ -75,7 +75,7 @@ export function SocioeconomicContextPanel({ ibgeCode, canRefresh }: Props) {
             )}
           </CardTitle>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Fonte oficial: IBGE/SIDRA (população estimada + PIB municipal)
+            {tx("Fonte oficial: IBGE/SIDRA (população estimada + PIB municipal)")}
           </p>
         </div>
         {canRefresh && (
@@ -106,14 +106,14 @@ export function SocioeconomicContextPanel({ ibgeCode, canRefresh }: Props) {
                 <TrendingUp className="h-3 w-3" /> {tx("PIB total")}
               </div>
               <div className="text-2xl font-semibold">{fmtBRL(data.pib_total_brl)}</div>
-              <div className="text-[10px] text-muted-foreground">SIDRA tab. 5938 (var. 37)</div>
+              <div className="text-[10px] text-muted-foreground">{tx("SIDRA tab. 5938 (var. 37)")}</div>
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <TrendingUp className="h-3 w-3" /> {tx("PIB per capita")}
               </div>
               <div className="text-2xl font-semibold">{fmtBRL(data.pib_per_capita_brl)}</div>
-              <div className="text-[10px] text-muted-foreground">SIDRA tab. 5938 (var. 39)</div>
+              <div className="text-[10px] text-muted-foreground">{tx("SIDRA tab. 5938 (var. 39)")}</div>
             </div>
           </div>
         )}

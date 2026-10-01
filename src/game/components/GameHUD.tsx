@@ -113,7 +113,7 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
       <div className="bg-gradient-to-r from-purple-600/90 to-indigo-600/90 rounded-xl p-3 text-white shadow-lg backdrop-blur-sm">
         <div className="flex items-center justify-between mb-1">
           <span className="text-sm font-bold">⭐ {LEVEL_NAMES[level]}</span>
-          <span className="text-xs opacity-80">Nível {level}</span>
+          <span className="text-xs opacity-80">{tx("Nível {{v0}}", { v0: level })}</span>
         </div>
         <div className="h-2 rounded-full bg-white/20 overflow-hidden">
           <div className="h-full rounded-full bg-yellow-400 transition-all duration-700" style={{ width: `${xpProgress}%` }} />
@@ -137,7 +137,7 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
           </div>
           <div>
             <div className="text-lg font-bold">{BIOME_INFO[biome].emoji}</div>
-            <div className="text-[10px] text-muted-foreground">Turno {turn}</div>
+            <div className="text-[10px] text-muted-foreground">{tx("Turno {{v0}}", { v0: turn })}</div>
           </div>
         </div>
 
@@ -187,7 +187,7 @@ export function GameHUD({ bars, coins, level, xp, turn, visitors, biome, alerts,
             <div key={i} className="flex items-center gap-1.5 text-xs">
               <span>{obj.done ? '✅' : '⬜'}</span>
               <span className={cn(obj.done ? 'text-green-700 dark:text-green-400 line-through' : 'text-amber-700 dark:text-amber-300')}>
-                {obj.emoji} {obj.label}
+                {obj.emoji} {tx(String(obj.label ?? ""))}
               </span>
             </div>
           ))}

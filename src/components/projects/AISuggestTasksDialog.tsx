@@ -48,7 +48,7 @@ export function AISuggestTasksDialog({
       setSelected(new Set(list.map((_, i) => i)));
       if (list.length === 0) toast.info(tx('Nenhuma sugestão gerada — projeto já parece coberto.'));
     } catch (e: any) {
-      toast.error(e?.message ?? "Erro ao gerar sugestões");
+      toast.error(e?.message ?? tx("Erro ao gerar sugestões"));
     } finally {
       setLoading(false);
     }

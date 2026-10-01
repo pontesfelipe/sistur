@@ -101,7 +101,7 @@ export function PillarGauge({ pillar, score, severity, isCritical }: PillarGauge
             </h3>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            {info.fullName}
+            {tx(String(info.fullName ?? ""))}
           </p>
         </div>
       </div>

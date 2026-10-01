@@ -207,7 +207,7 @@ export function DeleteAssessmentDialog({
                       className="flex items-center gap-2 text-sm cursor-pointer"
                     >
                       <FileText className="h-4 w-4 text-amber-600" />
-                      Excluir {relatedCounts.reports} relatório(s) associado(s)
+                      {tx("Excluir {{v0}} relatório(s) associado(s)", { v0: relatedCounts.reports })}
                     </Label>
                   </div>
                 )}
@@ -224,7 +224,7 @@ export function DeleteAssessmentDialog({
                       className="flex items-center gap-2 text-sm cursor-pointer"
                     >
                       <FolderKanban className="h-4 w-4 text-amber-600" />
-                      Excluir {relatedCounts.projects} projeto(s) associado(s)
+                      {tx("Excluir {{v0}} projeto(s) associado(s)", { v0: relatedCounts.projects })}
                     </Label>
                   </div>
                 )}

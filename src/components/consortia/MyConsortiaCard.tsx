@@ -59,7 +59,7 @@ export function MyConsortiaCard() {
         ))}
         {data.length > 3 && (
           <Button asChild variant="ghost" size="sm" className="w-full">
-            <Link to="/consorcios">Ver todos ({data.length})</Link>
+            <Link to="/consorcios">{tx("Ver todos ({{v0}})", { v0: data.length })}</Link>
           </Button>
         )}
       </CardContent>

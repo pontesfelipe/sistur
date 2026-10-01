@@ -35,7 +35,7 @@ function statusBadge(status: string, expires_at: string | null) {
     nao_aplicavel: { label: 'N/A', cls: 'bg-muted text-muted-foreground border-border' },
   };
   const m = map[effective] || map.pendente;
-  return <Badge variant="outline" className={m.cls}>{m.label}</Badge>;
+  return <Badge variant="outline" className={m.cls}>{tx(String(m.label ?? ""))}</Badge>;
 }
 
 function formatCnpj(s: string) {
@@ -113,11 +113,10 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-primary" /> Conformidade Legal — {destinationName}
+          <ShieldCheck className="h-5 w-5 text-primary" /> {tx("Conformidade Legal — {{v0}}", { v0: destinationName })}
         </CardTitle>
         <CardDescription>
-          Checklist de licenças e documentos obrigatórios (CADASTUR, Alvará, AVCB, Sanitário, LGPD).
-          Itens vencidos ou pendentes alimentam o indicador ENT_COMPLIANCE_RATE no diagnóstico.
+          {tx("Checklist de licenças e documentos obrigatórios (CADASTUR, Alvará, AVCB, Sanitário, LGPD). Itens vencidos ou pendentes alimentam o indicador ENT_COMPLIANCE_RATE no diagnóstico.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -208,7 +207,7 @@ export function EnterpriseCompliancePanel({ destinationId, destinationName }: Pr
                         >
                           <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            {STATUS_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                            {STATUS_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{tx(String(o.label ?? ""))}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>

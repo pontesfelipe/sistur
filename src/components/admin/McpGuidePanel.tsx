@@ -127,12 +127,10 @@ export function McpGuidePanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plug className="h-5 w-5" />
-            Conectando assistentes de IA ao SISTUR (MCP)
+            {tx("Conectando assistentes de IA ao SISTUR (MCP)")}
           </CardTitle>
           <CardDescription>
-            O SISTUR expõe um servidor MCP (Model Context Protocol) que permite a assistentes de IA —
-            como ChatGPT, Claude e Cursor — consultar e agir sobre os seus dados do sistema, sempre
-            com o login do próprio usuário e respeitando as permissões da sua organização.
+            {tx("O SISTUR expõe um servidor MCP (Model Context Protocol) que permite a assistentes de IA — como ChatGPT, Claude e Cursor — consultar e agir sobre os seus dados do sistema, sempre com o login do próprio usuário e respeitando as permissões da sua organização.")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -140,7 +138,7 @@ export function McpGuidePanel() {
             <code className="rounded-md bg-muted px-3 py-2 text-sm font-mono break-all">{MCP_URL}</code>
             <Button variant="outline" size="sm" onClick={copyUrl} className="gap-2">
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? 'Copiado' : 'Copiar URL'}
+              {copied ? 'Copiado' : tx('Copiar URL')}
             </Button>
           </div>
           <div className="flex items-start gap-3 rounded-lg border p-4">
@@ -169,7 +167,7 @@ export function McpGuidePanel() {
           <Accordion type="single" collapsible className="w-full">
             {CONNECTORS.map((c) => (
               <AccordionItem key={c.label} value={c.label}>
-                <AccordionTrigger className="text-left">{c.label}</AccordionTrigger>
+                <AccordionTrigger className="text-left">{tx(String(c.label ?? ""))}</AccordionTrigger>
                 <AccordionContent>
                   <ol className="list-decimal space-y-2 pl-5 text-sm">
                     {c.steps.map((s, i) => (

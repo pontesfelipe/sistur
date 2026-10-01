@@ -227,7 +227,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
               onCheckedChange={selectAll}
             />
             <span className="text-sm font-medium">
-              Selecionar todas ({selectableItems.length} ações)
+              {tx("Selecionar todas ({{v0}} ações)", { v0: selectableItems.length })}
             </span>
           </div>
           <Badge variant="secondary" className="text-xs">
@@ -311,7 +311,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
               {tx('Configurar Projeto')}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Preencha os detalhes do projeto. {selectedPlanIds.size} ação(ões) serão convertidas em tarefas.
+              {tx("Preencha os detalhes do projeto. {{v0}} ação(ões) serão convertidas em tarefas.", { v0: selectedPlanIds.size })}
             </p>
           </div>
         </CardContent>
@@ -406,7 +406,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <ListChecks className="h-4 w-4" />
-            Tarefas que serão criadas ({selectedPlanIds.size})
+            {tx("Tarefas que serão criadas ({{v0}})", { v0: selectedPlanIds.size })}
           </CardTitle>
           <CardDescription>
             {tx('Cada ação selecionada será convertida em uma tarefa do projeto')}

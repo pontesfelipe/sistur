@@ -77,7 +77,7 @@ export function ProfessorOverviewPanel() {
             <Target className="h-5 w-5" /> {tx("Visão geral por turma")}
           </CardTitle>
           <CardDescription>
-            Métricas consolidadas de cada turma sob sua responsabilidade — XP, engajamento e desempenho médio em provas (média geral: {avgScore}%).
+            {tx("Métricas consolidadas de cada turma sob sua responsabilidade — XP, engajamento e desempenho médio em provas (média geral: {{v0}}%).", { v0: avgScore })}
           </CardDescription>
         </CardHeader>
         <CardContent>

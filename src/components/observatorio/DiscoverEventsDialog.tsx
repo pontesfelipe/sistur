@@ -103,7 +103,7 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
         <DialogHeader>
           <DialogTitle>{tx("Descoberta automática de eventos")}</DialogTitle>
           <DialogDescription>
-            Consulta sites oficiais (prefeitura, secretaria de turismo) para sugerir eventos de {year}. Revise antes de importar.
+            {tx("Consulta sites oficiais (prefeitura, secretaria de turismo) para sugerir eventos de {{v0}}. Revise antes de importar.", { v0: year })}
           </DialogDescription>
         </DialogHeader>
 
@@ -170,7 +170,7 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
               {sources.length > 0 && (
                 <p className="text-[11px] text-muted-foreground flex items-start gap-1">
                   <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
-                  Sugestões automáticas — revise datas e nomes antes de importar. Fontes consultadas: {sources.length}.
+                  {tx("Sugestões automáticas — revise datas e nomes antes de importar. Fontes consultadas: {{v0}}.", { v0: sources.length })}
                 </p>
               )}
             </>

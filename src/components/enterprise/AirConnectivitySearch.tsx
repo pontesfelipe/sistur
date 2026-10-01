@@ -68,7 +68,7 @@ export function AirConnectivitySearch({ destinationId, onAutoFill, onAnalysisCap
     <div className="space-y-4">
       <Button onClick={run} disabled={loading} className="w-full">
         {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-        {loading ? 'Consultando ANAC...' : 'Analisar Conectividade Aérea'}
+        {loading ? tx('Consultando ANAC...') : tx('Analisar Conectividade Aérea')}
       </Button>
 
       {analysis && (
@@ -92,7 +92,7 @@ export function AirConnectivitySearch({ destinationId, onAutoFill, onAnalysisCap
 
           {analysis.airport_icao_codes && analysis.airport_icao_codes.length > 0 && (
             <div>
-              <div className="text-xs font-medium mb-1">Aeroportos (ICAO)</div>
+              <div className="text-xs font-medium mb-1">{tx("Aeroportos (ICAO)")}</div>
               <div className="flex flex-wrap gap-1">
                 {analysis.airport_icao_codes.map((c) => <Badge key={c} variant="secondary" className="text-[10px] font-mono">{c}</Badge>)}
               </div>

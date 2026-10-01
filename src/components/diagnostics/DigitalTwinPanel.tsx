@@ -72,7 +72,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
     const { error } = await supabase.from('twin_scenarios').insert({
       org_id: orgId, assessment_id: assessmentId, name, preset, years, intensities, projection: current as any,
     });
-    if (error) { toast.error(error.code === '42501' ? 'Sem permissão para salvar cenários nesta organização.' : error.message); return; }
+    if (error) { toast.error(error.code === '42501' ? tx('Sem permissão para salvar cenários nesta organização.') : error.message); return; }
     setScenarioName(''); toast.success(tx('Cenário salvo'));
     qc.invalidateQueries({ queryKey: ['twin-scenarios', assessmentId] });
   };
@@ -108,13 +108,13 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
         <CardHeader className="pb-3"><CardTitle className="text-base">{tx('Gêmeo Digital — cenários de 1 a 5 anos')}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Escolha um cenário e ajuste as alavancas. Os efeitos seguem regras sistêmicas: meio ambiente fraco (RA abaixo de 34%) limita ganhos operacionais, e governança fraca (OE abaixo de 34%) reduz todos os ganhos. Nada é salvo no diagnóstico oficial.
+            {tx("Escolha um cenário e ajuste as alavancas. Os efeitos seguem regras sistêmicas: meio ambiente fraco (RA abaixo de 34%) limita ganhos operacionais, e governança fraca (OE abaixo de 34%) reduz todos os ganhos. Nada é salvo no diagnóstico oficial.")}
           </p>
           <div className="flex flex-wrap items-center gap-2">
             {Object.keys(PRESETS).map((n) => (
               <Button key={n} size="sm" variant={preset === n ? 'default' : 'outline'} onClick={() => applyPreset(n)}>{n}</Button>
             ))}
-            <span className="ml-4 text-sm">Horizonte: {years} ano(s)</span>
+            <span className="ml-4 text-sm">{tx("Horizonte: {{v0}} ano(s)", { v0: years })}</span>
             <div className="w-40"><Slider value={[years]} min={1} max={5} step={1} onValueChange={([v]) => setYears(v)} aria-label={tx('Horizonte')} /></div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
@@ -163,7 +163,7 @@ export function DigitalTwinPanel({ pillarScores, assessmentId, orgId, destinatio
         </CardContent>
       </Card>
       <Card>
-        <CardHeader className="pb-3"><CardTitle className="text-base">Comparação de cenários (ano {years})</CardTitle></CardHeader>
+        <CardHeader className="pb-3"><CardTitle className="text-base">{tx("Comparação de cenários (ano {{v0}})", { v0: years })}</CardTitle></CardHeader>
         <CardContent className="grid sm:grid-cols-3 gap-3">
           {scenarios.map((s) => {
             const last = s.data[s.data.length - 1];

@@ -28,14 +28,14 @@ export default function CheckoutReturn() {
             <AlertCircle className="h-10 w-10 text-muted-foreground mb-2" />
           )}
           <CardTitle>
-            {sessionId ? 'Pagamento recebido' : 'Nenhuma informação de pagamento'}
+            {sessionId ? tx('Pagamento recebido') : tx('Nenhuma informação de pagamento')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           <p className="text-sm text-muted-foreground">
             {sessionId
-              ? 'Estamos confirmando sua contratação. O acesso é liberado automaticamente em alguns instantes.'
-              : 'Não localizamos a sessão de pagamento. Se você concluiu uma compra, verifique sua assinatura.'}
+              ? tx('Estamos confirmando sua contratação. O acesso é liberado automaticamente em alguns instantes.')
+              : tx('Não localizamos a sessão de pagamento. Se você concluiu uma compra, verifique sua assinatura.')}
           </p>
           <div className="flex gap-2 justify-center">
             <Button asChild>

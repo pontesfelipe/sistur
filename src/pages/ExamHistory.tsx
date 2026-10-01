@@ -317,7 +317,7 @@ const ExamHistory = () => {
                           })}
                         </TableCell>
                         <TableCell className="max-w-xs">
-                          <p className="text-sm line-clamp-2">{appeal.reason}</p>
+                          <p className="text-sm line-clamp-2">{tx(String(appeal.reason ?? ""))}</p>
                         </TableCell>
                         <TableCell>{getAppealStatusBadge(appeal.status)}</TableCell>
                         <TableCell className="max-w-xs">
@@ -343,8 +343,7 @@ const ExamHistory = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{tx('Enviar Recurso')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Questione o resultado da prova "{appealDialog?.courseName}". 
-              Descreva os motivos do recurso de forma clara e objetiva.
+              {tx("Questione o resultado da prova \"{{v0}}\". Descreva os motivos do recurso de forma clara e objetiva.", { v0: appealDialog?.courseName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-3 py-4">

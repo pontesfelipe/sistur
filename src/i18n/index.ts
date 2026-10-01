@@ -25,6 +25,37 @@ function detectInitial(): AppLanguage {
   return 'pt-BR';
 }
 
+/**
+ * Frases geradas pelo cálculo (gravadas em português no banco) são
+ * traduzidas por partes quando não existe tradução inteira.
+ */
+const GENERATED_PATTERNS: Array<[RegExp, string]> = [
+  [/^(.+) em nível (\S+) \((.+)\) — Interpretação: (.+)$/, '{{0}} em nível {{1}} ({{2}}) — Interpretação: {{3}}'],
+  [/^Esta capacitação foi prescrita porque o indicador (.+) está (\S+) no pilar (.+?)\.(.*)$/, 'Esta capacitação foi prescrita porque o indicador {{0}} está {{1}} no pilar {{2}}.{{3}}'],
+  [/^Prescrito porque o indicador (.+) está (\S+) no pilar (.+?)\.(.*)$/, 'Prescrito porque o indicador {{0}} está {{1}} no pilar {{2}}.{{3}}'],
+  [/^Esta capacitação foi prescrita porque o indicador (.+) está (\S+) — (.+)$/, 'Esta capacitação foi prescrita porque o indicador {{0}} está {{1}} — {{2}}'],
+  [/^Evidência: (.+)$/, 'Evidência: {{0}}'],
+];
+let translatingGenerated = false;
+function translateGenerated(key: string): string {
+  if (translatingGenerated || !i18n.language || i18n.language === 'pt-BR') return key;
+  for (const [re, template] of GENERATED_PATTERNS) {
+    const m = key.match(re);
+    if (!m) continue;
+    translatingGenerated = true;
+    try {
+      const vars: Record<string, string> = {};
+      m.slice(1).forEach((part, i) => {
+        const p = part.trim();
+        vars[String(i)] = p ? part.replace(p, String(i18n.t(p))) : part;
+      });
+      translatingGenerated = false;
+      return String(i18n.t(template, { ...vars, interpolation: { escapeValue: false } }));
+    } finally { translatingGenerated = false; }
+  }
+  return key;
+}
+
 i18n.use(initReactI18next).init({
   resources: {
     'pt-BR': { translation: {} },
@@ -43,7 +74,7 @@ i18n.use(initReactI18next).init({
   // o i18next cai no pt-BR e, como o recurso pt-BR é vazio, devolve a própria
   // chave — que é a frase em português. Ou seja, a tela nunca fica vazia
   // nem mostra códigos crus de tradução.
-  parseMissingKeyHandler: (key) => key,
+  parseMissingKeyHandler: (key) => translateGenerated(key),
   missingKeyHandler: (_lngs, _ns, key) => {
     if (import.meta.env.DEV) console.warn(`[i18n] tradução ausente: "${key}"`);
   },

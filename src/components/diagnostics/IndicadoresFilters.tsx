@@ -129,19 +129,19 @@ export function IndicadoresFilters({
             <SelectItem value="SMALL">
               <div className="flex items-center gap-2">
                 <Zap className="h-3 w-3 text-green-600" />
-                Essencial ({tierCounts.SMALL})
+                {tx("Essencial ({{v0}})", { v0: tierCounts.SMALL })}
               </div>
             </SelectItem>
             <SelectItem value="MEDIUM">
               <div className="flex items-center gap-2">
                 <Gauge className="h-3 w-3 text-amber-600" />
-                Estratégico ({tierCounts.MEDIUM})
+                {tx("Estratégico ({{v0}})", { v0: tierCounts.MEDIUM })}
               </div>
             </SelectItem>
             <SelectItem value="COMPLETE">
               <div className="flex items-center gap-2">
                 <Target className="h-3 w-3 text-primary" />
-                Integral ({tierCounts.COMPLETE})
+                {tx("Integral ({{v0}})", { v0: tierCounts.COMPLETE })}
               </div>
             </SelectItem>
           </SelectContent>
@@ -151,23 +151,23 @@ export function IndicadoresFilters({
             <SelectValue placeholder={tx('Escopo')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos escopos ({indicatorsTotal})</SelectItem>
+            <SelectItem value="all">{tx("Todos escopos ({{v0}})", { v0: indicatorsTotal })}</SelectItem>
             <SelectItem value="territorial">
               <div className="flex items-center gap-2">
                 <Landmark className="h-3 w-3 text-blue-600" />
-                Territorial ({scopeCounts.territorial})
+                {tx("Territorial ({{v0}})", { v0: scopeCounts.territorial })}
               </div>
             </SelectItem>
             <SelectItem value="enterprise">
               <div className="flex items-center gap-2">
                 <Hotel className="h-3 w-3 text-amber-600" />
-                Enterprise ({scopeCounts.enterprise})
+                {tx("Enterprise ({{v0}})", { v0: scopeCounts.enterprise })}
               </div>
             </SelectItem>
             <SelectItem value="both">
               <div className="flex items-center gap-2">
                 <Globe className="h-3 w-3 text-purple-600" />
-                Ambos ({scopeCounts.both})
+                {tx("Ambos ({{v0}})", { v0: scopeCounts.both })}
               </div>
             </SelectItem>
           </SelectContent>
@@ -181,25 +181,25 @@ export function IndicadoresFilters({
             <SelectItem value="AUTOMATICA">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-3 w-3 text-severity-good" />
-                API/Automático ({collectionCounts.AUTOMATICA})
+                {tx("API/Automático ({{v0}})", { v0: collectionCounts.AUTOMATICA })}
               </div>
             </SelectItem>
             <SelectItem value="DERIVED">
               <div className="flex items-center gap-2">
                 <Calculator className="h-3 w-3 text-violet-600" />
-                Calculado ({collectionCounts.DERIVED})
+                {tx("Calculado ({{v0}})", { v0: collectionCounts.DERIVED })}
               </div>
             </SelectItem>
             <SelectItem value="MANUAL">
               <div className="flex items-center gap-2">
                 <Shield className="h-3 w-3 text-severity-moderate" />
-                Manual ({collectionCounts.MANUAL})
+                {tx("Manual ({{v0}})", { v0: collectionCounts.MANUAL })}
               </div>
             </SelectItem>
             <SelectItem value="ESTIMADA">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="h-3 w-3 text-severity-critical" />
-                Estimado ({collectionCounts.ESTIMADA})
+                {tx("Estimado ({{v0}})", { v0: collectionCounts.ESTIMADA })}
               </div>
             </SelectItem>
           </SelectContent>
@@ -213,7 +213,7 @@ export function IndicadoresFilters({
             <SelectItem value="core">
               <div className="flex items-center gap-2">
                 <Landmark className="h-3 w-3 text-primary" />
-                Núcleo SISTUR ({mandalaCounts.core})
+                {tx("Núcleo SISTUR ({{v0}})", { v0: mandalaCounts.core })}
               </div>
             </SelectItem>
             <SelectItem value="mandala">

@@ -83,7 +83,7 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
             {tx('Validação Pré-Cálculo')}
           </span>
           <Badge variant={analysis.qualityScore >= 70 ? 'default' : analysis.qualityScore >= 40 ? 'secondary' : 'destructive'}>
-            Qualidade: {analysis.qualityScore}%
+            {tx("Qualidade: {{v0}}%", { v0: analysis.qualityScore })}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -120,7 +120,7 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
                 {data.missing.length > 0 && (
                   <div className="mt-1 space-y-1">
                     <p className="text-[11px] font-medium text-muted-foreground">
-                      Faltam preencher ({data.missing.length}):
+                      {tx("Faltam preencher ({{v0}}):", { v0: data.missing.length })}
                     </p>
                     <ul className="space-y-0.5 max-h-32 overflow-auto pr-1">
                       {data.missing.map((item, i) => (
@@ -150,7 +150,7 @@ export function PreCalculationChecklist({ indicators, indicatorValues, tier, isE
           <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
             <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
             <p className="text-xs text-amber-700 dark:text-amber-400">
-              {analysis.oldData.length} indicador(es) com dados com mais de 2 anos. Considere atualizar.
+              {tx("{{v0}} indicador(es) com dados com mais de 2 anos. Considere atualizar.", { v0: analysis.oldData.length })}
             </p>
           </div>
         )}

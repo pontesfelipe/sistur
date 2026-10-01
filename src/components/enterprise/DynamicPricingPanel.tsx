@@ -66,7 +66,7 @@ export function DynamicPricingPanel({ months }: { months: SeasonalityMonth[] }) 
         {field('marketAdr', 'Diária do mercado (R$)')}
       </div>
       {!hasData ? (
-        <p className="text-sm text-muted-foreground">Preencha a diária média (ADR) na aba Sazonalidade para gerar sugestões.</p>
+        <p className="text-sm text-muted-foreground">{tx("Preencha a diária média (ADR) na aba Sazonalidade para gerar sugestões.")}</p>
       ) : (
         <>
           <div className="flex flex-wrap gap-3 text-sm">

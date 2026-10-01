@@ -168,7 +168,7 @@ export function NovaRodadaDialogs({
         <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
           <Building2 className="h-4 w-4" />
           <span>
-            Diagnóstico de rede — {orderedUnits.length} unidades. Cada aba abaixo coleta dados de uma unidade.
+            {tx("Diagnóstico de rede — {{v0}} unidades. Cada aba abaixo coleta dados de uma unidade.", { v0: orderedUnits.length })}
           </span>
         </div>
         <TabsList className="flex flex-wrap h-auto gap-1">
@@ -318,7 +318,7 @@ export function NovaRodadaDialogs({
               <Button onClick={onNextStep}>
                 {validatedDataCount > 0 
                   ? `Continuar (${validatedDataCount} validados)` 
-                  : 'Pular para Preenchimento Manual'}
+                  : tx('Pular para Preenchimento Manual')}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>

@@ -135,7 +135,7 @@ function CommentsSection({ taskId, projectId }: { taskId: string; projectId: str
 
   return (
     <Card>
-      <CardHeader className="pb-2"><CardTitle className="text-sm">Comentários ({comments.length})</CardTitle></CardHeader>
+      <CardHeader className="pb-2"><CardTitle className="text-sm">{tx("Comentários ({{v0}})", { v0: comments.length })}</CardTitle></CardHeader>
       <CardContent className="space-y-3">
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {comments.length === 0 && (

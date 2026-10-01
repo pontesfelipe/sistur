@@ -55,7 +55,7 @@ export function CancelSubscriptionDialog({
       if (error) throw error;
       toast.success(
         isTrial
-          ? 'Trial cancelado com sucesso.'
+          ? tx('Trial cancelado com sucesso.')
           : `Plano cancelado. Acesso mantido até ${expiresAt ? new Date(expiresAt).toLocaleDateString('pt-BR') : 'o fim do período'}.`,
       );
       onCancelled();
@@ -82,7 +82,7 @@ export function CancelSubscriptionDialog({
           </div>
           <DialogDescription>
             {isTrial
-              ? 'Ao cancelar o trial, você perderá o acesso imediatamente.'
+              ? tx('Ao cancelar o trial, você perderá o acesso imediatamente.')
               : `Ao cancelar o plano ${planLabel}, você manterá acesso até o fim do período contratado.`}
           </DialogDescription>
         </DialogHeader>
@@ -112,7 +112,7 @@ export function CancelSubscriptionDialog({
 
           <div>
             <Label htmlFor="cancel-details" className="text-sm font-medium mb-1.5 block">
-              {selectedReason === 'Outro' ? 'Descreva o motivo *' : 'Detalhes adicionais (opcional)'}
+              {selectedReason === 'Outro' ? tx('Descreva o motivo *') : tx('Detalhes adicionais (opcional)')}
             </Label>
             <Textarea
               id="cancel-details"
@@ -134,7 +134,7 @@ export function CancelSubscriptionDialog({
             onClick={handleCancel}
             disabled={!canSubmit || processing}
           >
-            {processing ? 'Cancelando...' : 'Confirmar cancelamento'}
+            {processing ? 'Cancelando...' : tx('Confirmar cancelamento')}
           </Button>
         </DialogFooter>
       </DialogContent>

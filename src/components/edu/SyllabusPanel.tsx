@@ -103,7 +103,7 @@ export function SyllabusPanel({ training }: Props) {
         {habilidades.length > 0 && (
           <section>
             <h4 className="text-sm font-semibold flex items-center gap-2 mb-2">
-              <ListChecks className="h-4 w-4" /> Habilidades (objetivos de aprendizagem)
+              <ListChecks className="h-4 w-4" /> {tx("Habilidades (objetivos de aprendizagem)")}
             </h4>
             <ul className="space-y-1.5 text-sm text-muted-foreground list-disc pl-5">
               {habilidades.map((h, i) => <li key={i}>{h}</li>)}

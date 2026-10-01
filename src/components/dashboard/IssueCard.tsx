@@ -77,7 +77,7 @@ export function IssueCard({ issue, onViewRecommendations }: IssueCardProps) {
             <Badge variant={severityVariant}>{tx(severityInfo.label)}</Badge>
             {themeLabel ? (
               <Badge variant="outline" className="text-xs">
-                {themeLabel}
+                {tx(String(themeLabel ?? ""))}
               </Badge>
             ) : null}
             {/* Territorial Interpretation Badge */}

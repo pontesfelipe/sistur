@@ -59,7 +59,7 @@ export function MetricHistoryDialog({ metricId, metricName, unit }: Props) {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{metricName}</DialogTitle>
-            <DialogDescription>Série histórica em {unit}</DialogDescription>
+            <DialogDescription>{tx("Série histórica em {{v0}}", { v0: unit })}</DialogDescription>
           </DialogHeader>
           {isLoading ? (
             <div className="flex justify-center py-8">

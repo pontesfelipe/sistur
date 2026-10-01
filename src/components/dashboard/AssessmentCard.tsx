@@ -217,10 +217,10 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
               : `/diagnosticos/${assessment.id}`
           }>
             {assessment.status === 'CALCULATED'
-              ? 'Ver diagnóstico'
+              ? tx('Ver diagnóstico')
               : assessment.status === 'DATA_READY'
-              ? 'Calcular índices'
-              : 'Continuar preenchimento'}
+              ? tx('Calcular índices')
+              : tx('Continuar preenchimento')}
             <ChevronRight className="h-4 w-4" />
           </Link>
         </Button>

@@ -23,9 +23,9 @@ interface DestinationTrendProps {
 }
 
 const PILLAR_LABELS: Record<string, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 const PILLAR_COLORS: Record<string, string> = {
@@ -159,9 +159,9 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
   };
 
   const getTrendLabel = (trend: 'up' | 'down' | 'stable' | undefined) => {
-    if (trend === 'up') return 'Evolução';
-    if (trend === 'down') return 'Regressão';
-    return 'Estável';
+    if (trend === 'up') return tx('Evolução');
+    if (trend === 'down') return tx('Regressão');
+    return tx('Estável');
   };
 
   const getTrendVariant = (trend: 'up' | 'down' | 'stable' | undefined) => {
@@ -280,7 +280,7 @@ export function DestinationTrend({ destinations }: DestinationTrendProps) {
             </ChartContainer>
 
             <p className="text-xs text-muted-foreground text-center mt-2">
-              Total de {trendData.totalCycles} ciclo(s) de diagnóstico
+              {tx("Total de {{v0}} ciclo(s) de diagnóstico", { v0: trendData.totalCycles })}
             </p>
           </>
         ) : trendData && trendData.chartData.length === 1 ? (

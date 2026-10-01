@@ -133,7 +133,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
           <>
             <div className="grid gap-4 md:grid-cols-3 items-end">
               <div className="space-y-2">
-                <Label>Raio de influência: {radius} km</Label>
+                <Label>{tx("Raio de influência: {{v0}} km", { v0: radius })}</Label>
                 <Slider min={1} max={100} step={1} value={[radius]} onValueChange={v => setRadius(v[0])} />
               </div>
               <div className="flex items-center gap-2"><Switch checked={showComp} onCheckedChange={setShowComp} /><Label>{tx('Concorrentes')}</Label></div>
@@ -142,7 +142,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
               <div className="flex items-center gap-2"><Switch checked={showOrigin} onCheckedChange={setShowOrigin} /><Label>{tx('Origem dos visitantes')}</Label></div>
             </div>
             <div className="rounded-md border p-3 space-y-2 text-sm">
-              <p className="font-medium">Origem dos visitantes (por estado)</p>
+              <p className="font-medium">{tx("Origem dos visitantes (por estado)")}</p>
               <div className="flex flex-wrap items-center gap-2">
                 <select className="h-9 rounded-md border bg-background px-2" value={newUf} onChange={e => setNewUf(e.target.value)} aria-label={tx('Estado de origem')}>
                   {Object.keys(UF_CAPITALS).map(uf => <option key={uf}>{uf}</option>)}
@@ -163,12 +163,12 @@ export function GeomarketingPanel({ destinationId }: Props) {
                 <p className="text-xs text-muted-foreground">{supply.toLocaleString('pt-BR')} avaliações somadas</p>
               </div>
               <div className="rounded-md border p-3">
-                <p className="text-muted-foreground">Demanda aérea (ANAC, 12 meses)</p>
+                <p className="text-muted-foreground">{tx("Demanda aérea (ANAC, 12 meses)")}</p>
                 <p className="text-2xl font-semibold">{data?.anac ? Number(data.anac.total_passengers_12m ?? 0).toLocaleString('pt-BR') : '—'}</p>
-                <p className="text-xs text-muted-foreground">{data?.anac ? `${data.anac.flights_per_week ?? 0} voos/semana` : 'Sem aeroporto no município'}</p>
+                <p className="text-xs text-muted-foreground">{data?.anac ? `${data.anac.flights_per_week ?? 0} voos/semana` : tx('Sem aeroporto no município')}</p>
               </div>
               <div className="rounded-md border p-3">
-                <p className="text-muted-foreground">Próximos eventos (Observatório)</p>
+                <p className="text-muted-foreground">{tx("Próximos eventos (Observatório)")}</p>
                 {data?.events?.length ? data.events.slice(0, 4).map((e: any) => (
                   <p key={e.id} className="text-xs">{new Date(e.start_date).toLocaleDateString('pt-BR')} · {e.name}
                     {e.estimated_attendance ? <Badge variant="secondary" className="ml-1">{e.estimated_attendance.toLocaleString('pt-BR')}</Badge> : null}</p>

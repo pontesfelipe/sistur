@@ -107,14 +107,14 @@ export function ClassroomDiaryPanel({ classroomId, classroomName }: Props) {
                       <div className="font-medium">{r.student_name}</div>
                       {r.fraud_flags > 0 && (
                         <div className="text-xs text-destructive flex items-center gap-1 mt-0.5">
-                          <AlertTriangle className="h-3 w-3" /> {r.fraud_flags} alerta(s) pendente(s)
+                          <AlertTriangle className="h-3 w-3" /> {tx("{{v0}} alerta(s) pendente(s)", { v0: r.fraud_flags })}
                         </div>
                       )}
                     </TableCell>
                     <TableCell>{statusBadge(r)}</TableCell>
                     <TableCell className="text-right text-sm">
-                      {r.attendance_days} dia(s)
-                      <div className="text-xs text-muted-foreground">{r.total_sessions} sessões</div>
+                      {tx("{{v0}} dia(s)", { v0: r.attendance_days })}
+                      <div className="text-xs text-muted-foreground">{tx("{{v0}} sessões", { v0: r.total_sessions })}</div>
                     </TableCell>
                     <TableCell className="text-right text-sm">{fmtMinutes(r.total_active_minutes)}</TableCell>
                     <TableCell className="text-right text-sm">
@@ -124,7 +124,7 @@ export function ClassroomDiaryPanel({ classroomId, classroomName }: Props) {
                       {r.best_exam_score != null ? (
                         <>
                           <span className="font-medium">{Number(r.best_exam_score).toFixed(1)}%</span>
-                          <div className="text-xs text-muted-foreground">{r.exam_attempts} tentativa(s)</div>
+                          <div className="text-xs text-muted-foreground">{tx("{{v0}} tentativa(s)", { v0: r.exam_attempts })}</div>
                         </>
                       ) : '—'}
                     </TableCell>

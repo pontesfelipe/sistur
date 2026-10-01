@@ -194,11 +194,11 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
                 <span className="font-medium text-sm">{PROVIDER_LABEL[c.provider as Provider] ?? c.provider}</span>
                 {c.property_name && <span className="text-xs text-muted-foreground">· {c.property_name}</span>}
                 <Badge variant={c.status === 'active' ? 'default' : c.status === 'error' ? 'destructive' : 'secondary'} className="text-[10px]">
-                  {c.status}
+                  {tx(String(c.status ?? ""))}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {c.last_sync_at ? `Última sync: ${new Date(c.last_sync_at).toLocaleString('pt-BR')}` : 'Nunca sincronizado'}
+                {c.last_sync_at ? `Última sync: ${new Date(c.last_sync_at).toLocaleString('pt-BR')}` : tx('Nunca sincronizado')}
                 {c.last_sync_error ? ` · ${c.last_sync_error}` : ''}
               </p>
             </div>
@@ -226,15 +226,15 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
               <Select value={provider} onValueChange={(v) => { setProvider(v as Provider); setCredInputs({}); }}>
                 <SelectTrigger id="prov"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cloudbeds">Cloudbeds (OAuth)</SelectItem>
-                  <SelectItem value="stays">Stays (API Key)</SelectItem>
-                  <SelectItem value="opera">Oracle Opera Cloud (OAuth client_credentials)</SelectItem>
-                  <SelectItem value="hits">HITS Mobile (API Key)</SelectItem>
+                  <SelectItem value="cloudbeds">{tx("Cloudbeds (OAuth)")}</SelectItem>
+                  <SelectItem value="stays">{tx("Stays (API Key)")}</SelectItem>
+                  <SelectItem value="opera">{tx("Oracle Opera Cloud (OAuth client_credentials)")}</SelectItem>
+                  <SelectItem value="hits">{tx("HITS Mobile (API Key)")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="pid">ID da propriedade no PMS (opcional)</Label>
+              <Label htmlFor="pid">{tx("ID da propriedade no PMS (opcional)")}</Label>
               <Input id="pid" value={propertyId} onChange={(e) => setPropertyId(e.target.value)} placeholder={tx("Ex.: 12345")} />
             </div>
             <div>
@@ -243,7 +243,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
             </div>
             {PROVIDER_AUTH[provider] === 'apikey' && PROVIDER_FIELDS[provider].map((f) => (
               <div key={f.key}>
-                <Label htmlFor={`cred-${f.key}`}>{f.label}</Label>
+                <Label htmlFor={`cred-${f.key}`}>{tx(String(f.label ?? ""))}</Label>
                 <Input
                   id={`cred-${f.key}`}
                   type={f.type ?? 'text'}
@@ -257,7 +257,7 @@ export function PmsConnectionsPanel({ destinationId }: Props) {
             {PROVIDER_AUTH[provider] === 'apikey' && (
               <p className="text-xs text-muted-foreground flex items-start gap-1">
                 <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
-                Credenciais são criptografadas e acessíveis apenas pelo serviço de sincronização (RLS service_role).
+                {tx("Credenciais são criptografadas e acessíveis apenas pelo serviço de sincronização (RLS service_role).")}
               </p>
             )}
             {provider === 'cloudbeds' && (

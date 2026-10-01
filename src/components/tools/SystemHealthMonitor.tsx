@@ -121,7 +121,7 @@ export function SystemHealthMonitor() {
             <div className="flex items-center gap-3">
               <div className={`h-3 w-3 rounded-full ${health.color} animate-pulse`} />
               <div>
-                <p className="font-medium">{health.label}</p>
+                <p className="font-medium">{tx(String(health.label ?? ""))}</p>
                 {lastRefresh && (
                   <p className="text-xs text-muted-foreground">
                     Atualizado em {lastRefresh.toLocaleTimeString('pt-BR')}

@@ -68,7 +68,7 @@ export function RewardPicker({ cards, onPick, onSkip }: RewardPickerProps) {
               onClick={onSkip}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors underline"
             >
-              Pular (não adicionar carta)
+              {tx("Pular (não adicionar carta)")}
             </button>
           </motion.div>
         )}

@@ -149,7 +149,7 @@ export function StudentReportDialog({ studentId, studentName, open, onClose }: S
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Relatório — {studentName}
+            {tx("Relatório — {{v0}}", { v0: studentName })}
           </DialogTitle>
         </DialogHeader>
 
@@ -230,11 +230,11 @@ export function StudentReportDialog({ studentId, studentName, open, onClose }: S
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
                       <div className="h-3 w-3 rounded-full bg-green-500" />
-                      <span className="text-sm">{stats.examsPassed} aprovados</span>
+                      <span className="text-sm">{tx("{{v0}} aprovados", { v0: stats.examsPassed })}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <div className="h-3 w-3 rounded-full bg-destructive" />
-                      <span className="text-sm">{stats.examsFailed} reprovados</span>
+                      <span className="text-sm">{tx("{{v0}} reprovados", { v0: stats.examsFailed })}</span>
                     </div>
                   </div>
                 </CardContent>

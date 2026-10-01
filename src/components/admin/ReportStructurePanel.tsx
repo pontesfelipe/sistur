@@ -162,7 +162,7 @@ export function ReportStructurePanel() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Descrição (contrato)</label>
+                <label className="text-xs font-medium text-muted-foreground">{tx("Descrição (contrato)")}</label>
                 <Textarea value={t.description ?? ""} onChange={e => updateLocal(t.id, { description: e.target.value })} rows={2} />
               </div>
 

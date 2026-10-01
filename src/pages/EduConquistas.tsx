@@ -84,8 +84,8 @@ export default function EduConquistas() {
               <>
                 <div className="flex items-end justify-between gap-4 flex-wrap">
                   <div>
-                    <div className="text-3xl font-bold">Nível {level}</div>
-                    <div className="text-sm text-muted-foreground">{totalXp} XP totais</div>
+                    <div className="text-3xl font-bold">{tx("Nível {{v0}}", { v0: level })}</div>
+                    <div className="text-sm text-muted-foreground">{tx("{{v0}} XP totais", { v0: totalXp })}</div>
                   </div>
                   <div className="text-right text-xs text-muted-foreground">
                     {nextLevelXp - totalXp} XP para o nível {level + 1}

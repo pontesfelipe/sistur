@@ -85,7 +85,7 @@ export function EnterpriseOrgBenchmark({ orgId, currentDestinationId, currentAss
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <BarChart3 className="h-5 w-5 text-primary" />
-          Benchmark interno ({data.total} empreendimentos)
+          {tx("Benchmark interno ({{v0}} empreendimentos)", { v0: data.total })}
         </CardTitle>
         <CardDescription>
           {tx('Comparação anônima entre empreendimentos Enterprise da mesma organização. Sem ranking público — uso interno apenas.')}

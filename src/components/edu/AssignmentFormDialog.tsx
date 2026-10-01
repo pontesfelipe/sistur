@@ -182,7 +182,7 @@ export function AssignmentFormDialog({
         <DialogHeader>
           <DialogTitle>{tx('Nova atividade')}</DialogTitle>
           <DialogDescription>
-            Configure quando a atividade abre, quem recebe e (para provas) regras específicas.
+            {tx("Configure quando a atividade abre, quem recebe e (para provas) regras específicas.")}
           </DialogDescription>
         </DialogHeader>
 
@@ -296,7 +296,7 @@ export function AssignmentFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>Descrição (opcional)</Label>
+            <Label>{tx("Descrição (opcional)")}</Label>
             <Textarea
               value={form.description}
               maxLength={1000}
@@ -351,7 +351,7 @@ export function AssignmentFormDialog({
                 onCheckedChange={v => setAllMembers(!!v)}
               />
               <label htmlFor="all-members" className="text-sm cursor-pointer">
-                Toda a turma ({members.length} alunos)
+                {tx("Toda a turma ({{v0}} alunos)", { v0: members.length })}
               </label>
             </div>
 
@@ -375,7 +375,7 @@ export function AssignmentFormDialog({
                 )}
                 {!allMembers && form.target_user_ids.length > 0 && (
                   <Badge variant="secondary" className="ml-1 mt-1">
-                    {form.target_user_ids.length} selecionado(s)
+                    {tx("{{v0}} selecionado(s)", { v0: form.target_user_ids.length })}
                   </Badge>
                 )}
               </div>
@@ -398,7 +398,7 @@ export function AssignmentFormDialog({
               {showAdvanced && (
                 <div className="grid grid-cols-3 gap-3 p-3 bg-muted/30 rounded-md">
                   <div className="space-y-1">
-                    <Label className="text-xs">Tempo (min)</Label>
+                    <Label className="text-xs">{tx("Tempo (min)")}</Label>
                     <Input
                       type="number"
                       min={5}
@@ -424,7 +424,7 @@ export function AssignmentFormDialog({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Nota mín. (%)</Label>
+                    <Label className="text-xs">{tx("Nota mín. (%)")}</Label>
                     <Input
                       type="number"
                       min={0}

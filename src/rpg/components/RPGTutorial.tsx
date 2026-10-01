@@ -123,7 +123,7 @@ export function RPGTutorial({ onComplete }: RPGTutorialProps) {
                 : 'bg-gradient-to-r from-emerald-500 to-teal-600'
             )}
           >
-            {isLast ? '🌿 Começar!' : 'Próximo ➡️'}
+            {isLast ? '🌿 Começar!' : tx('Próximo ➡️')}
           </button>
         </div>
 

@@ -115,7 +115,7 @@ export function CreateTrackFromRecommendationsDialog({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Descrição (opcional)</label>
+                <label className="text-sm font-medium">{tx("Descrição (opcional)")}</label>
                 <Input
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -126,7 +126,7 @@ export function CreateTrackFromRecommendationsDialog({
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium">
-                    Itens da trilha ({selectedTrainingIds.length}/{trainingRecommendations.length})
+                    {tx("Itens da trilha ({{v0}}/{{v1}})", { v0: selectedTrainingIds.length, v1: trainingRecommendations.length })}
                   </p>
                   <Button
                     variant="outline"
@@ -188,8 +188,7 @@ export function CreateTrackFromRecommendationsDialog({
                 <div className="space-y-1">
                   <p className="text-sm font-medium">{tx('Gerar provas finais automaticamente')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Cria uma prova por pilar coberto pelos treinamentos (20 questões, 70% nota mínima, 60 min).
-                    Você pode pular e gerar depois.
+                    {tx("Cria uma prova por pilar coberto pelos treinamentos (20 questões, 70% nota mínima, 60 min). Você pode pular e gerar depois.")}
                   </p>
                 </div>
               </label>

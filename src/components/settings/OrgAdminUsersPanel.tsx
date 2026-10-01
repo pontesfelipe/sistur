@@ -198,7 +198,7 @@ export function OrgAdminUsersPanel() {
       });
       if (response.error) throw new Error(response.error.message);
       if (response.data?.error) throw new Error(response.data.error);
-      toast.success(blocked ? 'Usuário bloqueado' : 'Usuário desbloqueado');
+      toast.success(blocked ? tx('Usuário bloqueado') : tx('Usuário desbloqueado'));
       fetchUsers();
     } catch (error: any) {
       toast.error(error.message || 'Erro ao alterar status');
@@ -427,7 +427,7 @@ export function OrgAdminUsersPanel() {
                           <div className="flex items-center gap-2 mt-1">
                             <Badge className={roleInfo.color}>
                               <Shield className="h-3 w-3 mr-1" />
-                              {roleInfo.label}
+                              {tx(String(roleInfo.label ?? ""))}
                             </Badge>
                             {user.system_access && (
                               <Badge variant="outline">{user.system_access}</Badge>

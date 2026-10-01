@@ -209,10 +209,10 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
           body: JSON.stringify({ imageUrl: url, orgId }),
         }
       );
-      if (!response.ok) return { approved: true, reason: 'Moderação indisponível' };
+      if (!response.ok) return { approved: true, reason: tx('Moderação indisponível') };
       return await response.json();
     } catch {
-      return { approved: true, reason: 'Erro na moderação' };
+      return { approved: true, reason: tx('Erro na moderação') };
     }
   };
 
@@ -406,7 +406,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <ImageIcon className="h-4 w-4" />
-                Imagens ({imagePreviews.length}/{maxImages})
+                {tx("Imagens ({{v0}}/{{v1}})", { v0: imagePreviews.length, v1: maxImages })}
               </Label>
               
               <input
@@ -458,7 +458,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
                   <div className="flex flex-col items-center gap-1">
                     <Upload className="h-5 w-5 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
-                      Adicionar imagens (até {maxImages})
+                      {tx("Adicionar imagens (até {{v0}})", { v0: maxImages })}
                     </span>
                   </div>
                 </Button>
@@ -469,7 +469,7 @@ export function CreatePostDialog({ open, onOpenChange, editPost }: CreatePostDia
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
-                PDF (opcional)
+                {tx("PDF (opcional)")}
               </Label>
 
               <input

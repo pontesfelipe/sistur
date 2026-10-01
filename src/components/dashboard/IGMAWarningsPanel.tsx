@@ -84,7 +84,7 @@ export function IGMAWarningsPanel({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <AlertCircle className="h-5 w-5 text-amber-600" />
-          Alertas Sistêmicos (Mario Beni)
+          {tx("Alertas Sistêmicos (Mario Beni)")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">

@@ -117,7 +117,7 @@ export function EnterpriseRegressionAlerts({ destinationId, diagnosticType, dest
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base text-amber-700 dark:text-amber-300">
           <AlertTriangle className="h-5 w-5" />
-          Regressão detectada ({alerts.length})
+          {tx("Regressão detectada ({{v0}})", { v0: alerts.length })}
         </CardTitle>
         <CardDescription>
           Quedas superiores a 2 pontos percentuais em 2 rodadas consecutivas. Comparação interna deste {diagnosticType === 'enterprise' ? 'empreendimento' : 'destino'}.

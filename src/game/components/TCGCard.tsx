@@ -78,7 +78,7 @@ export function TCGPlayerCard({
       {/* Card header */}
       <div className={cn('px-1.5 py-1 bg-gradient-to-r text-white flex-shrink-0 relative z-[1]', cat.gradient)}>
         <div className="flex items-center justify-between">
-          <span className="text-[8px] sm:text-[9px] font-bold opacity-90 truncate">{typeInfo.emoji} {typeInfo.label}</span>
+          <span className="text-[8px] sm:text-[9px] font-bold opacity-90 truncate">{typeInfo.emoji} {tx(String(typeInfo.label ?? ""))}</span>
           <span className="text-[9px] sm:text-[10px] font-bold bg-black/20 rounded-full px-1.5 flex-shrink-0">💰{card.cost}</span>
         </div>
       </div>

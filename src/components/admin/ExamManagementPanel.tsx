@@ -133,7 +133,7 @@ export function ExamManagementPanel() {
           </TabsTrigger>
           <TabsTrigger value="appeals" className="gap-2">
             <MessageSquare className="h-4 w-4" />
-            Recursos ({pendingAppeals})
+            {tx("Recursos ({{v0}})", { v0: pendingAppeals })}
           </TabsTrigger>
         </TabsList>
 
@@ -229,7 +229,7 @@ export function ExamManagementPanel() {
                           {new Date(appeal.created_at).toLocaleDateString('pt-BR')}
                         </TableCell>
                         <TableCell className="max-w-xs">
-                          <p className="text-sm line-clamp-2">{appeal.reason}</p>
+                          <p className="text-sm line-clamp-2">{tx(String(appeal.reason ?? ""))}</p>
                         </TableCell>
                         <TableCell>
                           <Badge variant={appeal.status === 'pending' ? 'secondary' : appeal.status === 'accepted' ? 'default' : 'destructive'}>
@@ -270,7 +270,7 @@ export function ExamManagementPanel() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {resolveDialog?.action === 'accepted' ? 'Aceitar Recurso' : 'Rejeitar Recurso'}
+              {resolveDialog?.action === 'accepted' ? tx('Aceitar Recurso') : tx('Rejeitar Recurso')}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {tx("Forneça uma resposta ao aluno sobre a decisão.")}

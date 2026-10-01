@@ -90,9 +90,9 @@ interface ParsedRow {
 const officialSources = ['IBGE', 'IBGE_CENSO', 'DATASUS', 'INEP', 'STN', 'CADASTUR', 'MAPA_TURISMO', 'Pré-preenchido'];
 
 const pillarNames = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProps) {
@@ -291,9 +291,9 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
             const isDup = insertError.code === '23505';
             toast.error(tx('Não foi possível pré-preencher os indicadores'), {
               description: isRls
-                ? 'Você não tem permissão para gravar dados neste diagnóstico. Peça a um administrador ou analista da organização para executar o pré-preenchimento.'
+                ? tx('Você não tem permissão para gravar dados neste diagnóstico. Peça a um administrador ou analista da organização para executar o pré-preenchimento.')
                 : isDup
-                  ? 'Alguns indicadores já possuem valor neste diagnóstico. Recarregue a página e tente novamente.'
+                  ? tx('Alguns indicadores já possuem valor neste diagnóstico. Recarregue a página e tente novamente.')
                   : (insertError.message || 'Tente novamente.'),
             });
           } else if (savedCount === 0) {
@@ -424,14 +424,14 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
 
         const indicator = indicators.find(i => i.code === code);
         if (!indicator) {
-          return { indicator_code: code, value: null, source, valid: false, error: 'Código não encontrado' };
+          return { indicator_code: code, value: null, source, valid: false, error: tx('Código não encontrado') };
         }
 
         // Parse value as number; accept comma decimal separator (pt-BR CSVs).
         const normalized = valueStr.replace(/\./g, '').replace(',', '.');
         const value = parseFloat(normalized);
         if (!Number.isFinite(value)) {
-          return { indicator_code: code, value: null, source, valid: false, error: 'Valor inválido (deve ser numérico)' };
+          return { indicator_code: code, value: null, source, valid: false, error: tx('Valor inválido (deve ser numérico)') };
         }
 
         return { indicator_code: code, value, source, valid: true };
@@ -556,7 +556,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         value_raw: existingValue.value_raw,
         source: existingValue.source,
         is_ignored: newIgnored,
-        ignore_reason: newIgnored ? 'Marcado como não aplicável pelo usuário' : null,
+        ignore_reason: newIgnored ? tx('Marcado como não aplicável pelo usuário') : null,
       });
     } else {
       // Create a new entry marked as ignored (with null value)
@@ -566,7 +566,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
         value_raw: null,
         source: 'Manual',
         is_ignored: newIgnored,
-        ignore_reason: newIgnored ? 'Marcado como não aplicável pelo usuário' : null,
+        ignore_reason: newIgnored ? tx('Marcado como não aplicável pelo usuário') : null,
       });
     }
   };
@@ -847,7 +847,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
               </Badge>
               {!isEnterpriseAssessment && (
                 <span>
-                  {indicators.length} indicadores para este nível
+                  {tx("{{v0}} indicadores para este nível", { v0: indicators.length })}
                 </span>
               )}
             </div>
@@ -902,7 +902,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                     <span className="text-xs text-muted-foreground">
                       {preFilledCount > 0 
                         ? `${Math.round((preFilledCount / filledCount) * 100)}% dos dados de fontes oficiais`
-                        : 'Nenhum dado pré-preenchido ainda'}
+                        : tx('Nenhum dado pré-preenchido ainda')}
                     </span>
                   </div>
                 </div>
@@ -917,7 +917,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                   )}>
                     <CheckCircle2 className="h-4 w-4" />
                     {fillProgress === 100 
-                      ? "Todos os indicadores preenchidos! O diagnóstico pode ser calculado."
+                      ? tx("Todos os indicadores preenchidos! O diagnóstico pode ser calculado.")
                       : `${Math.round(fillProgress)}% dos indicadores preenchidos. O diagnóstico pode ser calculado.`
                     }
                   </p>
@@ -999,7 +999,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                         {errorCount > 0 && (
                           <p className="text-destructive flex items-center gap-1">
                             <AlertCircle className="h-3 w-3" />
-                            {errorCount} com erro de validação
+                            {tx("{{v0}} com erro de validação", { v0: errorCount })}
                           </p>
                         )}
                       </div>
@@ -1334,7 +1334,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                                         </Badge>
                                       </TooltipTrigger>
                                       <TooltipContent>
-                                        Fonte: {existingValue.source}
+                                        {tx("Fonte: {{v0}}", { v0: existingValue.source })}
                                       </TooltipContent>
                                     </Tooltip>
                                   )}
@@ -1388,7 +1388,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     <div className="p-3 bg-card border rounded-lg">
                       <p className="font-medium mb-1">{tx("codigo")}</p>
-                      <p className="text-muted-foreground">Código do indicador (ex: RA001)</p>
+                      <p className="text-muted-foreground">{tx("Código do indicador (ex: RA001)")}</p>
                     </div>
                     <div className="p-3 bg-card border rounded-lg">
                       <p className="font-medium mb-1">{tx("valor")}</p>
@@ -1396,7 +1396,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
                     </div>
                     <div className="p-3 bg-card border rounded-lg">
                       <p className="font-medium mb-1">{tx("fonte")}</p>
-                      <p className="text-muted-foreground">Fonte dos dados (opcional)</p>
+                      <p className="text-muted-foreground">{tx("Fonte dos dados (opcional)")}</p>
                     </div>
                   </div>
 

@@ -102,7 +102,7 @@ export function PillarTrendPanel({ destinationId, diagnosticType, currentAssessm
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <LineChart className="h-5 w-5 text-primary" />
-          Evolução temporal dos pilares ({rows.length} rodadas)
+          {tx("Evolução temporal dos pilares ({{v0}} rodadas)", { v0: rows.length })}
         </CardTitle>
         <CardDescription>
           Histórico de I-RA, I-OE e I-AO ao longo das rodadas calculadas{diagnosticType === 'enterprise' ? ' deste empreendimento' : ' deste destino'}. Comparação interna apenas — sem ranking entre {diagnosticType === 'enterprise' ? 'empreendimentos' : 'municípios'}.

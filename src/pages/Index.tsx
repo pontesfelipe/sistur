@@ -266,7 +266,7 @@ const Index = () => {
   return (
     <AppLayout 
       title={tx('Dashboard')} 
-      subtitle={isEnterprise ? "Visão consolidada do setor hoteleiro" : "Painel de controle do sistema de turismo"}
+      subtitle={isEnterprise ? tx("Visão consolidada do setor hoteleiro") : tx("Painel de controle do sistema de turismo")}
       actions={
         <div className="flex items-center gap-1 sm:gap-2">
           <WidgetCustomizer 
@@ -370,8 +370,8 @@ const Index = () => {
                     {selectedDestinationName 
                       ? `Dados de ${selectedDestinationName} (${activePillarData?.totalAssessments ?? 0} diagnóstico(s))`
                       : activePillarData?.totalAssessments 
-                        ? `Resumo de ${activePillarData.totalAssessments} diagnóstico(s) ${isEnterprise ? 'enterprise' : 'territorial'}(s)`
-                        : 'Nenhum diagnóstico disponível'}
+                        ? (isEnterprise ? tx('Resumo de {{n}} diagnóstico(s) empresarial(is)', { n: activePillarData.totalAssessments }) : tx('Resumo de {{n}} diagnóstico(s) territorial(is)', { n: activePillarData.totalAssessments }))
+                        : tx('Nenhum diagnóstico disponível')}
                   </CardDescription>
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
@@ -381,7 +381,7 @@ const Index = () => {
                   >
                     <SelectTrigger className="w-full sm:w-[180px]">
                       <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder={isEnterprise ? "Filtrar unidade" : "Filtrar destino"} />
+                      <SelectValue placeholder={isEnterprise ? tx("Filtrar unidade") : tx("Filtrar destino")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{isEnterprise ? tx('Todas as unidades') : tx('Todos os destinos')}</SelectItem>
@@ -434,7 +434,7 @@ const Index = () => {
                         <div className="flex items-center gap-2">
                           <TrendingUp className="h-4 w-4 text-primary" />
                           <span className="font-medium text-sm">
-                            {isEnterprise ? tx('Índice Geral Empresarial') : tx('Índice Geral SISTUR')} (média)
+                            {isEnterprise ? tx('Índice Geral Empresarial (média)') : tx('Índice Geral SISTUR (média)')}
                           </span>
                         </div>
                         <span className="font-mono font-semibold">{Math.round(averageScore * 100)}%</span>
@@ -465,7 +465,7 @@ const Index = () => {
                               <SelectItem value="inherit">
                                 {selectedDestination
                                   ? `Usar filtro do card (${selectedDestinationName ?? '—'})`
-                                  : 'Média de todos os destinos'}
+                                  : tx('Média de todos os destinos')}
                               </SelectItem>
                               {activeDestinations?.map((dest) => (
                                 <SelectItem key={dest.id} value={dest.id}>{dest.name}</SelectItem>
@@ -602,8 +602,8 @@ const Index = () => {
                 </h3>
                 <p className="text-primary-foreground/80 text-sm mb-4">
                   {isEnterprise 
-                    ? 'Avalie a performance e sustentabilidade do seu empreendimento.'
-                    : 'Crie uma nova rodada de avaliação para um destino turístico.'}
+                    ? tx('Avalie a performance e sustentabilidade do seu empreendimento.')
+                    : tx('Crie uma nova rodada de avaliação para um destino turístico.')}
                 </p>
                 <Button 
                   variant="secondary" 
@@ -631,9 +631,9 @@ const Index = () => {
                 ) : recentAssessments && recentAssessments.length > 0 ? (
                   recentAssessments.slice(0, 3).map((assessment) => {
                     const statusConfig = {
-                      DRAFT: { icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted', label: tx('Rascunho'), desc: 'Aguardando preenchimento' },
-                      DATA_READY: { icon: CheckCircle2, color: 'text-accent', bg: 'bg-accent/10', label: tx('Dados Prontos'), desc: 'Pronto para calcular' },
-                      CALCULATED: { icon: TrendingUp, color: 'text-severity-good', bg: 'bg-severity-good/10', label: tx('Calculado'), desc: 'Diagnóstico completo' },
+                      DRAFT: { icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted', label: tx('Rascunho'), desc: tx('Aguardando preenchimento') },
+                      DATA_READY: { icon: CheckCircle2, color: 'text-accent', bg: 'bg-accent/10', label: tx('Dados Prontos'), desc: tx('Pronto para calcular') },
+                      CALCULATED: { icon: TrendingUp, color: 'text-severity-good', bg: 'bg-severity-good/10', label: tx('Calculado'), desc: tx('Diagnóstico completo') },
                     };
                     const config = statusConfig[assessment.status as keyof typeof statusConfig] || statusConfig.DRAFT;
                     const StatusIcon = config.icon;

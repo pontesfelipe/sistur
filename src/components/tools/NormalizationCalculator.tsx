@@ -105,9 +105,9 @@ export function NormalizationCalculator() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="MIN_MAX">MIN_MAX (Linear)</SelectItem>
-                  <SelectItem value="BANDS">BANDS (Faixas)</SelectItem>
-                  <SelectItem value="BINARY">BINARY (Sim/Não)</SelectItem>
+                  <SelectItem value="MIN_MAX">{tx("MIN_MAX (Linear)")}</SelectItem>
+                  <SelectItem value="BANDS">{tx("BANDS (Faixas)")}</SelectItem>
+                  <SelectItem value="BINARY">{tx("BINARY (Sim/Não)")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

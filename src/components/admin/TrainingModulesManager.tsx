@@ -187,7 +187,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
       <div className="flex items-center justify-between">
         <Label className="text-base font-semibold flex items-center gap-2">
           <BookOpen className="h-4 w-4" />
-          Módulos do Curso ({modules.length})
+          {tx("Módulos do Curso ({{v0}})", { v0: modules.length })}
         </Label>
         <Button type="button" variant="outline" size="sm" onClick={handleOpenCreateModule}>
           <Plus className="h-4 w-4 mr-1" />
@@ -248,7 +248,7 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
                   <div className="text-left flex-1">
                     <p className="font-medium">{module.module_title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {module.lives.length} aula(s)
+                      {tx("{{v0}} aula(s)", { v0: module.lives.length })}
                     </p>
                   </div>
                 </div>
@@ -305,12 +305,12 @@ export function TrainingModulesManager({ modules, onModulesChange }: TrainingMod
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingModuleIndex !== null ? 'Editar Módulo' : 'Novo Módulo'}
+              {editingModuleIndex !== null ? tx('Editar Módulo') : tx('Novo Módulo')}
             </DialogTitle>
             <DialogDescription>
               {editingModuleIndex !== null
-                ? 'Atualize as informações do módulo'
-                : 'Adicione um novo módulo ao curso'}
+                ? tx('Atualize as informações do módulo')
+                : tx('Adicione um novo módulo ao curso')}
             </DialogDescription>
           </DialogHeader>
 

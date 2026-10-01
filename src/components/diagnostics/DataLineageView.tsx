@@ -23,9 +23,9 @@ interface Props {
 type SourceKind = 'OFFICIAL' | 'DERIVED' | 'MANUAL';
 
 const PILLAR_LABEL: Record<string, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 const SOURCE_META: Record<SourceKind, { label: string; icon: any; tone: string; ring: string }> = {
@@ -81,7 +81,7 @@ const SOURCE_DISPLAY_NAMES: Record<string, string> = {
 
 /**
  * Heurística específica para auto-fill Enterprise: mapeia o `source_detail`
- * (ex.: "Open-Meteo ERA5 — 5 anos (Auto)") para um nome amigável SEM
+ * (ex.: tx("Open-Meteo ERA5 — 5 anos (Auto)")) para um nome amigável SEM
  * mencionar o provedor de scraping. Cada bloco vira uma fonte distinta no
  * Sankey de linhagem.
  */
@@ -89,30 +89,30 @@ function classifyAutoFillSource(detail: string): { kind: SourceKind; sourceName:
   const d = detail.toUpperCase();
   // Cálculos derivados
   if (/DERIVAD|DERIVED|C[ÁA]LCULO|CALCULATED/.test(d)) {
-    return { kind: 'DERIVED', sourceName: 'Cálculo Interno' };
+    return { kind: 'DERIVED', sourceName: tx('Cálculo Interno') };
   }
   // Fontes oficiais já conhecidas
-  if (d.includes('OPEN-METEO') || d.includes('OPEN METEO')) return { kind: 'OFFICIAL', sourceName: 'Open-Meteo ERA5 (clima)' };
-  if (d.includes('BRASILAPI') || d.includes('RECEITA FEDERAL')) return { kind: 'OFFICIAL', sourceName: 'BrasilAPI / Receita Federal' };
+  if (d.includes('OPEN-METEO') || d.includes('OPEN METEO')) return { kind: 'OFFICIAL', sourceName: tx('Open-Meteo ERA5 (clima)') };
+  if (d.includes('BRASILAPI') || d.includes('RECEITA FEDERAL')) return { kind: 'OFFICIAL', sourceName: tx('BrasilAPI / Receita Federal') };
   if (d.includes('ANATEL')) return { kind: 'OFFICIAL', sourceName: displaySourceName('ANATEL') };
   if (d.includes('ANAC')) return { kind: 'OFFICIAL', sourceName: displaySourceName('ANAC') };
   if (d.includes('DATASUS') || d.includes('SAÚDE') || d.includes('SAUDE')) return { kind: 'OFFICIAL', sourceName: displaySourceName('DATASUS') };
   if (d.includes('IBGE')) return { kind: 'OFFICIAL', sourceName: displaySourceName('IBGE') };
   if (d.includes('MAPA TURISMO') || d.includes('MTUR')) return { kind: 'OFFICIAL', sourceName: displaySourceName('MAPA_TURISMO') };
   // Buckets temáticos de busca web (sem citar o provedor de scraping)
-  if (d.includes('RECLAME') || d.includes('PROCON')) return { kind: 'OFFICIAL', sourceName: 'Reclamações públicas (Reclame Aqui / Procon)' };
-  if (d.includes('INSTAGRAM') || d.includes('FACEBOOK') || d.includes('TIKTOK')) return { kind: 'OFFICIAL', sourceName: 'Redes Sociais (Instagram / Facebook / TikTok)' };
-  if (d.includes('OTA') || d.includes('BOOKING/TRIPADVISOR') || d.includes('PREÇO') || d.includes('PRECO')) return { kind: 'OFFICIAL', sourceName: 'OTAs e Tarifas Públicas (Booking / Decolar / Expedia)' };
-  if (d.includes('SUSTENTAB')) return { kind: 'OFFICIAL', sourceName: 'Sinais Públicos de Sustentabilidade' };
-  if (d.includes('SEGURAN')) return { kind: 'OFFICIAL', sourceName: 'Segurança ao Turista (notícias e oficial)' };
-  if (d.includes('TRANSPORTE') || d.includes('UBER') || d.includes('MOBILIDADE')) return { kind: 'OFFICIAL', sourceName: 'Mobilidade Urbana (transporte público e apps)' };
-  if (d.includes('AGENDA') || d.includes('EVENTOS')) return { kind: 'OFFICIAL', sourceName: 'Eventos Municipais Oficiais' };
-  if (d.includes('SERP') || d.includes('MÍDIA') || d.includes('MIDIA') || d.includes('FORÇA') || d.includes('FORCA')) return { kind: 'OFFICIAL', sourceName: 'Menções Públicas da Marca (mídia e SERP)' };
-  if (d.includes('PRESENÇA DIGITAL') || d.includes('PRESENCA DIGITAL')) return { kind: 'OFFICIAL', sourceName: 'Presença Digital Pública (site e redes)' };
-  if (d.includes('DEMANDA') || d.includes('TRENDS')) return { kind: 'OFFICIAL', sourceName: 'Sinais de Demanda e Interesse (Trends)' };
-  if (d.includes('ACESSIBIL')) return { kind: 'OFFICIAL', sourceName: 'Acessibilidade Urbana (fontes públicas)' };
+  if (d.includes('RECLAME') || d.includes('PROCON')) return { kind: 'OFFICIAL', sourceName: tx('Reclamações públicas (Reclame Aqui / Procon)') };
+  if (d.includes('INSTAGRAM') || d.includes('FACEBOOK') || d.includes('TIKTOK')) return { kind: 'OFFICIAL', sourceName: tx('Redes Sociais (Instagram / Facebook / TikTok)') };
+  if (d.includes('OTA') || d.includes('BOOKING/TRIPADVISOR') || d.includes('PREÇO') || d.includes('PRECO')) return { kind: 'OFFICIAL', sourceName: tx('OTAs e Tarifas Públicas (Booking / Decolar / Expedia)') };
+  if (d.includes('SUSTENTAB')) return { kind: 'OFFICIAL', sourceName: tx('Sinais Públicos de Sustentabilidade') };
+  if (d.includes('SEGURAN')) return { kind: 'OFFICIAL', sourceName: tx('Segurança ao Turista (notícias e oficial)') };
+  if (d.includes('TRANSPORTE') || d.includes('UBER') || d.includes('MOBILIDADE')) return { kind: 'OFFICIAL', sourceName: tx('Mobilidade Urbana (transporte público e apps)') };
+  if (d.includes('AGENDA') || d.includes('EVENTOS')) return { kind: 'OFFICIAL', sourceName: tx('Eventos Municipais Oficiais') };
+  if (d.includes('SERP') || d.includes('MÍDIA') || d.includes('MIDIA') || d.includes('FORÇA') || d.includes('FORCA')) return { kind: 'OFFICIAL', sourceName: tx('Menções Públicas da Marca (mídia e SERP)') };
+  if (d.includes('PRESENÇA DIGITAL') || d.includes('PRESENCA DIGITAL')) return { kind: 'OFFICIAL', sourceName: tx('Presença Digital Pública (site e redes)') };
+  if (d.includes('DEMANDA') || d.includes('TRENDS')) return { kind: 'OFFICIAL', sourceName: tx('Sinais de Demanda e Interesse (Trends)') };
+  if (d.includes('ACESSIBIL')) return { kind: 'OFFICIAL', sourceName: tx('Acessibilidade Urbana (fontes públicas)') };
   if (d.includes('REVIEW') || d.includes('GOOGLE') || d.includes('TRIPADVISOR') || d.includes('BOOKING') || d.includes('AIRBNB')) {
-    return { kind: 'OFFICIAL', sourceName: 'Avaliações Online (Google / TripAdvisor / Booking)' };
+    return { kind: 'OFFICIAL', sourceName: tx('Avaliações Online (Google / TripAdvisor / Booking)') };
   }
   return null;
 }
@@ -145,23 +145,23 @@ function classifyRow(row: any): { kind: SourceKind; sourceName: string } {
   const detail = String(row.source_detail || '').toUpperCase();
 
   if (type.startsWith('DERIVED') || isDerivedIndicator(code)) {
-    return { kind: 'DERIVED', sourceName: 'Cálculo Interno' };
+    return { kind: 'DERIVED', sourceName: tx('Cálculo Interno') };
   }
   // Enterprise auto-fill: extrai a fonte real (Open-Meteo, ANAC, Reclame Aqui,
   // OTAs, etc.) em vez de bucketar tudo como "Reviews Online".
   if (/\(AUTO\)|AUTOMÁTIC|AUTOMATIC|AUTO\b/.test(detail)) {
     const mapped = classifyAutoFillSource(detail);
     if (mapped) return mapped;
-    return { kind: 'OFFICIAL', sourceName: 'Pré-preenchimento Automático' };
+    return { kind: 'OFFICIAL', sourceName: tx('Pré-preenchimento Automático') };
   }
   if (type.startsWith('OFFICIAL_API') || type === 'AUTOMATICA') {
     const token = OFFICIAL_TOKENS.find((t) => detail.includes(t));
-    return { kind: 'OFFICIAL', sourceName: token ? displaySourceName(token) : 'Fonte Oficial' };
+    return { kind: 'OFFICIAL', sourceName: token ? displaySourceName(token) : tx('Fonte Oficial') };
   }
   const token = OFFICIAL_TOKENS.find((t) => detail.includes(t));
   if (token) return { kind: 'OFFICIAL', sourceName: displaySourceName(token) };
   if (type === 'ESTIMADA') return { kind: 'DERIVED', sourceName: 'Estimativa' };
-  return { kind: 'MANUAL', sourceName: 'Equipe local' };
+  return { kind: 'MANUAL', sourceName: tx('Equipe local') };
 }
 
 const KIND_COLOR: Record<SourceKind, string> = {
@@ -466,11 +466,10 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <GitBranch className="h-4 w-4 text-primary" />
-            Linhagem dos Dados (Data Lineage)
+            {tx("Linhagem dos Dados (Data Lineage)")}
           </CardTitle>
           <CardDescription>
-            Rastreio visual desde a fonte original até o score final do diagnóstico — {lineage.total} indicadores processados.
-            Passe o mouse sobre qualquer nó para destacar o fluxo correspondente.
+            {tx("Rastreio visual desde a fonte original até o score final do diagnóstico — {{v0}} indicadores processados. Passe o mouse sobre qualquer nó para destacar o fluxo correspondente.", { v0: lineage.total })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -501,7 +500,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
               {/* Col 1 — Fontes */}
             <div className="space-y-2">
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium px-1">
-                Fontes ({lineage.sourceList.length})
+                {tx("Fontes ({{v0}})", { v0: lineage.sourceList.length })}
               </p>
               <div className="space-y-1.5 max-h-[420px] overflow-auto pr-1">
                 {lineage.sourceList.map((s) => {
@@ -574,7 +573,7 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
                       </div>
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold tabular-nums">{count}</span>
-                        <span className="text-[10px] opacity-70">indicadores · {pct}%</span>
+                        <span className="text-[10px] opacity-70">{tx("indicadores · {{v0}}%", { v0: pct })}</span>
                       </div>
                       <div className="mt-2 h-1.5 rounded-full bg-background/60 overflow-hidden">
                         <div
@@ -644,11 +643,11 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
                         })}
                       </div>
                       <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
-                        <span>{stats.total} indicadores</span>
+                        <span>{tx("{{v0}} indicadores", { v0: stats.total })}</span>
                         <span className="flex items-center gap-1.5">
                           {stats.OFFICIAL > 0 && <span className="text-emerald-600 dark:text-emerald-400">{stats.OFFICIAL} of.</span>}
-                          {stats.DERIVED > 0 && <span className="text-blue-600 dark:text-blue-400">{stats.DERIVED} der.</span>}
-                          {stats.MANUAL > 0 && <span className="text-amber-600 dark:text-amber-400">{stats.MANUAL} man.</span>}
+                          {stats.DERIVED > 0 && <span className="text-blue-600 dark:text-blue-400">{tx("{{v0}} der.", { v0: stats.DERIVED })}</span>}
+                          {stats.MANUAL > 0 && <span className="text-amber-600 dark:text-amber-400">{tx("{{v0}} man.", { v0: stats.MANUAL })}</span>}
                         </span>
                       </div>
                     </div>
@@ -711,13 +710,13 @@ function LineageDiagram({ lineage, pillarKeys, pillarScores, finalScore, indicat
           <div className="mt-8 pt-4 border-t flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
             <span className="font-medium">{tx('Legenda:')}</span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Oficial (IBGE, CADASTUR, STN…)
+              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> {tx("Oficial (IBGE, CADASTUR, STN…)")}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-blue-500" /> Derivado (cálculo interno)
+              <span className="w-2.5 h-2.5 rounded-sm bg-blue-500" /> {tx("Derivado (cálculo interno)")}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" /> Manual (equipe local)
+              <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" /> {tx("Manual (equipe local)")}
             </span>
             <span className="ml-auto italic">
               {tx('A espessura das linhas é proporcional ao volume de indicadores.')}

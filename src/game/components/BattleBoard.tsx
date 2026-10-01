@@ -140,7 +140,7 @@ export function BattleBoard({ playerBoard, threats, scores, equilibrium, turn, s
 
                 {cards.length === 0 ? (
                   <p className="text-[10px] text-muted-foreground/40 italic mx-auto">
-                    Jogue cartas de {catInfo.label} aqui
+                    {tx("Jogue cartas de {{v0}} aqui", { v0: catInfo.label })}
                   </p>
                 ) : (
                   cards.map((card, i) => (

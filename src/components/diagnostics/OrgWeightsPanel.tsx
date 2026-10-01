@@ -27,9 +27,9 @@ type IndicatorWeight = {
 };
 
 const PILLAR_LABEL: Record<string, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 export function OrgWeightsPanel() {
@@ -150,7 +150,7 @@ export function OrgWeightsPanel() {
         <TabsContent value="pillars" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Distribuição entre Pilares (RA / OE / AO)</CardTitle>
+              <CardTitle className="text-base">{tx("Distribuição entre Pilares (RA / OE / AO)")}</CardTitle>
               <CardDescription>
                 {tx('Padrão SISTUR: RA 35% / OE 30% / AO 35%. A soma dos três pesos deve ser exatamente 100%.')}
                 {isCustom && <Badge variant="outline" className="ml-2 bg-violet-500/15 text-violet-700 dark:text-violet-300">{tx('Personalizado')}</Badge>}

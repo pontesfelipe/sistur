@@ -104,7 +104,7 @@ export function HealthCheckPanel() {
         <div className="flex items-center gap-2">
           <GitCommit className="h-4 w-4 text-muted-foreground" />
           <span className="text-muted-foreground">{tx("Registro:")}</span>
-          <Badge variant="secondary">{registryCount} testes</Badge>
+          <Badge variant="secondary">{tx("{{v0}} testes", { v0: registryCount })}</Badge>
         </div>
         {lastSync && (
           <>
@@ -207,10 +207,10 @@ export function HealthCheckPanel() {
                           <CardContent className="py-3 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               {catInfo.icon}
-                              <span className="font-medium text-sm">{catInfo.label}</span>
+                              <span className="font-medium text-sm">{tx(String(catInfo.label ?? ""))}</span>
                               <Badge variant="outline" className="text-xs">{checks.length}</Badge>
-                              {catFailed > 0 && <Badge variant="destructive" className="text-xs">{catFailed} falha(s)</Badge>}
-                              {catWarnings > 0 && <Badge className="text-xs bg-yellow-500/10 text-yellow-600 border-yellow-500/30">{catWarnings} aviso(s)</Badge>}
+                              {catFailed > 0 && <Badge variant="destructive" className="text-xs">{tx("{{v0}} falha(s)", { v0: catFailed })}</Badge>}
+                              {catWarnings > 0 && <Badge className="text-xs bg-yellow-500/10 text-yellow-600 border-yellow-500/30">{tx("{{v0}} aviso(s)", { v0: catWarnings })}</Badge>}
                             </div>
                             {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                           </CardContent>

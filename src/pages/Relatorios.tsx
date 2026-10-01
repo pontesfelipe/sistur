@@ -124,7 +124,7 @@ const getProviderLabel = (provider?: string | null, model?: string | null) => {
   if (!provider && !model) return 'IA n/d';
   const p = (provider || '').toLowerCase();
   if (p === 'claude') return 'Claude';
-  if (p === 'gpt5' || p === 'gpt-5') return (model || '').includes('gpt-6') ? 'GPT-6 Astra' : 'GPT-5';
+  if (p === 'gpt5' || p === 'gpt-5') return (model || '').includes('gpt-6') ? tx('GPT-6 Astra') : 'GPT-5';
   if (p === 'gemini') return 'Gemini';
   if (model) return model.split('/').pop() || model;
   return provider || null;
@@ -488,7 +488,7 @@ export default function Relatorios() {
       queryClient.invalidateQueries({ queryKey: ['destinations-with-report-data'] });
     } catch (error) {
       console.error('Error generating report:', error);
-      toast.error(error instanceof Error ? error.message : 'Erro ao gerar relatório');
+      toast.error(error instanceof Error ? error.message : tx('Erro ao gerar relatório'));
       queryClient.invalidateQueries({ queryKey: ['generated-reports'] });
     } finally {
       setGenerationStage('');
@@ -587,7 +587,7 @@ export default function Relatorios() {
     const logoHtml = c.logoUrl ? `<div style="text-align:center;margin-bottom:16px;"><img src="${c.logoUrl}" style="max-height:60px;max-width:200px;" /></div>` : '';
     const orgHtml = c.organizationName ? `<div style="text-align:center;font-size:14px;color:#64748B;margin-bottom:4px;">${c.organizationName}</div>` : '';
     const scopeBadge = scope === 'enterprise'
-      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">Relatório Empresarial — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)</div>`
+      ? `<div style="text-align:center;font-size:11px;color:#7C2D12;background:#FFEDD5;border:1px solid #FED7AA;padding:4pt 8pt;margin-bottom:8pt;letter-spacing:0.05em;text-transform:uppercase;">{tx("Relatório Empresarial — Diagnóstico Operacional & Estratégico (concorrentes anonimizados: Concorrente A/B/C)")}</div>`
       : '';
     const headerHtml = c.headerText ? `<div style="text-align:center;font-size:12px;color:#94a3b8;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:24px;">${c.headerText}</div>` : '';
     const footerHtml = c.footerText ? `<div style="text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:24px;">${c.footerText}</div>` : '';
@@ -1030,7 +1030,7 @@ export default function Relatorios() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="auto">⚙️ Auto (Claude→GPT-6 Astra→Gemini)</SelectItem>
+                          <SelectItem value="auto">{tx("⚙️ Auto (Claude→GPT-6 Astra→Gemini)")}</SelectItem>
                           <SelectItem value="claude">{tx('🟣 Claude Sonnet 4.5')}</SelectItem>
                           <SelectItem value="gpt5">{tx('🟢 GPT-6 Astra')}</SelectItem>
                           <SelectItem value="gemini">{tx('🔵 Gemini 3.1 Pro')}</SelectItem>
@@ -1057,8 +1057,8 @@ export default function Relatorios() {
                         </TooltipTrigger>
                         <TooltipContent>
                           {enableComparison
-                            ? 'O relatório incluirá um bloco comparando esta rodada com a anterior do mesmo destino.'
-                            : 'Ative para incluir comparação com a rodada anterior do mesmo destino.'}
+                            ? tx('O relatório incluirá um bloco comparando esta rodada com a anterior do mesmo destino.')
+                            : tx('Ative para incluir comparação com a rodada anterior do mesmo destino.')}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -1145,13 +1145,13 @@ export default function Relatorios() {
                     {issues && issues.length > 0 && (
                       <Badge variant="outline" className="gap-1">
                         <AlertTriangle className="h-3 w-3" />
-                        {issues.length} problema(s)
+                        {tx("{{v0}} problema(s)", { v0: issues.length })}
                       </Badge>
                     )}
                     {prescriptions && prescriptions.length > 0 && (
                       <Badge variant="outline" className="gap-1">
                         <Sparkles className="h-3 w-3" />
-                        {prescriptions.length} prescrição(ões)
+                        {tx("{{v0}} prescrição(ões)", { v0: prescriptions.length })}
                       </Badge>
                     )}
                   </div>
@@ -1180,8 +1180,8 @@ export default function Relatorios() {
                     </CardTitle>
                     <CardDescription>
                       {isGenerating && livePartial
-                        ? 'O texto abaixo está sendo escrito pela Mente Sistur agora — seções podem ser revisadas até a conclusão.'
-                        : 'Relatório gerado pela Mente Sistur com base no diagnóstico'}
+                        ? tx('O texto abaixo está sendo escrito pela Mente Sistur agora — seções podem ser revisadas até a conclusão.')
+                        : tx('Relatório gerado pela Mente Sistur com base no diagnóstico')}
                     </CardDescription>
                   </div>
                   {report && !isGenerating && (
@@ -1276,7 +1276,7 @@ export default function Relatorios() {
                   </CardTitle>
                   <CardDescription>
                     {reportsError
-                      ? 'Não foi possível carregar o histórico'
+                      ? tx('Não foi possível carregar o histórico')
                       : hasActiveHistoryFilters
                         ? `${filteredSavedReports.length} de ${visibleSavedReports.length} relatório(s) exibido(s)`
                         : `${visibleSavedReports.length} relatório(s) no histórico`}

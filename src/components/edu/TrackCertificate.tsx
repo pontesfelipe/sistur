@@ -323,7 +323,7 @@ export const TrackCertificate = ({
               fontSize: '11px', 
               color: 'hsl(215, 20%, 65%)',
             }}>
-              Concluído em {formattedDate}
+              {tx("Concluído em {{v0}}", { v0: formattedDate })}
             </div>
           </div>
         </div>

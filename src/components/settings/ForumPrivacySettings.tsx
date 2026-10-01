@@ -20,8 +20,8 @@ export function ForumPrivacySettings() {
     if (result.success) {
       toast.success(
         showIdentity 
-          ? 'Sua identidade será exibida em posts públicos' 
-          : 'Você aparecerá como anônimo em posts públicos'
+          ? tx('Sua identidade será exibida em posts públicos') 
+          : tx('Você aparecerá como anônimo em posts públicos')
       );
     } else {
       toast.error(tx("Erro ao atualizar configuração: ") + result.error);
@@ -53,7 +53,7 @@ export function ForumPrivacySettings() {
               </Label>
               <p className="text-sm text-muted-foreground">
                 {profile?.forum_show_identity 
-                  ? 'Seu nome e avatar são visíveis para todos'
+                  ? tx('Seu nome e avatar são visíveis para todos')
                   : 'Você aparece como "Usuário Anônimo"'}
               </p>
             </div>

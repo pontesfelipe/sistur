@@ -184,8 +184,8 @@ export function CsvImportDialog({ metrics }: { metrics: Metric[] }) {
           <AlertTitle>{tx("Formato esperado")}</AlertTitle>
           <AlertDescription className="text-xs space-y-1">
             <div>{tx("Colunas:")} <code>{tx("metric_code, reference_year, reference_month, value, source, notes")}</code></div>
-            <div><code>{tx("reference_month")}</code> aceita 1–12 ou vazio (medição anual). <code>{tx("value")}</code> {tx("aceita vírgula ou ponto decimal.")}</div>
-            <div>Use para importar FOHB (ocupação hoteleira), CGE/SECTUR estaduais ou qualquer outra fonte que não tenha API.</div>
+            <div><code>{tx("reference_month")}</code> {tx("aceita 1–12 ou vazio (medição anual).")} <code>{tx("value")}</code> {tx("aceita vírgula ou ponto decimal.")}</div>
+            <div>{tx("Use para importar FOHB (ocupação hoteleira), CGE/SECTUR estaduais ou qualquer outra fonte que não tenha API.")}</div>
           </AlertDescription>
         </Alert>
 
@@ -209,11 +209,11 @@ export function CsvImportDialog({ metrics }: { metrics: Metric[] }) {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
               <Badge variant="outline" className="bg-severity-good/15 text-severity-good border-severity-good/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" /> {validCount} válidas
+                <CheckCircle2 className="h-3 w-3 mr-1" /> {tx("{{v0}} válidas", { v0: validCount })}
               </Badge>
               {errorCount > 0 && (
                 <Badge variant="outline" className="bg-severity-critical/15 text-severity-critical border-severity-critical/30">
-                  <AlertTriangle className="h-3 w-3 mr-1" /> {errorCount} com erro
+                  <AlertTriangle className="h-3 w-3 mr-1" /> {tx("{{v0}} com erro", { v0: errorCount })}
                 </Badge>
               )}
             </div>

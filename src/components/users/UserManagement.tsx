@@ -265,7 +265,7 @@ export function UserManagement() {
                       disabled={loadingOrgs}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={loadingOrgs ? "Carregando..." : "Selecione uma organização"} />
+                        <SelectValue placeholder={loadingOrgs ? "Carregando..." : tx("Selecione uma organização")} />
                       </SelectTrigger>
                       <SelectContent>
                         {orgs.map(org => (
@@ -302,10 +302,10 @@ export function UserManagement() {
                     </Select>
                     <p className="text-xs text-muted-foreground">
                       {formData.systemAccess === 'ERP' 
-                        ? 'Acesso ao sistema de diagnóstico territorial' 
+                        ? tx('Acesso ao sistema de diagnóstico territorial') 
                         : formData.systemAccess === 'EDU' 
-                          ? 'Acesso à plataforma de capacitação' 
-                          : 'Escolha qual sistema o usuário terá acesso'}
+                          ? tx('Acesso à plataforma de capacitação') 
+                          : tx('Escolha qual sistema o usuário terá acesso')}
                     </p>
                   </div>
                   {formData.systemAccess && (
@@ -360,8 +360,8 @@ export function UserManagement() {
                       </Select>
                       <p className="text-xs text-muted-foreground">
                         {formData.systemAccess === 'EDU' 
-                          ? 'Estudante: acesso a cursos e trilhas. Professor: pode criar e gerenciar conteúdo.'
-                          : 'Admin: acesso total. Analista: diagnósticos. Visualizador: apenas leitura.'}
+                          ? tx('Estudante: acesso a cursos e trilhas. Professor: pode criar e gerenciar conteúdo.')
+                          : tx('Admin: acesso total. Analista: diagnósticos. Visualizador: apenas leitura.')}
                       </p>
                     </div>
                   )}
@@ -433,7 +433,7 @@ export function UserManagement() {
                           <SelectValue placeholder="—">
                             {accessInfo ? (
                               <Badge className={accessInfo.color}>
-                                {accessInfo.label}
+                                {tx(String(accessInfo.label ?? ""))}
                               </Badge>
                             ) : '—'}
                           </SelectValue>
@@ -463,7 +463,7 @@ export function UserManagement() {
                         <SelectTrigger className="w-[160px]">
                           <SelectValue>
                             <Badge className={roleInfo.color}>
-                              {roleInfo.label}
+                              {tx(String(roleInfo.label ?? ""))}
                             </Badge>
                           </SelectValue>
                         </SelectTrigger>
@@ -539,7 +539,7 @@ export function UserManagement() {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>{tx("Excluir usuário?")}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  {tx("Esta ação não pode ser desfeita. O usuário")} <strong>{user.full_name}</strong> ({user.email}) será permanentemente removido do sistema.
+                                  {tx("Esta ação não pode ser desfeita. O usuário")} <strong>{user.full_name}</strong> {tx("({{v0}}) será permanentemente removido do sistema.", { v0: user.email })}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>

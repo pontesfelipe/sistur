@@ -114,11 +114,11 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
       )}
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          Detecta automaticamente site oficial, Google Business, OTAs (Booking, Expedia, Airbnb…) e redes sociais — preenche maturidade digital e canal direto.
+          {tx("Detecta automaticamente site oficial, Google Business, OTAs (Booking, Expedia, Airbnb…) e redes sociais — preenche maturidade digital e canal direto.")}
         </p>
         <Button onClick={runSearch} disabled={loading || !businessName || !location} size="sm">
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Search className="h-4 w-4 mr-2" />}
-          {loading ? 'Analisando...' : 'Analisar Presença Digital'}
+          {loading ? 'Analisando...' : tx('Analisar Presença Digital')}
         </Button>
       </div>
 
@@ -156,7 +156,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
             </Card>
             <Card>
               <CardContent className="p-3 text-center">
-                <p className="text-[10px] text-muted-foreground uppercase">Canal Direto (est.)</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{tx("Canal Direto (est.)")}</p>
                 <p className="text-2xl font-bold">{analysis.direct_channel_estimate_pct ?? '—'}%</p>
               </CardContent>
             </Card>
@@ -213,7 +213,7 @@ export function DigitalPresenceSearch({ businessName, location, onAutoFill, onAn
           <Card>
             <CardContent className="p-3 space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium">
-                <TrendingUp className="h-4 w-4" /> Canais de Distribuição (OTAs)
+                <TrendingUp className="h-4 w-4" /> {tx("Canais de Distribuição (OTAs)")}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {analysis.otas.map((o) => (

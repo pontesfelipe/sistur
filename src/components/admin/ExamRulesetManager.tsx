@@ -158,10 +158,10 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                   )}
                   <div>
                     <p className="font-medium">
-                      {ruleset ? 'Regras de Exame Configuradas' : 'Nenhuma regra configurada'}
+                      {ruleset ? tx('Regras de Exame Configuradas') : tx('Nenhuma regra configurada')}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {loadingRuleset ? 'Carregando...' : ruleset ? 'Regras ativas para este curso' : 'Configure as regras abaixo'}
+                      {loadingRuleset ? 'Carregando...' : ruleset ? tx('Regras ativas para este curso') : tx('Configure as regras abaixo')}
                     </p>
                   </div>
                 </div>
@@ -186,7 +186,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="min_score">Nota mínima (%)</Label>
+                  <Label htmlFor="min_score">{tx("Nota mínima (%)")}</Label>
                   <Input
                     id="min_score"
                     type="number"
@@ -227,7 +227,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="time_limit">Limite de tempo (minutos)</Label>
+                  <Label htmlFor="time_limit">{tx("Limite de tempo (minutos)")}</Label>
                   <Input
                     id="time_limit"
                     type="number"
@@ -302,7 +302,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="retake_wait">Espera entre tentativas (horas)</Label>
+                        <Label htmlFor="retake_wait">{tx("Espera entre tentativas (horas)")}</Label>
                         <Input
                           id="retake_wait"
                           type="number"
@@ -333,7 +333,7 @@ export function ExamRulesetManager({ trainingId, trainingTitle, pillar }: ExamRu
               ) : (
                 <>
                   <ClipboardCheck className="h-4 w-4" />
-                  {ruleset ? 'Atualizar Regras' : 'Criar Regras de Exame'}
+                  {ruleset ? tx('Atualizar Regras') : tx('Criar Regras de Exame')}
                 </>
               )}
             </Button>

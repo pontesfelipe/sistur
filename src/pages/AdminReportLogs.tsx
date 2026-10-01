@@ -236,7 +236,7 @@ function ClaudeLivePipeline({ rows }: { rows: LogRow[] }) {
             </CardDescription>
           </div>
           <Badge variant="outline" className="font-mono text-[10px]">
-            {completed}/{PHASE_DEFS.length} etapas • {overallPct}%
+            {tx("{{v0}}/{{v1}} etapas • {{v2}}%", { v0: completed, v1: PHASE_DEFS.length, v2: overallPct })}
           </Badge>
         </div>
       </CardHeader>
@@ -263,7 +263,7 @@ function ClaudeLivePipeline({ rows }: { rows: LogRow[] }) {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     {def.icon}
-                    <span className="text-sm font-medium truncate">{def.label}</span>
+                    <span className="text-sm font-medium truncate">{tx(String(def.label ?? ""))}</span>
                   </div>
                   <Badge variant="outline" className="text-[10px] shrink-0">
                     {ph.status === 'pending' && 'aguardando'}
@@ -357,7 +357,7 @@ export default function AdminReportLogs() {
               <CardTitle className="text-2xl font-bold">{stats.total}</CardTitle>
               <CardDescription className="flex items-center gap-1 text-xs">
                 <FileText className="h-3.5 w-3.5" />
-                Eventos (últimos 500)
+                {tx("Eventos (últimos 500)")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -408,9 +408,9 @@ export default function AdminReportLogs() {
                 <SelectValue placeholder={tx("Provedor")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="claude">Claude (Anthropic)</SelectItem>
-                <SelectItem value="gpt5">GPT-5 (OpenAI)</SelectItem>
-                <SelectItem value="gemini">Gemini (Google)</SelectItem>
+                <SelectItem value="claude">{tx("Claude (Anthropic)")}</SelectItem>
+                <SelectItem value="gpt5">{tx("GPT-5 (OpenAI)")}</SelectItem>
+                <SelectItem value="gemini">{tx("Gemini (Google)")}</SelectItem>
                 <SelectItem value="all">{tx("Todos os provedores")}</SelectItem>
               </SelectContent>
             </Select>
@@ -490,7 +490,7 @@ export default function AdminReportLogs() {
                           <TableCell>
                             <Badge variant="outline" className={`gap-1 ${lvl.className}`}>
                               {lvl.icon}
-                              {lvl.label}
+                              {tx(String(lvl.label ?? ""))}
                             </Badge>
                           </TableCell>
                           <TableCell>

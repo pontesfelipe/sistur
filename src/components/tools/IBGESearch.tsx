@@ -131,7 +131,7 @@ export function IBGESearch() {
                                 {micro && `${micro} • `}{uf}
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
-                                Código IBGE: {m.id}
+                                {tx("Código IBGE: {{v0}}", { v0: m.id })}
                               </p>
                             </div>
                           </div>

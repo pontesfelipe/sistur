@@ -70,7 +70,7 @@ function InviteStudentsDialog() {
         <DialogHeader><DialogTitle>{tx("Convidar estudantes")}</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <div className="space-y-2">
-            <Label>E-mails (separados por vírgula, ponto e vírgula ou linha)</Label>
+            <Label>{tx("E-mails (separados por vírgula, ponto e vírgula ou linha)")}</Label>
             <Textarea
               rows={4}
               value={emails}
@@ -78,11 +78,11 @@ function InviteStudentsDialog() {
               placeholder={tx("aluno1@email.com, aluno2@email.com")}
             />
             <p className="text-xs text-muted-foreground">
-              {parsed.length} e-mail(s) válido(s). Máximo de 30 por envio.
+              {tx("{{v0}} e-mail(s) válido(s). Máximo de 30 por envio.", { v0: parsed.length })}
             </p>
           </div>
           <div className="space-y-2">
-            <Label>Mensagem (opcional)</Label>
+            <Label>{tx("Mensagem (opcional)")}</Label>
             <Textarea
               rows={3}
               value={message}
@@ -172,7 +172,7 @@ function ReferralPanel() {
               <p className="text-3xl font-bold">{count || 0} <span className="text-sm text-muted-foreground font-normal">{tx("/ 5 necessários")}</span></p>
             </div>
             <Badge variant={qualifies ? 'default' : 'secondary'} className={qualifies ? 'bg-green-600' : ''}>
-              {qualifies ? '✓ Isenção ativa' : 'Em progresso'}
+              {qualifies ? '✓ Isenção ativa' : tx('Em progresso')}
             </Badge>
           </div>
 
@@ -450,7 +450,7 @@ function ClassroomDetail({ classroomId, onBack }: { classroomId: string; onBack:
                           {targetCount ? (
                             <Badge variant="secondary" className="text-xs">
                               <Users className="h-3 w-3 mr-1" />
-                              {targetCount} aluno(s)
+                              {tx("{{v0}} aluno(s)", { v0: targetCount })}
                             </Badge>
                           ) : (
                             <Badge variant="outline" className="text-xs">{tx("Toda a turma")}</Badge>
@@ -759,7 +759,7 @@ export default function ProfessorDashboard() {
   
   const canManageContent = isAdmin || isProfessor || isOrgAdmin;
   const isEduOnly = !isAdmin && !isOrgAdmin && (isProfessor || hasEDUAccess);
-  const groupLabel = isEduOnly ? 'Salas de Aula' : 'Grupos / Salas';
+  const groupLabel = isEduOnly ? tx('Salas de Aula') : 'Grupos / Salas';
 
   return (
     <AppLayout title={tx("Painel do Professor")}>

@@ -81,7 +81,7 @@ export default function OAuthConsent() {
             <ShieldCheck className="h-5 w-5 text-primary-foreground" />
           </div>
           <CardTitle className="font-display">
-            {error ? 'Não foi possível concluir' : `Conectar ${clientName} à sua conta`}
+            {error ? tx('Não foi possível concluir') : `Conectar ${clientName} à sua conta`}
           </CardTitle>
           <CardDescription>
             {error

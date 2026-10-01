@@ -210,7 +210,7 @@ export function EnterpriseCategoriesView({ indicatorScores }: EnterpriseCategori
                     {Math.round(pillarData.avgScore * 100)}%
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    {pillarData.categories.size} categorias
+                    {tx("{{v0}} categorias", { v0: pillarData.categories.size })}
                   </span>
                 </div>
                 <Progress 

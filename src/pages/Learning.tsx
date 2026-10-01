@@ -315,7 +315,7 @@ const Learning = () => {
       {/* Territory Selection */}
       <Card className="mb-6">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Território (opcional)</CardTitle>
+          <CardTitle className="text-lg">{tx("Território (opcional)")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Select value={selectedTerritory} onValueChange={setSelectedTerritory}>
@@ -323,7 +323,7 @@ const Learning = () => {
               <SelectValue placeholder={tx("Selecione um destino")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Nenhum (geral)</SelectItem>
+              <SelectItem value="">{tx("Nenhum (geral)")}</SelectItem>
               {destinations?.map(dest => (
                 <SelectItem key={dest.id} value={dest.id}>
                   {dest.name} {dest.uf && `- ${dest.uf}`}
@@ -451,8 +451,8 @@ const Learning = () => {
             <AlertCircle className="mx-auto h-8 w-8 text-muted-foreground/50 mb-2" />
             <p className="text-muted-foreground">
               {indicators?.length === 0 
-                ? 'Nenhum indicador cadastrado no sistema.'
-                : 'Nenhum indicador encontrado com os filtros atuais.'}
+                ? tx('Nenhum indicador cadastrado no sistema.')
+                : tx('Nenhum indicador encontrado com os filtros atuais.')}
             </p>
           </CardContent>
         </Card>

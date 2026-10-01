@@ -137,8 +137,8 @@ export function PerformanceMetricsPanel() {
       label: tx('Latência de Consultas'),
       status: queryStatus,
       value: `${metrics.avgQueryTimeMs}ms`,
-      detail: queryStatus === 'ok' ? 'Tempo de resposta saudável' :
-        queryStatus === 'warning' ? 'Latência elevada — considere otimizar queries' :
+      detail: queryStatus === 'ok' ? tx('Tempo de resposta saudável') :
+        queryStatus === 'warning' ? tx('Latência elevada — considere otimizar queries') :
           'Latência crítica — recomenda-se upgrade de instância',
       icon: <Clock className="h-4 w-4" />,
     });
@@ -149,8 +149,8 @@ export function PerformanceMetricsPanel() {
       label: tx('Uso do Banco de Dados'),
       status: dbStatus,
       value: `${metrics.dbSizeMB.toFixed(1)} MB / ${DB_SIZE_LIMIT_MB} MB`,
-      detail: dbStatus === 'ok' ? 'Espaço suficiente' :
-        dbStatus === 'warning' ? 'Uso elevado — planeje expansão' :
+      detail: dbStatus === 'ok' ? tx('Espaço suficiente') :
+        dbStatus === 'warning' ? tx('Uso elevado — planeje expansão') :
           'Espaço quase esgotado — upgrade urgente',
       icon: <HardDrive className="h-4 w-4" />,
     });
@@ -161,8 +161,8 @@ export function PerformanceMetricsPanel() {
       label: tx('Conexões Estimadas'),
       status: connStatus,
       value: `~${Math.ceil(metrics.totalUsers * 0.1)} / ${MAX_CONNECTIONS}`,
-      detail: connStatus === 'ok' ? 'Capacidade confortável' :
-        connStatus === 'warning' ? 'Conexões crescendo — monitore de perto' :
+      detail: connStatus === 'ok' ? tx('Capacidade confortável') :
+        connStatus === 'warning' ? tx('Conexões crescendo — monitore de perto') :
           'Próximo do limite — upgrade necessário para suportar carga',
       icon: <Zap className="h-4 w-4" />,
     });
@@ -174,8 +174,8 @@ export function PerformanceMetricsPanel() {
       label: tx('Volume de Usuários'),
       status: userStatus,
       value: `${metrics.totalUsers} total (${metrics.activeUsersLast7d} ativos)`,
-      detail: userStatus === 'ok' ? 'Volume adequado para instância atual' :
-        userStatus === 'warning' ? 'Crescimento significativo — avalie upgrade' :
+      detail: userStatus === 'ok' ? tx('Volume adequado para instância atual') :
+        userStatus === 'warning' ? tx('Crescimento significativo — avalie upgrade') :
           'Alto volume — instância maior recomendada',
       icon: <Users className="h-4 w-4" />,
     });
@@ -186,8 +186,8 @@ export function PerformanceMetricsPanel() {
       label: tx('Volume de Dados'),
       status: dataStatus,
       value: `${metrics.totalRows.toLocaleString('pt-BR')} registros`,
-      detail: dataStatus === 'ok' ? 'Volume de dados leve' :
-        dataStatus === 'warning' ? 'Crescendo — considere índices e limpeza' :
+      detail: dataStatus === 'ok' ? tx('Volume de dados leve') :
+        dataStatus === 'warning' ? tx('Crescendo — considere índices e limpeza') :
           'Alto volume — performance pode degradar sem upgrade',
       icon: <Database className="h-4 w-4" />,
     });
@@ -241,16 +241,16 @@ export function PerformanceMetricsPanel() {
             )}
             <div className="flex-1">
               <p className="font-medium text-sm">
-                {hasCritical ? 'Ação Recomendada: Upgrade de Instância' :
-                  hasWarnings ? 'Atenção: Alguns indicadores merecem monitoramento' :
-                    'Sistema Saudável'}
+                {hasCritical ? tx('Ação Recomendada: Upgrade de Instância') :
+                  hasWarnings ? tx('Atenção: Alguns indicadores merecem monitoramento') :
+                    tx('Sistema Saudável')}
               </p>
               <p className="text-xs text-muted-foreground">
                 {hasCritical
-                  ? 'Métricas indicam necessidade de uma instância maior para manter a performance.'
+                  ? tx('Métricas indicam necessidade de uma instância maior para manter a performance.')
                   : hasWarnings
-                    ? 'O sistema está funcional, mas indicadores sugerem crescimento que pode exigir upgrade.'
-                    : 'Todos os indicadores estão dentro dos limites saudáveis.'}
+                    ? tx('O sistema está funcional, mas indicadores sugerem crescimento que pode exigir upgrade.')
+                    : tx('Todos os indicadores estão dentro dos limites saudáveis.')}
               </p>
             </div>
             {lastRefresh && (
@@ -266,13 +266,13 @@ export function PerformanceMetricsPanel() {
           <Alert variant={hasCritical ? 'destructive' : 'default'} className={!hasCritical ? 'border-yellow-500/50' : ''}>
             <ArrowUpCircle className="h-4 w-4" />
             <AlertTitle>
-              {hasCritical ? 'Upgrade Recomendado' : 'Planeje o Crescimento'}
+              {hasCritical ? tx('Upgrade Recomendado') : tx('Planeje o Crescimento')}
             </AlertTitle>
             <AlertDescription className="text-sm space-y-2">
               <p>
                 {hasCritical
-                  ? 'Para manter a estabilidade e performance, recomendamos aumentar o tamanho da instância do backend.'
-                  : 'O sistema está crescendo. Considere aumentar a instância se a tendência continuar.'}
+                  ? tx('Para manter a estabilidade e performance, recomendamos aumentar o tamanho da instância do backend.')
+                  : tx('O sistema está crescendo. Considere aumentar a instância se a tendência continuar.')}
               </p>
               <p className="text-xs text-muted-foreground">
                 {tx("Acesse")} <strong>{tx("Backend → Configurações Avançadas → Upgrade de Instância")}</strong> {tx("para ajustar os recursos de CPU, memória e I/O do banco de dados.")}
@@ -296,7 +296,7 @@ export function PerformanceMetricsPanel() {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className={statusColor(check.status)}>{check.icon}</span>
-                    <span className="text-sm font-medium">{check.label}</span>
+                    <span className="text-sm font-medium">{tx(String(check.label ?? ""))}</span>
                   </div>
                   <Badge variant={statusBadge(check.status)} className="text-xs">
                     {check.status === 'ok' ? 'OK' : check.status === 'warning' ? 'Atenção' : 'Crítico'}

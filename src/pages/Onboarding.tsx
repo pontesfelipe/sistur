@@ -129,14 +129,14 @@ export default function Onboarding() {
             <span className="font-display font-bold text-2xl">{tx("SISTUR")}</span>
           </div>
           <CardTitle className="text-2xl font-display">
-            {step === 1 ? 'Bem-vindo ao SISTUR!' : step === 2 ? 'Perfil Educacional' : 'Código do Professor'}
+            {step === 1 ? tx('Bem-vindo ao SISTUR!') : step === 2 ? tx('Perfil Educacional') : tx('Código do Professor')}
           </CardTitle>
           <CardDescription>
             {step === 1 
-              ? 'Escolha como deseja usar o sistema' 
+              ? tx('Escolha como deseja usar o sistema') 
               : step === 2
-              ? 'Selecione seu perfil no SISTUR EDU'
-              : 'Se você foi convidado por um professor, informe o código (opcional)'}
+              ? tx('Selecione seu perfil no SISTUR EDU')
+              : tx('Se você foi convidado por um professor, informe o código (opcional)')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -194,7 +194,7 @@ export default function Onboarding() {
               <div className="space-y-2 pt-2 border-t">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Building2 className="h-4 w-4" />
-                  <span>Código de Organização (opcional)</span>
+                  <span>{tx("Código de Organização (opcional)")}</span>
                 </div>
                 <Input
                   value={orgCode}

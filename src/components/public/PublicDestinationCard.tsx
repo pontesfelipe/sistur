@@ -35,9 +35,9 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
 
   const pillarOrder = ['RA', 'OE', 'AO'];
   const pillarNames: Record<string, string> = {
-    RA: 'Relações Ambientais',
-    OE: 'Organização Estrutural',
-    AO: 'Ações Operacionais',
+    RA: tx('Relações Ambientais'),
+    OE: tx('Organização Estrutural'),
+    AO: tx('Ações Operacionais'),
   };
 
   return (
@@ -83,7 +83,7 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
         {/* Pillar Scores */}
         {destination.pillar_scores && (
           <div>
-            <div className="text-sm font-medium mb-2">Avaliação SISTUR (Mario Beni)</div>
+            <div className="text-sm font-medium mb-2">{tx("Avaliação SISTUR (Mario Beni)")}</div>
             <div className="space-y-2">
               {pillarOrder.map((pillar) => {
                 const scoreData = destination.pillar_scores?.[pillar];
@@ -134,7 +134,7 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
             <div className="flex flex-wrap gap-1">
               {destination.sdg_alignments.map((sdg) => (
                 <Badge key={sdg} variant="secondary" className="text-xs">
-                  ODS {sdg}
+                  {tx("ODS {{v0}}", { v0: sdg })}
                 </Badge>
               ))}
             </div>
@@ -144,7 +144,7 @@ export function PublicDestinationCard({ destination, onViewDetails }: PublicDest
         {/* Metadata */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t">
           <Info className="w-3 h-3" />
-          {destination.indicator_count} indicadores avaliados • Metodologia Mario Beni
+          {tx("{{v0}} indicadores avaliados • Metodologia Mario Beni", { v0: destination.indicator_count })}
         </div>
       </CardContent>
 

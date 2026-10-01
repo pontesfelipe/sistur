@@ -559,13 +559,13 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             <>
               <h1 className="text-3xl font-display font-bold">{tx("Camada Semântica de Relatórios")}</h1>
               <p className="text-muted-foreground mt-1">
-                Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.
+                {tx("Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.")}
               </p>
             </>
           )}
           {embedded && (
             <p className="text-sm text-muted-foreground">
-              Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.
+              {tx("Edite as peças de conhecimento (metodologia, régua, fontes, bibliografia, regras anti-alucinação) usadas para gerar os relatórios. Alterações entram em vigor no próximo relatório gerado.")}
             </p>
           )}
         </div>
@@ -579,8 +579,8 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                 {(filter === "all" && !search.trim()) ? `Todas (${entries.length})` : `Filtradas (${filtered.length})`}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={exportJSON}>JSON (backup completo)</DropdownMenuItem>
-              <DropdownMenuItem onClick={exportCSV}>CSV (Excel/planilha)</DropdownMenuItem>
+              <DropdownMenuItem onClick={exportJSON}>{tx("JSON (backup completo)")}</DropdownMenuItem>
+              <DropdownMenuItem onClick={exportCSV}>{tx("CSV (Excel/planilha)")}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
@@ -700,7 +700,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              {creating ? "Nova entrada" : selected ? `Editar: ${selected.title}` : "Selecione uma entrada"}
+              {creating ? tx("Nova entrada") : selected ? `Editar: ${selected.title}` : tx("Selecione uma entrada")}
             </CardTitle>
             {creating && (
               <div className="flex items-center justify-between gap-2 mt-2">
@@ -755,7 +755,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.title}</p>
                   </div>
                   <div>
-                    <Label>Cabeçalho da seção (opcional)</Label>
+                    <Label>{tx("Cabeçalho da seção (opcional)")}</Label>
                     <Input
                       value={draft.section_header ?? ""}
                       onChange={(e) => setDraft({ ...draft, section_header: e.target.value })}
@@ -764,7 +764,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     <p className="text-[11px] text-muted-foreground mt-1">{FIELD_HELP.section_header}</p>
                   </div>
                   <div>
-                    <Label>Conteúdo (markdown)</Label>
+                    <Label>{tx("Conteúdo (markdown)")}</Label>
                     <Textarea
                       value={draft.content ?? ""}
                       onChange={(e) => setDraft({ ...draft, content: e.target.value })}
@@ -808,7 +808,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                       <Button onClick={save}><Save className="h-4 w-4 mr-2" /> {tx("Salvar")}</Button>
                       {selected && !creating && (
                         <Button variant="outline" onClick={() => openHistory(selected.id)}>
-                          <History className="h-4 w-4 mr-2" /> Histórico (v{selected.version})
+                          <History className="h-4 w-4 mr-2" /> {tx("Histórico (v{{v0}})", { v0: selected.version })}
                         </Button>
                       )}
                     </div>
@@ -853,11 +853,11 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     </table>
                   </div>
                   <div>
-                    <Label className="text-xs">Conteúdo (markdown injetado no prompt)</Label>
+                    <Label className="text-xs">{tx("Conteúdo (markdown injetado no prompt)")}</Label>
                     <pre className="mt-1 rounded-md border bg-muted/30 p-3 text-xs whitespace-pre-wrap font-mono">{EXAMPLE_DRAFT.content}</pre>
                   </div>
                   <div>
-                    <Label className="text-xs">Equivalente em JSON (para importação em lote)</Label>
+                    <Label className="text-xs">{tx("Equivalente em JSON (para importação em lote)")}</Label>
                     <pre className="mt-1 rounded-md border bg-muted/30 p-3 text-xs whitespace-pre-wrap font-mono overflow-x-auto">{JSON.stringify(EXAMPLE_DRAFT, null, 2)}</pre>
                   </div>
                 </TabsContent>
@@ -885,7 +885,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                 <ShieldCheck className="h-5 w-5 text-primary" /> {tx("Auditoria semântica de relatório")}
               </CardTitle>
               <p className="text-xs text-muted-foreground mt-1">
-                Envie um relatório (arquivo texto ou colado abaixo) e a IA confronta o conteúdo com todas as regras <b>{tx("ativas")}</b> {tx("da camada semântica, retornando aprovações, alertas e violações com trechos citados.")}
+                {tx("Envie um relatório (arquivo texto ou colado abaixo) e a IA confronta o conteúdo com todas as regras")} <b>{tx("ativas")}</b> {tx("da camada semântica, retornando aprovações, alertas e violações com trechos citados.")}
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -921,7 +921,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   <Select value={auditScope} onValueChange={(v: any) => setAuditScope(v)}>
                     <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="both">Todas (territorial + enterprise)</SelectItem>
+                      <SelectItem value="both">{tx("Todas (territorial + enterprise)")}</SelectItem>
                       <SelectItem value="territorial">{tx("Apenas territorial")}</SelectItem>
                       <SelectItem value="enterprise">{tx("Apenas enterprise")}</SelectItem>
                     </SelectContent>
@@ -932,7 +932,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
               {(savedLoading || savedReports.length > 0) && (
                 <div className="rounded-md border p-3 space-y-2 bg-muted/30">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <Label className="text-xs font-medium">Relatórios salvos (últimos 50)</Label>
+                    <Label className="text-xs font-medium">{tx("Relatórios salvos (últimos 50)")}</Label>
                     <div className="flex items-center gap-2">
                       <Select value={savedScope} onValueChange={(v: any) => setSavedScope(v)}>
                         <SelectTrigger className="h-7 text-xs w-[180px]"><SelectValue /></SelectTrigger>
@@ -988,7 +988,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
               <div className="flex items-center gap-3">
                 <Button onClick={runAudit} disabled={auditRunning || auditText.trim().length < 30}>
                   {auditRunning ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ShieldCheck className="h-4 w-4 mr-2" />}
-                  {auditRunning ? "Auditando…" : "Conferir conformidade"}
+                  {auditRunning ? "Auditando…" : tx("Conferir conformidade")}
                 </Button>
                 {auditText && (
                   <Button variant="ghost" size="sm" onClick={() => { setAuditText(""); setAuditFileName(""); setAuditResult(null); setAuditMeta(null); }}>
@@ -1060,7 +1060,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className="font-medium text-sm">{f.rule_title}</span>
                                 <code className="text-[10px] text-muted-foreground">{f.rule_key}</code>
-                                <Badge variant="outline" className="text-[10px] uppercase">{f.status}</Badge>
+                                <Badge variant="outline" className="text-[10px] uppercase">{tx(String(f.status ?? ""))}</Badge>
                               </div>
                               <p className="text-xs mt-1 text-foreground">{f.explanation}</p>
                               {f.evidence && (
@@ -1157,13 +1157,13 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                   <div className="flex items-start gap-2">
                     <RadioGroupItem value="merge" id="imp-merge" className="mt-1" />
                     <Label htmlFor="imp-merge" className="font-normal cursor-pointer">
-                      <span className="font-medium">Merge (recomendado)</span> {tx("— insere novas chaves e atualiza existentes. Entradas atuais não presentes no arquivo são mantidas.")}
+                      <span className="font-medium">{tx("Merge (recomendado)")}</span> {tx("— insere novas chaves e atualiza existentes. Entradas atuais não presentes no arquivo são mantidas.")}
                     </Label>
                   </div>
                   <div className="flex items-start gap-2">
                     <RadioGroupItem value="replace" id="imp-replace" className="mt-1" />
                     <Label htmlFor="imp-replace" className="font-normal cursor-pointer">
-                      <span className="font-medium">{tx("Substituir")}</span> {tx("— insere/atualiza do arquivo e")} <b>{tx("desativa")}</b> entradas ativas que não estão no arquivo (não exclui, permite reverter).
+                      <span className="font-medium">{tx("Substituir")}</span> {tx("— insere/atualiza do arquivo e")} <b>{tx("desativa")}</b> {tx("entradas ativas que não estão no arquivo (não exclui, permite reverter).")}
                     </Label>
                   </div>
                 </RadioGroup>

@@ -65,10 +65,10 @@ export function TutorialWizard({ open, onClose }: TutorialWizardProps) {
             <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
               <step.icon className="h-4 w-4 text-primary" />
             </div>
-            {step.title}
+            {tx(String(step.title ?? ""))}
           </DialogTitle>
           <DialogDescription className="text-sm leading-relaxed pt-2">
-            {step.description}
+            {tx(String(step.description ?? ""))}
           </DialogDescription>
         </DialogHeader>
 

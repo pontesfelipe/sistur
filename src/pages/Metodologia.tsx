@@ -202,12 +202,12 @@ const diagnosticTiers = [
 const tierComparison = [
   { feature: 'Indicadores analisados', essencial: '9', estrategico: '19', integral: '96' },
   { feature: 'Tempo de preenchimento', essencial: '30-45 min', estrategico: '2-3 horas', integral: '1-2 semanas' },
-  { feature: 'Cobertura temática', essencial: '3 temas/pilar', estrategico: '6 temas/pilar', integral: 'Todos os temas' },
-  { feature: 'Alertas IGMA', essencial: 'Básicos', estrategico: 'Detalhados', integral: 'Completos + Intersetoriais' },
+  { feature: 'Cobertura temática', essencial: '3 temas/pilar', estrategico: '6 temas/pilar', integral: tx('Todos os temas') },
+  { feature: 'Alertas IGMA', essencial: 'Básicos', estrategico: 'Detalhados', integral: tx('Completos + Intersetoriais') },
   { feature: 'Prescrições de capacitação', essencial: '3 prioritárias', estrategico: 'Direcionadas', integral: '100% personalizadas' },
   { feature: 'Análise de tendências', essencial: '—', estrategico: '✓', integral: '✓ + Projeções' },
   { feature: 'Simulação de cenários', essencial: '—', estrategico: '—', integral: '✓' },
-  { feature: 'Relatório para captação', essencial: 'Simplificado', estrategico: 'Completo', integral: 'Técnico (50+ pág)' },
+  { feature: 'Relatório para captação', essencial: 'Simplificado', estrategico: 'Completo', integral: tx('Técnico (50+ pág)') },
   { feature: 'Comparativo entre destinos', essencial: 'Básico', estrategico: '✓', integral: '✓ + Ranking' },
   { feature: 'Suporte a certificações', essencial: '—', estrategico: 'Parcial', integral: '✓ Completo' },
 ];
@@ -223,7 +223,7 @@ const rules = [
     detail: 'Se o pilar RA (Relações Ambientais) está crítico, o sistema bloqueia capacitações e investimentos em OE (infraestrutura). Não adianta construir hotéis se o ambiente está degradado.',
     trigger: 'RA = CRÍTICO',
     effect: 'EDU_OE bloqueado',
-    example: 'Praia poluída → Não expandir rede hoteleira'
+    example: tx('Praia poluída → Não expandir rede hoteleira')
   },
   {
     id: 2,
@@ -235,7 +235,7 @@ const rules = [
     detail: 'O sistema calcula automaticamente quando o diagnóstico deve ser revisado. Pilares críticos exigem revisão em 6 meses, atenção em 12 meses, e todos adequados em 18 meses.',
     trigger: 'Severidade dos pilares',
     effect: 'next_review_recommended_at',
-    example: 'Crítico → Revisar em 6 meses'
+    example: tx('Crítico → Revisar em 6 meses')
   },
   {
     id: 3,
@@ -247,7 +247,7 @@ const rules = [
     detail: 'Detecta crescimento estrutural que degrada o ambiente. Se OE evoluiu (melhorou) entre ciclos mas RA regrediu (piorou), o sistema gera alerta de externalidade negativa.',
     trigger: 'OE↑ enquanto RA↓',
     effect: 'Alerta de externalidade',
-    example: 'Mais hotéis, mais poluição → Alerta'
+    example: tx('Mais hotéis, mais poluição → Alerta')
   },
   {
     id: 4,
@@ -259,7 +259,7 @@ const rules = [
     detail: 'Se o pilar AO (governança/operações) está crítico, não há capacidade de gestão para implementar melhorias. O sistema bloqueia expansão de OE até a governança melhorar.',
     trigger: 'AO = CRÍTICO',
     effect: 'EDU_OE bloqueado',
-    example: 'Sem gestão → Não investir em infraestrutura'
+    example: tx('Sem gestão → Não investir em infraestrutura')
   },
   {
     id: 5,
@@ -271,7 +271,7 @@ const rules = [
     detail: 'Promover um destino com problemas ambientais graves ou falhas operacionais sérias pode gerar danos à reputação e frustrar turistas. Marketing só é liberado quando pilares essenciais estão saudáveis.',
     trigger: 'RA = CRÍTICO ou AO = CRÍTICO',
     effect: 'MARKETING bloqueado',
-    example: 'Ambiente degradado → Não promover destino'
+    example: tx('Ambiente degradado → Não promover destino')
   },
   {
     id: 6,
@@ -283,7 +283,7 @@ const rules = [
     detail: 'Alguns indicadores (saúde, educação, saneamento) dependem de ações coordenadas entre secretarias. O sistema sinaliza quando a melhoria requer articulação intersetorial, não apenas ações isoladas do turismo.',
     trigger: 'Indicador intersetorial presente',
     effect: 'Sinalização de dependência',
-    example: 'IDEB baixo → Requer articulação com Educação'
+    example: tx('IDEB baixo → Requer articulação com Educação')
   }
 ];
 
@@ -397,7 +397,7 @@ export default function Metodologia() {
           </CardHeader>
           <CardContent className="prose prose-sm max-w-none dark:prose-invert">
             <p>
-              O <strong>Sistema de Inteligência Territorial para o Turismo (SISTUR)</strong> {tx("implementa os princípios da")} <strong>{tx("Análise Estrutural do Turismo")}</strong> {tx("desenvolvida pelo Prof. Mario Carlos Beni. A teoria estabelece que o turismo é um sistema aberto, composto por subsistemas interdependentes que devem ser analisados de forma holística.")}
+              O <strong>{tx("Sistema de Inteligência Territorial para o Turismo (SISTUR)")}</strong> {tx("implementa os princípios da")} <strong>{tx("Análise Estrutural do Turismo")}</strong> {tx("desenvolvida pelo Prof. Mario Carlos Beni. A teoria estabelece que o turismo é um sistema aberto, composto por subsistemas interdependentes que devem ser analisados de forma holística.")}
             </p>
             <p>
               O <strong>{tx("Motor IGMA")}</strong> (Intelligence for Governance, Management and Action) é o núcleo 
@@ -405,7 +405,7 @@ export default function Metodologia() {
               decisões respeitem a lógica sistêmica do turismo.
             </p>
             <p>
-              {tx("A partir da v1.28.0, o SISTUR oferece a")} <strong>Mandala da Sustentabilidade no Turismo (MST)</strong>{' '}
+              {tx("A partir da v1.28.0, o SISTUR oferece a")} <strong>{tx("Mandala da Sustentabilidade no Turismo (MST)")}</strong>{' '}
               como expansão opcional. A MST representa visualmente os 3 conjuntos de Beni (RA / OE / AO) e seus
               subsistemas, e adiciona 4 dimensões contemporâneas (Tecnologia, Inclusão, TBC e Sensibilização) com
               9 indicadores complementares automatizáveis (TSE, Anatel, CADASTUR PNQT, NBR 9050).
@@ -418,7 +418,7 @@ export default function Metodologia() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-accent-foreground" />
-              🌀 Mandala da Sustentabilidade no Turismo (MST)
+              {tx("🌀 Mandala da Sustentabilidade no Turismo (MST)")}
               <Badge variant="outline" className="ml-2 text-xs">{tx("Opcional")}</Badge>
             </CardTitle>
             <CardDescription>
@@ -445,7 +445,7 @@ export default function Metodologia() {
               <div className="rounded-lg border border-blue-500/40 bg-blue-50/40 dark:bg-blue-950/20 p-3">
                 <p className="text-xs font-mono font-bold text-blue-700 dark:text-blue-400">{tx("OE — 3 indicadores")}</p>
                 <ul className="text-xs mt-1 space-y-0.5 text-muted-foreground">
-                  <li>• MST_5G_WIFI — Conectividade (Anatel)</li>
+                  <li>{tx("• MST_5G_WIFI — Conectividade (Anatel)")}</li>
                   <li>{tx("• MST_PNQT_QUAL — Qualificação CADASTUR")}</li>
                   <li>{tx("• MST_TSE_TURNOUT — Engajamento eleitoral")}</li>
                 </ul>
@@ -467,8 +467,7 @@ export default function Metodologia() {
               está fora do cache, o sistema tenta scraping sob demanda via Firecrawl em fontes
               agregadoras (G1 Eleições, Teleco) — porém TSE e Anatel oficiais bloqueiam acesso
               programático (SPA com hash routing e painéis Leaflet), então a maioria dos destinos
-              cai no <strong>{tx("fallback manual")}</strong>: o indicador aparece no painel de pré-preenchimento como linha MANUAL com valor vazio, badge 🌀 MST e link direto para a fonte oficial. O usuário insere o valor e o sistema persiste como fonte oficial validada. Disparado apenas quando <em>{tx("Expandir com Mandala")}</em> está ativo no
-              diagnóstico (zero custo extra para rodadas sem opt-in).
+              cai no <strong>{tx("fallback manual")}</strong>: o indicador aparece no painel de pré-preenchimento como linha MANUAL com valor vazio, badge 🌀 MST e link direto para a fonte oficial. O usuário insere o valor e o sistema persiste como fonte oficial validada. Disparado apenas quando <em>{tx("Expandir com Mandala")}</em> {tx("está ativo no diagnóstico (zero custo extra para rodadas sem opt-in).")}
             </p>
             <p className="text-xs text-muted-foreground">
               <strong>{tx("Cache TTL:")}</strong> TSE reutiliza valores enquanto{' '}
@@ -501,7 +500,7 @@ export default function Metodologia() {
                       <pillar.icon className="h-5 w-5" />
                     </div>
                     <Badge variant="outline" className="font-mono">
-                      Prioridade {pillar.priority}
+                      {tx("Prioridade {{v0}}", { v0: pillar.priority })}
                     </Badge>
                   </div>
                   <div>
@@ -562,7 +561,7 @@ export default function Metodologia() {
                     </div>
                     <div className="text-right">
                       <Badge variant="outline" className="font-mono">
-                        {tier.indicatorCount} indicadores
+                        {tx("{{v0}} indicadores", { v0: tier.indicatorCount })}
                       </Badge>
                     </div>
                   </div>
@@ -775,9 +774,7 @@ export default function Metodologia() {
             <div className="prose prose-sm max-w-none dark:prose-invert">
               <p>
                 O <strong>{tx("SISTUR Empresarial")}</strong> {tx("estende a teoria sistêmica de Mario Beni para organizações do setor privado, especialmente hotéis, resorts e redes hoteleiras. O módulo utiliza")} <strong>{tx("22 indicadores especializados")}</strong> {tx("de hospitalidade, sendo que")} 
-                <strong>{tx("6 indicadores são compartilhados")}</strong> entre os diagnósticos territoriais e empresariais 
-                (NPS, Reviews Online, Horas de Treinamento, % Funcionários Locais, % Compras Locais e Certificações Ambientais), 
-                mantendo a mesma lógica sistêmica e as 6 regras do Motor IGMA.
+                <strong>{tx("6 indicadores são compartilhados")}</strong> {tx("entre os diagnósticos territoriais e empresariais (NPS, Reviews Online, Horas de Treinamento, % Funcionários Locais, % Compras Locais e Certificações Ambientais), mantendo a mesma lógica sistêmica e as 6 regras do Motor IGMA.")}
               </p>
             </div>
 
@@ -793,7 +790,7 @@ export default function Metodologia() {
                       <category.icon className="h-4 w-4" />
                     </div>
                     <Badge variant="outline" className="font-mono text-xs">
-                      Pilar {category.pillar}
+                      {tx("Pilar {{v0}}", { v0: category.pillar })}
                     </Badge>
                   </div>
                   <div>
@@ -846,7 +843,7 @@ export default function Metodologia() {
               <div className="rounded-xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/20 dark:to-orange-950/10 p-5 space-y-3">
                 <div className="flex items-center gap-2">
                   <Hotel className="h-5 w-5 text-amber-500" />
-                  <h4 className="font-semibold">Organizações Privadas (Empresarial)</h4>
+                  <h4 className="font-semibold">{tx("Organizações Privadas (Empresarial)")}</h4>
                 </div>
                 <ul className="text-sm space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
@@ -859,7 +856,7 @@ export default function Metodologia() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                    22 indicadores de hospitalidade (6 compartilhados)
+                    {tx("22 indicadores de hospitalidade (6 compartilhados)")}
                   </li>
                   <li className="flex items-start gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
@@ -906,7 +903,7 @@ export default function Metodologia() {
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-semibold text-lg">
-                          Regra {rule.id}: {rule.name}
+                          {tx("Regra {{v0}}: {{v1}}", { v0: rule.id, v1: rule.name })}
                         </h3>
                         <Badge variant="outline" className="font-mono text-xs">
                           {rule.flag}
@@ -1031,7 +1028,7 @@ export default function Metodologia() {
               <div className="bg-green-50 dark:bg-green-950/20 rounded-xl p-5 border border-green-200 dark:border-green-900">
                 <h4 className="font-semibold flex items-center gap-2 mb-3 text-green-700 dark:text-green-400">
                   <CheckCircle className="h-5 w-5" />
-                  Ações Permitidas (quando pilares saudáveis)
+                  {tx("Ações Permitidas (quando pilares saudáveis)")}
                 </h4>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center gap-2">
@@ -1056,7 +1053,7 @@ export default function Metodologia() {
               <div className="bg-red-50 dark:bg-red-950/20 rounded-xl p-5 border border-red-200 dark:border-red-900">
                 <h4 className="font-semibold flex items-center gap-2 mb-3 text-red-700 dark:text-red-400">
                   <XCircle className="h-5 w-5" />
-                  Bloqueios (quando pilares críticos)
+                  {tx("Bloqueios (quando pilares críticos)")}
                 </h4>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
@@ -1107,15 +1104,15 @@ export default function Metodologia() {
                 <p className="text-sm text-muted-foreground">{tx("Confiabilidade: 5/5 ⭐ — Obtidos automaticamente de APIs públicas.")}</p>
                 <ul className="text-sm space-y-1.5">
                   <li className="flex items-start gap-2"><span className="text-green-600">📊</span> <strong>{tx("IBGE Agregados")}</strong>: População, PIB per capita, Densidade demográfica e Área territorial (Censo 2022, tabela 4714)</li>
-                  <li className="flex items-start gap-2"><span className="text-green-600">🏘️</span> <strong>IBGE SIDRA (Censo 2010)</strong>: Abastecimento de água (rede geral %) e Coleta de lixo domiciliar (%) — tabela 3217</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">🏘️</span> <strong>{tx("IBGE SIDRA (Censo 2010)")}</strong>: Abastecimento de água (rede geral %) e Coleta de lixo domiciliar (%) — tabela 3217</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">📈</span> <strong>{tx("IBGE Pesquisas")}</strong>: IDH Municipal, Índice de Gini, Incidência de pobreza</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">🏥</span> <strong>{tx("DATASUS")}</strong>: Leitos hospitalares por habitante, Cobertura de saúde (estabelecimentos), Taxa de mortalidade infantil, Mortalidade geral por mil habitantes</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">📚</span> <strong>{tx("INEP")}</strong>: IDEB (Índice de Desenvolvimento da Educação Básica)</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">💰</span> <strong>{tx("STN / Tesouro Nacional")}</strong>: Receita própria per capita, Despesa com turismo (R$ milhões)</li>
-                  <li className="flex items-start gap-2"><span className="text-green-600">🏨</span> <strong>IBGE Pesquisas (CADASTUR)</strong>: Meios de hospedagem (estabelecimentos e UH)</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">🏨</span> <strong>{tx("IBGE Pesquisas (CADASTUR)")}</strong>: Meios de hospedagem (estabelecimentos e UH)</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">🏨</span> <strong>{tx("CADASTUR / dados.gov.br")}</strong>: Guias de turismo e Agências de turismo via datasets oficiais abertos (ingestão trimestral)</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">🗺️</span> <strong>{tx("Mapa do Turismo Brasileiro")}</strong>: Região turística, Categoria (A-E), Empregos no turismo, Estabelecimentos turísticos, Visitantes nacionais e internacionais, Arrecadação turística, Conselho municipal de turismo — via API REST do Ministério do Turismo (mapa.turismo.gov.br)</li>
-                  <li className="flex items-start gap-2"><span className="text-green-600">💧</span> <strong>ANA / Hidroweb (Qualiágua)</strong>: IQA (Índice de Qualidade da Água) médio das estações de monitoramento do município, número de estações ativas e ano de referência — via API pública da Agência Nacional de Águas (alimenta o pilar RA com base hídrica oficial)</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">💧</span> <strong>{tx("ANA / Hidroweb (Qualiágua)")}</strong>: IQA (Índice de Qualidade da Água) médio das estações de monitoramento do município, número de estações ativas e ano de referência — via API pública da Agência Nacional de Águas (alimenta o pilar RA com base hídrica oficial)</li>
                 </ul>
               </div>
 
@@ -1145,11 +1142,7 @@ export default function Metodologia() {
             <div className="rounded-xl border bg-muted/30 p-5 space-y-3">
               <h4 className="font-semibold">{tx("Resumo: 8 Fontes Oficiais Integradas")}</h4>
               <p className="text-sm text-muted-foreground">
-                {tx("O SISTUR consulta automaticamente")} <strong>{tx("8 fontes oficiais")}</strong> para pré-preencher mais de 25 indicadores:
-                IBGE Agregados, IBGE SIDRA (Censo), IBGE Pesquisas, DATASUS, INEP, STN/Tesouro Nacional, CADASTUR (datasets abertos),
-                Mapa do Turismo Brasileiro (API REST do MTur) e ANA/Hidroweb (Qualiágua) para o IQA municipal.
-                Indicadores que não possuem API pública (como taxa de escolarização e dados de levantamento local)
-                são preenchidos manualmente pelo operador do diagnóstico, sempre com confirmação humana antes do cálculo.
+                {tx("O SISTUR consulta automaticamente")} <strong>{tx("8 fontes oficiais")}</strong> {tx("para pré-preencher mais de 25 indicadores: IBGE Agregados, IBGE SIDRA (Censo), IBGE Pesquisas, DATASUS, INEP, STN/Tesouro Nacional, CADASTUR (datasets abertos), Mapa do Turismo Brasileiro (API REST do MTur) e ANA/Hidroweb (Qualiágua) para o IQA municipal. Indicadores que não possuem API pública (como taxa de escolarização e dados de levantamento local) são preenchidos manualmente pelo operador do diagnóstico, sempre com confirmação humana antes do cálculo.")}
               </p>
             </div>
           </CardContent>
@@ -1183,7 +1176,7 @@ export default function Metodologia() {
                   {tx("Documentos específicos de cada destino: planos diretores, legislação municipal, pesquisas locais, dados socioeconômicos. Associados a destinos e usados automaticamente nos diagnósticos daquele município.")}
                 </p>
                 <ul className="text-sm space-y-1">
-                  <li className="flex items-center gap-2"><span className="text-blue-600">📄</span> PDF, DOCX, XLSX, CSV, TXT (até 20MB)</li>
+                  <li className="flex items-center gap-2"><span className="text-blue-600">📄</span> {tx("PDF, DOCX, XLSX, CSV, TXT (até 20MB)")}</li>
                   <li className="flex items-center gap-2"><span className="text-blue-600">🤖</span> {tx("Moderação automática por IA antes do upload")}</li>
                   <li className="flex items-center gap-2"><span className="text-blue-600">🏷️</span> {tx("8 categorias: Plano Diretor, Legislação, Pesquisa, etc.")}</li>
                 </ul>
@@ -1195,8 +1188,7 @@ export default function Metodologia() {
                   <h4 className="font-semibold">{tx("Referências Globais")}</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Documentos de referência nacional injetados em todos os relatórios: PNT (Plano Nacional de Turismo), 
-                  legislação federal, diretrizes do Ministério do Turismo. Gerenciados exclusivamente por administradores.
+                  {tx("Documentos de referência nacional injetados em todos os relatórios: PNT (Plano Nacional de Turismo), legislação federal, diretrizes do Ministério do Turismo. Gerenciados exclusivamente por administradores.")}
                 </p>
                 <ul className="text-sm space-y-1">
                   <li className="flex items-center gap-2"><span className="text-purple-600">🏛️</span> {tx("PNT 2024-2027 como referência padrão")}</li>
@@ -1254,24 +1246,19 @@ export default function Metodologia() {
           <CardContent className="space-y-4">
             <div className="prose prose-sm max-w-none dark:prose-invert">
               <p>
-                O SISTUR gera três templates distintos a partir do mesmo diagnóstico validado.
-                Todos compartilham a mesma base de dados auditados (<code>{tx("assessment_indicator_audit")}</code>),
-                a política <strong>{tx("Zero Alucinação")}</strong> {tx("e o pipeline de validação cruzada, mas diferem em público-alvo, tamanho, estrutura e tom.")}
+                {tx("O SISTUR gera três templates distintos a partir do mesmo diagnóstico validado. Todos compartilham a mesma base de dados auditados (")}<code>{tx("assessment_indicator_audit")}</code>), a política <strong>{tx("Zero Alucinação")}</strong> {tx("e o pipeline de validação cruzada, mas diferem em público-alvo, tamanho, estrutura e tom.")}
               </p>
 
-              <h4>📘 Completo (técnico-acadêmico)</h4>
+              <h4>{tx("📘 Completo (técnico-acadêmico)")}</h4>
               <ul>
                 <li><strong>{tx("Público:")}</strong> {tx("equipe técnica e gestores públicos.")}</li>
                 <li><strong>{tx("Tamanho:")}</strong> {tx("mínimo de 2.500 palavras.")}</li>
-                <li><strong>{tx("Norma:")}</strong> integral MEC/ABNT (NBR 14724, 6024, 6023, 6028, 10520).</li>
-                <li><strong>Estrutura (12 seções):</strong> Resumo + palavras-chave, Introdução,
-                  Contextualização do município, Metodologia, Análise por pilar (RA/OE/AO),
-                  Indicadores críticos, Recomendações, Plano de ação, Conclusão e Referências.</li>
-                <li><strong>{tx("Tom:")}</strong> técnico, fundamentado, com citações diretas a Beni (1997/2007),
-                  IGMA, IBGE, MTur, IGMA-IBT e demais fontes oficiais.</li>
+                <li><strong>{tx("Norma:")}</strong> {tx("integral MEC/ABNT (NBR 14724, 6024, 6023, 6028, 10520).")}</li>
+                <li><strong>Estrutura (12 seções):</strong> {tx("Resumo + palavras-chave, Introdução, Contextualização do município, Metodologia, Análise por pilar (RA/OE/AO), Indicadores críticos, Recomendações, Plano de ação, Conclusão e Referências.")}</li>
+                <li><strong>{tx("Tom:")}</strong> {tx("técnico, fundamentado, com citações diretas a Beni (1997/2007), IGMA, IBGE, MTur, IGMA-IBT e demais fontes oficiais.")}</li>
               </ul>
 
-              <h4>📗 Executivo (síntese para tomada de decisão)</h4>
+              <h4>{tx("📗 Executivo (síntese para tomada de decisão)")}</h4>
               <ul>
                 <li><strong>{tx("Público:")}</strong> {tx("alta gestão, secretários, prefeitos, comitês gestores.")}</li>
                 <li><strong>{tx("Tamanho:")}</strong> {tx("800–1.200 palavras.")}</li>
@@ -1279,7 +1266,7 @@ export default function Metodologia() {
                 <li><strong>{tx("Tom:")}</strong> {tx("direto, orientado a decisão, com destaque para riscos e oportunidades. Reduz citações acadêmicas, mantém apenas o essencial para legitimidade.")}</li>
               </ul>
 
-              <h4>📙 Investidores (atratividade econômica)</h4>
+              <h4>{tx("📙 Investidores (atratividade econômica)")}</h4>
               <ul>
                 <li><strong>{tx("Público:")}</strong> {tx("investidores, fundos, parceiros privados e captação.")}</li>
                 <li><strong>{tx("Tamanho:")}</strong> {tx("1.200–1.800 palavras.")}</li>
@@ -1291,64 +1278,41 @@ export default function Metodologia() {
 
               <h4>{tx("Variante Empresarial")}</h4>
               <p>
-                {tx("Cada um dos três templates possui versão")} <strong>{tx("Empresarial")}</strong> — acionada quando
-                o diagnóstico é de empreendimento (não destino). Substitui os eixos territoriais
-                (RA/OE/AO) por categorias funcionais (governança, ESG, satisfação do hóspede,
-                ocupação) e troca o foco territorial por KPIs de negócio e ROI.
+                {tx("Cada um dos três templates possui versão")} <strong>{tx("Empresarial")}</strong> {tx("— acionada quando o diagnóstico é de empreendimento (não destino). Substitui os eixos territoriais (RA/OE/AO) por categorias funcionais (governança, ESG, satisfação do hóspede, ocupação) e troca o foco territorial por KPIs de negócio e ROI.")}
               </p>
 
               <h4>{tx("Garantias comuns aos três templates")}</h4>
               <ul>
                 <li>{tx("Política")} <strong>{tx("Zero Alucinação")}</strong>: sem invenção de números, anos ou fontes.</li>
                 <li>{tx("Auto-correção determinística contra")} <code>{tx("assessment_indicator_audit")}</code> (divergência &gt; 5%).</li>
-                <li>Validação por agente IA (gemini-2.5-pro) sobre o texto pós-correção.</li>
-                <li>Banner de validação cruzada sempre exibido (limpo, com avisos ou auto-corrigido).</li>
+                <li>{tx("Validação por agente IA (gemini-2.5-pro) sobre o texto pós-correção.")}</li>
+                <li>{tx("Banner de validação cruzada sempre exibido (limpo, com avisos ou auto-corrigido).")}</li>
                 <li>{tx("Persistência do relatório de validação em")} <code>{tx("report_validations")}</code>.</li>
-                <li>Status canônico (CRÍTICO/ATENÇÃO/ADEQUADO/FORTE/EXCELENTE) e padrão BRL.</li>
+                <li>{tx("Status canônico (CRÍTICO/ATENÇÃO/ADEQUADO/FORTE/EXCELENTE) e padrão BRL.")}</li>
               </ul>
 
               <h4>{tx("Pipeline de geração — providers, fila e streaming")}</h4>
               <p>
                 {tx("A geração não depende de um único modelo. O orquestrador tenta os provedores na ordem")} <strong>{tx("Claude Sonnet 4.5")}</strong> →{' '}
-                <strong>{tx("GPT-5")}</strong> → <strong>{tx("Gemini 2.5 Pro")}</strong>. Se qualquer
-                chamada falhar (timeout, abort, conteúdo vazio mid-stream ou erro de
-                stream parcial), o trail é registrado e o próximo provedor da ordem é
-                acionado automaticamente, mantendo o mesmo prompt e dados auditados —
-                a regra de fallback é <strong>{tx("global")}</strong> (nunca mistura textos de
+                <strong>{tx("GPT-5")}</strong> → <strong>{tx("Gemini 2.5 Pro")}</strong>{tx(". Se qualquer chamada falhar (timeout, abort, conteúdo vazio mid-stream ou erro de stream parcial), o trail é registrado e o próximo provedor da ordem é acionado automaticamente, mantendo o mesmo prompt e dados auditados — a regra de fallback é")} <strong>{tx("global")}</strong> (nunca mistura textos de
                 provedores diferentes em um mesmo relatório).
               </p>
               <p>
                 {tx("No template")} <strong>{tx("Completo")}</strong>, o pipeline roda em duas fases:
                 <strong> {tx("Fase 1")}</strong> dispara três chamadas paralelas (uma por pilar
                 I-RA, I-OE, I-AO), cada uma restrita ao seu escopo; <strong>{tx("Fase 2")}</strong>
-                gera o envelope (introdução, ficha técnica, metodologia, alertas IGMA,
-                análise integrada, gargalos, benchmarks, prognóstico, banco de ações,
-                fontes, considerações finais, referências, glossário, apêndice) recebendo
-                os textos dos pilares como contexto de leitura para garantir
+                {tx("gera o envelope (introdução, ficha técnica, metodologia, alertas IGMA, análise integrada, gargalos, benchmarks, prognóstico, banco de ações, fontes, considerações finais, referências, glossário, apêndice) recebendo os textos dos pilares como contexto de leitura para garantir")}
                 <strong> {tx("coerência narrativa")}</strong>{tx(". Para Claude, o orçamento de")}
-                <code>{tx("max_tokens")}</code> e a janela de contexto são calibrados
-                dinamicamente por tier (essencial / estratégico / integral), template e
-                quantidade real de indicadores, evitando tanto respostas truncadas em
-                diagnósticos integrais quanto reservas excessivas em diagnósticos pequenos.
-                Templates Executivo e Investidor mantêm pipeline monolítico (estrutura
-                curta sem subseções por pilar).
+                <code>{tx("max_tokens")}</code> {tx("e a janela de contexto são calibrados dinamicamente por tier (essencial / estratégico / integral), template e quantidade real de indicadores, evitando tanto respostas truncadas em diagnósticos integrais quanto reservas excessivas em diagnósticos pequenos. Templates Executivo e Investidor mantêm pipeline monolítico (estrutura curta sem subseções por pilar).")}
               </p>
               <p>
-                {tx("Para resistir a timeouts do proxy em gerações longas, o pedido é enfileirado em")} <code>{tx("report_jobs")}</code> e processado por um worker
-                dedicado (<code>{tx("process-report-job")}</code>) acionado por trigger de
-                banco. O cliente recebe o <code>{tx("jobId")}</code> imediatamente (HTTP 202)
-                e faz polling. Mesmo se o usuário fechar a aba ou navegar para outra
-                página, o <code>{tx("useReportJobWatcher")}</code> {tx("global mantém o acompanhamento via")} <code>{tx("localStorage")}</code> {tx("e dispara toast + Notification do navegador quando o relatório fica pronto.")}
+                {tx("Para resistir a timeouts do proxy em gerações longas, o pedido é enfileirado em")} <code>{tx("report_jobs")}</code> {tx("e processado por um worker dedicado (")}<code>{tx("process-report-job")}</code>) acionado por trigger de banco. O cliente recebe o <code>{tx("jobId")}</code> {tx("imediatamente (HTTP 202) e faz polling. Mesmo se o usuário fechar a aba ou navegar para outra página, o")} <code>{tx("useReportJobWatcher")}</code> {tx("global mantém o acompanhamento via")} <code>{tx("localStorage")}</code> {tx("e dispara toast + Notification do navegador quando o relatório fica pronto.")}
               </p>
               <p>
                 {tx("Durante a geração, o card \"Plano de Desenvolvimento\" exibe")}
                 <strong> {tx("pré-visualização ao vivo")}</strong>: a edge function persiste progressivamente o markdown acumulado em
-                <code>{tx("report_jobs.partial_content")}</code> a cada subseção concluída
-                (RA → OE → AO → envelope), e a tela renderiza esse conteúdo parcial
-                em tempo real, com barra de progresso e badge animado. Quando o job
-                completa, troca-se naturalmente para o conteúdo final persistido em
-                <code>{tx("generated_reports")}</code> — sem flicker. PDF e DOCX só são
-                liberados após a persistência final (não exporta versões inacabadas).
+                <code>{tx("report_jobs.partial_content")}</code> {tx("a cada subseção concluída (RA → OE → AO → envelope), e a tela renderiza esse conteúdo parcial em tempo real, com barra de progresso e badge animado. Quando o job completa, troca-se naturalmente para o conteúdo final persistido em")}
+                <code>{tx("generated_reports")}</code> {tx("— sem flicker. PDF e DOCX só são liberados após a persistência final (não exporta versões inacabadas).")}
               </p>
 
               <h4>{tx("Observabilidade e auditoria")}</h4>
@@ -1359,21 +1323,14 @@ export default function Metodologia() {
                   <code> {tx("provider")}</code>, <code>{tx("model")}</code>, <code>{tx("trace_id")}</code>,
                   <code> {tx("job_id")}</code>, <code>{tx("report_id")}</code>,
                   <code> {tx("duration_ms")}</code>, <code>{tx("stage")}</code> e
-                  <code> {tx("metadata")}</code>. Stages explícitos
-                  (<code>{tx("provider_selected")}</code>, <code>{tx("provider_failed")}</code>,
+                  <code> {tx("metadata")}</code>{tx(". Stages explícitos (")}<code>{tx("provider_selected")}</code>, <code>{tx("provider_failed")}</code>,
                   <code> {tx("phase1_pillars_start")}</code>, <code>{tx("claude_budget_pillar")}</code>,
                   <code> {tx("phase2_envelope_done")}</code>,
                   <code> {tx("validation_agent_done")}</code>, <code>{tx("persist_inserted")}</code>,
-                  <code> {tx("stream_closed_ok")}</code>) cobrem cada tentativa de Claude /
-                  GPT-5 / Gemini, permitindo auditar quando e por que o fallback foi
-                  acionado.
+                  <code> {tx("stream_closed_ok")}</code>) cobrem cada tentativa de Claude / GPT-5 / Gemini, permitindo auditar quando e por que o fallback foi acionado.
                 </li>
                 <li>
-                  {tx("Painel administrativo em")} <code>{tx("/admin/report-logs")}</code> exibe os
-                  logs com filtros por provider, busca livre, dialog de detalhes e
-                  auto-refresh a 15s, além do bloco "Pipeline Claude — Tempo Real"
-                  com as 4 fases mapeadas (Pilares, Envelope, Validação,
-                  Persistência) e barra de progresso geral.
+                  {tx("Painel administrativo em")} <code>{tx("/admin/report-logs")}</code> {tx("exibe os logs com filtros por provider, busca livre, dialog de detalhes e auto-refresh a 15s, além do bloco \"Pipeline Claude — Tempo Real\" com as 4 fases mapeadas (Pilares, Envelope, Validação, Persistência) e barra de progresso geral.")}
                 </li>
                 <li>
                   {tx("Os campos")} <code>{tx("ai_provider")}</code> e <code>{tx("ai_model")}</code> em
@@ -1396,7 +1353,7 @@ export default function Metodologia() {
             <p><strong>{tx("LTV do hóspede:")}</strong> {tx("gasto por estadia × estadias por ano × anos de relacionamento × margem. CAC sugerido pela comissão média ponderada dos canais. LTV/CAC abaixo de 3 indica aquisição cara.")}</p>
             <p><strong>{tx("ROI de projeto:")}</strong> ROI = (retorno anual − investimento) ÷ investimento; payback = investimento ÷ retorno anual. Investimento vem do orçamento do projeto.</p>
             <p><strong>{tx("Gêmeo Digital:")}</strong> projeção de 1 a 5 anos dos pilares RA, OE e AO a partir de alavancas. Regras sistêmicas: com RA abaixo de 34%, ganhos em AO caem pela metade; com OE abaixo de 34%, todos os ganhos caem 30%. Resultados limitados entre 0% e 100%. Cenários são projeções, não previsões.</p>
-            <p><strong>{tx("Geomarketing:")}</strong> mapa do destino com raio de influência, concorrentes (intensidade pelo número de avaliações), unidades da rede, eventos, demanda aérea (ANAC) e origem dos visitantes informada. Não há ranking entre municípios.</p>
+            <p><strong>{tx("Geomarketing:")}</strong> {tx("mapa do destino com raio de influência, concorrentes (intensidade pelo número de avaliações), unidades da rede, eventos, demanda aérea (ANAC) e origem dos visitantes informada. Não há ranking entre municípios.")}</p>
             <p>{tx("Disponível nos planos Pro e Enterprise e durante o teste.")}</p>
           </CardContent>
         </Card>
@@ -1420,35 +1377,28 @@ export default function Metodologia() {
                 <strong>{tx("BENI, Mario Carlos.")}</strong> {tx("Política e Planejamento de Turismo no Brasil. São Paulo: Aleph, 2006.")}
               </li>
               <li>
-                <strong>{tx("IBGE.")}</strong> API de Agregados — Pesquisas Municipais (Censo 2022, PIB, etc.). 
-                Disponível em: servicodados.ibge.gov.br/api/v3/agregados
+                <strong>{tx("IBGE.")}</strong> {tx("API de Agregados — Pesquisas Municipais (Censo 2022, PIB, etc.). Disponível em: servicodados.ibge.gov.br/api/v3/agregados")}
               </li>
               <li>
-                <strong>{tx("IBGE.")}</strong> API SIDRA — Sistema IBGE de Recuperação Automática (Censo 2010, tabela 3217 — saneamento). 
-                Disponível em: apisidra.ibge.gov.br
+                <strong>{tx("IBGE.")}</strong> {tx("API SIDRA — Sistema IBGE de Recuperação Automática (Censo 2010, tabela 3217 — saneamento). Disponível em: apisidra.ibge.gov.br")}
               </li>
               <li>
-                <strong>{tx("IBGE.")}</strong> API SIDRA / Agregados — População estimada anual (tabela 6579, variável 9324) e PIB municipal a preços correntes (tabela 5938, variáveis 37 PIB total e 39 PIB per capita). Usadas pelo Observatório para enriquecimento socioeconômico automático por município.
-                Disponível em: servicodados.ibge.gov.br/api/v3/agregados
+                <strong>{tx("IBGE.")}</strong> {tx("API SIDRA / Agregados — População estimada anual (tabela 6579, variável 9324) e PIB municipal a preços correntes (tabela 5938, variáveis 37 PIB total e 39 PIB per capita). Usadas pelo Observatório para enriquecimento socioeconômico automático por município. Disponível em: servicodados.ibge.gov.br/api/v3/agregados")}
               </li>
               <li>
                 <strong>{tx("IBGE.")}</strong> {tx("API de Pesquisas Municipais — IDH, Gini, Hospedagem, Finanças. Disponível em: servicodados.ibge.gov.br/api/v1/pesquisas")}
               </li>
               <li>
-                <strong>{tx("DATASUS.")}</strong> Indicadores de Saúde — Leitos hospitalares, mortalidade infantil, mortalidade geral. 
-                Disponível em: datasus.saude.gov.br (via IBGE Pesquisas)
+                <strong>{tx("DATASUS.")}</strong> {tx("Indicadores de Saúde — Leitos hospitalares, mortalidade infantil, mortalidade geral. Disponível em: datasus.saude.gov.br (via IBGE Pesquisas)")}
               </li>
               <li>
-                <strong>{tx("INEP.")}</strong> IDEB — Índice de Desenvolvimento da Educação Básica. 
-                Disponível em: inep.gov.br (via IBGE Pesquisas)
+                <strong>{tx("INEP.")}</strong> {tx("IDEB — Índice de Desenvolvimento da Educação Básica. Disponível em: inep.gov.br (via IBGE Pesquisas)")}
               </li>
               <li>
-                <strong>Secretaria do Tesouro Nacional (STN).</strong> Finanças Municipais — Receita própria, Despesa com turismo. 
-                Disponível em: tesouro.fazenda.gov.br (via IBGE Pesquisas)
+                <strong>{tx("Secretaria do Tesouro Nacional (STN).")}</strong> {tx("Finanças Municipais — Receita própria, Despesa com turismo. Disponível em: tesouro.fazenda.gov.br (via IBGE Pesquisas)")}
               </li>
               <li>
-                <strong>{tx("Ministério do Turismo.")}</strong> CADASTUR — Cadastro de Prestadores de Serviços Turísticos (dados abertos). 
-                Disponível em: dados.gov.br
+                <strong>{tx("Ministério do Turismo.")}</strong> {tx("CADASTUR — Cadastro de Prestadores de Serviços Turísticos (dados abertos). Disponível em: dados.gov.br")}
               </li>
               <li>
                 <strong>{tx("Ministério do Turismo.")}</strong> {tx("Plano Nacional de Turismo 2024-2027. Disponível em: gov.br/turismo")}
@@ -1457,8 +1407,7 @@ export default function Metodologia() {
                 <strong>{tx("Ministério do Turismo.")}</strong> {tx("Mapa do Turismo Brasileiro — API REST de Regionalização. Disponível em: mapa.turismo.gov.br")}
               </li>
               <li>
-                <strong>Ministério do Trabalho e Emprego (MTE).</strong> Novo CAGED — Estatísticas mensais de admissões e desligamentos formais (CNAEs do turismo). Usado pelo Observatório como base anual via IGMA, com baseline mensal estimado (valor anual ÷ 12) quando não há série mensal carregada.
-                Disponível em: gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged
+                <strong>{tx("Ministério do Trabalho e Emprego (MTE).")}</strong> {tx("Novo CAGED — Estatísticas mensais de admissões e desligamentos formais (CNAEs do turismo). Usado pelo Observatório como base anual via IGMA, com baseline mensal estimado (valor anual ÷ 12) quando não há série mensal carregada. Disponível em: gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/novo-caged")}
               </li>
             </ul>
           </CardContent>

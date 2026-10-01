@@ -646,7 +646,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
                 ))}
               </div>
               <h2 className="text-xl font-bold text-amber-300 drop-shadow">
-                {stars === 3 ? 'Memória Perfeita!' : stars === 2 ? tx('Excelente!') : tx('Bem feito!')}
+                {stars === 3 ? tx('Memória Perfeita!') : stars === 2 ? tx('Excelente!') : tx('Bem feito!')}
               </h2>
               <p className="text-sm text-amber-400/80">
                 {state.errors === 0 ? '🌟 Sem nenhum erro! Incrível!' : `Você encontrou todos os pares com ${state.errors} erro${state.errors > 1 ? 's' : ''}!`}

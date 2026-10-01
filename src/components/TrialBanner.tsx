@@ -41,9 +41,9 @@ export function TrialBanner() {
             )}
             <span className={cn('font-medium truncate', urgent ? 'text-red-300' : 'text-amber-300')}>
               {isTrialExpired
-                ? 'Seu período de avaliação expirou.'
+                ? tx('Seu período de avaliação expirou.')
                 : trialDaysRemaining <= 1
-                ? 'Último dia do trial! Atualize agora.'
+                ? tx('Último dia do trial! Atualize agora.')
                 : `${trialDaysRemaining} dias restantes no trial gratuito.`
               }
             </span>

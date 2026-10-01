@@ -143,7 +143,7 @@ export function BeniConversationSidebar({ api, activeId, onNew, onNavigate, onDe
 
       <Dialog open={!!folderDialog} onOpenChange={(o) => !o && setFolderDialog(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{folderDialog?.id ? 'Editar pasta' : 'Nova pasta'}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{folderDialog?.id ? tx('Editar pasta') : tx('Nova pasta')}</DialogTitle></DialogHeader>
           <Input placeholder={tx("Nome do projeto")} value={folderDialog?.name ?? ''} onChange={(e) => setFolderDialog((d) => d && { ...d, name: e.target.value })} />
           <Textarea
             placeholder={tx("Instruções para o Beni neste projeto (opcional). Ex.: foco no destino Barretos.")}

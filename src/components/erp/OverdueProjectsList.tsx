@@ -60,7 +60,7 @@ export function OverdueProjectsList({ projects, isLoading }: OverdueProjectsList
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2 text-severity-critical">
           <AlertTriangle className="h-5 w-5" />
-          Projetos Atrasados ({projects.length})
+          {tx("Projetos Atrasados ({{v0}})", { v0: projects.length })}
         </CardTitle>
         <CardDescription>
           {tx('Projetos que ultrapassaram a data de término prevista')}
@@ -84,14 +84,14 @@ export function OverdueProjectsList({ projects, isLoading }: OverdueProjectsList
                   </div>
                   <Badge variant="destructive" className="text-xs shrink-0">
                     <Clock className="h-3 w-3 mr-1" />
-                    {project.daysOverdue}d atraso
+                    {tx("{{v0}}d atraso", { v0: project.daysOverdue })}
                   </Badge>
                 </div>
 
                 <div className="mt-2">
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="text-muted-foreground">
-                      Tarefas: {project.completedTasks}/{project.totalTasks}
+                      {tx("Tarefas: {{v0}}/{{v1}}", { v0: project.completedTasks, v1: project.totalTasks })}
                     </span>
                     <span className="font-medium">{project.completionRate}%</span>
                   </div>

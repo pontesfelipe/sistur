@@ -35,9 +35,9 @@ interface DestinationComparisonProps {
 }
 
 const PILLAR_LABELS: Record<string, string> = {
-  RA: 'Relações Ambientais',
-  OE: 'Organização Estrutural',
-  AO: 'Ações Operacionais',
+  RA: tx('Relações Ambientais'),
+  OE: tx('Organização Estrutural'),
+  AO: tx('Ações Operacionais'),
 };
 
 const COLORS = [
@@ -263,8 +263,8 @@ export function DestinationComparison({
             <BarChart3 className="h-12 w-12 mb-4 opacity-30" />
             <p className="text-sm">
               {selectedDestinations.length === 0 
-                ? 'Selecione pelo menos 2 destinos para comparar'
-                : 'Selecione mais 1 destino para iniciar a comparação'}
+                ? tx('Selecione pelo menos 2 destinos para comparar')
+                : tx('Selecione mais 1 destino para iniciar a comparação')}
             </p>
           </div>
         )}

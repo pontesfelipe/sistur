@@ -90,7 +90,7 @@ export function ExecutiveSummary({
               Sumário Executivo — {destinationName || assessment?.title}
             </CardTitle>
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
-              <span>Ciclo: {assessment?.title}</span>
+              <span>{tx("Ciclo: {{v0}}", { v0: assessment?.title })}</span>
               <span>
                 Período: {formatDate(assessment?.period_start)} — {formatDate(assessment?.period_end)}
               </span>
@@ -196,7 +196,7 @@ export function ExecutiveSummary({
             <div className="border-t pt-3 text-xs text-muted-foreground">
               <p>
                 <strong>{tx('Procedência dos dados:')}</strong>{' '}
-                {sources.length > 0 ? sources.join(' · ') : 'Registros manuais da organização.'}
+                {sources.length > 0 ? sources.join(' · ') : tx('Registros manuais da organização.')}
               </p>
               <p className="mt-1">
                 SISTUR v{APP_VERSION.full} — gerado em {new Date().toLocaleDateString('pt-BR')}

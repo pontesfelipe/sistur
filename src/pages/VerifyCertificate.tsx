@@ -121,7 +121,7 @@ const VerifyCertificate = () => {
             <div className="text-center mb-6">
               <p className="text-sm text-muted-foreground">
                 {isValid
-                  ? 'Este certificado é autêntico e foi emitido pela plataforma SISTUR EDU.'
+                  ? tx('Este certificado é autêntico e foi emitido pela plataforma SISTUR EDU.')
                   : result?.message || 'Este certificado não pôde ser verificado.'
                 }
               </p>
@@ -183,7 +183,7 @@ const VerifyCertificate = () => {
                   <Clock className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-xs text-muted-foreground">{tx('Carga Horária')}</p>
-                    <p className="font-medium">{certificate.workload_minutes} minutos</p>
+                    <p className="font-medium">{tx("{{v0}} minutos", { v0: certificate.workload_minutes })}</p>
                   </div>
                 </div>
               </div>

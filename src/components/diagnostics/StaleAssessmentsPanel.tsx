@@ -120,7 +120,7 @@ export function StaleAssessmentsPanel() {
           ) : (
             <>
               <RefreshCw className="mr-2 h-4 w-4" />
-              Recalcular todos ({rows.length})
+              {tx("Recalcular todos ({{v0}})", { v0: rows.length })}
             </>
           )}
         </Button>
@@ -135,7 +135,7 @@ export function StaleAssessmentsPanel() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium truncate">{r.destination_name}</span>
                   {r.ibge_code && (
-                    <Badge variant="outline" className="text-[10px] font-mono">IBGE {r.ibge_code}</Badge>
+                    <Badge variant="outline" className="text-[10px] font-mono">{tx("IBGE {{v0}}", { v0: r.ibge_code })}</Badge>
                   )}
                   {r.org_name && (
                     <Badge variant="secondary" className="text-[10px]">{r.org_name}</Badge>

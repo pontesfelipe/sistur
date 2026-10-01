@@ -51,7 +51,7 @@ function CreateConsortiumDialog() {
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={tx("Ex: Consórcio Vale Histórico")} />
           </div>
           <div>
-            <Label>Descrição (opcional)</Label>
+            <Label>{tx("Descrição (opcional)")}</Label>
             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={tx("Vocação, abrangência geográfica, objetivos...")} />
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function Consorcios() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <CardTitle className="text-base">{c.name}</CardTitle>
-                      <Badge variant={c.status === "active" ? "default" : "secondary"}>{c.status}</Badge>
+                      <Badge variant={c.status === "active" ? "default" : "secondary"}>{tx(String(c.status ?? ""))}</Badge>
                     </div>
                     {c.description && <CardDescription className="line-clamp-2">{c.description}</CardDescription>}
                   </CardHeader>

@@ -261,14 +261,14 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                   </SelectTrigger>
                   <SelectContent>
                     {PROPERTY_TYPES.map(type => (
-                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                      <SelectItem key={type.value} value={type.value}>{tx(String(type.label ?? ""))}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="star_rating">Categoria (Estrelas)</Label>
+                <Label htmlFor="star_rating">{tx("Categoria (Estrelas)")}</Label>
                 <Select 
                   value={formData.star_rating?.toString() || ''} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, star_rating: value ? parseInt(value) : null }))}
@@ -293,7 +293,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2">
                 <Label htmlFor="room_count" className="flex items-center gap-2">
                   <DoorOpen className="h-4 w-4" />
-                  Número de UHs (Quartos)
+                  {tx("Número de UHs (Quartos)")}
                 </Label>
                 <Input
                   id="room_count"
@@ -375,7 +375,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                   </SelectTrigger>
                   <SelectContent>
                     {SEASONALITY_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      <SelectItem key={opt.value} value={opt.value}>{tx(String(opt.label ?? ""))}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -409,7 +409,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
               <div className="space-y-2">
                 <Label htmlFor="average_occupancy_rate" className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  Taxa de Ocupação Média (%)
+                  {tx("Taxa de Ocupação Média (%)")}
                 </Label>
                 <Input
                   id="average_occupancy_rate"
@@ -448,7 +448,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                         className="cursor-pointer hover:bg-primary/80"
                         onClick={() => toggleArrayItem('target_market', market.value)}
                       >
-                        {market.label}
+                        {tx(String(market.label ?? ""))}
                       </Badge>
                     );
                   })}
@@ -492,7 +492,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                         className="cursor-pointer hover:bg-primary/80"
                         onClick={() => toggleArrayItem('certifications', cert.value)}
                       >
-                        {cert.label}
+                        {tx(String(cert.label ?? ""))}
                       </Badge>
                     );
                   })}
@@ -514,7 +514,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                         className={`cursor-pointer ${isSelected ? 'bg-green-600 hover:bg-green-700' : 'hover:bg-green-600/20'}`}
                         onClick={() => toggleArrayItem('sustainability_initiatives', init.value)}
                       >
-                        {init.label}
+                        {tx(String(init.label ?? ""))}
                       </Badge>
                     );
                   })}
@@ -536,7 +536,7 @@ export function EnterpriseProfilePanel({ destinationId, destinationName, onClose
                         className={`cursor-pointer ${isSelected ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-blue-600/20'}`}
                         onClick={() => toggleArrayItem('accessibility_features', feat.value)}
                       >
-                        {feat.label}
+                        {tx(String(feat.label ?? ""))}
                       </Badge>
                     );
                   })}

@@ -39,7 +39,7 @@ export function TCGHand({ hand, coins, onPlay, onDiscard, canPlay, selectedIndex
       <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
         <span className="flex items-center gap-1">
           🎴 <span className="font-bold text-foreground">{hand.length}</span>
-          {affordable > 0 && <span className="text-emerald-500">({affordable} jogáveis)</span>}
+          {affordable > 0 && <span className="text-emerald-500">{tx("({{v0}} jogáveis)", { v0: affordable })}</span>}
         </span>
         <span>•</span>
         <span className={cn('flex items-center gap-1', coins <= 1 && 'text-amber-500')}>
@@ -50,7 +50,7 @@ export function TCGHand({ hand, coins, onPlay, onDiscard, canPlay, selectedIndex
           'font-bold',
           playsLeft === 0 ? 'text-red-500' : playsLeft === 1 ? 'text-amber-500' : 'text-emerald-500'
         )}>
-          {cardsPlayed}/{maxPlays} jogadas
+          {tx("{{v0}}/{{v1}} jogadas", { v0: cardsPlayed, v1: maxPlays })}
         </span>
       </div>
 

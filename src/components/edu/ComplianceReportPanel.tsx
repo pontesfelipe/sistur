@@ -83,7 +83,7 @@ function ComplianceStatsCards({ userId }: { userId: string }) {
             <Clock className="h-3.5 w-3.5" /> {tx("Tempo Total")}
           </div>
           <p className="text-2xl font-bold">{stats.totalDurationMinutes}<span className="text-sm font-normal text-muted-foreground"> {tx("min")}</span></p>
-          <p className="text-xs text-muted-foreground">{stats.totalActiveMinutes} ativos / {stats.totalIdleMinutes} inativos</p>
+          <p className="text-xs text-muted-foreground">{tx("{{v0}} ativos / {{v1}} inativos", { v0: stats.totalActiveMinutes, v1: stats.totalIdleMinutes })}</p>
         </CardContent>
       </Card>
       <Card>
@@ -102,8 +102,8 @@ function ComplianceStatsCards({ userId }: { userId: string }) {
           </div>
           <p className="text-2xl font-bold">{stats.totalFlags}</p>
           <div className="flex gap-1 mt-1">
-            {stats.pendingFlags > 0 && <Badge variant="outline" className="text-[10px] border-yellow-500 text-yellow-600">{stats.pendingFlags} pendente(s)</Badge>}
-            {stats.confirmedFlags > 0 && <Badge variant="destructive" className="text-[10px]">{stats.confirmedFlags} confirmado(s)</Badge>}
+            {stats.pendingFlags > 0 && <Badge variant="outline" className="text-[10px] border-yellow-500 text-yellow-600">{tx("{{v0}} pendente(s)", { v0: stats.pendingFlags })}</Badge>}
+            {stats.confirmedFlags > 0 && <Badge variant="destructive" className="text-[10px]">{tx("{{v0}} confirmado(s)", { v0: stats.confirmedFlags })}</Badge>}
           </div>
         </CardContent>
       </Card>
@@ -144,7 +144,7 @@ function SessionDetailDialog({ session, open, onClose }: { session: LearningSess
 
         <div className="grid grid-cols-2 gap-4 text-sm mb-4">
           <div><span className="text-muted-foreground">{tx('Início:')}</span> {format(new Date(session.started_at), 'dd/MM/yyyy HH:mm:ss')}</div>
-          <div><span className="text-muted-foreground">{tx('Fim:')}</span> {session.ended_at ? format(new Date(session.ended_at), 'dd/MM/yyyy HH:mm:ss') : 'Em andamento'}</div>
+          <div><span className="text-muted-foreground">{tx('Fim:')}</span> {session.ended_at ? format(new Date(session.ended_at), 'dd/MM/yyyy HH:mm:ss') : tx('Em andamento')}</div>
           <div><span className="text-muted-foreground">{tx('Duração:')}</span> {Math.round(session.duration_seconds / 60)} min</div>
           <div><span className="text-muted-foreground">{tx('Ativo:')}</span> {Math.round(session.active_seconds / 60)} min ({session.duration_seconds > 0 ? Math.round((session.active_seconds / session.duration_seconds) * 100) : 0}%)</div>
           <div><span className="text-muted-foreground">{tx('Tipo:')}</span> {session.session_type}</div>
@@ -196,7 +196,7 @@ function FraudReviewDialog({ flag, open, onClose }: { flag: FraudFlag | null; op
 
   const handleReview = async (status: 'dismissed' | 'confirmed') => {
     await reviewMutation.mutateAsync({ flagId: flag.id, status, notes });
-    toast.success(status === 'confirmed' ? 'Alerta confirmado' : 'Alerta descartado');
+    toast.success(status === 'confirmed' ? tx('Alerta confirmado') : tx('Alerta descartado'));
     onClose();
   };
 

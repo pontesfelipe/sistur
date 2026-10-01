@@ -77,7 +77,7 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
         ) : sessions.length > 0 ? (
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              Sessões Salvas ({sessions.length})
+              {tx("Sessões Salvas ({{v0}})", { v0: sessions.length })}
             </h2>
             {sessions.map((session) => {
               const biomeInfo = BIOME_INFO[session.biome as BiomeType];
@@ -98,8 +98,8 @@ export function SessionPicker({ sessions, loading, onNewGame, onLoadSession, onD
                           <MapPin className="h-3 w-3" />
                           {biomeInfo?.name || session.biome}
                         </span>
-                        <span>Turno {session.turn}</span>
-                        <span>Nível {session.level}</span>
+                        <span>{tx("Turno {{v0}}", { v0: session.turn })}</span>
+                        <span>{tx("Nível {{v0}}", { v0: session.level })}</span>
                         <span className={`font-semibold ${getEquilibriumColor(session.equilibrium)}`}>
                           <TrendingUp className="h-3 w-3 inline mr-0.5" />
                           {Math.round(session.equilibrium)}%

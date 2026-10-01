@@ -118,7 +118,7 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
             transition={{ delay: 0.1 }}
             className="text-xs font-bold uppercase tracking-widest text-primary/70"
           >
-            Capítulo {scene.chapter}
+            {tx("Capítulo {{v0}}", { v0: scene.chapter })}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
@@ -329,7 +329,7 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
             >
-              {scene.endingType === 'restaurado' ? 'Missão Cumprida!' : scene.endingType === 'degradado' ? tx('Missão Fracassada') : tx('Resultado Misto')}
+              {scene.endingType === 'restaurado' ? tx('Missão Cumprida!') : scene.endingType === 'degradado' ? tx('Missão Fracassada') : tx('Resultado Misto')}
             </motion.h3>
             <motion.p
               className="text-sm text-muted-foreground"
@@ -338,10 +338,10 @@ export function StoryScene({ scene, chapter, onChoice, biomeName, biomeGradient,
               transition={{ delay: 0.9 }}
             >
               {scene.endingType === 'restaurado'
-                ? 'Suas escolhas sustentáveis restauraram o bioma!'
+                ? tx('Suas escolhas sustentáveis restauraram o bioma!')
                 : scene.endingType === 'degradado'
-                ? 'Escolhas arriscadas tiveram consequências graves.'
-                : 'Houve progresso, mas há espaço para melhorar.'}
+                ? tx('Escolhas arriscadas tiveram consequências graves.')
+                : tx('Houve progresso, mas há espaço para melhorar.')}
             </motion.p>
           </motion.div>
         )}

@@ -42,7 +42,7 @@ export function IndicadoresChart({
             <div className="flex items-center gap-2 mb-2">
               <Zap className="h-4 w-4 text-green-600" />
               <span className="font-medium text-green-700 dark:text-green-400">{tx('Essencial')}</span>
-              <Badge variant="outline" className="ml-auto text-xs">{tierCounts.SMALL} ind.</Badge>
+              <Badge variant="outline" className="ml-auto text-xs">{tx("{{v0}} ind.", { v0: tierCounts.SMALL })}</Badge>
             </div>
             <p className="text-xs text-green-600/80 dark:text-green-400/80">
               {tx("Indicadores essenciais para municípios menores ou análises rápidas. Ideal para primeira avaliação ou destinos com dados limitados.")}
@@ -52,7 +52,7 @@ export function IndicadoresChart({
             <div className="flex items-center gap-2 mb-2">
               <Gauge className="h-4 w-4 text-amber-600" />
               <span className="font-medium text-amber-700 dark:text-amber-400">{tx('Estratégico')}</span>
-              <Badge variant="outline" className="ml-auto text-xs">{tierCounts.MEDIUM} ind.</Badge>
+              <Badge variant="outline" className="ml-auto text-xs">{tx("{{v0}} ind.", { v0: tierCounts.MEDIUM })}</Badge>
             </div>
             <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
               {tx("Adiciona indicadores de profundidade intermediária. Recomendado para cidades médias ou diagnósticos de acompanhamento.")}
@@ -62,7 +62,7 @@ export function IndicadoresChart({
             <div className="flex items-center gap-2 mb-2">
               <Target className="h-4 w-4 text-primary" />
               <span className="font-medium text-primary">{tx('Integral')}</span>
-              <Badge variant="outline" className="ml-auto text-xs">{tierCounts.COMPLETE} ind.</Badge>
+              <Badge variant="outline" className="ml-auto text-xs">{tx("{{v0}} ind.", { v0: tierCounts.COMPLETE })}</Badge>
             </div>
             <p className="text-xs text-primary/80">
               {tx("Análise mais abrangente com todos os indicadores. Ideal para capitais, polos turísticos ou planejamento estratégico.")}
@@ -84,12 +84,12 @@ export function IndicadoresChart({
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {[
-            { name: 'IBGE', desc: 'Demográficos, econômicos e Censo (SIDRA)' },
-            { name: 'CADASTUR', desc: 'Serviços turísticos registrados' },
-            { name: 'DATASUS', desc: 'Saúde e mortalidade' },
-            { name: 'INEP', desc: 'Dados educacionais (IDEB)' },
-            { name: 'STN', desc: 'Dados fiscais municipais' },
-            { name: 'Mapa Turismo', desc: 'Regionalização e categorização' },
+            { name: 'IBGE', desc: tx('Demográficos, econômicos e Censo (SIDRA)') },
+            { name: 'CADASTUR', desc: tx('Serviços turísticos registrados') },
+            { name: 'DATASUS', desc: tx('Saúde e mortalidade') },
+            { name: 'INEP', desc: tx('Dados educacionais (IDEB)') },
+            { name: 'STN', desc: tx('Dados fiscais municipais') },
+            { name: 'Mapa Turismo', desc: tx('Regionalização e categorização') },
           ].map(source => (
             <div key={source.name} className="p-2 rounded bg-background border text-center">
               <span className="font-mono text-xs font-medium text-foreground">{source.name}</span>

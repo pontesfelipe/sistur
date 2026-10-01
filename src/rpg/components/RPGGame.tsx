@@ -168,7 +168,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
                   <span className="truncate">{biomeInfo.name}</span>
                 </h1>
                 <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
-                  Cap. {currentScene.chapter} • {state.choicesMade} decisões
+                  {tx("Cap. {{v0}} • {{v1}} decisões", { v0: currentScene.chapter, v1: state.choicesMade })}
                 </p>
               </div>
             </div>
@@ -247,7 +247,7 @@ export function RPGGame({ onBack }: { onBack: () => void }) {
             >
               <span className="flex items-center gap-2">
                 {tx('📜 Diário da Jornada')}
-                <span className="text-xs font-normal text-muted-foreground/60">({state.history.length} capítulos)</span>
+                <span className="text-xs font-normal text-muted-foreground/60">{tx("({{v0}} capítulos)", { v0: state.history.length })}</span>
               </span>
               {diaryOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>

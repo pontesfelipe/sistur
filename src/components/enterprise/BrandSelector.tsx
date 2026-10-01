@@ -193,7 +193,7 @@ export function BrandSelector({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="independent">Independente (1 unidade)</SelectItem>
+                  <SelectItem value="independent">{tx("Independente (1 unidade)")}</SelectItem>
                   <SelectItem value="chain">{tx("Rede própria")}</SelectItem>
                   <SelectItem value="franchise">{tx("Franquia")}</SelectItem>
                   <SelectItem value="collection">{tx("Coleção / soft brand")}</SelectItem>
@@ -201,7 +201,7 @@ export function BrandSelector({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="brand-site">Site (opcional)</Label>
+              <Label htmlFor="brand-site">{tx("Site (opcional)")}</Label>
               <Input
                 id="brand-site"
                 value={draftWebsite}

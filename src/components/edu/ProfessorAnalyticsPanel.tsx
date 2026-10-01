@@ -39,7 +39,7 @@ function ClassroomBlock({ classroomId, classroomName }: ClassroomBlockProps) {
           {classroomName}
         </CardTitle>
         <CardDescription>
-          {stats.totalAlunos} alunos · {stats.ativos7d} ativos (7d)
+          {tx("{{v0}} alunos · {{v1}} ativos (7d)", { v0: stats.totalAlunos, v1: stats.ativos7d })}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -80,7 +80,7 @@ function ClassroomBlock({ classroomId, classroomName }: ClassroomBlockProps) {
             {atRisk.length > 0 && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium text-destructive">
-                  <AlertTriangle className="h-4 w-4" /> Alunos em risco ({atRisk.length})
+                  <AlertTriangle className="h-4 w-4" /> {tx("Alunos em risco ({{v0}})", { v0: atRisk.length })}
                 </div>
                 <div className="rounded-lg border overflow-x-auto">
                   <Table>
@@ -110,7 +110,7 @@ function ClassroomBlock({ classroomId, classroomName }: ClassroomBlockProps) {
                             </TableCell>
                             <TableCell>
                               {r.fraud_flags > 0 && (
-                                <Badge variant="destructive">{r.fraud_flags} fraude</Badge>
+                                <Badge variant="destructive">{tx("{{v0}} fraude", { v0: r.fraud_flags })}</Badge>
                               )}
                             </TableCell>
                           </TableRow>

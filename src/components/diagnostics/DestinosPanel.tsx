@@ -252,8 +252,8 @@ export function DestinosPanel() {
           </h3>
           <p className="mt-2 text-muted-foreground">
             {searchQuery 
-              ? 'Tente ajustar sua busca.'
-              : 'Comece cadastrando seu primeiro destino turístico.'}
+              ? tx('Tente ajustar sua busca.')
+              : tx('Comece cadastrando seu primeiro destino turístico.')}
           </p>
           {!searchQuery && (
             <Button className="mt-4" onClick={() => setIsFormOpen(true)}>

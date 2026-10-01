@@ -97,7 +97,7 @@ export function ExternalDataQualityPanel() {
                   <Calendar className="h-3 w-3" />
                   {row.last_collected_at
                     ? `Última coleta: ${new Date(row.last_collected_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}`
-                    : 'Sem coleta registrada'}
+                    : tx('Sem coleta registrada')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">

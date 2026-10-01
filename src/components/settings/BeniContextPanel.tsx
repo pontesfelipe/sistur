@@ -210,7 +210,7 @@ export function BeniContextPanel() {
                 {MODEL_OPTIONS.map((m) => (
                   <SelectItem key={m.value} value={m.value}>
                     <div className="flex flex-col">
-                      <span className="font-medium">{m.label}</span>
+                      <span className="font-medium">{tx(String(m.label ?? ""))}</span>
                       <span className="text-xs text-muted-foreground">{m.hint}</span>
                     </div>
                   </SelectItem>

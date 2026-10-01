@@ -52,7 +52,7 @@ export function ChatInput({
           value={input}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder={isListening ? 'Ouvindo...' : 'Pergunte ao Professor Beni... (Enter envia, Shift+Enter quebra linha)'}
+          placeholder={isListening ? 'Ouvindo...' : tx('Pergunte ao Professor Beni... (Enter envia, Shift+Enter quebra linha)')}
           disabled={isLoading}
           className="min-h-[84px] max-h-[260px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
           rows={3}
@@ -81,7 +81,7 @@ export function ChatInput({
               onClick={onToggleVoiceInput}
               disabled={isLoading}
               className={cn('h-8 w-8', isListening && 'animate-pulse')}
-              title={isListening ? 'Parar gravação' : 'Falar'}
+              title={isListening ? tx('Parar gravação') : 'Falar'}
             >
               {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>

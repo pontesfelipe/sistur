@@ -230,7 +230,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
           <CardContent className="py-8 text-center">
             <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
             <p className="text-muted-foreground text-sm">
-              Nenhuma prescrição encontrada para o pilar {pillarFilter}.
+              {tx("Nenhuma prescrição encontrada para o pilar {{v0}}.", { v0: pillarFilter })}
             </p>
           </CardContent>
         </Card>
@@ -257,7 +257,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
                 <div className="text-center pt-2">
                   <Button variant="link" asChild>
                     <Link to="/learning">
-                      Ver todos os {courses.length} cursos
+                      {tx("Ver todos os {{v0}} cursos", { v0: courses.length })}
                       <ChevronRight className="ml-1 h-4 w-4" />
                     </Link>
                   </Button>
@@ -299,7 +299,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
                           variant={rec.status === 'CRÍTICO' ? 'destructive' : 'outline'} 
                           className="text-xs"
                         >
-                          {rec.status}
+                          {tx(String(rec.status ?? ""))}
                         </Badge>
                         <span className="text-xs text-muted-foreground truncate">
                           {rec.indicatorName}
@@ -315,7 +315,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
               <div className="text-center pt-4">
                 <Button variant="link" asChild>
                   <Link to="/learning">
-                    Ver todas as {lives.length} lives
+                    {tx("Ver todas as {{v0}} lives", { v0: lives.length })}
                     <ChevronRight className="ml-1 h-4 w-4" />
                   </Link>
                 </Button>
@@ -348,19 +348,19 @@ function RecommendationItem({ rec, index }: { rec: DisplayRecommendation; index:
             variant={rec.status === 'CRÍTICO' ? 'destructive' : 'secondary'} 
             className="text-xs"
           >
-            {rec.status}
+            {tx(String(rec.status ?? ""))}
           </Badge>
         </div>
         <h4 className="font-medium text-sm">
           {tx(rec.training.title)}
         </h4>
         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-          {rec.reasonTemplate}
+          {tx(String(rec.reasonTemplate ?? ""))}
         </p>
         {rec.training.target_audience && (
           <div className="mt-2">
             <Badge variant="outline" className="text-xs">
-              Público: {rec.training.target_audience}
+              {tx("Público: {{v0}}", { v0: rec.training.target_audience })}
             </Badge>
           </div>
         )}

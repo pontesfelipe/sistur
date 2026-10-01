@@ -103,7 +103,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
               <Card><CardContent className="pt-4 pb-3 text-center">
                 <p className="text-xs text-muted-foreground mb-1">{tx('Tentativas máx')}</p>
                 <p className="text-2xl font-bold">{data.assignment.max_attempts}</p>
-                <p className="text-[10px] text-muted-foreground">Mín. {data.assignment.min_score_pct}%</p>
+                <p className="text-[10px] text-muted-foreground">{tx("Mín. {{v0}}%", { v0: data.assignment.min_score_pct })}</p>
               </CardContent></Card>
             </div>
 
@@ -213,7 +213,7 @@ export function AssignmentProgressDialog({ assignmentId, open, onOpenChange }: P
                       onChange={(e) => setExtraCount(parseInt(e.target.value) || 1)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Aplica a todos os alunos da atividade. Atual: {data.assignment.max_attempts}
+                      {tx("Aplica a todos os alunos da atividade. Atual: {{v0}}", { v0: data.assignment.max_attempts })}
                     </p>
                     <Button
                       className="w-full"

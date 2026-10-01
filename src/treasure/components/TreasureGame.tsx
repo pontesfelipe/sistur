@@ -158,7 +158,7 @@ function ExitCompass({ playerRow, playerCol, map }: { playerRow: number; playerC
   const dist = Math.abs(dr) + Math.abs(dc);
   const angle = Math.atan2(dr, dc) * (180 / Math.PI);
 
-  const distLabel = dist <= 3 ? 'Muito perto!' : dist <= 6 ? 'Perto' : 'Longe';
+  const distLabel = dist <= 3 ? tx('Muito perto!') : dist <= 6 ? 'Perto' : 'Longe';
   const distColor = dist <= 3 ? 'text-emerald-400' : dist <= 6 ? 'text-amber-400' : 'text-slate-400';
 
   return (
@@ -758,7 +758,7 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
                 ? '⏰ O tempo acabou! Você não encontrou a saída a tempo.'
                 : state.riddleErrors >= state.maxRiddleErrors
                 ? '🧩 Muitos erros nos enigmas! O conhecimento é sua melhor ferramenta.'
-                : 'Sua saúde chegou a zero pelas armadilhas ambientais.'}
+                : tx('Sua saúde chegou a zero pelas armadilhas ambientais.')}
             </p>
             <div className="bg-black/30 rounded-2xl p-4 text-xs text-left text-slate-300 space-y-1.5 border border-white/5">
               <p><strong className="text-slate-200">{tx('Pontuação:')}</strong> {state.score}</p>
@@ -793,9 +793,9 @@ export function TreasureGame({ onBack }: { onBack: () => void }) {
             <div className="bg-black/20 rounded-2xl p-4 text-xs text-left text-amber-200 space-y-1.5 border border-amber-600/20">
               <p><strong>{tx('Pontuação:')}</strong> {state.score}</p>
               <p><strong>{tx('Tesouros:')}</strong> {state.treasuresCollected}/{state.totalTreasures}</p>
-              <p><strong>{tx('Enigmas:')}</strong> {state.riddlesSolved} (erros: {state.riddleErrors})</p>
+              <p><strong>{tx('Enigmas:')}</strong> {tx("{{v0}} (erros: {{v1}})", { v0: state.riddlesSolved, v1: state.riddleErrors })}</p>
               <p><strong>{tx('Tempo restante:')}</strong> {Math.floor(state.timeRemaining / 60)}:{(state.timeRemaining % 60).toString().padStart(2, '0')} (+bônus)</p>
-              <p><strong>{tx('Saúde restante:')}</strong> {state.health} (+bônus)</p>
+              <p><strong>{tx('Saúde restante:')}</strong> {tx("{{v0}} (+bônus)", { v0: state.health })}</p>
               <p><strong>{tx('Movimentos:')}</strong> {state.moves}</p>
             </div>
             <div className="flex gap-3">

@@ -255,9 +255,9 @@ const Diagnosticos = () => {
               icon={ClipboardList}
               title={searchQuery || statusFilter !== 'all' ? tx('Nenhum diagnóstico encontrado') : tx('Nenhum diagnóstico cadastrado')}
               description={searchQuery || statusFilter !== 'all'
-                ? 'Tente ajustar seus filtros para encontrar o que procura.'
-                : 'Comece avaliando um destino turístico para gerar insights e planos de ação.'}
-              actionLabel={!searchQuery && statusFilter === 'all' ? 'Criar Primeira Rodada' : undefined}
+                ? tx('Tente ajustar seus filtros para encontrar o que procura.')
+                : tx('Comece avaliando um destino turístico para gerar insights e planos de ação.')}
+              actionLabel={!searchQuery && statusFilter === 'all' ? tx('Criar Primeira Rodada') : undefined}
               actionHref={!searchQuery && statusFilter === 'all' ? '/nova-rodada' : undefined}
             />
           )}

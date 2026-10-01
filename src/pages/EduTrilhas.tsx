@@ -189,8 +189,8 @@ const TrackFormDialog = ({
           </DialogTitle>
           <DialogDescription>
             {mode === 'create' 
-              ? 'Crie uma trilha agrupando treinamentos para um percurso estruturado de capacitação.'
-              : 'Edite os dados da trilha e os treinamentos associados.'}
+              ? tx('Crie uma trilha agrupando treinamentos para um percurso estruturado de capacitação.')
+              : tx('Edite os dados da trilha e os treinamentos associados.')}
           </DialogDescription>
         </DialogHeader>
         
@@ -253,7 +253,7 @@ const TrackFormDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label>Treinamentos da Trilha * ({selectedTrainings.length} selecionados)</Label>
+            <Label>{tx("Treinamentos da Trilha * ({{v0}} selecionados)", { v0: selectedTrainings.length })}</Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -313,8 +313,7 @@ const TrackFormDialog = ({
               <div className="space-y-1">
                 <p className="text-sm font-medium">{tx('Gerar provas finais automaticamente')}</p>
                 <p className="text-xs text-muted-foreground">
-                  Cria uma prova por pilar coberto pelos treinamentos (20 questões, 70% nota mínima, 60 min, até 2 tentativas).
-                  Opcional — você pode gerar depois pelo botão "Gerar provas" no detalhe da trilha.
+                  {tx("Cria uma prova por pilar coberto pelos treinamentos (20 questões, 70% nota mínima, 60 min, até 2 tentativas). Opcional — você pode gerar depois pelo botão \"Gerar provas\" no detalhe da trilha.")}
                 </p>
               </div>
             </label>
@@ -530,7 +529,7 @@ const TrackCard = ({ track, index, locked }: { track: EduTrack; index: number; l
         {totalTrainings > 0 && (
           <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
             <GraduationCap className="h-4 w-4" />
-            <span>{totalTrainings} treinamentos</span>
+            <span>{tx("{{v0}} treinamentos", { v0: totalTrainings })}</span>
           </div>
         )}
         
@@ -761,7 +760,7 @@ export const EduTrilhaDetalhe = () => {
                   <AlertDialogHeader>
                     <AlertDialogTitle>{tx("Excluir trilha?")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Esta ação não pode ser desfeita. A trilha "{track.name}" será permanentemente excluída.
+                      {tx("Esta ação não pode ser desfeita. A trilha \"{{v0}}\" será permanentemente excluída.", { v0: track.name })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -851,7 +850,7 @@ export const EduTrilhaDetalhe = () => {
             <div className="mt-6">
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="font-medium">{tx('Seu progresso na trilha')}</span>
-                <span className="text-muted-foreground">{progressPercentage}% concluído</span>
+                <span className="text-muted-foreground">{tx("{{v0}}% concluído", { v0: progressPercentage })}</span>
               </div>
               <Progress value={progressPercentage} className="h-3" />
               {isTrackComplete && (

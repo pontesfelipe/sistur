@@ -107,7 +107,7 @@ export default function TutorialDetail() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">{tx("Progresso do tópico")}</span>
-            <span className="font-medium">{totalDone}/{topic.subSteps.length} passos ({progressPct}%)</span>
+            <span className="font-medium">{tx("{{v0}}/{{v1}} passos ({{v2}}%)", { v0: totalDone, v1: topic.subSteps.length, v2: progressPct })}</span>
           </div>
           <Progress value={progressPct} className="h-2" />
         </div>
@@ -243,7 +243,7 @@ export default function TutorialDetail() {
                       >
                         <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                         <span className="text-sm font-semibold text-amber-800 dark:text-amber-300 flex-1">
-                          Dicas ({subStep.tips.length})
+                          {tx("Dicas ({{v0}})", { v0: subStep.tips.length })}
                         </span>
                         {expandedTips ? (
                           <ChevronUp className="h-4 w-4 text-amber-600" />
@@ -282,7 +282,7 @@ export default function TutorialDetail() {
                   className="hidden sm:flex"
                 >
                   <CheckCircle2 className={cn('h-4 w-4 mr-1', stepDone && 'text-primary')} />
-                  {stepDone ? 'Concluído' : 'Marcar como concluído'}
+                  {stepDone ? 'Concluído' : tx('Marcar como concluído')}
                 </Button>
               </div>
 
@@ -308,7 +308,7 @@ export default function TutorialDetail() {
                     {tx("Quer experimentar agora?")}
                   </div>
                   <Button variant="outline" size="sm" onClick={() => navigate(originalStep.step.route!)}>
-                    Ir para {originalStep.step.title}
+                    {tx("Ir para {{v0}}", { v0: originalStep.step.title })}
                   </Button>
                 </div>
               </Card>

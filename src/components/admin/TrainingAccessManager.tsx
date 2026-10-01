@@ -148,7 +148,7 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
         <div>
           <h3 className="font-medium">{tx("Controle de Acesso")}</h3>
           <p className="text-sm text-muted-foreground">
-            Gerencie quem pode acessar: {trainingTitle}
+            {tx("Gerencie quem pode acessar: {{v0}}", { v0: trainingTitle })}
           </p>
         </div>
       </div>
@@ -353,13 +353,13 @@ export function TrainingAccessManager({ trainingId, trainingTitle }: TrainingAcc
                 {orgAccesses.length > 0 && (
                   <Badge variant="outline" className={ACCESS_TYPE_INFO.org.color}>
                     <Building2 className="h-3 w-3 mr-1" />
-                    {orgAccesses.length} organização(ões)
+                    {tx("{{v0}} organização(ões)", { v0: orgAccesses.length })}
                   </Badge>
                 )}
                 {userAccesses.length > 0 && (
                   <Badge variant="outline" className={ACCESS_TYPE_INFO.user.color}>
                     <User className="h-3 w-3 mr-1" />
-                    {userAccesses.length} usuário(s)
+                    {tx("{{v0}} usuário(s)", { v0: userAccesses.length })}
                   </Badge>
                 )}
                 {!isPublic && orgAccesses.length === 0 && userAccesses.length === 0 && (

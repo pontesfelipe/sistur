@@ -157,7 +157,7 @@ const Auth = () => {
     // 2) Try reaching Supabase auth health endpoint directly
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
     if (!supabaseUrl) {
-      return { kind: 'misconfig', detail: 'VITE_SUPABASE_URL ausente' };
+      return { kind: 'misconfig', detail: tx('VITE_SUPABASE_URL ausente') };
     }
     try {
       const ctrl = new AbortController();

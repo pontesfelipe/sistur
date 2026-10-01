@@ -232,7 +232,7 @@ const EduTrainingDetalhe = () => {
                 {training.duration_minutes && (
                   <Badge variant="outline" className="text-muted-foreground">
                     <Clock className="h-3 w-3 mr-1" />
-                    {training.duration_minutes} min
+                    {tx("{{v0}} min", { v0: training.duration_minutes })}
                   </Badge>
                 )}
                 {ingestionMeta?.viewCount && (
@@ -260,7 +260,7 @@ const EduTrainingDetalhe = () => {
                   {tx('Módulos do Curso')}
                 </CardTitle>
                 <CardDescription>
-                  {modules.length} módulos estruturados para o aprendizado
+                  {tx("{{v0}} módulos estruturados para o aprendizado", { v0: modules.length })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -374,7 +374,7 @@ const EduTrainingDetalhe = () => {
                   <Separator />
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{tx('Duração')}</span>
-                    <span className="font-medium">{training.duration_minutes} min</span>
+                    <span className="font-medium">{tx("{{v0}} min", { v0: training.duration_minutes })}</span>
                   </div>
                 </>
               )}

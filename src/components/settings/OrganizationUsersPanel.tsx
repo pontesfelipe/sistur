@@ -346,8 +346,8 @@ export function OrganizationUsersPanel() {
                 <DialogTitle>{tx("Adicionar Usuário à Organização")}</DialogTitle>
                 <DialogDescription>
                   {isPendingOrganizationSelected
-                    ? 'Usuários pendentes são gerenciados pelo fluxo de aprovação.'
-                    : 'Selecione um usuário para adicionar a esta organização'}
+                    ? tx('Usuários pendentes são gerenciados pelo fluxo de aprovação.')
+                    : tx('Selecione um usuário para adicionar a esta organização')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -511,7 +511,7 @@ export function OrganizationUsersPanel() {
         {selectedOrg && (
           <div className="flex items-center justify-between pt-4 border-t">
             <span className="text-sm text-muted-foreground">
-              {filteredUsers.length} usuário(s) na organização
+              {tx("{{v0}} usuário(s) na organização", { v0: filteredUsers.length })}
             </span>
             <div className="flex gap-2">
               {['ADMIN', 'ANALYST', 'VIEWER'].map(role => {

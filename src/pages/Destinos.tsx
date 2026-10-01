@@ -79,7 +79,7 @@ const Destinos = () => {
       setDeleteId(null);
     } catch (err) {
       // Keep the dialog open so the user sees the action didn't succeed.
-      toast.error(err instanceof Error ? err.message : 'Não foi possível excluir o destino.');
+      toast.error(err instanceof Error ? err.message : tx('Não foi possível excluir o destino.'));
     }
   };
 
@@ -204,8 +204,8 @@ const Destinos = () => {
           </h3>
           <p className="mt-2 text-muted-foreground">
             {searchQuery 
-              ? 'Tente ajustar sua busca.'
-              : 'Comece cadastrando seu primeiro destino turístico.'}
+              ? tx('Tente ajustar sua busca.')
+              : tx('Comece cadastrando seu primeiro destino turístico.')}
           </p>
           {!searchQuery && canMutate && (
             <Button className="mt-4" onClick={() => setIsFormOpen(true)}>

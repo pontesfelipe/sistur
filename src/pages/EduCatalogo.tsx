@@ -144,7 +144,7 @@ const EduCatalogo = () => {
             </Badge>
             {training.curriculum_level && (
               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${LEVEL_COLORS[training.curriculum_level]?.badge || ''}`}>
-                Nível {training.curriculum_level}
+                {tx("Nível {{v0}}", { v0: training.curriculum_level })}
               </span>
             )}
             {(() => {
@@ -182,7 +182,7 @@ const EduCatalogo = () => {
             {Array.isArray(training.modules) && training.modules.length > 0 && (
               <Badge variant="secondary" className="text-xs">
                 <FileText className="h-3 w-3 mr-1" />
-                {training.modules.length} módulos
+                {tx("{{v0}} módulos", { v0: training.modules.length })}
               </Badge>
             )}
           </div>
@@ -332,7 +332,7 @@ const EduCatalogo = () => {
                   <SelectItem value="all">{tx('Todos os níveis')}</SelectItem>
                   {[1, 2, 3, 4].map(lvl => (
                     <SelectItem key={lvl} value={String(lvl)}>
-                      Nível {lvl} — {LEVEL_SHORT_NAMES[lvl]}
+                      {tx("Nível {{v0}} — {{v1}}", { v0: lvl, v1: LEVEL_SHORT_NAMES[lvl] })}
                     </SelectItem>
                   ))}
                   <SelectItem value="none">{tx('Sem nível')}</SelectItem>
@@ -367,13 +367,13 @@ const EduCatalogo = () => {
                   <SelectItem value="content">
                     <span className="flex items-center gap-2">
                       <Video className="h-4 w-4 text-primary" />
-                      Com conteúdo ({contentCount})
+                      {tx("Com conteúdo ({{v0}})", { v0: contentCount })}
                     </span>
                   </SelectItem>
                   <SelectItem value="wip">
                     <span className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      Em progresso ({wipCount})
+                      {tx("Em progresso ({{v0}})", { v0: wipCount })}
                     </span>
                   </SelectItem>
                 </SelectContent>
@@ -487,8 +487,7 @@ const EduCatalogo = () => {
                         </div>
                       )}
                     </div>
-                  ) : (
-                    // Flat view when filtered by specific level
+                  ) : ( // Flat view when filtered by specific level
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       {filteredTrainings.map((training, index) => renderTrainingCard(training as EduTraining & { curriculum_level?: number | null }, index))}
                     </div>
@@ -498,9 +497,9 @@ const EduCatalogo = () => {
                     icon={GraduationCap}
                     title={trainings?.length === 0 ? tx('Nenhum treinamento cadastrado') : tx('Nenhum treinamento encontrado')}
                     description={trainings?.length === 0 
-                      ? 'Os treinamentos serão importados em breve. Enquanto isso, configure seu perfil de aprendizado.'
-                      : 'Tente ajustar os filtros de busca para encontrar o conteúdo desejado.'}
-                    actionLabel={trainings?.length === 0 ? 'Configurar Perfil' : undefined}
+                      ? tx('Os treinamentos serão importados em breve. Enquanto isso, configure seu perfil de aprendizado.')
+                      : tx('Tente ajustar os filtros de busca para encontrar o conteúdo desejado.')}
+                    actionLabel={trainings?.length === 0 ? tx('Configurar Perfil') : undefined}
                     actionHref={trainings?.length === 0 ? '/edu/perfil' : undefined}
                   />
                 )}
