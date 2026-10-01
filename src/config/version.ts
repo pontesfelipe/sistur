@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 23,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.23.2",
+    date: "2026-10-01",
+    type: "patch" as const,
+    changes: [
+      "Idiomas: revisão completa das 40 páginas em inglês — cerca de 3.200 textos novos traduzidos (Ajuda, Perguntas frequentes, Assinatura, Planos, Tutorial, Jogos, Recompensas).",
+      "Idiomas: rede de segurança que traduz na tela qualquer texto fixo que tenha tradução, inclusive listas de ajuda e perguntas frequentes.",
+      "Idiomas: datas em todas as telas seguem o idioma escolhido; selos Crítico/Atenção/Adequado traduzidos em todos os cartões.",
+    ],
+  },
   {
     version: "2.23.1",
     date: "2026-10-01",
