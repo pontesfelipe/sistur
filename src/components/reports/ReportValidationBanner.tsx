@@ -543,7 +543,7 @@ export function ReportValidationBanner({
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">
                           <span className="font-medium text-foreground">{tx('Problema:')}</span> a IA citou{' '}
-                          <span className="line-through">{c.from}</span>{tx(", divergente da tabela oficial.")}
+                          <span className="line-through">{c.from}</span>, divergente da tabela oficial.
                         </div>
                         <div className="text-xs text-muted-foreground">
                           <span className="font-medium text-foreground">{tx('Resolução:')}</span> {tx("valor substituído por")} <span className="text-foreground font-medium">{c.to}</span>{' '}

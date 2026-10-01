@@ -311,7 +311,7 @@ export default function Configuracoes() {
             {isAdmin && <PendingApprovalsPanel />}
             {isAdmin && <OrganizationManagement />}
             {isAdmin && <OrganizationUsersPanel />}
-            {isAdmin ? <UserManagement /> {tx(": isOrgAdmin ?")} <OrgAdminUsersPanel /> : (
+            {isAdmin ? <UserManagement /> : isOrgAdmin ? <OrgAdminUsersPanel /> : (
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-center text-muted-foreground">

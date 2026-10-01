@@ -467,7 +467,7 @@ export default function Metodologia() {
               está fora do cache, o sistema tenta scraping sob demanda via Firecrawl em fontes
               agregadoras (G1 Eleições, Teleco) — porém TSE e Anatel oficiais bloqueiam acesso
               programático (SPA com hash routing e painéis Leaflet), então a maioria dos destinos
-              cai no <strong>{tx("fallback manual")}</strong>{tx(": o indicador aparece no painel de pré-preenchimento como linha MANUAL com valor vazio, badge 🌀 MST e link direto para a fonte oficial. O usuário insere o valor e o sistema persiste como fonte oficial validada. Disparado apenas quando")} <em>{tx("Expandir com Mandala")}</em> está ativo no
+              cai no <strong>{tx("fallback manual")}</strong>: o indicador aparece no painel de pré-preenchimento como linha MANUAL com valor vazio, badge 🌀 MST e link direto para a fonte oficial. O usuário insere o valor e o sistema persiste como fonte oficial validada. Disparado apenas quando <em>{tx("Expandir com Mandala")}</em> está ativo no
               diagnóstico (zero custo extra para rodadas sem opt-in).
             </p>
             <p className="text-xs text-muted-foreground">
@@ -1108,7 +1108,7 @@ export default function Metodologia() {
                 <ul className="text-sm space-y-1.5">
                   <li className="flex items-start gap-2"><span className="text-green-600">📊</span> <strong>{tx("IBGE Agregados")}</strong>: População, PIB per capita, Densidade demográfica e Área territorial (Censo 2022, tabela 4714)</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">🏘️</span> <strong>IBGE SIDRA (Censo 2010)</strong>: Abastecimento de água (rede geral %) e Coleta de lixo domiciliar (%) — tabela 3217</li>
-                  <li className="flex items-start gap-2"><span className="text-green-600">📈</span> <strong>{tx("IBGE Pesquisas")}</strong>{tx(": IDH Municipal, Índice de Gini, Incidência de pobreza")}</li>
+                  <li className="flex items-start gap-2"><span className="text-green-600">📈</span> <strong>{tx("IBGE Pesquisas")}</strong>: IDH Municipal, Índice de Gini, Incidência de pobreza</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">🏥</span> <strong>{tx("DATASUS")}</strong>: Leitos hospitalares por habitante, Cobertura de saúde (estabelecimentos), Taxa de mortalidade infantil, Mortalidade geral por mil habitantes</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">📚</span> <strong>{tx("INEP")}</strong>: IDEB (Índice de Desenvolvimento da Educação Básica)</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">💰</span> <strong>{tx("STN / Tesouro Nacional")}</strong>: Receita própria per capita, Despesa com turismo (R$ milhões)</li>
@@ -1127,7 +1127,7 @@ export default function Metodologia() {
                 <p className="text-sm text-muted-foreground">{tx("Confiabilidade: 1/5 ⭐ — Sem API pública disponível. Requer inserção pelo operador.")}</p>
                 <ul className="text-sm space-y-1">
                   <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>{tx("Taxa de Escolarização")}</strong>: Dados disponíveis via Censo Escolar (coleta manual)</li>
-                  <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>{tx("Indicadores locais")}</strong>{tx(": Saneamento, segurança, acessibilidade e demais indicadores que dependem de levantamento de campo")}</li>
+                  <li className="flex items-center gap-2"><span className="text-amber-600">✏️</span> <strong>{tx("Indicadores locais")}</strong>: Saneamento, segurança, acessibilidade e demais indicadores que dependem de levantamento de campo</li>
                 </ul>
               </div>
             </div>
@@ -1138,7 +1138,7 @@ export default function Metodologia() {
                 {tx("Sobre o CADASTUR")}
               </AlertTitle>
               <AlertDescription className="text-blue-600 dark:text-blue-300">
-                {tx("A API transacional do CADASTUR é")} <strong>{tx("restrita a órgãos públicos federais")}</strong>{tx(", mas o SISTUR aproveita os")} <strong>{tx("datasets oficiais abertos")}</strong> {tx("publicados em dados.gov.br para ingestão periódica de guias e agências. Quando o arquivo do trimestre não está acessível ou não contém o município consultado, o indicador permanece fora do pré-preenchimento automático.")}
+                {tx("A API transacional do CADASTUR é")} <strong>{tx("restrita a órgãos públicos federais")}</strong>, mas o SISTUR aproveita os <strong>{tx("datasets oficiais abertos")}</strong> {tx("publicados em dados.gov.br para ingestão periódica de guias e agências. Quando o arquivo do trimestre não está acessível ou não contém o município consultado, o indicador permanece fora do pré-preenchimento automático.")}
               </AlertDescription>
             </Alert>
 
@@ -1299,7 +1299,7 @@ export default function Metodologia() {
 
               <h4>{tx("Garantias comuns aos três templates")}</h4>
               <ul>
-                <li>{tx("Política")} <strong>{tx("Zero Alucinação")}</strong>{tx(": sem invenção de números, anos ou fontes.")}</li>
+                <li>{tx("Política")} <strong>{tx("Zero Alucinação")}</strong>: sem invenção de números, anos ou fontes.</li>
                 <li>{tx("Auto-correção determinística contra")} <code>{tx("assessment_indicator_audit")}</code> (divergência &gt; 5%).</li>
                 <li>Validação por agente IA (gemini-2.5-pro) sobre o texto pós-correção.</li>
                 <li>Banner de validação cruzada sempre exibido (limpo, com avisos ou auto-corrigido).</li>
@@ -1318,7 +1318,7 @@ export default function Metodologia() {
                 provedores diferentes em um mesmo relatório).
               </p>
               <p>
-                {tx("No template")} <strong>{tx("Completo")}</strong>{tx(", o pipeline roda em duas fases:")}
+                {tx("No template")} <strong>{tx("Completo")}</strong>, o pipeline roda em duas fases:
                 <strong> {tx("Fase 1")}</strong> dispara três chamadas paralelas (uma por pilar
                 I-RA, I-OE, I-AO), cada uma restrita ao seu escopo; <strong>{tx("Fase 2")}</strong>
                 gera o envelope (introdução, ficha técnica, metodologia, alertas IGMA,
@@ -1342,7 +1342,7 @@ export default function Metodologia() {
               </p>
               <p>
                 {tx("Durante a geração, o card \"Plano de Desenvolvimento\" exibe")}
-                <strong> {tx("pré-visualização ao vivo")}</strong>{tx(": a edge function persiste progressivamente o markdown acumulado em")}
+                <strong> {tx("pré-visualização ao vivo")}</strong>: a edge function persiste progressivamente o markdown acumulado em
                 <code>{tx("report_jobs.partial_content")}</code> a cada subseção concluída
                 (RA → OE → AO → envelope), e a tela renderiza esse conteúdo parcial
                 em tempo real, com barra de progresso e badge animado. Quando o job

@@ -94,7 +94,7 @@ export function BusinessRulesPanel() {
             <FlowStep icon={CreditCard} title={tx("Plano pago")} desc="Assinatura desbloqueia módulos completos" tone="accent" />
           </div>
           <p className="text-xs text-muted-foreground">
-            Não há trial por tempo (7 dias). O acesso de avaliação é por <strong>{tx("consumo")}</strong>{tx(": termina quando o usuário conclui o curso base e esgota as perguntas gratuitas — sem data de expiração.")}
+            Não há trial por tempo (7 dias). O acesso de avaliação é por <strong>{tx("consumo")}</strong>: termina quando o usuário conclui o curso base e esgota as perguntas gratuitas — sem data de expiração.
           </p>
         </CardContent>
       </Card>

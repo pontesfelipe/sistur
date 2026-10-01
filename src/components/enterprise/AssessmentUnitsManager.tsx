@@ -100,7 +100,7 @@ export function AssessmentUnitsManager({
           {tx("Unidades do diagnóstico")}
         </CardTitle>
         <CardDescription>
-          {tx("Adicione um município por unidade do empreendimento. O diagnóstico será")} <strong>{tx("único")}</strong>{tx(", mas a coleta e a análise serão feitas por unidade — refletindo as diferenças de contexto de cada localidade.")}
+          {tx("Adicione um município por unidade do empreendimento. O diagnóstico será")} <strong>{tx("único")}</strong>, mas a coleta e a análise serão feitas por unidade — refletindo as diferenças de contexto de cada localidade.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -203,7 +203,7 @@ export default function Subscription() {
               <div className="flex items-center gap-3 mb-2">
                 {isCancelled ? <Ban className="h-6 w-6 text-muted-foreground" />
                   : hasSubscription || isPaidPlan ? <Crown className="h-6 w-6 text-emerald-400" />
-                  {tx(": inTrial ?")} <Sparkles className="h-6 w-6 text-amber-400" />
+                  : inTrial ? <Sparkles className="h-6 w-6 text-amber-400" />
                   : <AlertTriangle className="h-6 w-6 text-primary" />}
                 <h2 className="text-xl font-bold">{headline}</h2>
                 <span className={cn(

@@ -30,7 +30,7 @@ const statusColors: Record<string, string> = {
 };
 
 const statusIcons: Record<string, React.ReactNode> = {
-  pass: <CheckCircle2 className="h-4 w-4 text-green-500" />{tx(", fail:")} <XCircle className="h-4 w-4 text-red-500" />{tx(", warning:")} <AlertTriangle className="h-4 w-4 text-yellow-500" />,
+  pass: <CheckCircle2 className="h-4 w-4 text-green-500" />, fail: <XCircle className="h-4 w-4 text-red-500" />, warning: <AlertTriangle className="h-4 w-4 text-yellow-500" />,
 };
 
 export function HealthCheckPanel() {

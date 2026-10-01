@@ -437,7 +437,7 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
                 </h2>
                 
                 <p style={{ fontSize: '14px', color: '#334155', lineHeight: 1.6, maxWidth: '500px' }}>
-                  {tx("concluiu com êxito o curso")} <span style={{ fontWeight: 600, color: '#1a365d' }}>{courseTitle}</span>{tx(", com carga horária de")} <strong>{workloadHours} hora{workloadHours !== 1 ? 's' : ''}</strong>{tx(", na área de")} <strong>{getPillarName(coursePillar)}</strong>,
+                  {tx("concluiu com êxito o curso")} <span style={{ fontWeight: 600, color: '#1a365d' }}>{courseTitle}</span>, com carga horária de <strong>{workloadHours} hora{workloadHours !== 1 ? 's' : ''}</strong>, na área de <strong>{getPillarName(coursePillar)}</strong>,
                   conforme registro no Sistema Integrado de Suporte para Turismo em Regiões (SISTUR).
                 </p>
                 <p style={{ fontSize: '10px', color: '#94a3b8', maxWidth: '500px', lineHeight: 1.4 }}>
