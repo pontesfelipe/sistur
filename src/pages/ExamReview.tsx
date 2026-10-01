@@ -18,6 +18,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { useExamReview } from '@/hooks/useExamHistory';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const ExamReview = () => {
   const { attemptId } = useParams<{ attemptId: string }>();
@@ -70,7 +71,7 @@ const ExamReview = () => {
                   {isPending ? tx('Aguardando Correção') : isPassed ? tx('Aprovado') : tx('Reprovado')}
                 </CardTitle>
                 <CardDescription>
-                  {review.submitted_at && `Realizada em ${new Date(review.submitted_at).toLocaleDateString('pt-BR', {
+                  {review.submitted_at && `Realizada em ${new Date(review.submitted_at).toLocaleDateString(getIntlLocale(), {
                     day: '2-digit', month: '2-digit', year: 'numeric',
                     hour: '2-digit', minute: '2-digit',
                   })}`}

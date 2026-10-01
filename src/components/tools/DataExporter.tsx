@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 import { tx } from "@/i18n/t";
+import { getIntlLocale } from '@/i18n/dateLocale';
 type ExportType = 'assessments' | 'destinations' | 'indicators' | 'courses' | 'issues' | 'users';
 
 function downloadCsv(data: Record<string, unknown>[], filename: string) {
@@ -94,7 +95,7 @@ export function DataExporter() {
           const termsMap = new Map<string, any>();
           (termsRes.data || []).forEach((t: any) => termsMap.set(t.user_id, t));
 
-          const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString('pt-BR') : '';
+          const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString(getIntlLocale()) : '';
 
           const rows = activeUsers.map((u: any) => {
             const license = licensesMap.get(u.user_id);

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import { tx } from "@/i18n/t";
+import { getIntlLocale } from '@/i18n/dateLocale';
 interface PillarScore {
   assessment_id: string;
   pillar: string;
@@ -359,7 +360,7 @@ export function CycleMonitor() {
                       <div className="text-right">
                         <p className="font-medium">{formatScore(item.currentScore)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(item.calculatedAt).toLocaleDateString('pt-BR')}
+                          {new Date(item.calculatedAt).toLocaleDateString(getIntlLocale())}
                         </p>
                       </div>
                     </div>
@@ -381,7 +382,7 @@ export function CycleMonitor() {
                           {getEvolutionBadge(item.evolutionState)}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {getPillarLabel(item.pillar)} • {new Date(item.calculatedAt).toLocaleDateString('pt-BR')}
+                          {getPillarLabel(item.pillar)} • {new Date(item.calculatedAt).toLocaleDateString(getIntlLocale())}
                         </p>
                       </div>
                     </div>

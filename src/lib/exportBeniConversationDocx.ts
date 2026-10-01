@@ -1,8 +1,9 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 export async function exportBeniConversationDocx(title: string, messages: { role: string; content: string }[]) {
-  const date = new Date().toLocaleDateString('pt-BR');
+  const date = new Date().toLocaleDateString(getIntlLocale());
   const children: Paragraph[] = [
     new Paragraph({ children: [new TextRun({ text: 'SISTUR — Professor Beni', bold: true, size: 20 })] }),
     new Paragraph({ text: title, heading: HeadingLevel.HEADING_1 }),

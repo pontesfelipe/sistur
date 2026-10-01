@@ -3,6 +3,8 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 import "./i18n";
+import { initDomTranslator } from "./i18n/domTranslator";
+initDomTranslator();
 import { LanguageRoot } from "./i18n/LanguageRoot";
 
 createRoot(document.getElementById("root")!).render(

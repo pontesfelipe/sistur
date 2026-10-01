@@ -14,6 +14,7 @@ import {
   Legend,
   CartesianGrid,
 } from 'recharts';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface Props {
   destinationId: string;
@@ -63,7 +64,7 @@ export function PillarTrendPanel({ destinationId, diagnosticType, currentAssessm
         const dt = a.calculated_at || a.created_at;
         const row: Record<string, any> = {
           assessmentId: a.id,
-          label: new Date(dt).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }),
+          label: new Date(dt).toLocaleDateString(getIntlLocale(), { month: 'short', year: '2-digit' }),
           title: a.title,
           isCurrent: a.id === currentAssessmentId,
         };

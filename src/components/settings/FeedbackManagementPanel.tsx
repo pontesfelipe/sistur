@@ -34,6 +34,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const statusConfig: Record<UserFeedback['status'], { label: string; icon: React.ElementType; color: string }> = {
   pending: { label: tx('Pendente'), icon: Clock, color: 'bg-gray-500/20 text-gray-700 border-gray-500/30' },
@@ -133,7 +134,7 @@ function FeedbackItem({ feedback, onUpdate }: { feedback: UserFeedback; onUpdate
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {new Date(feedback.created_at).toLocaleDateString('pt-BR', { 
+              {new Date(feedback.created_at).toLocaleDateString(getIntlLocale(), { 
                 day: '2-digit', 
                 month: 'short', 
                 year: 'numeric',

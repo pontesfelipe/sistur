@@ -147,7 +147,7 @@ export function IGMAWarningsPanel({
             <div className="flex-1">
               <p className="text-sm font-medium">{tx('Próxima Revisão Recomendada')}</p>
               <p className="text-sm text-muted-foreground">
-                {format(new Date(nextReviewRecommendedAt), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() })}
+                {format(new Date(nextReviewRecommendedAt), tx("dd 'de' MMMM 'de' yyyy"), { locale: getDateLocale() })}
               </p>
             </div>
             <Badge variant="outline" className="text-xs">

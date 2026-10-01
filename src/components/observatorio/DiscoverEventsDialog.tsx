@@ -148,7 +148,7 @@ export function DiscoverEventsDialog({ orgId, year, disabled, destinationId }: P
                           {c.category && <Badge variant="secondary" className="text-[10px] capitalize">{c.category}</Badge>}
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {format(new Date(c.start_date + "T00:00:00"), "dd 'de' MMM", { locale: getDateLocale() })} – {format(new Date(c.end_date + "T00:00:00"), "dd 'de' MMM yyyy", { locale: getDateLocale() })}
+                          {format(new Date(c.start_date + "T00:00:00"), tx("dd 'de' MMM"), { locale: getDateLocale() })} – {format(new Date(c.end_date + "T00:00:00"), tx("dd 'de' MMM yyyy"), { locale: getDateLocale() })}
                         </p>
                         {c.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{c.description}</p>}
                         {c.source_url && (

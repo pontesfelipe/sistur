@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, ShieldAlert, Search } from "lucide-react";
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const LEVEL_COLOR: Record<string, string> = {
   bronze: "#CD7F32",
@@ -97,11 +98,11 @@ export default function VerificarCertificado() {
               <div className="grid grid-cols-2 gap-3 text-sm pt-3 border-t">
                 <div>
                   <p className="text-muted-foreground">{tx('Emitido em')}</p>
-                  <p className="font-medium">{new Date(cert.issued_at).toLocaleDateString("pt-BR")}</p>
+                  <p className="font-medium">{new Date(cert.issued_at).toLocaleDateString(getIntlLocale())}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">{tx('Válido até')}</p>
-                  <p className="font-medium">{new Date(cert.valid_until).toLocaleDateString("pt-BR")}</p>
+                  <p className="font-medium">{new Date(cert.valid_until).toLocaleDateString(getIntlLocale())}</p>
                 </div>
                 <div className="col-span-2">
                   <p className="text-muted-foreground">{tx('Código de verificação')}</p>

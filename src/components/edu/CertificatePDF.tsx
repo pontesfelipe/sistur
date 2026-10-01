@@ -39,7 +39,7 @@ export const CertificatePDF = forwardRef<CertificatePDFRef, CertificatePDFProps>
   const printRef = useRef<HTMLDivElement>(null);
   const verifyUrl = `${window.location.origin}/verificar-certificado/${verificationCode}`;
   
-  const formattedDate = format(new Date(issuedAt), "dd 'de' MMMM 'de' yyyy", { locale: getDateLocale() });
+  const formattedDate = format(new Date(issuedAt), tx("dd 'de' MMMM 'de' yyyy"), { locale: getDateLocale() });
   const workloadHours = Math.round(workloadMinutes / 60);
 
   const getPillarName = (pillar: string) => {

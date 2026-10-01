@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Coins, Infinity as InfinityIcon, Gift, Search, Ban, Plus, ArrowUpDown } from 'lucide-react';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 type SortField = 'name' | 'org' | 'used' | 'user_credits' | 'org_credits' | 'status';
 interface SortState { field: SortField; dir: 'asc' | 'desc' }
@@ -67,7 +68,7 @@ interface UnlimitedRow {
   created_at: string;
 }
 
-const fmtDate = (v?: string | null) => (v ? new Date(v).toLocaleDateString('pt-BR') : '—');
+const fmtDate = (v?: string | null) => (v ? new Date(v).toLocaleDateString(getIntlLocale()) : '—');
 
 export function BeniCreditsPanel() {
   const qc = useQueryClient();

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const CANCELLATION_REASONS = [
   'Custo elevado',
@@ -56,7 +57,7 @@ export function CancelSubscriptionDialog({
       toast.success(
         isTrial
           ? tx('Trial cancelado com sucesso.')
-          : `Plano cancelado. Acesso mantido até ${expiresAt ? new Date(expiresAt).toLocaleDateString('pt-BR') : 'o fim do período'}.`,
+          : `Plano cancelado. Acesso mantido até ${expiresAt ? new Date(expiresAt).toLocaleDateString(getIntlLocale()) : 'o fim do período'}.`,
       );
       onCancelled();
       onOpenChange(false);

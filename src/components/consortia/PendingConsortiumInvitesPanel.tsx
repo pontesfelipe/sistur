@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Network, Check, X, Loader2, Info } from "lucide-react";
 
 import { tx } from "@/i18n/t";
+import { getIntlLocale } from '@/i18n/dateLocale';
 /**
  * Bloco para `/configuracoes` mostrando convites de consórcio pendentes
  * direcionados à organização do usuário. Apenas ORG_ADMIN da org deve interagir,
@@ -52,7 +53,7 @@ export function PendingConsortiumInvitesPanel() {
                 <p className="text-xs text-muted-foreground mt-1">{invite.consortia.description}</p>
               )}
               <p className="text-[10px] text-muted-foreground mt-1">
-                Convite recebido em {new Date(invite.invited_at).toLocaleDateString("pt-BR")}
+                Convite recebido em {new Date(invite.invited_at).toLocaleDateString(getIntlLocale())}
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">

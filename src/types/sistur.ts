@@ -271,7 +271,7 @@ export function getLegacySeverityFromScore(score: number): 'CRITICO' | 'MODERADO
  * Portuguese term (Crítico / Atenção / Adequado), never the legacy enum key.
  */
 export function getSeverityLabel(severity: Severity): string {
-  return SEVERITY_INFO[severity].label;
+  return tx(SEVERITY_INFO[severity]?.label ?? String(severity));
 }
 
 // Territorial interpretation metadata

@@ -44,6 +44,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useAllExamAttempts, useAllExamAppeals, useResolveAppeal } from '@/hooks/useExamHistory';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 export function ExamManagementPanel() {
   const [activeTab, setActiveTab] = useState('attempts');
@@ -180,7 +181,7 @@ export function ExamManagementPanel() {
                         <TableCell className="font-medium">{a.user_name}</TableCell>
                         <TableCell className="max-w-xs truncate text-sm">{a.course_title}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {a.submitted_at ? new Date(a.submitted_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '—'}
+                          {a.submitted_at ? new Date(a.submitted_at).toLocaleDateString(getIntlLocale(), { day: '2-digit', month: '2-digit', year: '2-digit' }) : '—'}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
@@ -226,7 +227,7 @@ export function ExamManagementPanel() {
                       <TableRow key={appeal.id}>
                         <TableCell className="font-medium">{appeal.user_name}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {new Date(appeal.created_at).toLocaleDateString('pt-BR')}
+                          {new Date(appeal.created_at).toLocaleDateString(getIntlLocale())}
                         </TableCell>
                         <TableCell className="max-w-xs">
                           <p className="text-sm line-clamp-2">{tx(String(appeal.reason ?? ""))}</p>

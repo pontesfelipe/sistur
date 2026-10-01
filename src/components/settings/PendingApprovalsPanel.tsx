@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { UserPlus, Check, X, Clock, Loader2 } from 'lucide-react';
 import { approvalRoles, defaultRoleForSystem, ROLE_LABELS } from '@/lib/rbac';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface PendingUser {
   id: string;
@@ -163,7 +164,7 @@ export function PendingApprovalsPanel() {
                       {user.system_access || 'Não definido'}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
-                      Solicitado em {new Date(user.approval_requested_at).toLocaleDateString('pt-BR')}
+                      Solicitado em {new Date(user.approval_requested_at).toLocaleDateString(getIntlLocale())}
                     </span>
                   </div>
                 </div>

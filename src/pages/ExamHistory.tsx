@@ -52,6 +52,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useExamHistory, useExamAppeals, useExamAppealMutations } from '@/hooks/useExamHistory';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const ExamHistory = () => {
   const navigate = useNavigate();
@@ -218,12 +219,12 @@ const ExamHistory = () => {
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {attempt.submitted_at 
-                            ? new Date(attempt.submitted_at).toLocaleDateString('pt-BR', {
+                            ? new Date(attempt.submitted_at).toLocaleDateString(getIntlLocale(), {
                                 day: '2-digit', month: '2-digit', year: 'numeric',
                                 hour: '2-digit', minute: '2-digit',
                               })
                             : attempt.started_at 
-                              ? new Date(attempt.started_at).toLocaleDateString('pt-BR')
+                              ? new Date(attempt.started_at).toLocaleDateString(getIntlLocale())
                               : '—'
                           }
                         </TableCell>
@@ -312,7 +313,7 @@ const ExamHistory = () => {
                     {appeals.map((appeal) => (
                       <TableRow key={appeal.id}>
                         <TableCell className="text-sm">
-                          {new Date(appeal.created_at).toLocaleDateString('pt-BR', {
+                          {new Date(appeal.created_at).toLocaleDateString(getIntlLocale(), {
                             day: '2-digit', month: '2-digit', year: 'numeric',
                           })}
                         </TableCell>

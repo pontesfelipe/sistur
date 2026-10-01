@@ -1438,7 +1438,7 @@ export default function Relatorios() {
                     </CardTitle>
                     {selectedHistoryReport && (
                       <CardDescription>
-                        Gerado em {format(new Date(selectedHistoryReport.created_at), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: getDateLocale() })}
+                        Gerado em {format(new Date(selectedHistoryReport.created_at), tx("dd 'de' MMMM 'de' yyyy 'às' HH:mm"), { locale: getDateLocale() })}
                       </CardDescription>
                     )}
                   </div>

@@ -119,6 +119,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useBrandRollup } from '@/hooks/useBrandRollup';
 import { BrandRollupPanel } from '@/components/enterprise/BrandRollupPanel';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const normalizeDisplayScore = (
   value: number | null | undefined,
@@ -613,7 +614,7 @@ const DiagnosticoDetalhe = () => {
 
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return '—';
-    return new Date(dateString).toLocaleDateString('pt-BR', {
+    return new Date(dateString).toLocaleDateString(getIntlLocale(), {
       day: '2-digit',
       month: 'long',
       year: 'numeric',

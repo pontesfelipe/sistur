@@ -19,6 +19,7 @@ import {
   useMyBadges,
   xpForLevel,
 } from '@/hooks/useGamification';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 const ICONS: Record<string, any> = { Trophy, Star, Flag, Map: MapIcon, Flame, Sparkles, Award };
 
@@ -46,7 +47,7 @@ export default function EduConquistas() {
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      const label = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+      const label = d.toLocaleDateString(getIntlLocale(), { month: 'short' }).replace('.', '');
       buckets.push({ key, label, xp: 0 });
     }
     (events ?? []).forEach((e) => {

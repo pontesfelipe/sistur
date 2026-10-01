@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Database, Calendar, MapPin, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 type DataQualityRow = {
   source: string;
@@ -96,7 +97,7 @@ export function ExternalDataQualityPanel() {
                 <CardDescription className="flex items-center gap-1 text-xs">
                   <Calendar className="h-3 w-3" />
                   {row.last_collected_at
-                    ? `Última coleta: ${new Date(row.last_collected_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}`
+                    ? `Última coleta: ${new Date(row.last_collected_at).toLocaleDateString(getIntlLocale(), { day: '2-digit', month: 'short', year: 'numeric' })}`
                     : tx('Sem coleta registrada')}
                 </CardDescription>
               </CardHeader>

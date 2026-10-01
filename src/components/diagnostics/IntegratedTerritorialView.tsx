@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GitBranch, MapPin, AlertTriangle, ArrowRight, Building2, Info } from 'lucide-react';
 import { useIntegratedTerritorialView } from '@/hooks/useIntegratedTerritorialView';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface Props {
   enterpriseDestinationId: string;
@@ -103,7 +104,7 @@ export function IntegratedTerritorialView({
                   {data.assessment?.calculated_at && (
                     <span className="text-xs text-muted-foreground ml-1">
                       · diagnóstico territorial de{' '}
-                      {new Date(data.assessment.calculated_at).toLocaleDateString('pt-BR')}
+                      {new Date(data.assessment.calculated_at).toLocaleDateString(getIntlLocale())}
                     </span>
                   )}
                 </span>

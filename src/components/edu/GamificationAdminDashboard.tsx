@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trophy, Flame, Award, Target, Users, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { getIntlLocale } from '@/i18n/dateLocale';
 
 interface TopXP { user_id: string; total_xp: number; level: number; current_streak: number; full_name?: string | null; }
 interface BadgeCount { badge_id: string; title: string; icon: string | null; count: number; }
@@ -54,7 +55,7 @@ function useGamificationStats() {
       const buckets: { day: string; count: number }[] = [];
       for (let i = 6; i >= 0; i--) {
         const d = new Date(); d.setDate(d.getDate() - i);
-        buckets.push({ day: d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', ''), count: 0 });
+        buckets.push({ day: d.toLocaleDateString(getIntlLocale(), { weekday: 'short' }).replace('.', ''), count: 0 });
       }
       (missions ?? []).forEach((m: any) => {
         const d = new Date(m.completed_at);
