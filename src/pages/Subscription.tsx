@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { CancelSubscriptionDialog } from '@/components/subscription/CancelSubscriptionDialog';
 import { PlanCatalog } from '@/components/subscription/PlanCatalog';
 import { BeniCreditPacks } from '@/components/subscription/BeniCreditPacks';
+import { FreeTrialCard } from '@/components/subscription/FreeTrialCard';
 import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useStripeCheckout } from '@/hooks/useStripeCheckout';
@@ -42,8 +43,8 @@ const FAQ: { q: string; a: string }[] = [
     a: 'Não. Ele começa com 5 usuários e cresce conforme a necessidade: cada usuário adicional é cobrado pelo mesmo valor por usuário/mês. Você ajusta a quantidade a qualquer momento no checkout ou em Gerenciar conta.',
   },
   {
-    q: 'Como funciona o período de avaliação?',
-    a: 'A avaliação é por uso, sem prazo: cada nova conta tem o curso base do SISTUR EDU e 10 perguntas ao Professor Beni; cada nova organização tem 1 diagnóstico com resultado em prévia. Depois disso, basta escolher um plano para liberar tudo.',
+    q: 'Como funciona a degustação gratuita?',
+    a: 'Você pode ativar a degustação gratuita sem cartão: ela dura 7 dias e libera o curso base do SISTUR EDU, 1 diagnóstico com resultado em prévia e 10 perguntas ao Professor Beni. Cursos completos, resultados detalhados, relatórios e projetos ficam disponíveis ao escolher um plano.',
   },
   {
     q: 'E se a renovação não for paga?',
@@ -306,6 +307,9 @@ export default function Subscription() {
             </p>
           )}
         </section>
+
+        {/* Degustação gratuita: alternativa à assinatura para contas sem licença */}
+        {!hasSubscription && !isPaidPlan && !license && <FreeTrialCard />}
 
         {paymentsReady && <PaymentTestModeBanner />}
 
