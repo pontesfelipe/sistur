@@ -71,6 +71,13 @@
       "when": 1790820320747,
       "tag": "0009_email_language_lookup",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790822834723,
+      "tag": "0010_fix_student_transcript_exam_join",
+      "breakpoints": true
     }
   ]
 }

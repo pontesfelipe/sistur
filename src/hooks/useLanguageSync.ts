@@ -47,7 +47,13 @@ export function useLanguageSync() {
     if (!user) return;
     const onChange = (lng: string) => {
       if (!isSupported(lng)) return;
-      void supabase.from('profiles').update({ language: lng }).eq('user_id', user.id);
+      // O builder do PostgREST só dispara a requisição quando é aguardado —
+      // por isso o update precisa ser awaitado de verdade.
+      void (async () => {
+        try {
+          await supabase.from('profiles').update({ language: lng }).eq('user_id', user.id);
+        } catch { /* ignora falhas de rede; o localStorage já guardou a escolha */ }
+      })();
     };
     i18n.on('languageChanged', onChange);
     return () => { i18n.off('languageChanged', onChange); };
