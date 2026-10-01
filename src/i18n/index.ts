@@ -33,6 +33,7 @@ const GENERATED_PATTERNS: Array<[RegExp, string]> = [
   [/^(.+) em nível (\S+) \((.+)\) — Interpretação: (.+)$/, '{{0}} em nível {{1}} ({{2}}) — Interpretação: {{3}}'],
   [/^Esta capacitação foi prescrita porque o indicador (.+) está (\S+) no pilar (.+?)\.(.*)$/, 'Esta capacitação foi prescrita porque o indicador {{0}} está {{1}} no pilar {{2}}.{{3}}'],
   [/^Prescrito porque o indicador (.+) está (\S+) no pilar (.+?)\.(.*)$/, 'Prescrito porque o indicador {{0}} está {{1}} no pilar {{2}}.{{3}}'],
+  [/^Esta capacitação foi prescrita porque o indicador (.+) está (\S+) — (.+)$/, 'Esta capacitação foi prescrita porque o indicador {{0}} está {{1}} — {{2}}'],
   [/^Evidência: (.+)$/, 'Evidência: {{0}}'],
 ];
 let translatingGenerated = false;
