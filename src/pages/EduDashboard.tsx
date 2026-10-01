@@ -93,7 +93,7 @@ const EduDashboard = () => {
               <p className="text-2xl font-display font-bold">{totalXP}</p>
               <p className="text-xs text-muted-foreground">{tx('XP Total')}</p>
               <Progress value={xpProgress} className="h-1.5 mt-2" />
-              <p className="text-[10px] text-muted-foreground mt-1">{nextLevelXP - totalXP} XP para nível {level + 1}</p>
+              <p className="text-[10px] text-muted-foreground mt-1">{tx('{{xp}} XP para nível {{level}}', { xp: nextLevelXP - totalXP, level: level + 1 })}</p>
             </CardContent>
           </Card>
 

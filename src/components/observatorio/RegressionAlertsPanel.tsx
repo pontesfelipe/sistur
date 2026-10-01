@@ -125,7 +125,7 @@ export function RegressionAlertsPanel() {
                 </div>
                 <p className="text-sm">{a.message}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Variação: {a.delta_pct.toFixed(1)}%
+                  {tx('Variação')}: {a.delta_pct.toFixed(1)}%
                 </p>
               </div>
               <div className="flex gap-1 shrink-0">

@@ -382,7 +382,7 @@ export default function Observatorio() {
                                 )}
                               </div>
                               <p className="text-xs text-muted-foreground mt-0.5">
-                                {hasData ? `${formatValue(Number(s!.total_value), m.unit)} · ${s!.data_points} ${s!.data_points === 1 ? "registro" : "registros"}` : "Sem dados em " + year}
+                                {hasData ? `${formatValue(Number(s!.total_value), m.unit)} · ${s!.data_points} ${s!.data_points === 1 ? tx("registro") : tx("registros")}` : tx("Sem dados em {{year}}", { year })}
                               </p>
                             </div>
 
