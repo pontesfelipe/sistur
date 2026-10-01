@@ -261,7 +261,7 @@ export default function Subscription() {
                 label={tx("Professor Beni")}
                 done={beniRemaining + beniCredits <= 0 && !beniUnlimited}
                 doneText="Perguntas de cortesia esgotadas"
-                openText={`${beniRemaining + beniCredits} pergunta(s) restante(s)`}
+                openText={tx('{{n}} pergunta(s) restante(s)', { n: beniRemaining + beniCredits })}
               />
             </div>
           )}
