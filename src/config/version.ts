@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 29,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.29.2",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "`ingest-inmet` lê direto as planilhas oficiais das Normais 1991-2020 (temperatura média, máxima, mínima e chuva): 223 estações × 12 meses.",
+      "`ingest-snis` usa o SINISA 2024 (ano-ref. 2023, Base Municipal): água IAG0001, coleta IES0001, coleta+tratamento IES0007, perdas IAG2013; valores fora de 0–100% descartados. Arquivo convertido guardado no armazenamento privado `official-data/snis`. 5.247 municípios.",
+    ],
+  },
   {
     version: "2.29.1",
     date: "2026-10-02",

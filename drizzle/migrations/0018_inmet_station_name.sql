@@ -1,0 +1,1 @@
+ALTER TABLE public.inmet_climate_normals ADD COLUMN IF NOT EXISTS station_name text;
