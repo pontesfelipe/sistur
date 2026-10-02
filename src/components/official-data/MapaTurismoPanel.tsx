@@ -50,7 +50,7 @@ export default function MapaTurismoPanel() {
   const [useFirecrawl, setUseFirecrawl] = useState(true);
 
   const { data: municipios, isLoading } = useMapaTurismo({
-    uf: filterUF || undefined,
+    uf: filterUF && filterUF !== 'all' ? filterUF : undefined,
     ano: filterAno,
   });
   const { data: stats } = useMapaTurismoStats();
