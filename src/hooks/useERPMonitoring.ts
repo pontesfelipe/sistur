@@ -108,7 +108,6 @@ export function useERPRealtimeUpdates() {
           table: 'action_plans'
         },
         () => {
-          console.log('Action plans changed, invalidating ERP queries...');
           invalidateAll();
         }
       )
@@ -125,7 +124,6 @@ export function useERPRealtimeUpdates() {
           table: 'projects'
         },
         () => {
-          console.log('Projects changed, invalidating ERP queries...');
           invalidateAll();
         }
       )
@@ -142,7 +140,6 @@ export function useERPRealtimeUpdates() {
           table: 'project_tasks'
         },
         () => {
-          console.log('Project tasks changed, invalidating ERP queries...');
           invalidateAll();
         }
       )

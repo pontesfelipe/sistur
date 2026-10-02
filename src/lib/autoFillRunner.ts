@@ -194,9 +194,7 @@ async function runEntry(id: string, fn: RunFn): Promise<{ status: 'success' | 'e
     return { status: 'success' };
   } catch (err) {
     const { kind, message } = classifyError(err);
-    if (kind === 'no_data') {
-      console.info(`[autoFillRunner] "${id}" sem dados: ${message}`);
-    } else {
+    if (kind !== 'no_data') {
       console.error(`[autoFillRunner] "${id}" failed`, err);
     }
     setStatus(id, { status: kind, error: message, lastRunAt: new Date().toISOString(), lastDurationMs: Date.now() - started });

@@ -158,16 +158,6 @@ const Index = () => {
   // Determine if enterprise mode is available
   const hasEnterpriseAccess = orgSettings?.has_enterprise_access ?? false;
   
-  if (import.meta.env.DEV) {
-    console.log('[Dashboard Debug]', {
-      effectiveOrgId,
-      orgSettings,
-      orgSettingsLoading,
-      orgSettingsError,
-      hasEnterpriseAccess,
-    });
-  }
-
   // Select appropriate data based on mode
   const isEnterprise = diagnosticMode === 'enterprise';
   const activeDestinations = isEnterprise ? enterpriseDestinations : destinations;
