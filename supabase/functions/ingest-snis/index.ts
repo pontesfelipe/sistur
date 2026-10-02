@@ -33,14 +33,29 @@ Deno.serve(async (req) => {
     try { body = await req.json(); } catch { /* ok */ }
     const filterIbge: string | undefined = body.ibge_code;
 
+    // Fonte: SNIS_CSV_URL, ou o arquivo oficial já convertido no armazenamento interno
+    // (official-data/snis/*.csv — extraído do SINISA "Base Municipal": IAG0001, IES0001, IES0007, IAG2013).
     const csvUrl = Deno.env.get('SNIS_CSV_URL');
-    if (!csvUrl) {
-      return json({ success: true, status: 'skipped_no_source', message: 'SNIS: fonte CSV não configurada (SNIS_CSV_URL).', processed: 0 });
+    let text: string;
+    if (csvUrl) {
+      const resp = await fetch(csvUrl, { signal: AbortSignal.timeout(60000) });
+      if (!resp.ok) throw new Error(`SNIS CSV HTTP ${resp.status}`);
+      text = await resp.text();
+    } else {
+      const { data: files } = await supabase.storage.from('official-data').list('snis');
+      const csvs = (files ?? []).filter((f) => f.name.endsWith('.csv')).map((f) => f.name).sort();
+      if (!csvs.length) {
+        return json({ success: true, status: 'skipped_no_source', message: 'SNIS: nenhuma fonte configurada.', processed: 0 });
+      }
+      text = '';
+      for (const name of csvs) {
+        const { data, error } = await supabase.storage.from('official-data').download(`snis/${name}`);
+        if (error || !data) throw new Error(`SNIS storage: ${error?.message ?? name}`);
+        const t = await data.text();
+        text += (text ? t.split(/\r?\n/).slice(1).join('\n') : t) + '\n';
+      }
     }
-
-    const resp = await fetch(csvUrl, { signal: AbortSignal.timeout(60000) });
-    if (!resp.ok) throw new Error(`SNIS CSV HTTP ${resp.status}`);
-    const lines = (await resp.text()).split(/\r?\n/).filter((l) => l.trim());
+    const lines = text.split(/\r?\n/).filter((l) => l.trim());
 
     const rows: Record<string, unknown>[] = [];
     for (const line of lines.slice(1)) {
