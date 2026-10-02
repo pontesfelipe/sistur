@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { AlertTriangle, CalendarClock, CheckCircle2, PlayCircle, RefreshCw, XCircle, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { PfIngestionRunsCard } from '@/components/admin/PfIngestionRunsCard';
 import { ptBR } from 'date-fns/locale';
 
 type HealthRow = {
@@ -61,6 +62,7 @@ const FN_DISPLAY: Record<string, string> = {
   'ingest-ana': 'ANA — IQA (Qualidade da Água)',
   'ingest-tse': 'TSE (Eleições)',
   'ingest-anatel': 'ANATEL (Cobertura)',
+  'ingest-pf-turismo': 'Polícia Federal / MTur (Chegadas internacionais)',
   'ingest-observatory': 'Observatório (derivação automática de métricas)',
 };
 
@@ -267,6 +269,8 @@ export default function AdminIngestionHealth() {
             )}
           </CardContent>
         </Card>
+
+        <PfIngestionRunsCard />
 
         {/* Recent runs history */}
         <Card>
