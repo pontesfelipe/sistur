@@ -182,7 +182,16 @@ export default function MapaTurismoPanel() {
 
         <TabsContent value="dados" className="space-y-4">
           {/* Filters */}
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex gap-3 flex-wrap items-center">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={tx("Buscar município ou região turística...")}
+                className="pl-9"
+              />
+            </div>
             <Select value={filterUF} onValueChange={setFilterUF}>
               <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder={tx("UF")} />
@@ -208,9 +217,22 @@ export default function MapaTurismoPanel() {
                 </SelectContent>
               </Select>
             )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={groups.length === 0}
+              onClick={() => setOpenGroups(allOpen ? [] : groups.map(([uf]) => uf))}
+            >
+              {allOpen ? (
+                <><ChevronsDownUp className="h-4 w-4 mr-1" /> {tx("Recolher tudo")}</>
+              ) : (
+                <><ChevronsUpDown className="h-4 w-4 mr-1" /> {tx("Expandir tudo")}</>
+              )}
+            </Button>
           </div>
 
-          {/* Table */}
+          {/* Table grouped by UF */}
           {isLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -223,41 +245,64 @@ export default function MapaTurismoPanel() {
                 <p className="text-sm">{tx("Use a aba \"Importar\" para buscar dados do Mapa do Turismo.")}</p>
               </CardContent>
             </Card>
+          ) : filtered.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                <Search className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                <p>{tx("Nenhum município encontrado para a busca.")}</p>
+              </CardContent>
+            </Card>
           ) : (
             <Card>
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{tx("Município")}</TableHead>
-                      <TableHead>UF</TableHead>
-                      <TableHead>{tx("Região Turística")}</TableHead>
-                      <TableHead>{tx("Categoria")}</TableHead>
-                      <TableHead>{tx("Tipo")}</TableHead>
-                      <TableHead>{tx("Ano")}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {municipios.map(m => (
-                      <TableRow key={m.id}>
-                        <TableCell className="font-medium">{m.municipio}</TableCell>
-                        <TableCell>{m.uf}</TableCell>
-                        <TableCell className="text-sm">{m.regiao_turistica || '—'}</TableCell>
-                        <TableCell>
-                          {m.categoria ? (
-                            <Badge className={CATEGORY_COLORS[m.categoria] || 'bg-muted'}>
-                              {m.categoria}
-                            </Badge>
-                          ) : '—'}
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {m.municipality_type ? TYPE_LABELS[m.municipality_type] || m.municipality_type : '—'}
-                        </TableCell>
-                        <TableCell>{m.ano_referencia}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <Accordion type="multiple" value={openGroups} onValueChange={setOpenGroups}>
+                  {groups.map(([uf, rows]) => (
+                    <AccordionItem key={uf} value={uf} className="border-b last:border-b-0">
+                      <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                        <div className="flex items-center gap-3 flex-1 text-left">
+                          <span className="font-semibold">{uf}</span>
+                          <Badge variant="secondary">{rows.length}</Badge>
+                          <span className="hidden sm:inline text-xs text-muted-foreground truncate">
+                            {rows.slice(0, 3).map(r => r.municipio).join(', ')}
+                            {rows.length > 3 ? ', ...' : ''}
+                          </span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-0 pb-3">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{tx("Município")}</TableHead>
+                              <TableHead>{tx("Região Turística")}</TableHead>
+                              <TableHead>{tx("Categoria")}</TableHead>
+                              <TableHead>{tx("Tipo")}</TableHead>
+                              <TableHead>{tx("Ano")}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {rows.map(m => (
+                              <TableRow key={m.id}>
+                                <TableCell className="font-medium">{m.municipio}</TableCell>
+                                <TableCell className="text-sm">{m.regiao_turistica || '—'}</TableCell>
+                                <TableCell>
+                                  {m.categoria ? (
+                                    <Badge className={CATEGORY_COLORS[m.categoria] || 'bg-muted'}>
+                                      {m.categoria}
+                                    </Badge>
+                                  ) : '—'}
+                                </TableCell>
+                                <TableCell className="text-sm">
+                                  {m.municipality_type ? TYPE_LABELS[m.municipality_type] || m.municipality_type : '—'}
+                                </TableCell>
+                                <TableCell>{m.ano_referencia}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </CardContent>
             </Card>
           )}
