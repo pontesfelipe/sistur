@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 29,
-  patch: 2,
+  patch: 3,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.29.3",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "`ingest-caged` lê agregados oficiais em `official-data/caged/*.csv`, gerados dos microdados CAGEDMOV (FTP do MTE) por município × mês × setor turístico (alojamento, alimentação, transporte, agências, aluguel de transportes, cultura e lazer). Primeira carga: ago/2026, 8.704 registros. Estoque não vem nos microdados de movimentação.",
+      "`ingest-iphan` consulta direto o geoserver público do IPHAN (camada SICG:Bem_Protecao), extraindo o código IBGE do código IPHAN. 18.137 bens protegidos em 2.083 municípios.",
+    ],
+  },
   {
     version: "2.29.2",
     date: "2026-10-02",
