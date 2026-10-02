@@ -567,21 +567,6 @@ export default function Configuracoes() {
                   <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Calculator className="h-4 w-4 text-primary" />
-                        {tx("Calculadora de Normalização")}
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        {tx("Simule o cálculo de normalização de indicadores")}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <NormalizationCalculator />
-                    </CardContent>
-                  </Card>
-
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
                         <FlaskConical className="h-4 w-4 text-primary" />
                         {tx("Simulador de Indicadores")}
                       </CardTitle>
@@ -606,21 +591,6 @@ export default function Configuracoes() {
                     </CardHeader>
                     <CardContent>
                       <DataExporter />
-                    </CardContent>
-                  </Card>
-
-                  <Card className="hover:shadow-md transition-shadow md:col-span-2">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <Search className="h-4 w-4 text-primary" />
-                        {tx("Busca de Reviews Online")}
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        {tx("Pesquise avaliações do estabelecimento no Google, TripAdvisor e outros")}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <BusinessReviewSearch />
                     </CardContent>
                   </Card>
 
