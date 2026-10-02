@@ -7086,6 +7086,51 @@ export type Database = {
         }
         Relationships: []
       }
+      inmet_climate_normals: {
+        Row: {
+          created_at: string
+          ibge_code: string | null
+          id: string
+          month: number
+          period: string
+          precipitacao_mm: number | null
+          station_code: string
+          temp_max_c: number | null
+          temp_media_c: number | null
+          temp_min_c: number | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ibge_code?: string | null
+          id?: string
+          month: number
+          period?: string
+          precipitacao_mm?: number | null
+          station_code: string
+          temp_max_c?: number | null
+          temp_media_c?: number | null
+          temp_min_c?: number | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ibge_code?: string | null
+          id?: string
+          month?: number
+          period?: string
+          precipitacao_mm?: number | null
+          station_code?: string
+          temp_max_c?: number | null
+          temp_media_c?: number | null
+          temp_min_c?: number | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       internal_cron_secrets: {
         Row: {
           created_at: string
@@ -9115,6 +9160,39 @@ export type Database = {
           payload?: Json | null
           price_id?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      pf_international_arrivals: {
+        Row: {
+          arrivals: number | null
+          created_at: string
+          id: string
+          reference_month: number
+          reference_year: number
+          uf: string
+          updated_at: string
+          via: string
+        }
+        Insert: {
+          arrivals?: number | null
+          created_at?: string
+          id?: string
+          reference_month: number
+          reference_year: number
+          uf: string
+          updated_at?: string
+          via?: string
+        }
+        Update: {
+          arrivals?: number | null
+          created_at?: string
+          id?: string
+          reference_month?: number
+          reference_year?: number
+          uf?: string
+          updated_at?: string
+          via?: string
         }
         Relationships: []
       }
