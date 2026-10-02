@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 31,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.31.2",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "Configurações › Ferramentas › Mapa do Turismo Brasileiro: lista de 1.000 municípios agrupada por estado com seções que abrem e fecham (contagem por UF e prévia dos 3 primeiros municípios).",
+      "Mapa do Turismo: novo campo de busca por município ou região turística, com os grupos abrindo automaticamente ao buscar; filtros de UF e ano e botões 'Expandir tudo' / 'Recolher tudo'.",
+      "Correção: o filtro 'Todas UFs' não é mais enviado como um estado de verdade na consulta (nenhum resultado era exibido com todos os estados).",
+    ],
+  },
   {
     version: "2.31.1",
     date: "2026-10-02",
