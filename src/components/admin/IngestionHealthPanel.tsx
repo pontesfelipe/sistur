@@ -60,6 +60,13 @@ const FN_DISPLAY: Record<string, string> = {
   'ingest-ana': 'ANA — IQA (Qualidade da Água)',
   'ingest-tse': 'TSE (Eleições)',
   'ingest-anatel': 'ANATEL (Cobertura)',
+  'ingest-observatory': 'Observatório Turístico',
+  'ingest-caged': 'Novo CAGED (Empregos no turismo)',
+  'ingest-siconfi': 'SICONFI / Tesouro (Despesa municipal)',
+  'ingest-snis': 'SNIS / SINISA (Saneamento)',
+  'ingest-iphan': 'IPHAN / SICG (Patrimônio cultural)',
+  'ingest-pf-turismo': 'Polícia Federal / MTur (Chegadas internacionais)',
+  'ingest-inmet': 'INMET (Normais climatológicas)',
 };
 
 function formatDate(iso: string | null) {
@@ -141,7 +148,7 @@ export function IngestionHealthPanel() {
         <div>
           <h3 className="text-base font-semibold">{tx("Saúde das Ingestões Oficiais")}</h3>
           <p className="text-xs text-muted-foreground">
-            {tx("Monitoramento e teste manual das funções automáticas (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo).")}
+            {tx("Monitoramento e teste manual das funções automáticas (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo, CAGED, SICONFI, SNIS, IPHAN, PF e INMET). Fontes sem planilha configurada aparecem como execuções sem dados, sem falha.")}
           </p>
         </div>
         <Button
