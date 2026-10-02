@@ -1,13 +1,20 @@
 import { getDateLocale } from '@/i18n/dateLocale';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { useMapaTurismo, useMapaTurismoStats, useMapaTurismoSyncLogs, useIngestMapaTurismo } from '@/hooks/useMapaTurismo';
-import { Loader2, Download, MapPin, BarChart3, RefreshCw, CheckCircle2, XCircle, Clock, Flame, Database } from 'lucide-react';
+import { Loader2, Download, MapPin, BarChart3, RefreshCw, CheckCircle2, XCircle, Clock, Flame, Database, Search, ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
@@ -36,17 +43,56 @@ const TYPE_LABELS: Record<string, string> = {
 export default function MapaTurismoPanel() {
   const [filterUF, setFilterUF] = useState<string>('');
   const [filterAno, setFilterAno] = useState<number | undefined>();
+  const [search, setSearch] = useState<string>('');
+  const [openGroups, setOpenGroups] = useState<string[]>([]);
   const [syncYear, setSyncYear] = useState<number>(2017);
   const [syncType, setSyncType] = useState<'mapa_turismo' | 'categorizacao'>('mapa_turismo');
   const [useFirecrawl, setUseFirecrawl] = useState(true);
 
   const { data: municipios, isLoading } = useMapaTurismo({
-    uf: filterUF || undefined,
+    uf: filterUF && filterUF !== 'all' ? filterUF : undefined,
     ano: filterAno,
   });
   const { data: stats } = useMapaTurismoStats();
   const { data: syncLogs } = useMapaTurismoSyncLogs();
   const ingestMutation = useIngestMapaTurismo();
+
+  const filtered = useMemo(() => {
+    if (!municipios) return [];
+    const q = search.trim().toLowerCase();
+    if (!q) return municipios;
+    return municipios.filter(m =>
+      m.municipio.toLowerCase().includes(q) ||
+      (m.regiao_turistica || '').toLowerCase().includes(q)
+    );
+  }, [municipios, search]);
+
+  const groups = useMemo(() => {
+    const map = new Map<string, typeof filtered>();
+    for (const m of filtered) {
+      const arr = map.get(m.uf);
+      if (arr) arr.push(m);
+      else map.set(m.uf, [m]);
+    }
+    return [...map.entries()]
+      .map(([uf, rows]) => [uf, rows.sort((a, b) => a.municipio.localeCompare(b.municipio))] as [string, typeof filtered])
+      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+  }, [filtered]);
+
+  // Ao buscar, abre todos os grupos; ao limpar, volta ao comportamento padrão
+  useEffect(() => {
+    if (search.trim()) {
+      setOpenGroups(groups.map(([uf]) => uf));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  // Quando uma UF específica é filtrada, abre só ela
+  useEffect(() => {
+    setOpenGroups(filterUF && filterUF !== 'all' ? [filterUF] : []);
+  }, [filterUF]);
+
+  const allOpen = groups.length > 0 && openGroups.length >= groups.length;
 
   const handleSync = () => {
     ingestMutation.mutate({ year: syncYear, sync_type: syncType, use_firecrawl: useFirecrawl });
@@ -136,7 +182,16 @@ export default function MapaTurismoPanel() {
 
         <TabsContent value="dados" className="space-y-4">
           {/* Filters */}
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex gap-3 flex-wrap items-center">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={tx("Buscar município ou região turística...")}
+                className="pl-9"
+              />
+            </div>
             <Select value={filterUF} onValueChange={setFilterUF}>
               <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder={tx("UF")} />
@@ -162,9 +217,22 @@ export default function MapaTurismoPanel() {
                 </SelectContent>
               </Select>
             )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={groups.length === 0}
+              onClick={() => setOpenGroups(allOpen ? [] : groups.map(([uf]) => uf))}
+            >
+              {allOpen ? (
+                <><ChevronsDownUp className="h-4 w-4 mr-1" /> {tx("Recolher tudo")}</>
+              ) : (
+                <><ChevronsUpDown className="h-4 w-4 mr-1" /> {tx("Expandir tudo")}</>
+              )}
+            </Button>
           </div>
 
-          {/* Table */}
+          {/* Table grouped by UF */}
           {isLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -177,41 +245,64 @@ export default function MapaTurismoPanel() {
                 <p className="text-sm">{tx("Use a aba \"Importar\" para buscar dados do Mapa do Turismo.")}</p>
               </CardContent>
             </Card>
+          ) : filtered.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                <Search className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                <p>{tx("Nenhum município encontrado para a busca.")}</p>
+              </CardContent>
+            </Card>
           ) : (
             <Card>
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{tx("Município")}</TableHead>
-                      <TableHead>UF</TableHead>
-                      <TableHead>{tx("Região Turística")}</TableHead>
-                      <TableHead>{tx("Categoria")}</TableHead>
-                      <TableHead>{tx("Tipo")}</TableHead>
-                      <TableHead>{tx("Ano")}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {municipios.map(m => (
-                      <TableRow key={m.id}>
-                        <TableCell className="font-medium">{m.municipio}</TableCell>
-                        <TableCell>{m.uf}</TableCell>
-                        <TableCell className="text-sm">{m.regiao_turistica || '—'}</TableCell>
-                        <TableCell>
-                          {m.categoria ? (
-                            <Badge className={CATEGORY_COLORS[m.categoria] || 'bg-muted'}>
-                              {m.categoria}
-                            </Badge>
-                          ) : '—'}
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {m.municipality_type ? TYPE_LABELS[m.municipality_type] || m.municipality_type : '—'}
-                        </TableCell>
-                        <TableCell>{m.ano_referencia}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <Accordion type="multiple" value={openGroups} onValueChange={setOpenGroups}>
+                  {groups.map(([uf, rows]) => (
+                    <AccordionItem key={uf} value={uf} className="border-b last:border-b-0">
+                      <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                        <div className="flex items-center gap-3 flex-1 text-left">
+                          <span className="font-semibold">{uf}</span>
+                          <Badge variant="secondary">{rows.length}</Badge>
+                          <span className="hidden sm:inline text-xs text-muted-foreground truncate">
+                            {rows.slice(0, 3).map(r => r.municipio).join(', ')}
+                            {rows.length > 3 ? ', ...' : ''}
+                          </span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-0 pb-3">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{tx("Município")}</TableHead>
+                              <TableHead>{tx("Região Turística")}</TableHead>
+                              <TableHead>{tx("Categoria")}</TableHead>
+                              <TableHead>{tx("Tipo")}</TableHead>
+                              <TableHead>{tx("Ano")}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {rows.map(m => (
+                              <TableRow key={m.id}>
+                                <TableCell className="font-medium">{m.municipio}</TableCell>
+                                <TableCell className="text-sm">{m.regiao_turistica || '—'}</TableCell>
+                                <TableCell>
+                                  {m.categoria ? (
+                                    <Badge className={CATEGORY_COLORS[m.categoria] || 'bg-muted'}>
+                                      {m.categoria}
+                                    </Badge>
+                                  ) : '—'}
+                                </TableCell>
+                                <TableCell className="text-sm">
+                                  {m.municipality_type ? TYPE_LABELS[m.municipality_type] || m.municipality_type : '—'}
+                                </TableCell>
+                                <TableCell>{m.ano_referencia}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </CardContent>
             </Card>
           )}
