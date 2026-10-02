@@ -127,6 +127,13 @@
       "when": 1790969428203,
       "tag": "0017_ingestion_health_new_sources",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790972009823,
+      "tag": "0018_inmet_station_name",
+      "breakpoints": true
     }
   ]
 }

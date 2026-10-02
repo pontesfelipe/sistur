@@ -7095,6 +7095,7 @@ export type Database = {
           period: string
           precipitacao_mm: number | null
           station_code: string
+          station_name: string | null
           temp_max_c: number | null
           temp_media_c: number | null
           temp_min_c: number | null
@@ -7109,6 +7110,7 @@ export type Database = {
           period?: string
           precipitacao_mm?: number | null
           station_code: string
+          station_name?: string | null
           temp_max_c?: number | null
           temp_media_c?: number | null
           temp_min_c?: number | null
@@ -7123,6 +7125,7 @@ export type Database = {
           period?: string
           precipitacao_mm?: number | null
           station_code?: string
+          station_name?: string | null
           temp_max_c?: number | null
           temp_media_c?: number | null
           temp_min_c?: number | null
