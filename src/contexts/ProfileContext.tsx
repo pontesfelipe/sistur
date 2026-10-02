@@ -162,7 +162,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const isBlocked = !!profile?.blocked_at;
     const effectiveOrgId = profile?.viewing_demo_org_id || profile?.org_id;
     return { hasRoleFn, isAdmin, isOrgAdmin, isAnalyst, isProfessor, isEstudante, hasERPAccess, hasEDUAccess, needsOnboarding, awaitingApproval, isViewingDemoData, isBlocked, effectiveOrgId };
-  }, [roles, profile]);
+  }, [roles, profile, entitlements]);
 
   const completeOnboarding = async (
     systemAccess: 'ERP' | 'EDU' | null,
