@@ -309,15 +309,28 @@ export default function AdminIngestionHealth() {
         {/* Recent runs history */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{tx("Últimas 50 execuções")}</CardTitle>
-            <CardDescription>{tx("Histórico unificado (cron + manual + admin).")}</CardDescription>
+            <CardTitle className="text-base">{tx("Histórico de execuções")}</CardTitle>
+            <CardDescription>{tx("Todas as execuções (agendadas e manuais), com status, horários e erros.")}</CardDescription>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <select aria-label={tx("Filtrar por fonte")} className="h-8 rounded-md border bg-background px-2 text-xs" value={fnFilter} onChange={(e) => setFnFilter(e.target.value)}>
+                <option value="all">{tx("Todas as fontes")}</option>
+                {Object.keys(FN_SCHEDULE).map((f) => <option key={f} value={f}>{FN_DISPLAY[f] ?? f}</option>)}
+              </select>
+              <select aria-label={tx("Filtrar por status")} className="h-8 rounded-md border bg-background px-2 text-xs" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <option value="all">{tx("Todos os status")}</option>
+                <option value="success">{tx("Sucesso")}</option>
+                <option value="partial">{tx("Parcial")}</option>
+                <option value="failed">{tx("Falhou")}</option>
+                <option value="running">{tx("Em andamento")}</option>
+              </select>
+            </div>
           </CardHeader>
           <CardContent>
             {runsQuery.isLoading ? (
               <Skeleton className="h-48 w-full" />
             ) : (runsQuery.data ?? []).length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
-                {tx("Nenhuma execução registrada ainda. Rode um smoke test para começar.")}
+                {tx("Nenhuma execução registrada ainda. Use "Atualizar agora" para começar.")}
               </div>
             ) : (
               <div className="rounded-md border max-h-[500px] overflow-auto">
@@ -331,14 +344,15 @@ export default function AdminIngestionHealth() {
                       <TableHead className="text-right">{tx("Proc.")}</TableHead>
                       <TableHead className="text-right">{tx("Falhas")}</TableHead>
                       <TableHead className="text-right">{tx("Duração")}</TableHead>
+                      <TableHead>{tx("Erro")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(runsQuery.data ?? []).map((r) => (
+                    {(runsQuery.data ?? []).filter((r) => (fnFilter === 'all' || r.function_name === fnFilter) && (statusFilter === 'all' || r.status === statusFilter)).map((r) => (
                       <TableRow key={r.id}>
                         <TableCell className="text-xs whitespace-nowrap">{formatDate(r.started_at)}</TableCell>
                         <TableCell className="font-mono text-xs">{r.function_name}</TableCell>
-                        <TableCell><Badge variant="outline" className="text-xs">{r.triggered_by}</Badge></TableCell>
+                        <TableCell><Badge variant="outline" className="text-xs">{tx(TRIGGER_LABEL[r.triggered_by] ?? r.triggered_by)}</Badge></TableCell>
                         <TableCell>
                           <Badge variant="outline" className={
                             r.status === 'success' ? 'bg-severity-good/15 text-severity-good border-severity-good/30' :
@@ -352,6 +366,7 @@ export default function AdminIngestionHealth() {
                         <TableCell className="text-right tabular-nums text-xs">{r.records_processed}</TableCell>
                         <TableCell className="text-right tabular-nums text-xs">{r.records_failed}</TableCell>
                         <TableCell className="text-right tabular-nums text-xs">{formatDuration(r.duration_ms)}</TableCell>
+                        <TableCell className="text-xs text-severity-critical max-w-[280px] truncate" title={r.error_message ?? ''}>{r.error_message ?? ''}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
