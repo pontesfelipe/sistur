@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 31,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.31.1",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "Configurações > Saúde das Ingestões: mesmo botão 'Atualizar agora' e próxima atualização por fonte",
+      "Documentação atualizada: FAQ (como as fontes são atualizadas), Metodologia (agendamentos e rastreabilidade) e documento técnico (funções de ingestão)",
+    ],
+  },
   {
     version: "2.31.0",
     date: "2026-10-02",

@@ -69,6 +69,14 @@ const FN_DISPLAY: Record<string, string> = {
   'ingest-inmet': 'INMET (Normais climatológicas)',
 };
 
+const FN_SCHEDULE: Record<string, string> = {
+  'ingest-cadastur': 'Dia 1 de jan/abr/jul/out', 'ingest-mapa-turismo': 'Dia 1 de jan/abr/jul/out',
+  'ingest-ana': '1º de fevereiro', 'ingest-tse': '1º de maio', 'ingest-anatel': 'Todo dia 5',
+  'ingest-observatory': 'Todo dia 1', 'ingest-caged': 'Todo dia 5 (automação externa)',
+  'ingest-pf-turismo': 'Todo dia 10', 'ingest-iphan': 'Todo dia 12', 'ingest-siconfi': 'Todo dia 15',
+  'ingest-snis': 'Todo dia 18', 'ingest-inmet': '20 de março',
+};
+
 function formatDate(iso: string | null) {
   if (!iso) return '—';
   return format(new Date(iso), "dd/MM/yyyy HH:mm", { locale: getDateLocale() });
@@ -148,7 +156,7 @@ export function IngestionHealthPanel() {
         <div>
           <h3 className="text-base font-semibold">{tx("Saúde das Ingestões Oficiais")}</h3>
           <p className="text-xs text-muted-foreground">
-            {tx("Monitoramento e teste manual das funções automáticas (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo, CAGED, SICONFI, SNIS, IPHAN, PF e INMET). Fontes sem planilha configurada aparecem como execuções sem dados, sem falha.")}
+            {tx("Monitoramento e atualização manual ('Atualizar agora') das fontes automáticas (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo, CAGED, SICONFI, SNIS, IPHAN, PF e INMET). Fontes sem planilha configurada aparecem como execuções sem dados, sem falha.")}
           </p>
         </div>
         <Button
@@ -250,6 +258,7 @@ export function IngestionHealthPanel() {
                         <div className="font-medium tabular-nums">{row.last_records_failed ?? 0}</div>
                       </div>
                     </div>
+                    <div className="text-xs"><span className="text-muted-foreground">{tx("Próxima atualização automática")}: </span><span className="font-medium">{tx(FN_SCHEDULE[row.function_name] ?? '—')}</span></div>
                     {row.last_error && (
                       <div className="text-xs text-severity-critical bg-severity-critical/5 p-2 rounded border border-severity-critical/20 line-clamp-2">
                         {row.last_error}
@@ -260,10 +269,14 @@ export function IngestionHealthPanel() {
                       variant="outline"
                       className="w-full"
                       disabled={triggering === row.function_name}
-                      onClick={() => triggerMut.mutate(row.function_name)}
+                      onClick={() => {
+                        if (window.confirm(tx('Iniciar agora a atualização completa desta fonte? Pode levar alguns minutos.'))) {
+                          triggerMut.mutate(row.function_name);
+                        }
+                      }}
                     >
                       <PlayCircle className="h-4 w-4 mr-2" />
-                      {triggering === row.function_name ? 'Executando...' : tx('Smoke test')}
+                      {triggering === row.function_name ? tx('Atualizando...') : tx('Atualizar agora')}
                     </Button>
                   </div>
                 );
@@ -276,7 +289,7 @@ export function IngestionHealthPanel() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{tx("Últimas 50 execuções")}</CardTitle>
-          <CardDescription>{tx("Histórico unificado (cron + manual + admin).")}</CardDescription>
+          <CardDescription>{tx("Todas as execuções (agendadas e manuais), com status, horários e erros.")}</CardDescription>
         </CardHeader>
         <CardContent>
           {runsQuery.isLoading ? (
