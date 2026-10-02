@@ -43,6 +43,8 @@ const TYPE_LABELS: Record<string, string> = {
 export default function MapaTurismoPanel() {
   const [filterUF, setFilterUF] = useState<string>('');
   const [filterAno, setFilterAno] = useState<number | undefined>();
+  const [search, setSearch] = useState<string>('');
+  const [openGroups, setOpenGroups] = useState<string[]>([]);
   const [syncYear, setSyncYear] = useState<number>(2017);
   const [syncType, setSyncType] = useState<'mapa_turismo' | 'categorizacao'>('mapa_turismo');
   const [useFirecrawl, setUseFirecrawl] = useState(true);
@@ -54,6 +56,43 @@ export default function MapaTurismoPanel() {
   const { data: stats } = useMapaTurismoStats();
   const { data: syncLogs } = useMapaTurismoSyncLogs();
   const ingestMutation = useIngestMapaTurismo();
+
+  const filtered = useMemo(() => {
+    if (!municipios) return [];
+    const q = search.trim().toLowerCase();
+    if (!q) return municipios;
+    return municipios.filter(m =>
+      m.municipio.toLowerCase().includes(q) ||
+      (m.regiao_turistica || '').toLowerCase().includes(q)
+    );
+  }, [municipios, search]);
+
+  const groups = useMemo(() => {
+    const map = new Map<string, typeof filtered>();
+    for (const m of filtered) {
+      const arr = map.get(m.uf);
+      if (arr) arr.push(m);
+      else map.set(m.uf, [m]);
+    }
+    return [...map.entries()]
+      .map(([uf, rows]) => [uf, rows.sort((a, b) => a.municipio.localeCompare(b.municipio))] as [string, typeof filtered])
+      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+  }, [filtered]);
+
+  // Ao buscar, abre todos os grupos; ao limpar, volta ao comportamento padrão
+  useEffect(() => {
+    if (search.trim()) {
+      setOpenGroups(groups.map(([uf]) => uf));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  // Quando uma UF específica é filtrada, abre só ela
+  useEffect(() => {
+    setOpenGroups(filterUF ? [filterUF] : []);
+  }, [filterUF]);
+
+  const allOpen = groups.length > 0 && openGroups.length >= groups.length;
 
   const handleSync = () => {
     ingestMutation.mutate({ year: syncYear, sync_type: syncType, use_firecrawl: useFirecrawl });
