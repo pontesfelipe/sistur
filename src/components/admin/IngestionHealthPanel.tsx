@@ -156,7 +156,7 @@ export function IngestionHealthPanel() {
         <div>
           <h3 className="text-base font-semibold">{tx("Saúde das Ingestões Oficiais")}</h3>
           <p className="text-xs text-muted-foreground">
-            {tx("Monitoramento e atualização manual ("Atualizar agora") das fontes automáticas (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo, CAGED, SICONFI, SNIS, IPHAN, PF e INMET). Fontes sem planilha configurada aparecem como execuções sem dados, sem falha.")}
+            {tx("Monitoramento e atualização manual ('Atualizar agora') das fontes automáticas (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo, CAGED, SICONFI, SNIS, IPHAN, PF e INMET). Fontes sem planilha configurada aparecem como execuções sem dados, sem falha.")}
           </p>
         </div>
         <Button
