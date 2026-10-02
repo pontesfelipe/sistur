@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 30,
+  minor: 31,
   patch: 0,
 
   get full() {
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.31.0",
+    date: "2026-10-02",
+    type: "minor" as const,
+    changes: [
+      "Saúde das Ingestões: botão 'Atualizar agora' por fonte (com confirmação) e data do próximo agendamento",
+      "Histórico de execuções com filtros por fonte e status, origem (agendamento/manual) e coluna de erro",
+      "Atualizações agendadas agora passam pelo registro central e aparecem no histórico (antes só as manuais)",
+      "Agendamentos mensais: PF/MTur (dia 10), IPHAN (12), SICONFI (15), saneamento (18); INMET anual (20/mar)",
+    ],
+  },
   {
     version: "2.30.0",
     date: "2026-10-02",

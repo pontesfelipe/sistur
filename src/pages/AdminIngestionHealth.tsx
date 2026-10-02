@@ -64,6 +64,30 @@ const FN_DISPLAY: Record<string, string> = {
   'ingest-anatel': 'ANATEL (Cobertura)',
   'ingest-pf-turismo': 'Polícia Federal / MTur (Chegadas internacionais)',
   'ingest-observatory': 'Observatório (derivação automática de métricas)',
+  'ingest-caged': 'CAGED (Empregos no turismo)',
+  'ingest-siconfi': 'SICONFI (Finanças municipais)',
+  'ingest-snis': 'SNIS/SINISA (Saneamento)',
+  'ingest-iphan': 'IPHAN (Patrimônio protegido)',
+  'ingest-inmet': 'INMET (Normais climatológicas)',
+};
+
+const FN_SCHEDULE: Record<string, string> = {
+  'ingest-cadastur': 'Dia 1 de jan/abr/jul/out',
+  'ingest-mapa-turismo': 'Dia 1 de jan/abr/jul/out',
+  'ingest-ana': '1º de fevereiro',
+  'ingest-tse': '1º de maio',
+  'ingest-anatel': 'Todo dia 5',
+  'ingest-observatory': 'Todo dia 1',
+  'ingest-caged': 'Todo dia 5 (automação externa)',
+  'ingest-pf-turismo': 'Todo dia 10',
+  'ingest-iphan': 'Todo dia 12',
+  'ingest-siconfi': 'Todo dia 15',
+  'ingest-snis': 'Todo dia 18',
+  'ingest-inmet': '20 de março',
+};
+
+const TRIGGER_LABEL: Record<string, string> = {
+  cron: 'Agendamento', admin: 'Manual (admin)', manual: 'Manual', system: 'Sistema',
 };
 
 function formatDate(iso: string | null) {
@@ -81,6 +105,8 @@ function formatDuration(ms: number | null) {
 export default function AdminIngestionHealth() {
   const qc = useQueryClient();
   const [triggering, setTriggering] = useState<string | null>(null);
+  const [fnFilter, setFnFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const healthQuery = useQuery({
     queryKey: ['ingestion-health'],
@@ -99,7 +125,7 @@ export default function AdminIngestionHealth() {
         .from('ingestion_runs')
         .select('id, function_name, triggered_by, status, records_processed, records_failed, duration_ms, started_at, finished_at, error_message')
         .order('started_at', { ascending: false })
-        .limit(50);
+        .limit(200);
       if (error) throw error;
       return (data ?? []) as RunRow[];
     },
@@ -142,7 +168,7 @@ export default function AdminIngestionHealth() {
   return (
     <AppLayout
       title={tx("Saúde das Ingestões Oficiais")}
-      subtitle={tx("Monitoramento e teste manual das funções automáticas que coletam dados oficiais (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo).")}
+      subtitle={tx("Monitoramento e teste manual das funções automáticas que coletam dados oficiais (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo, CAGED, SICONFI, saneamento, IPHAN, PF/MTur, INMET).")}
       actions={
         <Button
           variant="outline"
@@ -204,7 +230,7 @@ export default function AdminIngestionHealth() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">{tx("Status atual por função")}</CardTitle>
-            <CardDescription>{tx("Teste manual (smoke test) registra a execução no histórico abaixo.")}</CardDescription>
+            <CardDescription>{tx("Cada fonte atualiza sozinha no agendamento; use \"Atualizar agora\" para iniciar manualmente. Toda execução fica registrada no histórico abaixo.")}</CardDescription>
           </CardHeader>
           <CardContent>
             {healthQuery.isLoading ? (
@@ -238,6 +264,10 @@ export default function AdminIngestionHealth() {
                             {row.last_run_at ? `${formatDate(row.last_run_at)} (${row.age_days}d)` : 'Nunca'}
                           </div>
                         </div>
+                        <div className="col-span-2">
+                          <div className="text-muted-foreground">{tx("Próxima atualização automática")}</div>
+                          <div className="font-medium">{tx(FN_SCHEDULE[row.function_name] ?? '—')}</div>
+                        </div>
                         <div>
                           <div className="text-muted-foreground">{tx("Processados")}</div>
                           <div className="font-medium tabular-nums">{row.last_records_processed ?? 0}</div>
@@ -257,10 +287,14 @@ export default function AdminIngestionHealth() {
                         variant="outline"
                         className="w-full"
                         disabled={triggering === row.function_name}
-                        onClick={() => triggerMut.mutate(row.function_name)}
+                        onClick={() => {
+                          if (window.confirm(tx('Iniciar agora a atualização completa desta fonte? Pode levar alguns minutos.'))) {
+                            triggerMut.mutate(row.function_name);
+                          }
+                        }}
                       >
                         <PlayCircle className="h-4 w-4 mr-2" />
-                        {triggering === row.function_name ? 'Executando...' : tx('Smoke test')}
+                        {triggering === row.function_name ? tx('Atualizando...') : tx('Atualizar agora')}
                       </Button>
                     </div>
                   );
@@ -275,15 +309,28 @@ export default function AdminIngestionHealth() {
         {/* Recent runs history */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{tx("Últimas 50 execuções")}</CardTitle>
-            <CardDescription>{tx("Histórico unificado (cron + manual + admin).")}</CardDescription>
+            <CardTitle className="text-base">{tx("Histórico de execuções")}</CardTitle>
+            <CardDescription>{tx("Todas as execuções (agendadas e manuais), com status, horários e erros.")}</CardDescription>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <select aria-label={tx("Filtrar por fonte")} className="h-8 rounded-md border bg-background px-2 text-xs" value={fnFilter} onChange={(e) => setFnFilter(e.target.value)}>
+                <option value="all">{tx("Todas as fontes")}</option>
+                {Object.keys(FN_SCHEDULE).map((f) => <option key={f} value={f}>{FN_DISPLAY[f] ?? f}</option>)}
+              </select>
+              <select aria-label={tx("Filtrar por status")} className="h-8 rounded-md border bg-background px-2 text-xs" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <option value="all">{tx("Todos os status")}</option>
+                <option value="success">{tx("Sucesso")}</option>
+                <option value="partial">{tx("Parcial")}</option>
+                <option value="failed">{tx("Falhou")}</option>
+                <option value="running">{tx("Em andamento")}</option>
+              </select>
+            </div>
           </CardHeader>
           <CardContent>
             {runsQuery.isLoading ? (
               <Skeleton className="h-48 w-full" />
             ) : (runsQuery.data ?? []).length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
-                {tx("Nenhuma execução registrada ainda. Rode um smoke test para começar.")}
+                {tx("Nenhuma execução registrada ainda. Use 'Atualizar agora' para começar.")}
               </div>
             ) : (
               <div className="rounded-md border max-h-[500px] overflow-auto">
@@ -297,14 +344,15 @@ export default function AdminIngestionHealth() {
                       <TableHead className="text-right">{tx("Proc.")}</TableHead>
                       <TableHead className="text-right">{tx("Falhas")}</TableHead>
                       <TableHead className="text-right">{tx("Duração")}</TableHead>
+                      <TableHead>{tx("Erro")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(runsQuery.data ?? []).map((r) => (
+                    {(runsQuery.data ?? []).filter((r) => (fnFilter === 'all' || r.function_name === fnFilter) && (statusFilter === 'all' || r.status === statusFilter)).map((r) => (
                       <TableRow key={r.id}>
                         <TableCell className="text-xs whitespace-nowrap">{formatDate(r.started_at)}</TableCell>
                         <TableCell className="font-mono text-xs">{r.function_name}</TableCell>
-                        <TableCell><Badge variant="outline" className="text-xs">{r.triggered_by}</Badge></TableCell>
+                        <TableCell><Badge variant="outline" className="text-xs">{tx(TRIGGER_LABEL[r.triggered_by] ?? r.triggered_by)}</Badge></TableCell>
                         <TableCell>
                           <Badge variant="outline" className={
                             r.status === 'success' ? 'bg-severity-good/15 text-severity-good border-severity-good/30' :
@@ -318,6 +366,7 @@ export default function AdminIngestionHealth() {
                         <TableCell className="text-right tabular-nums text-xs">{r.records_processed}</TableCell>
                         <TableCell className="text-right tabular-nums text-xs">{r.records_failed}</TableCell>
                         <TableCell className="text-right tabular-nums text-xs">{formatDuration(r.duration_ms)}</TableCell>
+                        <TableCell className="text-xs text-severity-critical max-w-[280px] truncate" title={r.error_message ?? ''}>{r.error_message ?? ''}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
