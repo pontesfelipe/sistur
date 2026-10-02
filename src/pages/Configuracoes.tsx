@@ -11,6 +11,7 @@ import { OrganizationManagement } from '@/components/settings/OrganizationManage
 import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersPanel';
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { DataExporter } from '@/components/tools/DataExporter';
+import { IndicatorSimulator } from '@/components/tools/IndicatorSimulator';
 import { IndicatorWeightsManager } from '@/components/tools/IndicatorWeightsManager';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
