@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 31,
-  patch: 3,
+  patch: 4,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.31.4",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "Limpeza de logs de depuração: removidos console.log/info de desenvolvimento no painel principal, no preenchimento automático de dados e no monitoramento em tempo real do ERP — erros reais continuam registrados centralmente no relatório de erros do cliente.",
+    ],
+  },
   {
     version: "2.31.3",
     date: "2026-10-02",
