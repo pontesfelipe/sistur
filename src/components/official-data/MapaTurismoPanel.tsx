@@ -89,7 +89,7 @@ export default function MapaTurismoPanel() {
 
   // Quando uma UF específica é filtrada, abre só ela
   useEffect(() => {
-    setOpenGroups(filterUF ? [filterUF] : []);
+    setOpenGroups(filterUF && filterUF !== 'all' ? [filterUF] : []);
   }, [filterUF]);
 
   const allOpen = groups.length > 0 && openGroups.length >= groups.length;
