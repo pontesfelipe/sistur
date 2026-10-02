@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 31,
-  patch: 2,
+  patch: 3,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.31.3",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "Configurações › Ferramentas: removida a 'Busca de Reviews Online' — não gravava resultado algum fora do cadastro Enterprise, onde a ferramenta já existe com preenchimento automático do perfil.",
+      "Configurações › Ferramentas: removida a 'Calculadora de Normalização' — redundante com o 'Simulador de Indicadores', que aplica a mesma matemática usando indicadores reais do sistema.",
+    ],
+  },
   {
     version: "2.31.2",
     date: "2026-10-02",
