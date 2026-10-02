@@ -91,6 +91,18 @@ export function PfIngestionRunsCard() {
               </div>
             </div>
 
+            {last.status === 'failed' && last.error_message && (
+              <div role="alert" className="flex gap-2 rounded-md border border-severity-critical/30 bg-severity-critical/5 p-3 text-sm text-severity-critical">
+                <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <div>
+                  <div className="font-medium">
+                    {/tentativas/.test(last.error_message) ? tx('Tentativas esgotadas na última importação') : tx('A última importação falhou')}
+                  </div>
+                  <div className="whitespace-pre-wrap break-words">{last.error_message}</div>
+                </div>
+              </div>
+            )}
+
             <div className="rounded-md border max-h-[420px] overflow-auto">
               <Table>
                 <TableHeader className="sticky top-0 bg-background z-10">

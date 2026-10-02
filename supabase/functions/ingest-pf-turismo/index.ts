@@ -27,11 +27,42 @@ const MES: Record<string, number> = {
 const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const VIA: Record<string, string> = { aerea:'AEREA', terrestre:'TERRESTRE', maritima:'MARITIMA', fluvial:'FLUVIAL' };
 
+// Retentativas seguras: só requisições GET (idempotentes) e só em erros transitórios
+// (rede, timeout, 408, 429, 5xx). Erros 4xx definitivos falham na hora.
+const MAX_ATTEMPTS = 3;
+class RetriesExhaustedError extends Error {
+  constructor(public label: string, public attempts: number, public lastError: string) {
+    super(`PF: não foi possível acessar ${label} após ${attempts} tentativas. Último erro: ${lastError}. A fonte oficial pode estar fora do ar — tente novamente mais tarde.`);
+  }
+}
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+async function fetchWithRetry(url: string, label: string, timeoutMs: number): Promise<Response> {
+  let lastError = '';
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    let waitMs = 2000 * 2 ** (attempt - 1) + Math.floor(Math.random() * 500);
+    try {
+      const resp = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+      if (resp.ok) return resp;
+      const transient = resp.status === 408 || resp.status === 429 || resp.status >= 500;
+      await resp.body?.cancel();
+      if (!transient) throw new Error(`PF: ${label} respondeu HTTP ${resp.status} (erro definitivo, sem nova tentativa).`);
+      lastError = `HTTP ${resp.status}`;
+      const ra = Number(resp.headers.get('retry-after'));
+      if (ra > 0) waitMs = Math.min(ra * 1000, 15000);
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('erro definitivo')) throw e;
+      lastError = e instanceof Error ? (e.name === 'TimeoutError' ? `tempo esgotado (${timeoutMs / 1000}s)` : e.message) : String(e);
+    }
+    console.warn(`[PF] ${label}: tentativa ${attempt}/${MAX_ATTEMPTS} falhou (${lastError})`);
+    if (attempt < MAX_ATTEMPTS) await sleep(waitMs);
+  }
+  throw new RetriesExhaustedError(label, MAX_ATTEMPTS, lastError);
+}
+
 async function resolveUrls(): Promise<string[]> {
   const override = Deno.env.get('PF_ARRIVALS_CSV_URL');
   if (override) return [override];
-  const r = await fetch(DATASET_API, { signal: AbortSignal.timeout(30000) });
-  if (!r.ok) throw new Error(`dados.turismo.gov.br HTTP ${r.status}`);
+  const r = await fetchWithRetry(DATASET_API, 'o catálogo dados.turismo.gov.br', 30000);
   const d = await r.json();
   const csvs = (d?.result?.resources ?? [])
     .filter((x: any) => String(x.format).toUpperCase() === 'CSV' && /chegadas/i.test(x.url))
@@ -59,8 +90,7 @@ Deno.serve(async (req) => {
     };
 
     for (const url of urls) {
-      const resp = await fetch(url, { signal: AbortSignal.timeout(90000) });
-      if (!resp.ok) throw new Error(`PF CSV HTTP ${resp.status} (${url})`);
+      const resp = await fetchWithRetry(url, `o arquivo ${url.split('/').pop()}`, 90000);
       const buf = new Uint8Array(await resp.arrayBuffer());
       let text = new TextDecoder('utf-8').decode(buf);
       if (text.includes('\uFFFD')) text = new TextDecoder('latin1').decode(buf);
@@ -98,6 +128,9 @@ Deno.serve(async (req) => {
     return json({ success: true, message: `PF: ${processed} registros (UF×mês×via) importados de ${urls.length} arquivo(s).`, processed, failed, sources: urls });
   } catch (e) {
     console.error('[PF] Fatal:', e);
-    return json({ success: false, error: e instanceof Error ? e.message : 'Unknown error' }, 500);
+    if (e instanceof RetriesExhaustedError) {
+      return json({ success: false, code: 'retries_exhausted', attempts: e.attempts, error: e.message }, 502);
+    }
+    return json({ success: false, code: 'error', error: e instanceof Error ? e.message : 'Unknown error' }, 500);
   }
 });
