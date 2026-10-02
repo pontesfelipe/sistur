@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 26,
+  minor: 27,
   patch: 0,
 
   get full() {
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.27.0",
+    date: "2026-10-02",
+    type: "minor" as const,
+    changes: [
+      "Novas fontes de dados públicos (Fase 2): SNIS/SINISA (saneamento: água, esgoto, resíduos, perdas) e IPHAN/SICG (patrimônio cultural) para o pilar RA.",
+      "Novas tabelas `snis_sanitation_indicators` e `iphan_heritage_assets` (leitura autenticada, escrita só via serviço).",
+      "Novas funções `ingest-snis` e `ingest-iphan` (CSV configurável; sem fonte, registram skipped_no_source) e registro no catálogo e no disparador de ingestão.",
+    ],
+  },
   {
     version: "2.26.0",
     date: "2026-10-02",
