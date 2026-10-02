@@ -10,9 +10,7 @@ import { OrgAdminUsersPanel } from '@/components/settings/OrgAdminUsersPanel';
 import { OrganizationManagement } from '@/components/settings/OrganizationManagement';
 import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersPanel';
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
-import { NormalizationCalculator } from '@/components/tools/NormalizationCalculator';
 import { DataExporter } from '@/components/tools/DataExporter';
-import { IndicatorSimulator } from '@/components/tools/IndicatorSimulator';
 import { IndicatorWeightsManager } from '@/components/tools/IndicatorWeightsManager';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
@@ -26,7 +24,6 @@ import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel'
 import { HealthCheckPanel } from '@/components/tools/HealthCheckPanel';
 import MapaTurismoPanel from '@/components/official-data/MapaTurismoPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
-import { BusinessReviewSearch } from '@/components/enterprise/BusinessReviewSearch';
 import { IngestionHealthPanel } from '@/components/admin/IngestionHealthPanel';
 import { useProfile } from '@/hooks/useProfile';
 import { OrgReferralManagePanel, JoinOrgByCodePanel } from '@/components/settings/OrgReferralPanel';
