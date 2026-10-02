@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 29,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.29.1",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "`ingest-pf-turismo` lê direto o formato oficial de dados.turismo.gov.br (2 arquivos mais recentes, Latin-1, nome do estado e do mês), somando países por UF×mês×via + TOTAL. Primeira carga: 2025 (9,29 mi chegadas) e 2026 até agosto.",
+    ],
+  },
   {
     version: "2.29.0",
     date: "2026-10-02",
