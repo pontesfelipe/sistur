@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 27,
+  minor: 28,
   patch: 0,
 
   get full() {
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.28.0",
+    date: "2026-10-02",
+    type: "minor" as const,
+    changes: [
+      "Novas fontes de dados públicos (Fase 3): Polícia Federal/MTur (chegadas de turistas internacionais por UF, mês e via) e INMET (normais climatológicas 1991-2020 por estação).",
+      "Novas tabelas `pf_international_arrivals` e `inmet_climate_normals` (leitura autenticada, escrita só via serviço).",
+      "Novas funções `ingest-pf-turismo` e `ingest-inmet` (CSV configurável; sem fonte, registram skipped_no_source) e registro no catálogo e no disparador de ingestão. Google Trends adiado (sem API oficial).",
+    ],
+  },
   {
     version: "2.27.0",
     date: "2026-10-02",
