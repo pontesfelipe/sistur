@@ -9,11 +9,11 @@ const corsHeaders = {
 // SICONFI — API pública do Tesouro Nacional (RREO Anexo 02: despesa por função)
 const SICONFI_BASE = 'https://apidatalake.tesouro.gov.br/ords/siconfi/tt/rreo';
 
-// Funções orçamentárias de interesse
+// Funções orçamentárias de interesse (identificadas pelo nome em `conta`)
 const FUNCOES: Record<string, string> = {
-  '13': 'turismo',
-  '12': 'cultura',
-  '17': 'saneamento',
+  'TURISMO': 'turismo',
+  'CULTURA': 'cultura',
+  'SANEAMENTO': 'saneamento',
 };
 
 interface RreoRow {
@@ -26,7 +26,7 @@ interface RreoRow {
 async function fetchFuncaoSpending(
   ibgeCode: string, year: number,
 ): Promise<Map<string, { liquidada: number; empenhada: number }>> {
-  const url = `${SICONFI_BASE}?an_exercicio=${year}&nr_periodo=6&co_tipo_demonstrativo=RREO&no_anexo=RREO%20Anexo%2002&id_ente=${ibgeCode}`;
+  const url = `${SICONFI_BASE}?an_exercicio=${year}&nr_periodo=6&co_tipo_demonstrativo=RREO&no_anexo=RREO-Anexo%2002&id_ente=${ibgeCode}`;
   const resp = await fetch(url, { signal: AbortSignal.timeout(30000) });
   if (!resp.ok) throw new Error(`SICONFI HTTP ${resp.status}`);
   const data = await resp.json();
@@ -34,8 +34,8 @@ async function fetchFuncaoSpending(
 
   const result = new Map<string, { liquidada: number; empenhada: number }>();
   for (const row of rows) {
-    const cod = (row.cod_conta || '').trim();
-    const funcao = FUNCOES[cod];
+    const conta = (row.conta || '').trim().toUpperCase();
+    const funcao = FUNCOES[conta];
     if (!funcao) continue;
     const coluna = (row.coluna || '').toUpperCase();
     const entry = result.get(funcao) ?? { liquidada: 0, empenhada: 0 };
