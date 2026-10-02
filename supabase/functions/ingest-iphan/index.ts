@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
       }
     }
     const rows = [...seen.entries()].map(([k, v]) => {
-      const [ibge_code, asset_name] = k.split('|');
+      const ibge_code = k.slice(0, 7); const asset_name = k.slice(8);
       return { ibge_code, asset_name, asset_type: v.asset_type, protection_level: [...v.prot].sort().join('; ') || null, status: v.status };
     });
 
