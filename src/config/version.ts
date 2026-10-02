@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 29,
-  patch: 4,
+  patch: 5,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.29.5",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "`ingest-pf-turismo`: até 3 tentativas com espera crescente (2s, 4s + variação; respeita Retry-After) só para downloads GET e erros transitórios (rede, timeout, 408, 429, 5xx). Erros 4xx definitivos falham sem repetir. Ao esgotar, responde 502 `retries_exhausted` com mensagem clara.",
+      "`trigger-ingestion` grava no histórico a mensagem de erro legível da função; painel PF exibe alerta destacado quando a última importação falhou ou esgotou as tentativas.",
+    ],
+  },
   {
     version: "2.29.4",
     date: "2026-10-02",
