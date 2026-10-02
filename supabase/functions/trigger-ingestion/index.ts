@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
 const ALLOWED = new Set([
@@ -81,8 +81,8 @@ Deno.serve(async (req) => {
     .from("ingestion_runs")
     .insert({
       function_name: fn,
-      triggered_by: "admin",
-      triggered_user_id: userData.user.id,
+      triggered_by: triggeredBy,
+      triggered_user_id: triggeredUserId,
       status: "running",
       metadata: { source: "trigger-ingestion" },
     })
@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${SERVICE_KEY}`,
       },
-      body: JSON.stringify({ smoke_test: true, triggered_by: "admin" }),
+      body: JSON.stringify({ triggered_by: triggeredBy }),
     });
     const text = await resp.text();
     try { payload = JSON.parse(text); } catch { payload = text; }
