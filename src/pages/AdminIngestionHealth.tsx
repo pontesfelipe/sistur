@@ -64,6 +64,30 @@ const FN_DISPLAY: Record<string, string> = {
   'ingest-anatel': 'ANATEL (Cobertura)',
   'ingest-pf-turismo': 'Polícia Federal / MTur (Chegadas internacionais)',
   'ingest-observatory': 'Observatório (derivação automática de métricas)',
+  'ingest-caged': 'CAGED (Empregos no turismo)',
+  'ingest-siconfi': 'SICONFI (Finanças municipais)',
+  'ingest-snis': 'SNIS/SINISA (Saneamento)',
+  'ingest-iphan': 'IPHAN (Patrimônio protegido)',
+  'ingest-inmet': 'INMET (Normais climatológicas)',
+};
+
+const FN_SCHEDULE: Record<string, string> = {
+  'ingest-cadastur': 'Dia 1 de jan/abr/jul/out',
+  'ingest-mapa-turismo': 'Dia 1 de jan/abr/jul/out',
+  'ingest-ana': '1º de fevereiro',
+  'ingest-tse': '1º de maio',
+  'ingest-anatel': 'Todo dia 5',
+  'ingest-observatory': 'Todo dia 1',
+  'ingest-caged': 'Todo dia 5 (automação externa)',
+  'ingest-pf-turismo': 'Todo dia 10',
+  'ingest-iphan': 'Todo dia 12',
+  'ingest-siconfi': 'Todo dia 15',
+  'ingest-snis': 'Todo dia 18',
+  'ingest-inmet': '20 de março',
+};
+
+const TRIGGER_LABEL: Record<string, string> = {
+  cron: 'Agendamento', admin: 'Manual (admin)', manual: 'Manual', system: 'Sistema',
 };
 
 function formatDate(iso: string | null) {
@@ -81,6 +105,8 @@ function formatDuration(ms: number | null) {
 export default function AdminIngestionHealth() {
   const qc = useQueryClient();
   const [triggering, setTriggering] = useState<string | null>(null);
+  const [fnFilter, setFnFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const healthQuery = useQuery({
     queryKey: ['ingestion-health'],
@@ -99,7 +125,7 @@ export default function AdminIngestionHealth() {
         .from('ingestion_runs')
         .select('id, function_name, triggered_by, status, records_processed, records_failed, duration_ms, started_at, finished_at, error_message')
         .order('started_at', { ascending: false })
-        .limit(50);
+        .limit(200);
       if (error) throw error;
       return (data ?? []) as RunRow[];
     },
@@ -142,7 +168,7 @@ export default function AdminIngestionHealth() {
   return (
     <AppLayout
       title={tx("Saúde das Ingestões Oficiais")}
-      subtitle={tx("Monitoramento e teste manual das funções automáticas que coletam dados oficiais (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo).")}
+      subtitle={tx("Monitoramento e teste manual das funções automáticas que coletam dados oficiais (CADASTUR, ANA, TSE, ANATEL, Mapa do Turismo, CAGED, SICONFI, saneamento, IPHAN, PF/MTur, INMET).")}
       actions={
         <Button
           variant="outline"
@@ -204,7 +230,7 @@ export default function AdminIngestionHealth() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">{tx("Status atual por função")}</CardTitle>
-            <CardDescription>{tx("Teste manual (smoke test) registra a execução no histórico abaixo.")}</CardDescription>
+            <CardDescription>{tx("Cada fonte atualiza sozinha no agendamento; use \"Atualizar agora\" para iniciar manualmente. Toda execução fica registrada no histórico abaixo.")}</CardDescription>
           </CardHeader>
           <CardContent>
             {healthQuery.isLoading ? (
@@ -238,6 +264,10 @@ export default function AdminIngestionHealth() {
                             {row.last_run_at ? `${formatDate(row.last_run_at)} (${row.age_days}d)` : 'Nunca'}
                           </div>
                         </div>
+                        <div className="col-span-2">
+                          <div className="text-muted-foreground">{tx("Próxima atualização automática")}</div>
+                          <div className="font-medium">{tx(FN_SCHEDULE[row.function_name] ?? '—')}</div>
+                        </div>
                         <div>
                           <div className="text-muted-foreground">{tx("Processados")}</div>
                           <div className="font-medium tabular-nums">{row.last_records_processed ?? 0}</div>
@@ -257,10 +287,14 @@ export default function AdminIngestionHealth() {
                         variant="outline"
                         className="w-full"
                         disabled={triggering === row.function_name}
-                        onClick={() => triggerMut.mutate(row.function_name)}
+                        onClick={() => {
+                          if (window.confirm(tx('Iniciar agora a atualização completa desta fonte? Pode levar alguns minutos.'))) {
+                            triggerMut.mutate(row.function_name);
+                          }
+                        }}
                       >
                         <PlayCircle className="h-4 w-4 mr-2" />
-                        {triggering === row.function_name ? 'Executando...' : tx('Smoke test')}
+                        {triggering === row.function_name ? tx('Atualizando...') : tx('Atualizar agora')}
                       </Button>
                     </div>
                   );
