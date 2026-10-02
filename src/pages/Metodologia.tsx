@@ -1119,7 +1119,7 @@ export default function Metodologia() {
                   <li className="flex items-start gap-2"><span className="text-green-600">🏛️</span> <strong>{tx("IPHAN / SICG")}</strong>: {tx("Bens culturais tombados e registrados no município — pilar RA")}</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">✈️</span> <strong>{tx("Polícia Federal / MTur")}</strong>: {tx("Chegadas de turistas internacionais por UF, mês e via de entrada — demanda internacional")}</li>
                   <li className="flex items-start gap-2"><span className="text-green-600">🌦️</span> <strong>{tx("INMET (Normais 1991-2020)")}</strong>: {tx("Temperatura e chuva médias mensais por estação — sazonalidade")}</li>
-                  <li className="text-xs text-muted-foreground">{tx("IPHAN é consultado direto no geoserver oficial. CAGED (microdados mensais do MTE agregados por município e setor turístico), SNIS, PF e INMET são importados de arquivos de dados abertos. Sem dado disponível, o indicador fica fora do pré-preenchimento.")}</li>
+                  <li className="text-xs text-muted-foreground">{tx("IPHAN é consultado direto no geoserver oficial. CAGED (microdados mensais do MTE agregados por município e setor turístico, com atualização automática mensal via agendamento externo), SNIS, PF e INMET são importados de arquivos de dados abertos. Sem dado disponível, o indicador fica fora do pré-preenchimento.")}</li>
                 </ul>
               </div>
 

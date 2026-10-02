@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 29,
-  patch: 5,
+  minor: 30,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.30.0",
+    date: "2026-10-02",
+    type: "minor" as const,
+    changes: [
+      "Automação mensal do CAGED: repositório GitHub Actions (pontesfelipe/sistur-caged-ingest) roda todo dia 5, baixa o CAGEDMOV do FTP do MTE, agrega por município × setor turístico (via API de municípios do IBGE) e envia ao SISTUR.",
+      "Nova função `receive-caged`: porta de entrada autenticada por token que recebe o CSV agregado, grava em `official-data/caged/` e dispara a importação automaticamente.",
+      "Validado de ponta a ponta: execução de teste baixou ago/2026, enviou 8.704 linhas e a importação processou 69.994 registros (jan–ago/2026) sem falhas.",
+    ],
+  },
   {
     version: "2.29.5",
     date: "2026-10-02",
