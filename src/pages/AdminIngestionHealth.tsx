@@ -330,7 +330,7 @@ export default function AdminIngestionHealth() {
               <Skeleton className="h-48 w-full" />
             ) : (runsQuery.data ?? []).length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
-                {tx("Nenhuma execução registrada ainda. Use "Atualizar agora" para começar.")}
+                {tx("Nenhuma execução registrada ainda. Use 'Atualizar agora' para começar.")}
               </div>
             ) : (
               <div className="rounded-md border max-h-[500px] overflow-auto">
