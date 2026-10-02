@@ -7348,6 +7348,36 @@ export type Database = {
           },
         ]
       }
+      iphan_heritage_assets: {
+        Row: {
+          asset_name: string
+          asset_type: string | null
+          created_at: string
+          ibge_code: string
+          id: string
+          protection_level: string | null
+          status: string | null
+        }
+        Insert: {
+          asset_name: string
+          asset_type?: string | null
+          created_at?: string
+          ibge_code: string
+          id?: string
+          protection_level?: string | null
+          status?: string | null
+        }
+        Update: {
+          asset_name?: string
+          asset_type?: string | null
+          created_at?: string
+          ibge_code?: string
+          id?: string
+          protection_level?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       issues: {
         Row: {
           assessment_id: string
@@ -11128,6 +11158,45 @@ export type Database = {
           id?: string
           reference_year?: number
           source_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      snis_sanitation_indicators: {
+        Row: {
+          agua_cobertura_pct: number | null
+          created_at: string
+          esgoto_coleta_pct: number | null
+          esgoto_tratamento_pct: number | null
+          ibge_code: string
+          id: string
+          perdas_agua_pct: number | null
+          reference_year: number
+          residuos_coleta_pct: number | null
+          updated_at: string
+        }
+        Insert: {
+          agua_cobertura_pct?: number | null
+          created_at?: string
+          esgoto_coleta_pct?: number | null
+          esgoto_tratamento_pct?: number | null
+          ibge_code: string
+          id?: string
+          perdas_agua_pct?: number | null
+          reference_year: number
+          residuos_coleta_pct?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agua_cobertura_pct?: number | null
+          created_at?: string
+          esgoto_coleta_pct?: number | null
+          esgoto_tratamento_pct?: number | null
+          ibge_code?: string
+          id?: string
+          perdas_agua_pct?: number | null
+          reference_year?: number
+          residuos_coleta_pct?: number | null
           updated_at?: string
         }
         Relationships: []

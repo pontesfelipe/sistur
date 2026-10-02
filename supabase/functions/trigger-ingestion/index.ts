@@ -15,6 +15,8 @@ const ALLOWED = new Set([
   "ingest-observatory",
   "ingest-caged",
   "ingest-siconfi",
+  "ingest-snis",
+  "ingest-iphan",
 ]);
 
 Deno.serve(async (req) => {
