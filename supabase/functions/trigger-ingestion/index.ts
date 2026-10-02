@@ -104,7 +104,10 @@ Deno.serve(async (req) => {
     try { payload = JSON.parse(text); } catch { payload = text; }
     if (!resp.ok) {
       finalStatus = "failed";
-      errorMessage = typeof payload === "string"
+      const pe = payload && typeof payload === "object" ? (payload as Record<string, unknown>).error : null;
+      errorMessage = typeof pe === "string"
+        ? pe.slice(0, 1000)
+        : typeof payload === "string"
         ? payload.slice(0, 500)
         : JSON.stringify(payload).slice(0, 500);
     } else if (payload && typeof payload === "object") {
