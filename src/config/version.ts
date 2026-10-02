@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 29,
-  patch: 3,
+  patch: 4,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.29.4",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "Admin › Saúde das Ingestões: novo painel da importação PF/MTur com último status, último sucesso, contagem de falhas e histórico das 30 últimas execuções (início, fim, origem, duração e mensagem de erro completa).",
+    ],
+  },
   {
     version: "2.29.3",
     date: "2026-10-02",
