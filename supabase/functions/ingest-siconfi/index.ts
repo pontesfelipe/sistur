@@ -39,8 +39,9 @@ async function fetchFuncaoSpending(
     if (!funcao) continue;
     const coluna = (row.coluna || '').toUpperCase();
     const entry = result.get(funcao) ?? { liquidada: 0, empenhada: 0 };
-    if (coluna.includes('LIQUIDADAS')) entry.liquidada += Number(row.valor || 0);
-    else if (coluna.includes('EMPENHADAS')) entry.empenhada += Number(row.valor || 0);
+    // Apenas colunas acumuladas "ATÉ O BIMESTRE" — evita duplicar com "NO BIMESTRE"
+    if (coluna.includes('LIQUIDADAS') && coluna.includes('ATÉ O BIMESTRE')) entry.liquidada += Number(row.valor || 0);
+    else if (coluna.includes('EMPENHADAS') && coluna.includes('ATÉ O BIMESTRE')) entry.empenhada += Number(row.valor || 0);
     result.set(funcao, entry);
   }
   return result;
