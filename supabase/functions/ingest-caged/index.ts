@@ -39,23 +39,28 @@ Deno.serve(async (req) => {
     try { body = await req.json(); } catch { /* ok */ }
     const filterIbge: string | undefined = body.ibge_code;
 
+    // Fonte: CAGED_CSV_URL ou agregados oficiais em official-data/caged/*.csv
+    // (gerados a partir dos microdados CAGEDMOV do FTP do MTE, CNAEs turísticas).
     const csvUrl = Deno.env.get('CAGED_CSV_URL');
-    if (!csvUrl) {
-      console.log('[CAGED] CAGED_CSV_URL não configurada — execução registrada como skipped_no_source');
-      return new Response(
-        JSON.stringify({
-          success: true,
-          status: 'skipped_no_source',
-          message: 'CAGED: fonte CSV não configurada (CAGED_CSV_URL). Nenhum dado importado.',
-          processed: 0,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+    let text = '';
+    if (csvUrl) {
+      const resp = await fetch(csvUrl, { signal: AbortSignal.timeout(60000) });
+      if (!resp.ok) throw new Error(`CAGED CSV HTTP ${resp.status}`);
+      text = await resp.text();
+    } else {
+      const { data: files } = await supabase.storage.from('official-data').list('caged');
+      const csvs = (files ?? []).filter((f) => f.name.endsWith('.csv')).map((f) => f.name).sort();
+      if (!csvs.length) {
+        return new Response(JSON.stringify({ success: true, status: 'skipped_no_source', message: 'CAGED: nenhuma fonte configurada.', processed: 0 }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      for (const name of csvs) {
+        const { data, error } = await supabase.storage.from('official-data').download(`caged/${name}`);
+        if (error || !data) throw new Error(`CAGED storage: ${error?.message ?? name}`);
+        const t = await data.text();
+        text += (text ? t.split(/\r?\n/).slice(1).join('\n') : t) + '\n';
+      }
     }
-
-    const resp = await fetch(csvUrl, { signal: AbortSignal.timeout(60000) });
-    if (!resp.ok) throw new Error(`CAGED CSV HTTP ${resp.status}`);
-    const text = await resp.text();
     const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
 
     const rows: Record<string, unknown>[] = [];
@@ -73,7 +78,7 @@ Deno.serve(async (req) => {
         desligamentos: parseInt(desl || '0', 10) || 0,
         estoque_empregos: estoque ? parseInt(estoque, 10) : null,
       });
-      if (rows.length >= 5000) break; // proteção de memória
+      if (rows.length >= 200000) break; // proteção de memória
     }
 
     let upsertCount = 0;

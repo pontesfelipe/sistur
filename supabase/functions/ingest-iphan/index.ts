@@ -28,32 +28,39 @@ Deno.serve(async (req) => {
     const filterIbge: string | undefined = body.ibge_code;
 
     const csvUrl = Deno.env.get('IPHAN_CSV_URL');
-    if (!csvUrl) {
-      return json({ success: true, status: 'skipped_no_source', message: 'IPHAN: fonte CSV não configurada (IPHAN_CSV_URL).', processed: 0 });
+    const seen = new Map<string, { asset_type: string | null; prot: Set<string>; status: string | null }>();
+    const add = (ibge: string, nome: string, tipo?: string | null, prot?: string | null, sit?: string | null) => {
+      if (!/^\d{7}$/.test(ibge || '') || !nome) return;
+      if (filterIbge && ibge !== filterIbge) return;
+      const key = `${ibge}|${nome.slice(0, 500)}`;
+      const cur = seen.get(key);
+      if (cur) { if (prot) cur.prot.add(prot.toLowerCase()); return; }
+      seen.set(key, { asset_type: tipo?.toLowerCase() || null, prot: new Set(prot ? [prot.toLowerCase()] : []), status: sit || null });
+    };
+    if (csvUrl) {
+      const resp = await fetch(csvUrl, { signal: AbortSignal.timeout(60000) });
+      if (!resp.ok) throw new Error(`IPHAN CSV HTTP ${resp.status}`);
+      for (const line of (await resp.text()).split(/\r?\n/).slice(1)) {
+        const [ibge, nome, tipo, protecao, situacao] = line.split(';').map((s) => s.trim());
+        add(ibge, nome, tipo, protecao, situacao);
+      }
+    } else {
+      // Geoserver público do IPHAN (SICG:Bem_Protecao). co_iphan = UF + código IBGE (7 dígitos) + ...
+      const url = 'https://geoserver.iphan.gov.br/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature'
+        + '&typeName=SICG:Bem_Protecao&outputFormat=application/json'
+        + '&propertyName=identificacao_bem,co_iphan,ds_natureza,ds_tipo_protecao,ds_condicao_protecao';
+      const resp = await fetch(url, { signal: AbortSignal.timeout(120000) });
+      if (!resp.ok) throw new Error(`IPHAN WFS HTTP ${resp.status}`);
+      const geo = await resp.json();
+      for (const f of geo.features ?? []) {
+        const p = f.properties ?? {};
+        add(String(p.co_iphan ?? '').slice(2, 9), String(p.identificacao_bem ?? '').trim(), p.ds_natureza, p.ds_tipo_protecao, p.ds_condicao_protecao);
+      }
     }
-
-    const resp = await fetch(csvUrl, { signal: AbortSignal.timeout(60000) });
-    if (!resp.ok) throw new Error(`IPHAN CSV HTTP ${resp.status}`);
-    const lines = (await resp.text()).split(/\r?\n/).filter((l) => l.trim());
-
-    const seen = new Set<string>();
-    const rows: Record<string, unknown>[] = [];
-    for (const line of lines.slice(1)) {
-      const [ibge, nome, tipo, protecao, situacao] = line.split(';').map((s) => s.trim());
-      if (!ibge || !nome) continue;
-      if (filterIbge && ibge !== filterIbge) continue;
-      const key = `${ibge}|${nome}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      rows.push({
-        ibge_code: ibge,
-        asset_name: nome.slice(0, 500),
-        asset_type: tipo?.toLowerCase() || null,
-        protection_level: protecao?.toLowerCase() || null,
-        status: situacao || null,
-      });
-      if (rows.length >= 20000) break;
-    }
+    const rows = [...seen.entries()].map(([k, v]) => {
+      const [ibge_code, asset_name] = k.split('|');
+      return { ibge_code, asset_name, asset_type: v.asset_type, protection_level: [...v.prot].sort().join('; ') || null, status: v.status };
+    });
 
     let processed = 0;
     for (let i = 0; i < rows.length; i += 500) {
