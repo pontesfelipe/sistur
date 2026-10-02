@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 28,
+  minor: 29,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.29.0",
+    date: "2026-10-02",
+    type: "minor" as const,
+    changes: [
+      "Novas fontes de dados públicos (Fase 4): painel de saúde das ingestões passa a monitorar CAGED, SICONFI, SNIS, IPHAN, PF e INMET (cadência e defasagem esperadas).",
+      "Metodologia: fontes automatizadas atualizadas com as 6 novas fontes oficiais e regra de importação por planilha de dados abertos.",
+    ],
+  },
   {
     version: "2.28.0",
     date: "2026-10-02",
