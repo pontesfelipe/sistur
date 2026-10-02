@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 25,
+  minor: 26,
   patch: 0,
 
   get full() {
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.26.0",
+    date: "2026-10-02",
+    type: "minor" as const,
+    changes: [
+      "Novas fontes de dados públicos (Fase 1 do plano de melhoria): Novo CAGED (empregos formais no turismo por município) e SICONFI/FINBRA (despesa municipal realizada em Turismo, Cultura e Saneamento).",
+      "Novas tabelas `caged_tourism_employment` e `siconfi_municipal_spending` com leitura pública autenticada e escrita apenas via serviço.",
+      "Novas funções de ingestão `ingest-caged` (CSV de dados abertos, com registro de execução mesmo sem fonte configurada) e `ingest-siconfi` (API pública do Tesouro Nacional, RREO Anexo 02).",
+      "Ambas as fontes registradas no catálogo `external_data_sources` e no disparador administrativo de ingestão.",
+    ],
+  },
   {
     version: "2.25.0",
     date: "2026-10-01",

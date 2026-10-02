@@ -1195,6 +1195,51 @@ export type Database = {
         }
         Relationships: []
       }
+      caged_tourism_employment: {
+        Row: {
+          admissoes: number
+          created_at: string
+          desligamentos: number
+          estoque_empregos: number | null
+          ibge_code: string
+          id: string
+          reference_month: number
+          reference_year: number
+          saldo_empregos: number
+          sector: string
+          source_code: string
+          updated_at: string
+        }
+        Insert: {
+          admissoes?: number
+          created_at?: string
+          desligamentos?: number
+          estoque_empregos?: number | null
+          ibge_code: string
+          id?: string
+          reference_month: number
+          reference_year: number
+          saldo_empregos?: number
+          sector: string
+          source_code?: string
+          updated_at?: string
+        }
+        Update: {
+          admissoes?: number
+          created_at?: string
+          desligamentos?: number
+          estoque_empregos?: number | null
+          ibge_code?: string
+          id?: string
+          reference_month?: number
+          reference_year?: number
+          saldo_empregos?: number
+          sector?: string
+          source_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           certificate_id: string
@@ -11050,6 +11095,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      siconfi_municipal_spending: {
+        Row: {
+          created_at: string
+          despesa_empenhada: number | null
+          despesa_realizada: number
+          funcao: string
+          ibge_code: string
+          id: string
+          reference_year: number
+          source_code: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          despesa_empenhada?: number | null
+          despesa_realizada?: number
+          funcao: string
+          ibge_code: string
+          id?: string
+          reference_year: number
+          source_code?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          despesa_empenhada?: number | null
+          despesa_realizada?: number
+          funcao?: string
+          ibge_code?: string
+          id?: string
+          reference_year?: number
+          source_code?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       stakeholder_profiles: {
         Row: {
