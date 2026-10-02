@@ -1,13 +1,20 @@
 import { getDateLocale } from '@/i18n/dateLocale';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { useMapaTurismo, useMapaTurismoStats, useMapaTurismoSyncLogs, useIngestMapaTurismo } from '@/hooks/useMapaTurismo';
-import { Loader2, Download, MapPin, BarChart3, RefreshCw, CheckCircle2, XCircle, Clock, Flame, Database } from 'lucide-react';
+import { Loader2, Download, MapPin, BarChart3, RefreshCw, CheckCircle2, XCircle, Clock, Flame, Database, Search, ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
