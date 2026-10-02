@@ -29,29 +29,41 @@ Deno.serve(async (req) => {
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-  // Authenticate caller and require ADMIN
-  const auth = req.headers.get("Authorization") ?? "";
-  const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
-    global: { headers: { Authorization: auth } },
-  });
-  const { data: userData, error: userErr } = await userClient.auth.getUser();
-  if (userErr || !userData?.user) {
-    return new Response(JSON.stringify({ error: "unauthenticated" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-  const { data: hasAdmin } = await admin.rpc("has_role", {
-    _user_id: userData.user.id,
-    _role: "ADMIN",
-  });
-  if (!hasAdmin) {
-    return new Response(JSON.stringify({ error: "not_authorized" }), {
-      status: 403,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+  let triggeredBy: "admin" | "cron" = "admin";
+  let triggeredUserId: string | null = null;
+
+  // (a) Agendamento automático: cabeçalho x-cron-secret válido
+  const cronHeader = req.headers.get("x-cron-secret") ?? "";
+  if (cronHeader) {
+    const { data: sec } = await admin
+      .from("internal_cron_secrets").select("value")
+      .eq("name", "ingestion_cron_secret").maybeSingle();
+    if (!sec?.value || sec.value !== cronHeader) {
+      return new Response(JSON.stringify({ error: "invalid_cron_secret" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    triggeredBy = "cron";
+  } else {
+    // (b) Admin autenticado
+    const auth = req.headers.get("Authorization") ?? "";
+    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: auth } },
     });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "unauthenticated" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: hasAdmin } = await admin.rpc("has_role", { _user_id: userData.user.id, _role: "ADMIN" });
+    if (!hasAdmin) {
+      return new Response(JSON.stringify({ error: "not_authorized" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    triggeredUserId = userData.user.id;
   }
 
   let body: { function_name?: string } = {};
