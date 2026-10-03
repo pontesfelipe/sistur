@@ -12,7 +12,6 @@ import { OrganizationUsersPanel } from '@/components/settings/OrganizationUsersP
 import { LogAnalytics } from '@/components/analytics/LogAnalytics';
 import { DataExporter } from '@/components/tools/DataExporter';
 import { IndicatorSimulator } from '@/components/tools/IndicatorSimulator';
-import { IndicatorWeightsManager } from '@/components/tools/IndicatorWeightsManager';
 import { DemoModeToggle } from '@/components/settings/DemoModeToggle';
 import { PendingApprovalsPanel } from '@/components/settings/PendingApprovalsPanel';
 import { ActAsUserPanel } from '@/components/settings/ActAsUserPanel';
@@ -595,7 +594,6 @@ export default function Configuracoes() {
             </Card>
 
             {/* Indicator Weights Manager - Admin only */}
-            {isAdmin && <IndicatorWeightsManager />}
 
             {/* Health Check Panel - Admin only */}
             {isAdmin && (

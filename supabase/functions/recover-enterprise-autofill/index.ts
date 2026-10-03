@@ -169,12 +169,29 @@ Deno.serve(async (req) => {
 
     // Load enterprise_profile for this destination + org
     const cols = Object.keys(ANALYSIS_MAP).join(',');
-    const { data: profile, error: pErr } = await admin
+    // Prefer the assessment's org; fall back to the destination's own org
+    // (e.g. diagnostics created over Demo destinations).
+    let { data: profile, error: pErr } = await admin
       .from('enterprise_profiles')
       .select(`id, ${cols}`)
       .eq('destination_id', assessment.destination_id)
       .eq('org_id', assessment.org_id)
       .maybeSingle();
+    if (!pErr && !profile) {
+      const { data: dest } = await admin
+        .from('destinations').select('org_id').eq('id', assessment.destination_id).maybeSingle();
+      if (dest?.org_id) {
+        const r = await admin
+          .from('enterprise_profiles')
+          .select(`id, ${cols}`)
+          .eq('destination_id', assessment.destination_id)
+          .eq('org_id', dest.org_id)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        profile = r.data; pErr = r.error;
+      }
+    }
     if (pErr || !profile) {
       return new Response(JSON.stringify({ error: 'Perfil enterprise não encontrado para este destino' }), {
         status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -258,7 +275,7 @@ Deno.serve(async (req) => {
 
     const calcRes = await fetch(`${supabaseUrl}/functions/v1/calculate-assessment`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}` },
+      headers: { 'Content-Type': 'application/json', Authorization: req.headers.get('Authorization') ?? '', apikey: Deno.env.get('SUPABASE_ANON_KEY') ?? '' },
       body: JSON.stringify({ assessment_id }),
     });
     const calcOk = calcRes.ok;

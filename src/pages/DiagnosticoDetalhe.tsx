@@ -545,7 +545,14 @@ const DiagnosticoDetalhe = () => {
       const { data, error } = await supabase.functions.invoke('recover-enterprise-autofill', {
         body: { assessment_id: id },
       });
-      if (error) throw error;
+      if (error) {
+        let msg = error.message;
+        try {
+          const body = await (error as any).context?.json?.();
+          if (body?.error) msg = body.error;
+        } catch { /* ignore */ }
+        throw new Error(msg);
+      }
       if (!data?.ok) {
         toast.error(data?.error || 'Não foi possível recuperar valores automáticos', { id: t });
         return;

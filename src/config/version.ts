@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 31,
-  patch: 4,
+  patch: 5,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.31.5",
+    date: "2026-10-02",
+    type: "patch" as const,
+    changes: [
+      "Diagnóstico Enterprise: 'Recuperar valores automáticos' agora encontra o perfil da empresa mesmo quando o destino pertence a outra organização (ex.: Demo), e mostra a mensagem real do servidor em caso de falha.",
+      "Configurações › Ferramentas: removido o 'Ajuste de Pesos dos Indicadores' — somava indicadores territoriais e empresariais juntos e exibia porcentagens acima de 100%; o ajuste seguro continua em Diagnósticos › Indicadores › Pesos.",
+    ],
+  },
   {
     version: "2.31.4",
     date: "2026-10-02",
