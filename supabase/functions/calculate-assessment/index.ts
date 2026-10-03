@@ -1006,12 +1006,26 @@ async function runCalculationCore(
         console.log(`Fetching validated external data for IBGE code: ${destinationIbgeCode}`);
         
         // Fetch validated external indicator values
-        const { data: externalValues, error: externalError } = await supabase
+        // Pré-preenchimento obrigatório: usa dados oficiais da org do diagnóstico
+        // E da org dona do destino (ex.: destinos Demo). Valores ainda não
+        // revisados também entram — só ficam de fora os que o usuário recusou
+        // (indicator_values.is_ignored) ou que não têm valor/fonte oficial.
+        const extOrgIds = Array.from(new Set([orgId, assessment.destination?.org_id].filter(Boolean)));
+        const { data: externalRaw, error: externalError } = await supabase
           .from("external_indicator_values")
-          .select("indicator_code, raw_value, source_code, reference_year")
+          .select("indicator_code, raw_value, source_code, reference_year, validated, org_id")
           .eq("municipality_ibge_code", destinationIbgeCode)
-          .eq("org_id", orgId)
-          .eq("validated", true);
+          .in("org_id", extOrgIds)
+          .neq("source_code", "MANUAL")
+          .not("raw_value", "is", null);
+        // Dedup por indicador: prioriza validado, depois org do diagnóstico.
+        const extByCode = new Map<string, any>();
+        for (const ev of (externalRaw || []) as any[]) {
+          const rank = (ev.validated ? 2 : 0) + (ev.org_id === orgId ? 1 : 0);
+          const cur = extByCode.get(ev.indicator_code);
+          if (!cur || rank > cur._rank) extByCode.set(ev.indicator_code, { ...ev, _rank: rank });
+        }
+        const externalValues = Array.from(extByCode.values());
 
         if (externalError) {
           console.error("Error fetching external indicator values:", externalError);
@@ -2398,7 +2412,7 @@ async function runCalculationCore(
           .from("external_indicator_values")
           .select("indicator_code, raw_value, raw_value_text, source_code, reference_year, confidence_level, collection_method")
           .eq("municipality_ibge_code", destinationIbgeCode)
-          .eq("org_id", orgId);
+          .in("org_id", Array.from(new Set([orgId, assessment.destination?.org_id].filter(Boolean))));
 
         if (allExternalValues && allExternalValues.length > 0) {
           const snapshots = allExternalValues.map((ev: any) => ({
