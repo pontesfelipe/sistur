@@ -16,6 +16,7 @@ import { PreCalculationChecklist } from '@/components/diagnostics/PreCalculation
 import { DataProvenancePanel } from '@/components/diagnostics/DataProvenancePanel';
 import { AssessmentAuditTrail } from '@/components/diagnostics/AssessmentAuditTrail';
 import { DataLineageView } from '@/components/diagnostics/DataLineageView';
+import { PrefillExplanation } from '@/components/diagnostics/PrefillExplanation';
 import { ExecutiveSummary } from '@/components/diagnostics/ExecutiveSummary';
 import { TrialResultsTeaser } from '@/components/diagnostics/TrialResultsTeaser';
 import { useTrialState } from '@/hooks/useTrialState';
@@ -1290,6 +1291,7 @@ const DiagnosticoDetalhe = () => {
 
           {/* Linhagem dos Dados Tab */}
           <TabsContent value="linhagem" className="space-y-4">
+            {id && <PrefillExplanation assessmentId={id} indicatorValues={indicatorValues as any} />}
             <DataLineageView
               auditRows={auditRows as any}
               indicatorValues={indicatorValues as any}
