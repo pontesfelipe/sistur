@@ -275,7 +275,7 @@ Deno.serve(async (req) => {
 
     const calcRes = await fetch(`${supabaseUrl}/functions/v1/calculate-assessment`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}` },
+      headers: { 'Content-Type': 'application/json', Authorization: req.headers.get('Authorization') ?? '', apikey: Deno.env.get('SUPABASE_ANON_KEY') ?? '' },
       body: JSON.stringify({ assessment_id }),
     });
     const calcOk = calcRes.ok;
