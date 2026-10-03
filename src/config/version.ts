@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 31,
-  patch: 5,
+  patch: 6,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.31.6",
+    date: "2026-10-03",
+    type: "patch" as const,
+    changes: [
+      "Cálculo territorial passa a usar sempre os dados oficiais disponíveis do município (inclusive de destinos Demo e ainda não revisados); só ficam de fora os recusados pelo usuário",
+      "Linhagem dos Dados explica por que há poucos ou nenhum dado pré-preenchido e como resolver",
+    ],
+  },
   {
     version: "2.31.5",
     date: "2026-10-02",
