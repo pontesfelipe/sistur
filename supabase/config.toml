@@ -55,3 +55,5 @@ project_id = "enexnpmkhvgufcervjsv"
     verify_jwt = true
   [functions.change-plan]
   verify_jwt = false
+  [functions.summarize-global-reference]
+    verify_jwt = false
