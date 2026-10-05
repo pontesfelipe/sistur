@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 31,
-  patch: 6,
+  minor: 32,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.32.0",
+    date: "2026-10-05",
+    type: "minor" as const,
+    changes: [
+      "Referências Globais: ao escolher o arquivo, a IA lê o documento inteiro e sugere um resumo estruturado (tese, diretrizes, metas, relação com RA/OE/AO, implicações para o município) para revisão antes de salvar",
+      "Referências Globais: botão 'Melhorar com IA' relê o documento e aprimora o resumo existente, mantendo o que estiver correto",
+      "Limpeza de marcas de citação coladas por engano no meio de dois resumos existentes",
+    ],
+  },
   {
     version: "2.31.6",
     date: "2026-10-03",
