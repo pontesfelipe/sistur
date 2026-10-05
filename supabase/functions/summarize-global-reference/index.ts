@@ -100,22 +100,43 @@ TEXTO DO DOCUMENTO${truncated ? " (truncado por tamanho)" : ""}:
 ${text}
 """`;
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch", "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [{ role: "system", content: system }, { role: "user", content: user }],
+        model: "openai/gpt-6-astra",
+        instructions: system,
+        input: [{ role: "user", content: [{ type: "input_text", text: user }] }],
+        stream: true,
+        store: false,
+        reasoning: { effort: "low" },
       }),
     });
     if (res.status === 429) return json({ error: "Limite de requisições de IA excedido. Tente em alguns minutos." }, 429);
     if (res.status === 402) return json({ error: "Créditos de IA insuficientes." }, 402);
-    if (!res.ok) {
-      console.error("AI error", res.status, await res.text());
+    if (!res.ok || !res.body) {
+      console.error("AI error", res.status, await res.text().catch(() => ""));
       return json({ error: "Falha ao gerar o resumo com IA." }, 502);
     }
-    const data = await res.json();
-    const summary = String(data.choices?.[0]?.message?.content || "").replace(/\*\*/g, "").replace(/^#+\s*/gm, "").trim();
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "", out = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let i: number;
+      while ((i = buf.indexOf("\n")) !== -1) {
+        const line = buf.slice(0, i).trim();
+        buf = buf.slice(i + 1);
+        if (!line.startsWith("data:")) continue;
+        try {
+          const ev = JSON.parse(line.slice(5).trim());
+          if (ev.type === "response.output_text.delta") out += ev.delta;
+        } catch { /* ignore */ }
+      }
+    }
+    const summary = out.replace(/\*\*/g, "").replace(/^#+\s*/gm, "").trim();
     if (!summary) return json({ error: "A IA não retornou resumo." }, 502);
     return json({ summary, chars_read: text.length, truncated });
   } catch (e) {
