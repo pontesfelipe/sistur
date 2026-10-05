@@ -13,14 +13,15 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Upload, FileText, Trash2, Download, Edit, FolderOpen, Plus,
-  File, FileSpreadsheet, BookOpenCheck, Eye, EyeOff,
+  File, FileSpreadsheet, BookOpenCheck, Eye, EyeOff, Sparkles, Loader2,
 } from 'lucide-react';
 import {
   useGlobalReferenceFiles, useUploadGlobalReference, useDeleteGlobalReference,
   useDownloadGlobalReference, useUpdateGlobalReference,
-  REFERENCE_CATEGORIES, ACCEPTED_EXTENSIONS, GlobalReferenceFile,
+  REFERENCE_CATEGORIES, ACCEPTED_EXTENSIONS, GlobalReferenceFile, generateReferenceSummary,
 } from '@/hooks/useGlobalReferences';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 import { ptBR } from 'date-fns/locale';
 
 const fileIcon = (type: string) => {
@@ -165,6 +166,20 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('plano_nacional');
   const [summary, setSummary] = useState('');
+  const [generating, setGenerating] = useState(false);
+
+  const runSummary = async (f: File) => {
+    setGenerating(true);
+    try {
+      const r = await generateReferenceSummary({ file: f, category, description });
+      setSummary(r.summary);
+      toast.success(r.truncated ? 'Resumo gerado (documento muito longo: lida a parte inicial). Revise antes de salvar.' : 'Resumo gerado a partir do documento inteiro. Revise antes de salvar.');
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!file) return;
@@ -184,7 +199,7 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <input ref={fileRef} type="file" accept={ACCEPTED_EXTENSIONS.join(',')} className="hidden" onChange={e => setFile(e.target.files?.[0] || null)} />
+            <input ref={fileRef} type="file" accept={ACCEPTED_EXTENSIONS.join(',')} className="hidden" onChange={e => { const f = e.target.files?.[0] || null; setFile(f); if (f && !summary) runSummary(f); }} />
             <Button variant="outline" className="w-full h-24 border-dashed" onClick={() => fileRef.current?.click()}>
               {file ? (
                 <div className="flex items-center gap-2">
@@ -212,15 +227,20 @@ function UploadDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
             placeholder={tx("Resumo do documento (será injetado nos prompts de geração de relatórios)")}
             value={summary}
             onChange={e => setSummary(e.target.value)}
-            rows={4}
+            rows={8}
+            disabled={generating}
           />
+          <Button type="button" variant="secondary" size="sm" disabled={!file || generating} onClick={() => file && runSummary(file)}>
+            {generating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+            {generating ? tx('Lendo o documento e gerando resumo...') : tx('Gerar resumo com IA')}
+          </Button>
           <p className="text-xs text-muted-foreground">
-            {tx("💡 O resumo é fundamental: ele será incluído automaticamente no contexto da IA ao gerar relatórios e diagnósticos.")}
+            {tx("💡 Ao escolher o arquivo, a IA lê o documento inteiro e sugere o resumo. É ele que o Professor Beni e os relatórios usam — revise e ajuste antes de salvar.")}
           </p>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{tx("Cancelar")}</Button>
-          <Button onClick={handleSubmit} disabled={!file || uploadFile.isPending}>
+          <Button onClick={handleSubmit} disabled={!file || uploadFile.isPending || generating}>
             {uploadFile.isPending ? 'Enviando...' : 'Adicionar'}
           </Button>
         </DialogFooter>
@@ -233,6 +253,20 @@ function EditDialog({ file, open, onOpenChange }: { file: GlobalReferenceFile; o
   const updateFile = useUpdateGlobalReference();
   const [description, setDescription] = useState(file.description || '');
   const [summary, setSummary] = useState(file.summary || '');
+  const [generating, setGenerating] = useState(false);
+
+  const runSummary = async () => {
+    setGenerating(true);
+    try {
+      const r = await generateReferenceSummary({ id: file.id, improve: !!summary.trim() });
+      setSummary(r.summary);
+      toast.success('Nova versão do resumo pronta. Revise e clique em Salvar.');
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const handleSubmit = async () => {
     await updateFile.mutateAsync({ id: file.id, description, summary });
@@ -251,15 +285,23 @@ function EditDialog({ file, open, onOpenChange }: { file: GlobalReferenceFile; o
             placeholder={tx("Resumo do documento (injetado nos relatórios via IA)")}
             value={summary}
             onChange={e => setSummary(e.target.value)}
-            rows={6}
+            rows={12}
+            disabled={generating}
           />
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted-foreground">{summary.length} {tx("caracteres")}</span>
+            <Button type="button" variant="secondary" size="sm" disabled={generating} onClick={runSummary}>
+              {generating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+              {generating ? tx('Relendo o documento...') : summary.trim() ? tx('Melhorar com IA') : tx('Gerar resumo com IA')}
+            </Button>
+          </div>
           <p className="text-xs text-muted-foreground">
             {tx("💡 Inclua os pontos-chave: metas quantitativas, princípios, eixos de atuação, tendências e diretrizes que devem contextualizar os relatórios.")}
           </p>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{tx("Cancelar")}</Button>
-          <Button onClick={handleSubmit} disabled={updateFile.isPending}>
+          <Button onClick={handleSubmit} disabled={updateFile.isPending || generating}>
             {updateFile.isPending ? 'Salvando...' : 'Salvar'}
           </Button>
         </DialogFooter>

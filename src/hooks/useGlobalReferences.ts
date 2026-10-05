@@ -149,3 +149,31 @@ export function useDownloadGlobalReference() {
     onError: (e: any) => toast.error('Erro ao baixar: ' + e.message),
   });
 }
+
+/** Gera (ou melhora) o resumo de um documento lendo o arquivo inteiro com IA. */
+export async function generateReferenceSummary(
+  input: { file: File; category?: string; description?: string } | { id: string; improve?: boolean },
+): Promise<{ summary: string; chars_read: number; truncated: boolean }> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Não autenticado');
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/summarize-global-reference`;
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${session.access_token}`,
+    apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  };
+  let body: BodyInit;
+  if ('file' in input) {
+    const fd = new FormData();
+    fd.append('file', input.file);
+    if (input.category) fd.append('category', input.category);
+    if (input.description) fd.append('description', input.description);
+    body = fd;
+  } else {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(input);
+  }
+  const resp = await fetch(url, { method: 'POST', headers, body });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) throw new Error(data.error || 'Falha ao gerar resumo');
+  return data;
+}
