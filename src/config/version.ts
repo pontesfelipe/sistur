@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 33,
-  patch: 1,
+  minor: 34,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -24,10 +24,13 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
-    version: "2.33.1",
+    version: "2.34.0",
     date: "2026-10-06",
-    type: "patch" as const,
+    type: "minor" as const,
     changes: [
+      "Referências Globais: busca por trechos (RAG). Cada documento é dividido em trechos com vetores; o Professor Beni recebe os 3 trechos mais relevantes para cada pergunta e cita documento e página.",
+      "Relatórios técnicos recebem trechos originais ligados aos indicadores em Atenção/Crítico de cada pilar.",
+      "Painel de Referências Globais: status de indexação, botão Reindexar e caixa Testar busca por trechos. Indexação automática após o envio.",
       "Referências Globais: PDFs grandes (ex.: PNT 7 MB) agora são lidos página a página, liberando memória, para o resumo por IA não estourar o limite.",
     ],
   },
