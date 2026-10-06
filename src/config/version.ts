@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 35,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.35.1",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Ajuda: no tutorial do Professor Beni, as imagens ilustrativas dos passos foram retiradas — o vídeo do tópico já mostra o mesmo conteúdo.",
+      "Regra geral do tutorial: quando um tópico tem vídeo próprio, as imagens estáticas dos passos deixam de ser exibidas.",
+    ],
+  },
   {
     version: "2.35.0",
     date: "2026-10-06",

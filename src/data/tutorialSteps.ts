@@ -5,8 +5,6 @@
 
 import beniTutorialVideo from '@/assets/videos/professor-beni-tutorial.mp4.asset.json';
 
-
-
 export interface TutorialSubStep {
   id: string;
   title: string;
