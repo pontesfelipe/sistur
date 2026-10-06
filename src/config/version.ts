@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 36,
-  patch: 3,
+  patch: 4,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.36.4",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Geomarketing: concorrentes no lugar real (localização pelo endereço ou marcação no mapa); posições aproximadas aparecem tracejadas",
+      "Geomarketing: origem dos visitantes salva para toda a equipe (antes ficava só no navegador)",
+      "Geomarketing: novas medidas no raio — concorrentes a cada 100 km², nota média, diária média e sua diária comparada ao entorno",
+      "Geomarketing: removida a relação 'visitantes por avaliação', que não tinha significado prático",
+    ],
+  },
   {
     version: "2.36.3",
     date: "2026-10-06",
