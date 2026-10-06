@@ -30,7 +30,7 @@ export default function AdminInteligencia() {
   return (
     <AppLayout
       title={tx("Inteligência")}
-      subtitle={tx("Professor Beni, contexto dos relatórios, camada semântica, estrutura de análise e integração MCP.")}
+      subtitle={tx("Professor Beni, contexto dos relatórios, camada semântica, estrutura de análise, referências globais e integração MCP.")}
     >
       <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className="flex w-full gap-1 overflow-x-auto whitespace-nowrap justify-start">
@@ -49,6 +49,10 @@ export default function AdminInteligencia() {
           <TabsTrigger value="estrutura" className="flex items-center gap-2 shrink-0">
             <ListOrdered className="h-4 w-4" />
             {tx("Estrutura")}
+          </TabsTrigger>
+          <TabsTrigger value="referencias" className="flex items-center gap-2 shrink-0">
+            <BookOpen className="h-4 w-4" />
+            {tx("Referências")}
           </TabsTrigger>
           <TabsTrigger value="mcp" className="flex items-center gap-2 shrink-0">
             <Plug className="h-4 w-4" />
@@ -75,6 +79,12 @@ export default function AdminInteligencia() {
         <TabsContent value="estrutura" className="space-y-6">
           <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">{tx("Carregando estrutura do relatório…")}</div>}>
             <ReportStructurePanel />
+          </Suspense>
+        </TabsContent>
+
+        <TabsContent value="referencias" className="space-y-6">
+          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">{tx("Carregando referências globais…")}</div>}>
+            <GlobalReferencesPanel />
           </Suspense>
         </TabsContent>
 

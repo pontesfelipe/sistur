@@ -20,7 +20,6 @@ import { ForumPrivacySettings } from '@/components/settings/ForumPrivacySettings
 import { PendingConsortiumInvitesPanel } from '@/components/consortia/PendingConsortiumInvitesPanel';
 import { ContentModerationPanel } from '@/components/settings/ContentModerationPanel';
 import { PerformanceMetricsPanel } from '@/components/settings/PerformanceMetricsPanel';
-import { GlobalReferencesPanel } from '@/components/admin/GlobalReferencesPanel';
 import { HealthCheckPanel } from '@/components/tools/HealthCheckPanel';
 import MapaTurismoPanel from '@/components/official-data/MapaTurismoPanel';
 import { EmailDispatchPanel } from '@/components/tools/EmailDispatchPanel';
@@ -626,9 +625,6 @@ export default function Configuracoes() {
             {isAdmin && <EmailDispatchPanel />}
             {isAdmin && <ContentModerationPanel />}
             {isAdmin && <PerformanceMetricsPanel />}
-
-            {/* Global References - Admin only */}
-            {isAdmin && <GlobalReferencesPanel />}
 
             {/* Ingestões oficiais - Admin only */}
             {isAdmin && (
