@@ -436,7 +436,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Você pode se matricular em várias trilhas simultaneamente.',
           'O progresso é salvo automaticamente.',
         ],
-        imagePath: '/tutorial/edu-cat-2.jpg',
       },
       {
         id: 'edu-cat-3',

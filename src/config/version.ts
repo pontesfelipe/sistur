@@ -24,6 +24,15 @@ export const APP_VERSION = {
 
 export const VERSION_HISTORY = [
   {
+    version: "2.36.0",
+    date: "2026-10-06",
+    type: "minor" as const,
+    changes: [
+      "Ajuda: vídeos tutoriais animados (27s) em Seu Perfil, Dashboard Principal, Criar Diagnósticos, Gestão de Projetos, Relatórios e Catálogo de Cursos.",
+      "Imagens estáticas desses tutoriais retiradas, pois o vídeo cobre o mesmo conteúdo.",
+    ],
+  },
+  {
     version: "2.35.1",
     date: "2026-10-06",
     type: "patch" as const,
