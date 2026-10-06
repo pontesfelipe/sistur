@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 34,
-  patch: 2,
+  patch: 3,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.34.3",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Aba Referências: novo quadro no final explicando como funcionam resumo, busca por trechos, limite de relevância e fontes nos relatórios.",
+      "Resumos dos 3 documentos de referência revisados pela IA (Globalização do Turismo refeito, pois descrevia outro livro).",
+    ],
+  },
   {
     version: "2.34.2",
     date: "2026-10-06",
