@@ -8,10 +8,25 @@ const MAX_DOC_CHARS = 600_000; // ~150k tokens — cabe no contexto do modelo
 async function extractText(bytes: Uint8Array, fileName: string, mime: string): Promise<string> {
   const lower = fileName.toLowerCase();
   if (mime === "application/pdf" || lower.endsWith(".pdf")) {
-    const { extractText, getDocumentProxy } = await import("npm:unpdf@0.12.1");
-    const pdf = await getDocumentProxy(bytes);
-    const { text } = await extractText(pdf, { mergePages: true });
-    return String(text);
+    // Leitura em partes: página a página, liberando cada página após extrair o texto
+    // e parando ao atingir MAX_DOC_CHARS. Evita estourar a memória em PDFs grandes (ex.: PNT 7 MB).
+    const { getDocumentProxy } = await import("npm:unpdf@0.12.1");
+    const pdf = await getDocumentProxy(bytes, { disableFontFace: true, useSystemFonts: false, isEvalSupported: false } as any);
+    const parts: string[] = [];
+    let total = 0;
+    try {
+      for (let i = 1; i <= pdf.numPages && total < MAX_DOC_CHARS; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const t = content.items.map((it: any) => it.str ?? "").join(" ");
+        parts.push(t);
+        total += t.length;
+        page.cleanup();
+      }
+    } finally {
+      await pdf.destroy().catch(() => {});
+    }
+    return parts.join("\n");
   }
   if (lower.endsWith(".docx")) {
     const mammoth = await import("npm:mammoth@1.8.0");
