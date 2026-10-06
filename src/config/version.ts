@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 33,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.33.1",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Referências Globais: PDFs grandes (ex.: PNT 7 MB) agora são lidos página a página, liberando memória, para o resumo por IA não estourar o limite.",
+    ],
+  },
   {
     version: "2.33.0",
     date: "2026-10-06",
