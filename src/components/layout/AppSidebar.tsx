@@ -50,6 +50,24 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 import { tx } from "@/i18n/t";
+
+// Preload page code on hover/focus so navigation feels instant.
+const ROUTE_PRELOADERS: Record<string, () => Promise<unknown>> = {
+  '/diagnosticos': () => import('@/pages/Diagnosticos'),
+  '/projetos': () => import('@/pages/Projetos'),
+  '/relatorios': () => import('@/pages/Relatorios'),
+  '/edu/catalogo': () => import('@/pages/EduCatalogo'),
+  '/edu': () => import('@/pages/EduDashboard'),
+  '/minhas-tarefas': () => import('@/pages/MinhasTarefas'),
+  '/forum': () => import('@/pages/Forum'),
+};
+const preloaded = new Set<string>();
+function preloadRoute(href: string) {
+  const load = ROUTE_PRELOADERS[href];
+  if (!load || preloaded.has(href)) return;
+  preloaded.add(href);
+  load().catch(() => preloaded.delete(href));
+}
 interface NavItem {
   name: string;
   href: string;
@@ -214,6 +232,8 @@ export function AppSidebar() {
     const content = (
       <Link
         to={isLocked ? '/assinatura' : item.href}
+        onMouseEnter={() => !isLocked && preloadRoute(item.href)}
+        onFocus={() => !isLocked && preloadRoute(item.href)}
         className={cn(
           'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group relative',
           collapsed ? 'justify-center' : 'pl-9',
@@ -273,6 +293,8 @@ export function AppSidebar() {
     const content = (
       <Link
         to={item.href}
+        onMouseEnter={() => preloadRoute(item.href)}
+        onFocus={() => preloadRoute(item.href)}
         className={cn(
           'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group',
           isActive
