@@ -6378,15 +6378,60 @@ export type Database = {
         }
         Relationships: []
       }
+      global_reference_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          embedding: string | null
+          id: string
+          page: number | null
+          reference_id: string
+          tsv: unknown
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          page?: number | null
+          reference_id: string
+          tsv?: unknown
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          page?: number | null
+          reference_id?: string
+          tsv?: unknown
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_reference_chunks_reference_id_fkey"
+            columns: ["reference_id"]
+            isOneToOne: false
+            referencedRelation: "global_reference_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       global_reference_files: {
         Row: {
           category: string
+          chunk_count: number
           created_at: string
           description: string | null
           file_name: string
           file_size_bytes: number
           file_type: string
           id: string
+          index_error: string | null
+          index_status: string
+          indexed_at: string | null
           is_active: boolean | null
           storage_path: string
           summary: string | null
@@ -6395,12 +6440,16 @@ export type Database = {
         }
         Insert: {
           category?: string
+          chunk_count?: number
           created_at?: string
           description?: string | null
           file_name: string
           file_size_bytes?: number
           file_type?: string
           id?: string
+          index_error?: string | null
+          index_status?: string
+          indexed_at?: string | null
           is_active?: boolean | null
           storage_path: string
           summary?: string | null
@@ -6409,12 +6458,16 @@ export type Database = {
         }
         Update: {
           category?: string
+          chunk_count?: number
           created_at?: string
           description?: string | null
           file_name?: string
           file_size_bytes?: number
           file_type?: string
           id?: string
+          index_error?: string | null
+          index_status?: string
+          indexed_at?: string | null
           is_active?: boolean | null
           storage_path?: string
           summary?: string | null
@@ -12914,6 +12967,23 @@ export type Database = {
           full_name: string
           role: string
           user_id: string
+        }[]
+      }
+      match_reference_chunks: {
+        Args: {
+          match_count?: number
+          min_similarity?: number
+          query_embedding: string
+          query_text: string
+        }
+        Returns: {
+          content: string
+          file_name: string
+          id: string
+          page: number
+          reference_id: string
+          score: number
+          similarity: number
         }[]
       }
       org_has_module: {

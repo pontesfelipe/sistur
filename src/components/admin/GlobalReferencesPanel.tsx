@@ -13,16 +13,61 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Upload, FileText, Trash2, Download, Edit, FolderOpen, Plus,
-  File, FileSpreadsheet, BookOpenCheck, Eye, EyeOff, Sparkles, Loader2,
+  File, FileSpreadsheet, BookOpenCheck, Eye, EyeOff, Sparkles, Loader2, RefreshCw, Search,
 } from 'lucide-react';
 import {
   useGlobalReferenceFiles, useUploadGlobalReference, useDeleteGlobalReference,
   useDownloadGlobalReference, useUpdateGlobalReference,
   REFERENCE_CATEGORIES, ACCEPTED_EXTENSIONS, GlobalReferenceFile, generateReferenceSummary,
+  indexGlobalReference, searchGlobalReferenceChunks, ReferenceChunkHit,
 } from '@/hooks/useGlobalReferences';
+import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { ptBR } from 'date-fns/locale';
+
+function IndexBadge({ file }: { file: GlobalReferenceFile }) {
+  const s = file.index_status || 'pending';
+  if (s === 'ready') return <Badge variant="outline" className="text-xs shrink-0">{tx('{{v0}} trechos', { v0: file.chunk_count ?? 0 })}</Badge>;
+  if (s === 'indexing') return <Badge variant="outline" className="text-xs shrink-0">{tx('Indexando…')}</Badge>;
+  if (s === 'error') return <Badge variant="outline" className="text-xs shrink-0 text-destructive">{tx('Erro na indexação')}</Badge>;
+  return <Badge variant="outline" className="text-xs shrink-0 text-muted-foreground">{tx('Não indexado')}</Badge>;
+}
+
+function SearchTester() {
+  const [q, setQ] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [hits, setHits] = useState<ReferenceChunkHit[] | null>(null);
+  const run = async () => {
+    if (q.trim().length < 8) return;
+    setLoading(true);
+    try { setHits(await searchGlobalReferenceChunks(q, 3)); }
+    catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+  return (
+    <div className="border rounded-lg p-4 space-y-3">
+      <div>
+        <p className="font-medium text-sm">{tx('Testar busca por trechos')}</p>
+        <p className="text-xs text-muted-foreground">{tx('Veja quais trechos dos documentos o Professor Beni receberia para uma pergunta.')}</p>
+      </div>
+      <div className="flex gap-2">
+        <Input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && run()}
+          placeholder={tx('Ex.: o que a política nacional diz sobre pousadas históricas?')} />
+        <Button onClick={run} disabled={loading || q.trim().length < 8}>
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+        </Button>
+      </div>
+      {hits && hits.length === 0 && <p className="text-sm text-muted-foreground">{tx('Nenhum trecho relevante encontrado.')}</p>}
+      {hits?.map((h) => (
+        <div key={h.id} className="text-sm border-l-2 border-primary pl-3">
+          <p className="text-xs text-muted-foreground">{h.file_name}{h.page ? ` · p. ${h.page}` : ''} · {Math.round(h.similarity * 100)}%</p>
+          <p className="line-clamp-4">{h.content}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const fileIcon = (type: string) => {
   if (type.includes('pdf')) return <FileText className="h-5 w-5 text-destructive" />;
@@ -85,6 +130,8 @@ export function GlobalReferencesPanel() {
           Estes documentos são injetados automaticamente nos relatórios gerados por IA
         </p>
 
+        {files.length > 0 && <SearchTester />}
+
         <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} />
         {editFile && <EditDialog file={editFile} open={!!editFile} onOpenChange={(v) => !v && setEditFile(null)} />}
       </CardContent>
@@ -96,7 +143,22 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
   const deleteFile = useDeleteGlobalReference();
   const downloadFile = useDownloadGlobalReference();
   const updateFile = useUpdateGlobalReference();
+  const queryClient = useQueryClient();
+  const [indexing, setIndexing] = useState(false);
   const catLabel = REFERENCE_CATEGORIES.find(c => c.value === file.category)?.label || file.category;
+  const reindex = async () => {
+    setIndexing(true);
+    try {
+      const r = await indexGlobalReference(file.id);
+      toast.success(tx('Documento dividido em {{v0}} trechos.', { v0: r.chunks }));
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setIndexing(false);
+      queryClient.invalidateQueries({ queryKey: ['global-reference-files'] });
+    }
+  };
+
 
   return (
     <div className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${file.is_active ? 'hover:border-primary/30' : 'opacity-60 bg-muted/30'}`}>
@@ -115,11 +177,16 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
               {tx("Resumo ✓")}
             </Badge>
           )}
+          <IndexBadge file={file} />
         </div>
         {file.description && <p className="text-sm text-muted-foreground truncate mt-0.5">{file.description}</p>}
         <p className="text-xs text-muted-foreground mt-1">
           {formatSize(file.file_size_bytes)} • {format(new Date(file.created_at), "dd MMM yyyy", { locale: getDateLocale() })}
+          {file.indexed_at && ` • ${tx("indexado em")} ${format(new Date(file.indexed_at), "dd MMM yyyy HH:mm", { locale: getDateLocale() })}`}
         </p>
+        {file.index_status === 'error' && file.index_error && (
+          <p className="text-xs text-destructive mt-1">{file.index_error}</p>
+        )}
       </div>
       <div className="flex items-center gap-1 shrink-0">
         <Switch
@@ -127,6 +194,9 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           onCheckedChange={(checked) => updateFile.mutate({ id: file.id, is_active: checked })}
           title={file.is_active ? tx('Ativo (usado nos relatórios)') : 'Inativo'}
         />
+        <Button size="icon" variant="ghost" onClick={reindex} disabled={indexing || file.index_status === 'indexing'} title={tx("Reindexar trechos")}>
+          {indexing || file.index_status === 'indexing' ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+        </Button>
         <Button size="icon" variant="ghost" onClick={onEdit} title={tx("Editar resumo")}>
           <Edit className="h-4 w-4" />
         </Button>

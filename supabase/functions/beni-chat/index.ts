@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { extractAttachment, triageRelevance, attachmentContentParts, sseTextResponse, IRRELEVANT_REPLY } from "./attachment.ts";
+import { searchReferenceChunks, formatChunksForPrompt } from "../_shared/referenceRag.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -421,6 +422,18 @@ serve(async (req) => {
         }
       } catch (refErr) {
         console.error("beni-chat: failed to fetch global references", refErr);
+      }
+
+      // Busca por trechos (RAG): os 3 trechos originais mais relevantes para a pergunta atual.
+      try {
+        const lastQ = [...messages].reverse().find((m: any) => m.role === "user")?.content || "";
+        const ragClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+        const chunks = await searchReferenceChunks(ragClient, lastQ, 3);
+        if (chunks.length > 0) {
+          systemPrompt += `\n\nTRECHOS ORIGINAIS DOS DOCUMENTOS DE REFERÊNCIA (selecionados para a pergunta atual):\n${formatChunksForPrompt(chunks)}\n\nQuando usar esses trechos, cite a fonte de forma falada, por exemplo: segundo o documento tal, página tal. Não invente conteúdo além do que está nos trechos. Não use markdown.\n`;
+        }
+      } catch (ragErr) {
+        console.error("beni-chat: reference chunk search failed", ragErr);
       }
     } catch (fetchErr) {
       console.error("beni-chat: failed to fetch user diagnostics/reports", fetchErr);
