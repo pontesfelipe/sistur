@@ -24,6 +24,10 @@ export interface GlobalReferenceFile {
   category: string;
   summary: string | null;
   is_active: boolean;
+  index_status?: 'pending' | 'indexing' | 'ready' | 'error';
+  chunk_count?: number;
+  indexed_at?: string | null;
+  index_error?: string | null;
   uploaded_by: string | null;
   created_at: string;
   updated_at: string;
@@ -63,7 +67,7 @@ export function useUploadGlobalReference() {
         .upload(storagePath, file);
       if (uploadError) throw uploadError;
 
-      const { error: dbError } = await supabase
+      const { data: inserted, error: dbError } = await supabase
         .from('global_reference_files' as any)
         .insert({
           file_name: file.name,
@@ -74,12 +78,21 @@ export function useUploadGlobalReference() {
           category,
           summary: summary || null,
           uploaded_by: user.id,
-        } as any);
+        } as any)
+        .select('id')
+        .single();
       if (dbError) throw dbError;
+      // Indexa os trechos em segundo plano (busca por trechos do Professor Beni e relatórios).
+      const newId = (inserted as any)?.id;
+      if (newId) {
+        indexGlobalReference(newId)
+          .then(() => queryClient.invalidateQueries({ queryKey: ['global-reference-files'] }))
+          .catch((e) => { toast.error('Indexação de trechos falhou: ' + e.message); queryClient.invalidateQueries({ queryKey: ['global-reference-files'] }); });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['global-reference-files'] });
-      toast.success('Documento de referência enviado');
+      toast.success('Documento enviado. Dividindo em trechos para a busca...');
     },
     onError: (e: any) => toast.error('Erro ao enviar: ' + e.message),
   });
