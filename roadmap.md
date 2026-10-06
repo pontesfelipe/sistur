@@ -1,4 +1,5 @@
 # Roadmap — Idiomas (PT / EN / ES)
+- [ ] Criar vídeo do Professor Beni com identidade SISTUR e disponibilizar em Ajuda › Tutorial do Professor Beni; conferir reprodução.
 - [x] Fase 1: base de tradução, seletor (login + topo), login, menus, títulos das páginas, Professor Beni no idioma
 - [x] Fase 2: Painel, Diagnósticos, Relatórios (incl. relatórios com IA no idioma), Projetos
 - [x] Fase 3: EDU (catálogo, cursos, provas, certificados), Social, Jogos
