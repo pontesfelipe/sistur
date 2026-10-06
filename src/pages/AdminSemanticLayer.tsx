@@ -89,9 +89,9 @@ const EXAMPLE_DRAFT: Partial<Entry> = {
   content: `Use SEMPRE estes 5 níveis ao classificar indicadores e pilares:
 - Crítico: 0–33%
 - Atenção: 34–66%
-- Adequado: 67–84%
-- Bom: 85–94%
-- Excelente: 95–100%
+- Adequado: 67–79%
+- Forte: 80–89%
+- Excelente: 90–100%
 
 Regras:
 1. Exiba sempre em percentual inteiro (ex.: 72%), nunca decimais.
@@ -162,9 +162,23 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
   const [auditScope, setAuditScope] = useState<"both" | "territorial" | "enterprise">("both");
   const [auditRunning, setAuditRunning] = useState(false);
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
-  const [auditMeta, setAuditMeta] = useState<{ truncated: boolean; report_chars: number; rules_evaluated: number } | null>(null);
+  const [auditMeta, setAuditMeta] = useState<{ truncated: boolean; report_chars: number; rules_evaluated: number; segments: number } | null>(null);
   const [auditFilter, setAuditFilter] = useState<"all" | "fail" | "warn" | "pass">("all");
   const auditFileInputRef = useRef<HTMLInputElement | null>(null);
+  type AuditHistoryRow = {
+    id: string; report_name: string | null; score: number; fails: number; warns: number; passes: number;
+    report_chars: number; segments: number; summary: string | null; findings: any; created_at: string;
+  };
+  const [auditHistory, setAuditHistory] = useState<AuditHistoryRow[]>([]);
+  const loadAuditHistory = async () => {
+    const { data } = await supabase
+      .from("report_semantic_audits")
+      .select("id, report_name, score, fails, warns, passes, report_chars, segments, summary, findings, created_at")
+      .order("created_at", { ascending: false })
+      .limit(20);
+    setAuditHistory((data as AuditHistoryRow[]) || []);
+  };
+  useEffect(() => { loadAuditHistory(); }, []);
 
   // v1.91.0 — Fase 8: carregar relatórios já gerados (Empresarial ou Territorial)
   // direto do banco para auditoria, sem precisar copiar/colar.
@@ -246,8 +260,25 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
       });
       if (error) throw error;
       if (!data?.ok) throw new Error(data?.error || "Falha desconhecida");
-      setAuditResult(data.result as AuditResult);
-      setAuditMeta({ truncated: !!data.truncated, report_chars: data.report_chars, rules_evaluated: data.rules_evaluated });
+      const res = data.result as AuditResult;
+      setAuditResult(res);
+      setAuditMeta({ truncated: false, report_chars: data.report_chars, rules_evaluated: data.rules_evaluated, segments: data.segments ?? 1 });
+      const count = (s: string) => res.findings.filter((f) => f.status === s).length;
+      const { error: saveErr } = await supabase.from("report_semantic_audits").insert({
+        report_name: auditFileName || null,
+        applies_to: auditScope,
+        score: res.score,
+        fails: count("fail"),
+        warns: count("warn"),
+        passes: count("pass"),
+        report_chars: data.report_chars ?? auditText.length,
+        segments: data.segments ?? 1,
+        summary: res.summary,
+        findings: res.findings as any,
+        created_by: user?.id ?? null,
+      });
+      if (saveErr) console.error("save audit", saveErr);
+      loadAuditHistory();
       toast.success(tx("Auditoria concluída."));
     } catch (e: any) {
       toast.error(tx("Erro na auditoria: ") + (e?.message ?? String(e)));
@@ -317,6 +348,15 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
   const save = async () => {
     if (!draft.key || !draft.title || !draft.content) {
       toast.error(tx("Preencha chave, título e conteúdo."));
+      return;
+    }
+    const issues = findRuleConflicts(draft, entries, creating ? null : selected?.id ?? null);
+    const blocking = issues.filter((i) => i.blocking);
+    if (blocking.length) {
+      toast.error(blocking.map((i) => i.message).join(" "));
+      return;
+    }
+    if (issues.length && !window.confirm(tx("Possíveis conflitos encontrados:") + "\n\n- " + issues.map((i) => i.message).join("\n- ") + "\n\n" + tx("Salvar mesmo assim?"))) {
       return;
     }
     if (creating) {
@@ -1000,6 +1040,41 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
             </CardContent>
           </Card>
 
+          {auditHistory.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{tx("Histórico de auditorias")}</CardTitle>
+                <p className="text-[11px] text-muted-foreground">{tx("Compare a conformidade antes e depois de mudar as regras.")}</p>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {auditHistory.map((h, i) => {
+                  const prev = auditHistory.slice(i + 1).find((p) => p.report_name === h.report_name);
+                  const delta = prev ? h.score - prev.score : null;
+                  return (
+                    <div key={h.id} className="flex items-center justify-between gap-3 rounded-md border p-2 text-xs">
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">{h.report_name || tx("Relatório sem nome")}</div>
+                        <div className="text-muted-foreground">
+                          {new Date(h.created_at).toLocaleString(getIntlLocale())} · {h.fails} {tx("violações")} · {h.warns} {tx("alertas")} · {h.passes} {tx("aprovações")}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="font-bold">{h.score}%</span>
+                        {delta !== null && delta !== 0 && (
+                          <Badge variant={delta > 0 ? "default" : "destructive"}>{delta > 0 ? `+${delta}` : delta}</Badge>
+                        )}
+                        <Button size="sm" variant="ghost" onClick={() => {
+                          setAuditResult({ summary: h.summary || "", score: h.score, findings: h.findings || [] });
+                          setAuditMeta({ truncated: false, report_chars: h.report_chars, rules_evaluated: (h.findings || []).length, segments: h.segments });
+                        }}>{tx("Ver")}</Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          )}
+
           {auditResult && (
             <Card>
               <CardHeader>
@@ -1009,7 +1084,7 @@ export default function AdminSemanticLayer({ embedded = false }: { embedded?: bo
                     {auditMeta && (
                       <p className="text-[11px] text-muted-foreground mt-1">
                         {auditMeta.rules_evaluated} regra(s) avaliada(s) · {auditMeta.report_chars.toLocaleString("pt-BR")} caracteres analisados
-                        {auditMeta.truncated ? " · ⚠ relatório truncado para auditoria" : ""}
+                        {auditMeta.segments > 1 ? ` · relatório completo auditado em ${auditMeta.segments} partes` : ""}
                       </p>
                     )}
                   </div>
