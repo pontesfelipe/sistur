@@ -13,7 +13,7 @@ const corsHeaders = {
  */
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST' && req.method !== 'GET') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 
@@ -21,6 +21,23 @@ Deno.serve(async (req) => {
   const provided = req.headers.get('x-caged-token') ?? '';
   if (!expected || provided !== expected) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
+  // Checagem idempotente: GET ?check=YYYYMM -> { exists, records }
+  if (req.method === 'GET') {
+    const check = new URL(req.url).searchParams.get('check') ?? '';
+    if (!/^\d{6}$/.test(check)) {
+      return new Response(JSON.stringify({ error: 'check deve ser YYYYMM' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const sb = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
+    const { count, error } = await sb.from('caged_tourism_employment')
+      .select('id', { count: 'exact', head: true })
+      .eq('reference_year', Number(check.slice(0, 4)))
+      .eq('reference_month', Number(check.slice(4)));
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    return new Response(JSON.stringify({ month: check, exists: (count ?? 0) > 0, records: count ?? 0 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 
   try {
