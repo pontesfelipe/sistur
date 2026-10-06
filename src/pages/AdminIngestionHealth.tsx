@@ -69,6 +69,7 @@ const FN_DISPLAY: Record<string, string> = {
   'ingest-snis': 'SNIS/SINISA (Saneamento)',
   'ingest-iphan': 'IPHAN (Patrimônio protegido)',
   'ingest-inmet': 'INMET (Normais climatológicas)',
+  'caged-watchdog': 'Cão de guarda do CAGED (verificação do dia 6)',
 };
 
 const FN_SCHEDULE: Record<string, string> = {
@@ -78,7 +79,8 @@ const FN_SCHEDULE: Record<string, string> = {
   'ingest-tse': '1º de maio',
   'ingest-anatel': 'Todo dia 5',
   'ingest-observatory': 'Todo dia 1',
-  'ingest-caged': 'Todo dia 5 (automação externa)',
+  'ingest-caged': 'Dia 5 (12h e 18h UTC) e dia 6 (12h UTC), automação externa com novas tentativas',
+  'caged-watchdog': 'Todo dia 6, 21h UTC',
   'ingest-pf-turismo': 'Todo dia 10',
   'ingest-iphan': 'Todo dia 12',
   'ingest-siconfi': 'Todo dia 15',
