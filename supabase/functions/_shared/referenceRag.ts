@@ -1,6 +1,8 @@
 // Busca por trechos (RAG) nas Referências Globais: extração página a página,
 // fatiamento, embeddings e busca híbrida (semântica + palavras-chave).
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/embeddings";
+// Import dinâmico por variável: mantém o módulo testável fora do Deno.
+const load = (spec: string) => import(spec);
 const EMB_MODEL = "openai/text-embedding-3-small"; // 1536 dimensões
 
 export interface PageText { page: number | null; text: string }
@@ -9,7 +11,7 @@ export interface PageText { page: number | null; text: string }
 export async function extractPages(bytes: Uint8Array, fileName: string, mime: string, maxChars = 2_000_000): Promise<PageText[]> {
   const lower = fileName.toLowerCase();
   if (mime === "application/pdf" || lower.endsWith(".pdf")) {
-    const { getDocumentProxy } = await import("npm:unpdf@0.12.1");
+    const { getDocumentProxy } = await load("npm:unpdf@0.12.1");
     const pdf = await getDocumentProxy(bytes, { disableFontFace: true, isEvalSupported: false } as any);
     const out: PageText[] = [];
     let total = 0;
@@ -29,10 +31,10 @@ export async function extractPages(bytes: Uint8Array, fileName: string, mime: st
   }
   let text = "";
   if (lower.endsWith(".docx")) {
-    const mammoth = await import("npm:mammoth@1.8.0");
+    const mammoth = await load("npm:mammoth@1.8.0");
     text = (await (mammoth.default ?? mammoth).extractRawText({ buffer: bytes })).value;
   } else if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) {
-    const XLSX = await import("npm:xlsx@0.18.5");
+    const XLSX = await load("npm:xlsx@0.18.5");
     const wb = XLSX.read(bytes, { type: "array" });
     text = wb.SheetNames.slice(0, 10).map((n: string) => `Planilha ${n}:\n` + XLSX.utils.sheet_to_csv(wb.Sheets[n])).join("\n\n");
   } else {
@@ -63,7 +65,7 @@ export function chunkPages(pages: PageText[], size = 1000, overlap = 150): { pag
 }
 
 export async function embed(inputs: string[]): Promise<number[][]> {
-  const key = Deno.env.get("LOVABLE_API_KEY");
+  const key = (globalThis as any).Deno?.env.get("LOVABLE_API_KEY");
   if (!key) throw new Error("LOVABLE_API_KEY not configured");
   const res = await fetch(GATEWAY, {
     method: "POST",
@@ -80,7 +82,10 @@ export async function embed(inputs: string[]): Promise<number[][]> {
 export interface RefChunk { id: string; reference_id: string; file_name: string; page: number | null; content: string; similarity: number; score: number }
 
 /** Busca os k trechos mais relevantes. Nunca lança: em falha devolve []. */
-export async function searchReferenceChunks(admin: any, query: string, k = 3, minSimilarity = 0.3): Promise<RefChunk[]> {
+/** Similaridade mínima para um trecho contar como relevante (abaixo disso, fallback sem citação). */
+export const RELEVANCE_THRESHOLD = 0.45;
+
+export async function searchReferenceChunks(admin: any, query: string, k = 3, minSimilarity = RELEVANCE_THRESHOLD): Promise<RefChunk[]> {
   try {
     const q = (query || "").trim().slice(0, 2000);
     if (q.length < 8) return [];
@@ -102,3 +107,20 @@ export function formatChunksForPrompt(chunks: RefChunk[]): string {
     `[T${i + 1}] ${c.file_name}${c.page ? `, página ${c.page}` : ""}:\n"${c.content}"`
   ).join("\n\n");
 }
+
+/** Lista "Documento — páginas X, Y" agrupada por documento. */
+export function formatSourcesList(chunks: RefChunk[]): string[] {
+  const byDoc = new Map<string, Set<number>>();
+  for (const c of chunks) {
+    if (!byDoc.has(c.file_name)) byDoc.set(c.file_name, new Set());
+    if (c.page) byDoc.get(c.file_name)!.add(c.page);
+  }
+  return [...byDoc.entries()].map(([doc, pages]) => {
+    const p = [...pages].sort((a, b) => a - b);
+    return p.length ? `${doc} — ${p.length > 1 ? "páginas" : "página"} ${p.join(", ")}` : doc;
+  });
+}
+
+/** Instrução de fallback quando nenhum trecho é relevante para a pergunta. */
+export const NO_MATCH_INSTRUCTION =
+  "BUSCA NOS DOCUMENTOS DE REFERÊNCIA: nenhum trecho dos documentos é suficientemente relacionado a esta pergunta. Não cite documentos, páginas ou trechos. Se a pergunta for sobre o conteúdo de algum documento, diga com naturalidade que os documentos de referência cadastrados não tratam diretamente desse tema e responda com base no seu conhecimento geral, deixando claro que não é uma citação.";

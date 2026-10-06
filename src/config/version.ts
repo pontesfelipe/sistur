@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 34,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.34.1",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Busca por trechos: só conta trechos com pelo menos 45% de relevância. Sem trecho relevante, o Professor Beni não cita documentos e avisa que as referências não tratam do tema.",
+      "Relatórios: nova seção final 'Fontes dos trechos de referência' com documentos e páginas usados em cada pilar (ou aviso quando nenhum trecho foi relevante).",
+    ],
+  },
   {
     version: "2.34.0",
     date: "2026-10-06",

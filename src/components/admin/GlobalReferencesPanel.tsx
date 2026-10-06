@@ -58,7 +58,7 @@ function SearchTester() {
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
         </Button>
       </div>
-      {hits && hits.length === 0 && <p className="text-sm text-muted-foreground">{tx('Nenhum trecho relevante encontrado.')}</p>}
+      {hits && hits.length === 0 && <p className="text-sm text-muted-foreground">{tx('Nenhum trecho relevante encontrado. Nesse caso o Professor Beni responde sem citar documentos e avisa que os documentos de referência não tratam diretamente do tema.')}</p>}
       {hits?.map((h) => (
         <div key={h.id} className="text-sm border-l-2 border-primary pl-3">
           <p className="text-xs text-muted-foreground">{h.file_name}{h.page ? ` · p. ${h.page}` : ''} · {Math.round(h.similarity * 100)}%</p>
