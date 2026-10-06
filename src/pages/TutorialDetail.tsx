@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { getTopicDetail, type TutorialSubStep } from '@/data/tutorialSteps';
 import { tutorialCategories } from '@/data/tutorialData';
+import { TutorialVideo } from '@/components/tutorial/TutorialVideo';
+import beniTutorialVideo from '@/assets/videos/professor-beni-tutorial.mp4.asset.json';
 
 import { tx } from "@/i18n/t";
 export default function TutorialDetail() {
@@ -102,6 +104,13 @@ export default function TutorialDetail() {
             <p className="text-muted-foreground mt-2 leading-relaxed">{topic.introduction}</p>
           </div>
         </div>
+
+        {topicId === 'gs-beni' && (
+          <TutorialVideo
+            src={beniTutorialVideo.url}
+            title={tx('Vídeo tutorial do Professor Beni')}
+          />
+        )}
 
         {/* Progress */}
         <div className="space-y-2">
