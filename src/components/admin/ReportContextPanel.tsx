@@ -135,7 +135,7 @@ export function ReportContextPanel() {
           {tx("Camada de Contexto do Relatório")}
         </CardTitle>
         <CardDescription>
-          {tx("Define a")} <strong>{tx("persona, audiência, tom e prioridades editoriais")}</strong> {tx("que o agente de IA aplica em TODO relatório gerado. O contexto da organização (quando existir) prevalece sobre o contexto global. É usado junto com a camada semântica, a estrutura canônica e os dados do diagnóstico.")}
+          {tx("Define a")} <strong>{tx("persona, audiência, tom e prioridades editoriais")}</strong> {tx("que o agente de IA aplica em TODO relatório gerado. O contexto da organização (quando existir) prevalece sobre o contexto global. É usado junto com a camada semântica, a estrutura canônica, os dados do diagnóstico e os trechos das referências globais.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
