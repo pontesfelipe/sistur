@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 34,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.34.2",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Referências Globais saíram de Configurações › Ferramentas e ganharam a aba 'Referências' no menu Inteligência (ao lado de Beni, Contexto, Semântica e Estrutura).",
+      "Metodologia e textos do menu Inteligência atualizados para explicar a busca por trechos: documentos são fatiados por página, só trechos com 45%+ de relevância são usados e os relatórios citam documento e página nas fontes.",
+    ],
+  },
   {
     version: "2.34.1",
     date: "2026-10-06",
