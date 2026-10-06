@@ -1,5 +1,6 @@
 import { tx } from '@/i18n/t';
 import { useEffect, useMemo, useRef, useState } from "react";
+import { findRuleConflicts } from "@/lib/semanticRuleConflicts";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
