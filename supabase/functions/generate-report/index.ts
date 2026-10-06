@@ -3175,6 +3175,32 @@ serve(async (req) => {
     const actionPlans = actionPlansRes.data || [];
     const indicatorValues = indicatorValuesRes.data || [];
     const globalRefs = globalRefsRes.data || [];
+
+    // Busca por trechos (RAG): para cada pilar, procura trechos dos documentos
+    // de referência ligados aos indicadores mais fracos (Atenção/Crítico).
+    let ragReferenceText = '';
+    try {
+      const weak = (indicatorScores as any[]).filter((s) => Number(s.score ?? 1) < 0.67 && s.indicators?.name);
+      const seen = new Set<string>();
+      const blocks: string[] = [];
+      for (const pillar of ['RA', 'OE', 'AO']) {
+        const names = weak.filter((s) => s.indicators?.pillar === pillar).slice(0, 4).map((s) => s.indicators.name);
+        if (!names.length) continue;
+        const chunks = (await searchReferenceChunks(supabaseAdmin, `Diretrizes e políticas públicas de turismo sobre: ${names.join('; ')}`, 3))
+          .filter((c) => !seen.has(c.id));
+        chunks.forEach((c) => seen.add(c.id));
+        if (chunks.length) blocks.push(`Pilar ${pillar} (indicadores: ${names.join(', ')}):\n${formatChunksForPrompt(chunks)}`);
+      }
+      if (blocks.length) {
+        ragReferenceText = `=== TRECHOS ORIGINAIS DOS DOCUMENTOS DE REFERÊNCIA ===
+Trechos literais selecionados por relevância para os indicadores em Atenção/Crítico. Ao usá-los, cite documento e página. Não extrapole além do texto.
+
+${blocks.join('\n\n')}
+`;
+      }
+    } catch (ragErr) {
+      console.error('generate-report: reference chunk search failed', ragErr);
+    }
     const kbFiles = kbFilesRes.data || [];
     const dataSnapshots = dataSnapshotsRes.data || [];
     const externalValues = externalValuesRes.data || [];
