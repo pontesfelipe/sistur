@@ -3597,6 +3597,7 @@ ${(() => {
     lines.push(`| ${r.indicator_code} | ${name} | ${rawDisplay} | ${scoreDisplay} | ${src} | ${w} |`);
   }
   return lines.join('\n');
+${ragReferenceText}
 })()}
 
 GARGALOS (com evidências e indicadores que dispararam cada problema):
