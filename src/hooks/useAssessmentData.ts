@@ -1,24 +1,39 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+
+async function fetchAssessment(id: string) {
+  const { data, error } = await supabase
+    .from('assessments')
+    .select(`
+      *,
+      destination:destinations(*)
+    `)
+    .eq('id', id)
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function fetchPillarScores(assessmentId: string) {
+  const { data, error } = await supabase
+    .from('pillar_scores')
+    .select('*')
+    .eq('assessment_id', assessmentId);
+  if (error) throw error;
+  return data || [];
+}
+
+/** Warm the cache before navigating to a diagnostic detail page (hover/focus). */
+export function prefetchAssessmentDetail(queryClient: QueryClient, id: string) {
+  const staleTime = 30_000;
+  queryClient.prefetchQuery({ queryKey: ['assessment', id], queryFn: () => fetchAssessment(id), staleTime });
+  queryClient.prefetchQuery({ queryKey: ['pillar-scores', id], queryFn: () => fetchPillarScores(id), staleTime });
+}
 
 export function useAssessment(id: string | undefined) {
   return useQuery({
     queryKey: ['assessment', id],
-    queryFn: async () => {
-      if (!id) return null;
-      
-      const { data, error } = await supabase
-        .from('assessments')
-        .select(`
-          *,
-          destination:destinations(*)
-        `)
-        .eq('id', id)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
+    queryFn: async () => (id ? fetchAssessment(id) : null),
     enabled: !!id,
   });
 }
@@ -26,17 +41,7 @@ export function useAssessment(id: string | undefined) {
 export function usePillarScores(assessmentId: string | undefined) {
   return useQuery({
     queryKey: ['pillar-scores', assessmentId],
-    queryFn: async () => {
-      if (!assessmentId) return [];
-      
-      const { data, error } = await supabase
-        .from('pillar_scores')
-        .select('*')
-        .eq('assessment_id', assessmentId);
-      
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: async () => (assessmentId ? fetchPillarScores(assessmentId) : []),
     enabled: !!assessmentId,
   });
 }

@@ -584,12 +584,28 @@ const DiagnosticoDetalhe = () => {
   if (loadingAssessment) {
     return (
       <AppLayout title={tx('Carregando...')}>
-        <div className="space-y-6">
-          <Skeleton className="h-32 w-full" />
-          <div className="grid grid-cols-3 gap-6">
-            <Skeleton className="h-48" />
-            <Skeleton className="h-48" />
-            <Skeleton className="h-48" />
+        <div className="space-y-6" aria-busy="true" aria-label={tx('Carregando diagnóstico')}>
+          <div className="rounded-xl border bg-card p-5 space-y-3">
+            <div className="flex gap-2">
+              <Skeleton className="h-5 w-20 rounded-full" />
+              <Skeleton className="h-5 w-24 rounded-full" />
+            </div>
+            <Skeleton className="h-6 w-2/3" />
+            <Skeleton className="h-4 w-1/3" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="rounded-lg border bg-card p-4 flex flex-col items-center gap-3">
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-24 w-24 rounded-full" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </div>
+          <Skeleton className="h-10 w-full max-w-2xl rounded-md" />
+          <div className="space-y-3">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
           </div>
         </div>
       </AppLayout>

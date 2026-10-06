@@ -13,6 +13,8 @@ import {
 import { useState } from 'react';
 import { DeleteAssessmentDialog } from './DeleteAssessmentDialog';
 import { getIntlLocale } from '@/i18n/dateLocale';
+import { useQueryClient } from '@tanstack/react-query';
+import { prefetchAssessmentDetail } from '@/hooks/useAssessmentData';
 
 interface AssessmentCardProps {
   assessment: Assessment & { tier?: string; creator?: { full_name: string } | null; visibility?: string; is_demo?: boolean; diagnostic_type?: string | null; expand_with_mandala?: boolean };
@@ -28,6 +30,7 @@ const tierConfig = {
 
 export function AssessmentCard({ assessment, onDelete, isDemoContext }: AssessmentCardProps) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const visibility = isDemoContext ? 'demo' : ((assessment as any).visibility || 'organization');
   const visibilityConfig = {
@@ -80,8 +83,19 @@ export function AssessmentCard({ assessment, onDelete, isDemoContext }: Assessme
   const dtInfo = diagnosticTypeConfig[diagnosticType as keyof typeof diagnosticTypeConfig] || diagnosticTypeConfig.territorial;
   const DtIcon = dtInfo.icon;
 
+  const warm = () => {
+    if (assessment.status === 'DRAFT') return;
+    import('@/pages/DiagnosticoDetalhe');
+    prefetchAssessmentDetail(queryClient, assessment.id);
+  };
+
   return (
-    <div className="p-4 rounded-xl border bg-card hover:shadow-lg transition-all duration-300 group">
+    <div
+      className="p-4 rounded-xl border bg-card hover:shadow-lg transition-all duration-300 group"
+      onMouseEnter={warm}
+      onFocus={warm}
+      onTouchStart={warm}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant={statusVariants[assessment.status]}>
