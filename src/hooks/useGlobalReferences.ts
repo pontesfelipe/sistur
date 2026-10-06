@@ -190,3 +190,27 @@ export async function generateReferenceSummary(
   if (!resp.ok) throw new Error(data.error || 'Falha ao gerar resumo');
   return data;
 }
+
+async function callIndexFn(body: Record<string, unknown>) {
+  const { data, error } = await supabase.functions.invoke('index-global-reference', { body });
+  if (error) {
+    let msg = error.message;
+    try { const j = await (error as any).context?.json?.(); if (j?.error) msg = j.error; } catch { /* ignore */ }
+    throw new Error(msg);
+  }
+  if ((data as any)?.error) throw new Error((data as any).error);
+  return data as any;
+}
+
+/** Divide o documento em trechos e gera os vetores para a busca por trechos. */
+export function indexGlobalReference(id: string): Promise<{ chunks: number; pages: number }> {
+  return callIndexFn({ id });
+}
+
+export interface ReferenceChunkHit { id: string; file_name: string; page: number | null; content: string; similarity: number; score: number }
+
+/** Testa a busca: devolve os trechos que o Professor Beni receberia para a pergunta. */
+export async function searchGlobalReferenceChunks(query: string, k = 3): Promise<ReferenceChunkHit[]> {
+  const r = await callIndexFn({ query, k });
+  return r.results ?? [];
+}
