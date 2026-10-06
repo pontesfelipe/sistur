@@ -1,6 +1,6 @@
 # Roadmap — Idiomas (PT / EN / ES)
 - [x] Revisar roteiro explicativo em linguagem comum: falta de dados, entregas do diagnóstico, prioridades, ações e valor; salvar v2 em Files e preservar original.
-- [ ] Gerar vídeo explicativo v2 apenas em Files com painéis fiéis; aguardando o arquivo do logo oficial, pois os símbolos encontrados no app não confirmam a marca que o usuário deseja.
+- [ ] Gerar e revisar vídeo explicativo v2 apenas em Files com painéis fiéis e logo oficial SISTUR-Icone-Stripe.png confirmado pelo usuário.
 - [x] Criar vídeo do Professor Beni com identidade SISTUR e disponibilizar em Ajuda › Tutorial do Professor Beni. Arquivo e entrega verificados; reprodução automatizada não confirmada (Chromium de teste sem suporte H.264).
 - [x] Retirar as imagens ilustrativas dos passos do tutorial do Professor Beni, que ficaram sem sentido com o vídeo no ar; tópico com vídeo não mostra mais imagens dos passos.
 - [x] Fase 1: base de tradução, seletor (login + topo), login, menus, títulos das páginas, Professor Beni no idioma
