@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 36,
-  patch: 4,
+  patch: 5,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.36.5",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Referências Globais: resumo de PDFs longos não estoura mais o limite de processamento — lê até 120 páginas espalhadas pelo documento",
+    ],
+  },
   {
     version: "2.36.4",
     date: "2026-10-06",
