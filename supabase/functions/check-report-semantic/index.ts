@@ -453,7 +453,7 @@ serve(async (req) => {
     const warns = findings.filter((f) => f.status === "warn").length;
     const passes = findings.filter((f) => f.status === "pass").length;
 
-    const summary = `Auditoria em ${batches.length} lote(s) LLM + ${detFindings.length} checagens determinísticas. ` +
+    const summary = `Auditoria em ${segments.length} parte(s) × ${batches.length} lote(s) LLM + ${detFindings.length} checagens determinísticas. ` +
       `${passes} aprovações, ${warns} alertas, ${fails} violações. Conformidade geral: ${score}%.`;
 
     return new Response(JSON.stringify({
@@ -462,6 +462,7 @@ serve(async (req) => {
       report_chars: reportText.length,
       rules_evaluated: findings.length,
       batches: batches.length,
+      segments: segments.length,
       deterministic_checks: detFindings.length,
       result: { summary, score, findings },
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
