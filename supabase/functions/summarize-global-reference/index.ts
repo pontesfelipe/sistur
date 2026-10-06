@@ -12,20 +12,29 @@ async function extractText(bytes: Uint8Array, fileName: string, mime: string): P
     // e parando ao atingir MAX_DOC_CHARS. Evita estourar a memória em PDFs grandes (ex.: PNT 7 MB).
     const { getDocumentProxy } = await import("npm:unpdf@0.12.1");
     const pdf = await getDocumentProxy(bytes, { disableFontFace: true, useSystemFonts: false, isEvalSupported: false } as any);
+    // Limite de processamento da função: em PDFs longos, lê no máximo MAX_PAGES páginas
+    // espalhadas pelo documento inteiro e para ao atingir o orçamento de tempo.
+    const MAX_PAGES = 120;
+    const BUDGET_MS = 1200;
+    const n = pdf.numPages;
+    const step = Math.max(1, Math.ceil(n / MAX_PAGES));
     const parts: string[] = [];
     let total = 0;
+    const t0 = performance.now();
     try {
-      for (let i = 1; i <= pdf.numPages && total < MAX_DOC_CHARS; i++) {
+      for (let i = 1; i <= n && total < MAX_DOC_CHARS; i += step) {
+        if (performance.now() - t0 > BUDGET_MS && parts.length > 0) break;
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
         const t = content.items.map((it: any) => it.str ?? "").join(" ");
-        parts.push(t);
+        parts.push(step > 1 ? `[página ${i}] ${t}` : t);
         total += t.length;
         page.cleanup();
       }
     } finally {
       await pdf.destroy().catch(() => {});
     }
+    console.log(`pdf pages=${n} read=${parts.length} step=${step} ms=${Math.round(performance.now() - t0)}`);
     return parts.join("\n");
   }
   if (lower.endsWith(".docx")) {
