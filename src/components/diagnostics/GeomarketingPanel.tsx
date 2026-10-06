@@ -10,10 +10,11 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Crosshair, Search } from 'lucide-react';
+import { MapPin, Crosshair, Search, Lightbulb, FolderPlus, Landmark } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { getIntlLocale } from '@/i18n/dateLocale';
-import { effectiveDistance, radiusMetrics, positionVsArea } from '@/lib/geomarketing';
+import { effectiveDistance, radiusMetrics, positionVsArea, buildGeoInsights, type PoiCounts, type GeoInsight } from '@/lib/geomarketing';
 
 interface Props { destinationId: string }
 
@@ -37,6 +38,31 @@ async function geocode(q: string): Promise<[number, number] | null> {
   return j?.[0] ? [Number(j[0].lat), Number(j[0].lon)] : null;
 }
 
+type Poi = { lat: number; lng: number; name: string; cat: keyof PoiCounts };
+const POI_LABEL: Record<keyof PoiCounts, string> = { atrativos: 'Atrativos', restaurantes: 'Restaurantes', transporte: 'Transporte', saude: 'Saúde' };
+
+async function fetchPois(lat: number, lng: number, km: number): Promise<Poi[]> {
+  const r = Math.min(km, 15) * 1000;
+  const q = `[out:json][timeout:25];(
+    nwr(around:${r},${lat},${lng})[tourism~"^(attraction|museum|viewpoint|gallery|theme_park|zoo)$"];
+    nwr(around:${r},${lat},${lng})[natural=beach];
+    nwr(around:${r},${lat},${lng})[amenity~"^(restaurant|cafe|bar)$"];
+    nwr(around:${r},${lat},${lng})[amenity~"^(bus_station|ferry_terminal|taxi)$"];
+    nwr(around:${r},${lat},${lng})[aeroway=aerodrome];
+    nwr(around:${r},${lat},${lng})[amenity~"^(hospital|clinic|pharmacy)$"];
+  );out center 400;`;
+  const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(q) });
+  if (!res.ok) throw new Error('Serviço de mapa indisponível');
+  const j = await res.json();
+  return (j.elements ?? []).map((e: any) => {
+    const t = e.tags ?? {};
+    const cat: keyof PoiCounts = t.tourism || t.natural ? 'atrativos'
+      : /restaurant|cafe|bar/.test(t.amenity ?? '') ? 'restaurantes'
+      : /hospital|clinic|pharmacy/.test(t.amenity ?? '') ? 'saude' : 'transporte';
+    return { lat: e.lat ?? e.center?.lat, lng: e.lon ?? e.center?.lon, name: t.name ?? POI_LABEL[cat], cat };
+  }).filter((p: Poi) => p.lat != null);
+}
+
 const brl = (v: number | null) => v == null ? '—' : v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 
 export function GeomarketingPanel({ destinationId }: Props) {
@@ -54,6 +80,11 @@ export function GeomarketingPanel({ destinationId }: Props) {
   const [showOrigin, setShowOrigin] = useState(true);
   const [newUf, setNewUf] = useState('SP');
   const [newPct, setNewPct] = useState(20);
+  const [pois, setPois] = useState<Poi[] | null>(null);
+  const [loadingPoi, setLoadingPoi] = useState(false);
+  const [showPoi, setShowPoi] = useState(true);
+  const [creating, setCreating] = useState<string | null>(null);
+  const { user } = useAuth();
   const key = ['geomarketing', destinationId];
 
   const { data } = useQuery({
@@ -81,7 +112,9 @@ export function GeomarketingPanel({ destinationId }: Props) {
         .eq('brand_id', own.brand_id) : { data: [] as any[] };
       const { data: origins } = await supabase.from('destination_visitor_origins')
         .select('id,uf,share_pct,org_id').eq('destination_id', destinationId);
-      return { dest, comps: comps ?? [], events: events ?? [], anac: anac?.[0] ?? null, units: units ?? [], own, origins: origins ?? [] };
+      const { data: asmt } = await supabase.from('assessments').select('id').eq('destination_id', destinationId)
+        .order('created_at', { ascending: false }).limit(1);
+      return { assessmentId: asmt?.[0]?.id ?? null, dest, comps: comps ?? [], events: events ?? [], anac: anac?.[0] ?? null, units: units ?? [], own, origins: origins ?? [] };
     },
   });
 
@@ -91,6 +124,15 @@ export function GeomarketingPanel({ destinationId }: Props) {
   const m = useMemo(() => center ? radiusMetrics(data?.comps ?? [], center, radius) : null, [data, radius, center?.[0], center?.[1]]);
   const ownRate = data?.own?.average_daily_rate ?? null;
   const rateDiff = positionVsArea(ownRate, m?.avgDailyRate ?? null);
+  const poiInRadius = useMemo(() => {
+    if (!pois || !center) return null;
+    const c: PoiCounts = { atrativos: 0, restaurantes: 0, transporte: 0, saude: 0 };
+    pois.forEach(p => { if (effectiveDistance({ latitude: p.lat, longitude: p.lng }, center)! <= radius) c[p.cat]++; });
+    return c;
+  }, [pois, radius, center?.[0], center?.[1]]);
+  const insights = useMemo(() => m ? buildGeoInsights({
+    count: m.count, avgRating: m.avgRating, rateDiff, radiusKm: radius, pois: poiInRadius, nextEvent: data?.events?.[0] ?? null,
+  }) : [], [m, rateDiff, radius, poiInRadius, data]);
   const unlocated = (data?.comps ?? []).filter((c: any) => c.latitude == null);
 
   const savePos = async (id: string, lat: number, lng: number, source: string) => {
@@ -111,6 +153,34 @@ export function GeomarketingPanel({ destinationId }: Props) {
     setLocating(false);
     toast.success(tx('{{v0}} de {{v1}} concorrentes localizados. Os demais podem ser marcados no mapa.', { v0: ok, v1: Math.min(30, unlocated.length) }));
     qc.invalidateQueries({ queryKey: key });
+  };
+
+  const loadPois = async () => {
+    if (!center) return;
+    setLoadingPoi(true);
+    try { setPois(await fetchPois(center[0], center[1], radius)); }
+    catch { toast.error(tx('Não foi possível buscar os atrativos agora. Tente de novo em instantes.')); }
+    setLoadingPoi(false);
+  };
+
+  const saveRate = async (id: string, v: string) => {
+    const n = v === '' ? null : Number(v);
+    if (n != null && (isNaN(n) || n < 0)) return;
+    const { error } = await supabase.from('enterprise_competitors').update({ avg_daily_rate: n } as any).eq('id', id);
+    if (error) toast.error(error.message); else qc.invalidateQueries({ queryKey: key });
+  };
+
+  const createProject = async (ins: GeoInsight) => {
+    if (!dest || !orgId || !data?.assessmentId || !user) { toast.error(tx('É preciso ter um diagnóstico deste destino para criar o projeto.')); return; }
+    setCreating(ins.id);
+    const { data: trial } = await (supabase.rpc as any)('get_my_trial_state');
+    if (trial?.org_trialing) { setCreating(null); toast.error(tx('O módulo de Projetos faz parte dos planos contratados.')); return; }
+    const { error } = await supabase.from('projects').insert({
+      org_id: orgId, destination_id: destinationId, assessment_id: data.assessmentId, created_by: user.id,
+      name: `${ins.title} — ${dest.name}`, description: `${ins.text}\n\nOrigem: leitura do Geomarketing (raio de ${radius} km).`, methodology: 'kanban',
+    });
+    setCreating(null);
+    if (error) toast.error(error.message); else toast.success(tx('Projeto criado. Veja em Projetos.'));
   };
 
   const addOrigin = async () => {
@@ -169,9 +239,14 @@ export function GeomarketingPanel({ destinationId }: Props) {
       L.circleMarker(pos, { radius: 4 + pct / 5, color: 'hsl(var(--pillar-ao))', fillOpacity: 0.6 }).bindPopup(`<b>${o.uf}</b>: ${pct}% dos visitantes`).addTo(g);
       bounds.extend(pos);
     });
+    const POI_COLOR: Record<keyof PoiCounts, string> = { atrativos: 'hsl(var(--pillar-ra))', restaurantes: 'hsl(var(--severity-moderado))', transporte: 'hsl(var(--muted-foreground))', saude: 'hsl(var(--severity-bom))' };
+    if (showPoi) (pois ?? []).forEach(p => {
+      L.circleMarker([p.lat, p.lng], { radius: 3, color: POI_COLOR[p.cat], fillOpacity: 0.9, weight: 1 })
+        .bindPopup(`<b>${p.name}</b><br/>${POI_LABEL[p.cat]}`).addTo(g);
+    });
     mapRef.current?.fitBounds(bounds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, radius, showComp, showHeat, showBrand, showOrigin, destinationId]);
+  }, [data, radius, showComp, showHeat, showBrand, showOrigin, destinationId, pois, showPoi]);
 
   const totalOrigin = (data?.origins ?? []).reduce((s: number, o: any) => s + Number(o.share_pct), 0);
 
@@ -195,6 +270,10 @@ export function GeomarketingPanel({ destinationId }: Props) {
               <div className="flex items-center gap-2"><Switch checked={showHeat} onCheckedChange={setShowHeat} /><Label>{tx('Mancha de concentração')}</Label></div>
               <div className="flex items-center gap-2"><Switch checked={showBrand} onCheckedChange={setShowBrand} /><Label>{tx('Unidades da rede')} ({Math.max(0, (data?.units?.length ?? 0) - 1)})</Label></div>
               <div className="flex items-center gap-2"><Switch checked={showOrigin} onCheckedChange={setShowOrigin} /><Label>{tx('Origem dos visitantes')}</Label></div>
+              <div className="flex items-center gap-2">
+                {pois ? <><Switch checked={showPoi} onCheckedChange={setShowPoi} /><Label>{tx('Atrativos e serviços')} ({pois.length})</Label></>
+                  : <Button size="sm" variant="outline" disabled={loadingPoi} onClick={loadPois}><Landmark className="h-4 w-4 mr-1" />{loadingPoi ? tx('Buscando...') : tx('Mostrar atrativos e serviços')}</Button>}
+              </div>
             </div>
 
             {(data?.comps?.length ?? 0) > 0 && (
@@ -211,6 +290,18 @@ export function GeomarketingPanel({ destinationId }: Props) {
                     </Badge>
                   ))}
                 </div>
+                <details className="text-xs">
+                  <summary className="cursor-pointer text-muted-foreground">{tx('Informar a diária média dos concorrentes')}</summary>
+                  <div className="mt-2 grid gap-1 sm:grid-cols-2">
+                    {data!.comps.map((c: any) => (
+                      <label key={c.id} className="flex items-center justify-between gap-2">
+                        <span className="truncate">{c.name}</span>
+                        <input type="number" min={0} defaultValue={c.avg_daily_rate ?? ''} placeholder="R$" aria-label={tx('Diária média de {{v0}}', { v0: c.name })}
+                          className="h-8 w-24 rounded-md border bg-background px-2" onBlur={e => { if (e.target.value !== String(c.avg_daily_rate ?? '')) saveRate(c.id, e.target.value); }} />
+                      </label>
+                    ))}
+                  </div>
+                </details>
                 <p className="text-xs text-muted-foreground">{tx('Pontos tracejados estão em posição aproximada. Clique num nome e depois no mapa para ajustar.')}</p>
               </div>
             )}
@@ -260,6 +351,29 @@ export function GeomarketingPanel({ destinationId }: Props) {
                 <p className="text-xs text-muted-foreground">{data?.anac ? `${data.anac.flights_per_week ?? 0} voos/semana` : tx('Sem aeroporto no município')}</p>
               </div>
             </div>
+            {poiInRadius && (
+              <div className="grid gap-3 grid-cols-2 md:grid-cols-4 text-sm">
+                {(Object.keys(POI_LABEL) as (keyof PoiCounts)[]).map(k => (
+                  <div key={k} className="rounded-md border p-3"><p className="text-muted-foreground">{tx(POI_LABEL[k])} {tx('no raio')}</p><p className="text-2xl font-semibold">{poiInRadius[k]}</p></div>
+                ))}
+                <p className="col-span-full text-xs text-muted-foreground">{tx('Dados abertos do OpenStreetMap, até 15 km. Podem estar incompletos em cidades pequenas.')}</p>
+              </div>
+            )}
+
+            <div className="rounded-md border p-3 space-y-3 text-sm">
+              <p className="font-medium flex items-center gap-2"><Lightbulb className="h-4 w-4 text-primary" />{tx('O que o entorno indica')}</p>
+              {insights.length === 0 ? (
+                <p className="text-xs text-muted-foreground">{tx('Nenhum ponto de atenção com os dados atuais. Mostre os atrativos e informe as diárias para leituras mais completas.')}</p>
+              ) : insights.map(ins => (
+                <div key={ins.id} className="flex flex-col gap-2 rounded-md bg-muted/50 p-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div><p className="font-medium">{tx(ins.title)}</p><p className="text-muted-foreground">{ins.text}</p></div>
+                  <Button size="sm" variant="outline" disabled={creating === ins.id} onClick={() => createProject(ins)} className="shrink-0">
+                    <FolderPlus className="h-4 w-4 mr-1" />{tx('Virar projeto')}
+                  </Button>
+                </div>
+              ))}
+            </div>
+
             <div className="rounded-md border p-3 text-sm">
               <p className="text-muted-foreground">{tx("Próximos eventos (Observatório)")}</p>
               {data?.events?.length ? data.events.slice(0, 4).map((e: any) => (
