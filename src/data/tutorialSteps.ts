@@ -3,6 +3,10 @@
  * Each topic from tutorialData.ts can have detailed sub-steps here.
  */
 
+import beniTutorialVideo from '@/assets/videos/professor-beni-tutorial.mp4.asset.json';
+
+
+
 export interface TutorialSubStep {
   id: string;
   title: string;
@@ -19,6 +23,8 @@ export interface TutorialTopicDetail {
   introduction: string;
   estimatedMinutes: number;
   subSteps: TutorialSubStep[];
+  /** Topic-level video; when set, it replaces the static step illustrations. */
+  videoUrl?: string;
 }
 
 export const tutorialTopicDetails: TutorialTopicDetail[] = [
@@ -144,6 +150,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
     title: 'Professor Beni (IA)',
     introduction: 'O Professor Beni é um assistente com inteligência artificial treinado na metodologia de Mario Beni. Ele pode responder perguntas, interpretar dados e sugerir ações.',
     estimatedMinutes: 3,
+    videoUrl: beniTutorialVideo.url,
     subSteps: [
       {
         id: 'gs-beni-1',
@@ -154,7 +161,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Suas conversas são salvas e você pode retomá-las depois.',
           'O Beni tem contexto sobre a metodologia SISTUR e seus dados.',
         ],
-        imagePath: '/tutorial/gs-beni-1.jpg',
       },
       {
         id: 'gs-beni-2',

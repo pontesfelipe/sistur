@@ -14,7 +14,6 @@ import {
 import { getTopicDetail, type TutorialSubStep } from '@/data/tutorialSteps';
 import { tutorialCategories } from '@/data/tutorialData';
 import { TutorialVideo } from '@/components/tutorial/TutorialVideo';
-import beniTutorialVideo from '@/assets/videos/professor-beni-tutorial.mp4.asset.json';
 
 import { tx } from "@/i18n/t";
 export default function TutorialDetail() {
@@ -105,10 +104,10 @@ export default function TutorialDetail() {
           </div>
         </div>
 
-        {topicId === 'gs-beni' && (
+        {topic.videoUrl && (
           <TutorialVideo
-            src={beniTutorialVideo.url}
-            title={tx('Vídeo tutorial do Professor Beni')}
+            src={topic.videoUrl}
+            title={tx('Vídeo tutorial: {{v0}}', { v0: topic.title })}
           />
         )}
 
@@ -199,8 +198,8 @@ export default function TutorialDetail() {
                 {/* Description */}
                 <p className="text-foreground leading-relaxed text-base">{subStep.description}</p>
 
-                {/* Illustrative image */}
-                {subStep.imagePath && (
+                {/* Illustrative image (hidden when the topic has its own video) */}
+                {subStep.imagePath && !topic.videoUrl && (
                   <div className="rounded-xl overflow-hidden border bg-muted/30">
                     <img
                       src={subStep.imagePath}
@@ -213,8 +212,8 @@ export default function TutorialDetail() {
                   </div>
                 )}
 
-                {/* Video placeholder */}
-                {subStep.videoUrl && (
+                {/* Video placeholder (only when the topic has no topic-level video) */}
+                {subStep.videoUrl && !topic.videoUrl && (
                   <div className="rounded-xl overflow-hidden border bg-muted/30 aspect-video flex items-center justify-center">
                     <div className="text-center text-muted-foreground">
                       <Video className="h-10 w-10 mx-auto mb-2" />
