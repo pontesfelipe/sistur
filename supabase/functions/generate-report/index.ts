@@ -3622,6 +3622,7 @@ INSTRUÇÕES SOBRE REFERÊNCIAS:
 - Aponte alinhamento ou desalinhamento com políticas públicas vigentes
 - Use dados e benchmarks dos documentos para enriquecer comparações
 ` : ''}
+${ragReferenceText}
 ${kbFiles.length > 0 ? `=== BASE DE CONHECIMENTO DO DESTINO ===
 Os seguintes documentos foram associados a este destino e devem ser considerados como referência adicional:
 
