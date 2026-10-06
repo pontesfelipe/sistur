@@ -2,3 +2,4 @@
 - i18n DOM safety net: src/i18n/domTranslator.ts swaps exact dictionary phrases in text nodes/attributes when lang≠pt-BR. Why: module-level constants (FAQ, help, tutorials) can't call t().
 - Official-data ingestion: cron jobs and admin buttons call trigger-ingestion (cron via x-cron-secret from internal_cron_secrets 'ingestion_cron_secret'), never the ingest-* function directly. Why: every run is logged in ingestion_runs for tracking.
 - Global References RAG lives in supabase/functions/_shared/referenceRag.ts (page-by-page extraction, chunking, embeddings, hybrid search via service_role-only RPC match_reference_chunks). Why: single module shared by beni-chat, generate-report and index-global-reference.
+- Tutorial videos use CDN asset pointers and a standalone native-controls player outside EDU tracking. Why: keep large MP4s out of source and avoid recording course progress for help content.
