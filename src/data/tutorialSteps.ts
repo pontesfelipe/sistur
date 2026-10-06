@@ -4,6 +4,12 @@
  */
 
 import beniTutorialVideo from '@/assets/videos/professor-beni-tutorial.mp4.asset.json';
+import profileVideo from '@/assets/videos/tutorial-gs-profile.mp4.asset.json';
+import dashboardVideo from '@/assets/videos/tutorial-erp-dashboard.mp4.asset.json';
+import diagnosticosVideo from '@/assets/videos/tutorial-erp-diagnosticos.mp4.asset.json';
+import projetosVideo from '@/assets/videos/tutorial-erp-projetos.mp4.asset.json';
+import reportsVideo from '@/assets/videos/tutorial-erp-reports.mp4.asset.json';
+import catalogVideo from '@/assets/videos/tutorial-edu-catalog.mp4.asset.json';
 
 export interface TutorialSubStep {
   id: string;
@@ -29,6 +35,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
   // ─── PRIMEIROS PASSOS ───
   {
     topicId: 'gs-profile',
+    videoUrl: profileVideo.url,
     title: 'Seu Perfil',
     introduction: 'Após criar sua conta, o primeiro passo é configurar seu perfil. O SISTUR usa seu perfil para personalizar a experiência e definir quais módulos você pode acessar.',
     estimatedMinutes: 5,
@@ -43,7 +50,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Após criar a conta, verifique seu email para ativar o acesso.',
         ],
         tips: ['Use seu email institucional para aprovação mais rápida.'],
-        imagePath: '/tutorial/gs-profile-1.jpg',
       },
       {
         id: 'gs-profile-2',
@@ -56,7 +62,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Esses dados podem ser alterados depois nas Configurações.',
         ],
         tips: ['Se não sabe qual escolher, converse com seu gestor ou comece com EDU para explorar.'],
-        imagePath: '/tutorial/gs-profile-2.jpg',
       },
       {
         id: 'gs-profile-3',
@@ -68,7 +73,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Normalmente a aprovação leva até 24 horas úteis.',
           'Após aprovado, você terá acesso completo ao sistema.',
         ],
-        imagePath: '/tutorial/gs-profile-3.jpg',
       },
     ],
   },
@@ -181,6 +185,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
   // ─── ERP DIAGNÓSTICOS ───
   {
     topicId: 'erp-dashboard',
+    videoUrl: dashboardVideo.url,
     title: 'Dashboard Principal',
     introduction: 'O Dashboard é o centro de comando do SISTUR Analítico. Aqui você vê uma visão consolidada de todos os seus destinos, diagnósticos e alertas em tempo real.',
     estimatedMinutes: 5,
@@ -195,7 +200,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'AO (Ações Operacionais): Analisa marketing, serviços e operação.',
           'Cada pilar varia de 0 a 100. Verde (>70), Amarelo (40-70), Vermelho (<40).',
         ],
-        imagePath: '/tutorial/erp-dash-1.jpg',
       },
       {
         id: 'erp-dash-2',
@@ -208,7 +212,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Alertas persistentes (2+ ciclos) são destacados em vermelho escuro.',
         ],
         tips: ['Priorize alertas com "governance_block" pois impedem certificação do destino.'],
-        imagePath: '/tutorial/erp-dash-2.jpg',
       },
       {
         id: 'erp-dash-3',
@@ -229,12 +232,12 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Planos de ação são vinculados a diagnósticos e issues específicos.',
           'Use o comparativo de destinos para benchmarking.',
         ],
-        imagePath: '/tutorial/erp-dash-4.jpg',
       },
     ],
   },
   {
     topicId: 'erp-diagnosticos',
+    videoUrl: diagnosticosVideo.url,
     title: 'Criar Diagnósticos',
     introduction: 'Os diagnósticos são o coração do SISTUR Analítico. Através deles, você avalia sistematicamente um destino turístico usando indicadores baseados na metodologia de Mario Beni.',
     estimatedMinutes: 8,
@@ -248,7 +251,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Filtros permitem buscar por destino, status ou período.',
           'Cada card mostra o status (rascunho, calculado, revisado).',
         ],
-        imagePath: '/tutorial/erp-diag-1.jpg',
       },
       {
         id: 'erp-diag-2',
@@ -261,7 +263,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Você pode usar o template padrão ou personalizar os indicadores.',
         ],
         tips: ['Recomendamos usar todos os indicadores na primeira rodada para ter uma visão completa.'],
-        imagePath: '/tutorial/erp-diag-2.jpg',
       },
       {
         id: 'erp-diag-3',
@@ -278,7 +279,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Revise os dados pré-preenchidos e confirme antes de prosseguir.',
           'Indicadores sem fonte oficial disponível serão direcionados para preenchimento manual.',
         ],
-        imagePath: '/tutorial/erp-diag-3.jpg',
       },
       {
         id: 'erp-diag-4',
@@ -291,7 +291,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Prescrições são geradas para cada issue encontrada.',
           'Alertas IGMA são criados para padrões que requerem atenção.',
         ],
-        imagePath: '/tutorial/erp-diag-4.jpg',
       },
       {
         id: 'erp-diag-5',
@@ -309,6 +308,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
   },
   {
     topicId: 'erp-projetos',
+    videoUrl: projetosVideo.url,
     title: 'Gestão de Projetos',
     introduction: 'O módulo de Projetos permite organizar iniciativas de melhoria vinculadas aos diagnósticos. Gerencie fases, milestones e tarefas de forma estruturada.',
     estimatedMinutes: 5,
@@ -323,7 +323,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Defina datas de início e fim previstas.',
           'Adicione uma descrição dos objetivos.',
         ],
-        imagePath: '/tutorial/erp-proj-1.jpg',
       },
       {
         id: 'erp-proj-2',
@@ -379,6 +378,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
   },
   {
     topicId: 'erp-reports',
+    videoUrl: reportsVideo.url,
     title: 'Relatórios',
     introduction: 'Gere relatórios completos dos diagnósticos para apresentações, tomada de decisão e prestação de contas.',
     estimatedMinutes: 3,
@@ -391,7 +391,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Apenas diagnósticos com status "calculado" podem gerar relatórios.',
           'Selecione o formato desejado (PDF, visualização em tela).',
         ],
-        imagePath: '/tutorial/erp-rep-1.jpg',
       },
       {
         id: 'erp-rep-2',
@@ -411,6 +410,7 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
   // ─── EDU ESTUDANTE ───
   {
     topicId: 'edu-catalog',
+    videoUrl: catalogVideo.url,
     title: 'Catálogo de Cursos',
     introduction: 'O SISTUR EDU oferece um catálogo completo de trilhas e capacitações organizadas por pilar, com videoaulas, materiais e avaliações.',
     estimatedMinutes: 5,
@@ -425,7 +425,6 @@ export const tutorialTopicDetails: TutorialTopicDetail[] = [
           'Filtros por tema, nível e pilar ajudam a encontrar conteúdo relevante.',
           'Tags indicam duração estimada e certificação.',
         ],
-        imagePath: '/tutorial/edu-cat-1.jpg',
       },
       {
         id: 'edu-cat-2',
