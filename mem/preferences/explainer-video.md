@@ -4,6 +4,7 @@ description: Logo verdadeiro, painéis fiéis, problema da falta de dados e entr
 type: preference
 ---
 O vídeo explicativo deve usar o logo correto do SISTUR, não uma marca inventada, e painéis próximos do sistema real.
+Logo oficial confirmado por Felipe para o vídeo: SISTUR-Icone-Stripe.png em Files, S branco em fundo azul com traço amarelo. Usar esse arquivo sem substituí-lo por um símbolo inventado.
 O problema não é apenas dados dispersos: muitos gestores nem têm dados e enfrentam dificuldade para tomar decisões.
 Explicar concretamente o que o diagnóstico entrega: situação atual, pontos que precisam de atenção e prioridades para orientar ações; não apenas apresentar siglas ou nomes dos pilares, que o público não compreende.
 Usar linguagem comum e roteiro mais convincente sobre funcionalidades, integrações, resultados, valor e públicos atendidos.
