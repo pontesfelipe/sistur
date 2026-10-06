@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 37,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.37.1",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Plano Empresarial reposicionado para R$ 129 por usuário/mês, com mínimo de 5 usuários.",
+      "Plano Empresarial anual atualizado para R$ 1.315,80 por usuário/ano (15% de desconto), com piso de R$ 6.579 para 5 usuários.",
+      "Catálogo, checkout, traduções e regras comerciais alinhados ao novo preço; assinaturas existentes preservam o preço contratado até uma nova contratação ou troca.",
+    ],
+  },
   {
     version: "2.37.0",
     date: "2026-10-06",

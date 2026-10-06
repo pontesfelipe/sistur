@@ -1,5 +1,5 @@
 # Roadmap — Idiomas (PT / EN / ES)
-- [ ] Reprecificar o plano Empresarial para R$ 129 por usuário/mês (mínimo 5), anual com 15% de desconto, alinhando cobrança, catálogo, traduções, documentação e versão.
+- [x] Reprecificar o plano Empresarial para R$ 129 por usuário/mês (mínimo 5), anual com 15% de desconto, alinhando cobrança, catálogo, traduções, documentação e versão.
 - [x] Revisar roteiro explicativo em linguagem comum: falta de dados, entregas do diagnóstico, prioridades, ações e valor; salvar v2 em Files e preservar original.
 - [x] Gerar vídeo explicativo v2 apenas em Files com logo oficial confirmado; 64s, cenas revisadas. Entregar como versão para revisão: movimento conferido parcialmente e áudio medido, não ouvido.
 - [x] Criar vídeo do Professor Beni com identidade SISTUR e disponibilizar em Ajuda › Tutorial do Professor Beni. Arquivo e entrega verificados; reprodução automatizada não confirmada (Chromium de teste sem suporte H.264).

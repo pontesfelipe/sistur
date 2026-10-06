@@ -55,7 +55,7 @@ function PlanCard({
   const features = Object.entries(p.features || {}).filter(([, v]) => v === true);
   const hasAnnual = !!p.stripe_price_id_annual && !!p.annual_price_cents;
   const useAnnual = annual && hasAnnual;
-  const unitCents = useAnnual ? p.annual_price_cents! : p.price_cents;
+  const unitCents = useAnnual ? p.annual_price_cents : p.price_cents;
   const onlinePriceId = !p.quote_only && p.price_cents
     ? (useAnnual ? p.stripe_price_id_annual : p.stripe_price_id)
     : null;
@@ -81,16 +81,16 @@ function PlanCard({
         {useAnnual ? (
           <div className="mt-3 space-y-1">
             <p className="text-sm text-muted-foreground line-through">
-              {formatBRL(p.price_cents! * 12)}{tx('/ano')}
+               {formatBRL((p.price_cents ?? 0) * 12)}{tx('/ano')}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-2xl font-bold tracking-tight">
-                {formatBRL(p.annual_price_cents!)}{tx('/ano')}{p.seat_based ? ' ' + tx('por usuário') : ''}
+                 {formatBRL(p.annual_price_cents ?? 0)}{tx('/ano')}{p.seat_based ? ' ' + tx('por usuário') : ''}
               </p>
               <Badge variant="secondary">{tx("15% de desconto")}</Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              {tx('Equivale a {{v}}/mês, pago uma vez por ano.', { v: formatBRL(Math.floor(p.annual_price_cents! / 1200) * 100) })}
+               {tx('Equivale a {{v}}/mês, pago uma vez por ano.', { v: formatBRL((p.annual_price_cents ?? 0) / 12) })}
             </p>
           </div>
         ) : (
