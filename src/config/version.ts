@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 36,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.36.1",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Desempenho: ao passar o mouse sobre um diagnóstico, os dados são pré-carregados e a tela abre mais rápido.",
+      "Menu lateral pré-carrega as páginas mais usadas (Diagnósticos, Projetos, Relatórios, Cursos, Fórum).",
+      "Tela de carregamento do diagnóstico agora mostra o formato real (cabeçalho, 3 pilares e abas).",
+    ],
+  },
   {
     version: "2.36.0",
     date: "2026-10-06",
