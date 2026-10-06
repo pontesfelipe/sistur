@@ -401,8 +401,14 @@ serve(async (req) => {
       });
     }
 
-    const truncated = reportText.length > MAX_REPORT_CHARS;
-    const reportForAudit = truncated ? reportText.slice(0, MAX_REPORT_CHARS) : reportText;
+    // Relatórios longos: auditar em partes (com sobreposição) em vez de cortar.
+    const truncated = false;
+    const SEG_OVERLAP = 2000;
+    const segments: string[] = [];
+    for (let start = 0; start < reportText.length; start += MAX_REPORT_CHARS - SEG_OVERLAP) {
+      segments.push(reportText.slice(start, start + MAX_REPORT_CHARS));
+      if (start + MAX_REPORT_CHARS >= reportText.length) break;
+    }
 
     // (1) Determinísticas
     const detFindings = deterministicChecks(reportText);
@@ -426,9 +432,20 @@ serve(async (req) => {
       }
     }
 
-    const tasks = batches.map((b) => () => runLlmBatch(LOVABLE_API_KEY, b.rules, reportForAudit, reportName || null, truncated, b.label));
+    const tasks: Array<() => Promise<Finding[]>> = [];
+    segments.forEach((seg, si) => {
+      const segName = segments.length > 1 ? `${reportName || "relatório"} [parte ${si + 1}/${segments.length}]` : (reportName || null);
+      for (const b of batches) tasks.push(() => runLlmBatch(LOVABLE_API_KEY, b.rules, seg, segName, false, b.label));
+    });
     const batchResults = await pooledAll(tasks, MAX_PARALLEL);
-    const llmFindings = batchResults.flat();
+    // Mesclar por regra: pior status vence (fail > warn > pass).
+    const rank: Record<string, number> = { pass: 0, warn: 1, fail: 2 };
+    const merged = new Map<string, Finding>();
+    for (const f of batchResults.flat()) {
+      const prev = merged.get(f.rule_key);
+      if (!prev || rank[f.status] > rank[prev.status]) merged.set(f.rule_key, f);
+    }
+    const llmFindings = Array.from(merged.values());
 
     const findings = [...detFindings, ...llmFindings];
     const score = computeScore(findings);
@@ -436,7 +453,7 @@ serve(async (req) => {
     const warns = findings.filter((f) => f.status === "warn").length;
     const passes = findings.filter((f) => f.status === "pass").length;
 
-    const summary = `Auditoria em ${batches.length} lote(s) LLM + ${detFindings.length} checagens determinísticas. ` +
+    const summary = `Auditoria em ${segments.length} parte(s) × ${batches.length} lote(s) LLM + ${detFindings.length} checagens determinísticas. ` +
       `${passes} aprovações, ${warns} alertas, ${fails} violações. Conformidade geral: ${score}%.`;
 
     return new Response(JSON.stringify({
@@ -445,6 +462,7 @@ serve(async (req) => {
       report_chars: reportText.length,
       rules_evaluated: findings.length,
       batches: batches.length,
+      segments: segments.length,
       deterministic_checks: detFindings.length,
       result: { summary, score, findings },
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });

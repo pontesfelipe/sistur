@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 36,
-  patch: 2,
+  patch: 3,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.36.3",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Camada Semântica: exemplo da régua oficial corrigido (Adequado 67–79, Forte 80–89, Excelente ≥90)",
+      "Auditoria de relatórios longos agora lê o texto inteiro, em partes, sem cortar o final",
+      "Histórico de auditorias salvo, com comparação de nota antes/depois",
+      "Aviso ao salvar regra com chave duplicada, título/seção repetidos ou faixas fora da régua oficial",
+    ],
+  },
   {
     version: "2.36.2",
     date: "2026-10-06",

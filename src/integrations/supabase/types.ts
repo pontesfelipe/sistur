@@ -11061,6 +11061,54 @@ export type Database = {
           },
         ]
       }
+      report_semantic_audits: {
+        Row: {
+          applies_to: string
+          created_at: string
+          created_by: string | null
+          fails: number
+          findings: Json
+          id: string
+          passes: number
+          report_chars: number
+          report_name: string | null
+          score: number
+          segments: number
+          summary: string | null
+          warns: number
+        }
+        Insert: {
+          applies_to?: string
+          created_at?: string
+          created_by?: string | null
+          fails?: number
+          findings?: Json
+          id?: string
+          passes?: number
+          report_chars?: number
+          report_name?: string | null
+          score: number
+          segments?: number
+          summary?: string | null
+          warns?: number
+        }
+        Update: {
+          applies_to?: string
+          created_at?: string
+          created_by?: string | null
+          fails?: number
+          findings?: Json
+          id?: string
+          passes?: number
+          report_chars?: number
+          report_name?: string | null
+          score?: number
+          segments?: number
+          summary?: string | null
+          warns?: number
+        }
+        Relationships: []
+      }
       report_semantic_entries: {
         Row: {
           active: boolean
