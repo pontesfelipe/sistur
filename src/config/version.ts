@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 35,
-  patch: 1,
+  minor: 36,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.36.0",
+    date: "2026-10-06",
+    type: "minor" as const,
+    changes: [
+      "Ajuda: vídeos tutoriais animados (27s) em Seu Perfil, Dashboard Principal, Criar Diagnósticos, Gestão de Projetos, Relatórios e Catálogo de Cursos.",
+      "Imagens estáticas desses tutoriais retiradas, pois o vídeo cobre o mesmo conteúdo.",
+    ],
+  },
   {
     version: "2.35.1",
     date: "2026-10-06",
