@@ -2539,6 +2539,54 @@ export type Database = {
           },
         ]
       }
+      destination_visitor_origins: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          destination_id: string
+          id: string
+          org_id: string
+          share_pct: number
+          uf: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          destination_id: string
+          id?: string
+          org_id: string
+          share_pct: number
+          uf: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          destination_id?: string
+          id?: string
+          org_id?: string
+          share_pct?: number
+          uf?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "destination_visitor_origins_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "destination_visitor_origins_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+        ]
+      }
       destinations: {
         Row: {
           created_at: string
@@ -4515,6 +4563,7 @@ export type Database = {
       }
       enterprise_competitors: {
         Row: {
+          avg_daily_rate: number | null
           captured_at: string
           created_at: string
           created_by: string | null
@@ -4522,10 +4571,13 @@ export type Database = {
           distance_km: number | null
           id: string
           is_manual: boolean
+          latitude: number | null
           location: string | null
+          longitude: number | null
           name: string
           notes: string | null
           org_id: string
+          position_source: string | null
           property_type: string | null
           rating: number | null
           review_volume: number | null
@@ -4534,6 +4586,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          avg_daily_rate?: number | null
           captured_at?: string
           created_at?: string
           created_by?: string | null
@@ -4541,10 +4594,13 @@ export type Database = {
           distance_km?: number | null
           id?: string
           is_manual?: boolean
+          latitude?: number | null
           location?: string | null
+          longitude?: number | null
           name: string
           notes?: string | null
           org_id: string
+          position_source?: string | null
           property_type?: string | null
           rating?: number | null
           review_volume?: number | null
@@ -4553,6 +4609,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          avg_daily_rate?: number | null
           captured_at?: string
           created_at?: string
           created_by?: string | null
@@ -4560,10 +4617,13 @@ export type Database = {
           distance_km?: number | null
           id?: string
           is_manual?: boolean
+          latitude?: number | null
           location?: string | null
+          longitude?: number | null
           name?: string
           notes?: string | null
           org_id?: string
+          position_source?: string | null
           property_type?: string | null
           rating?: number | null
           review_volume?: number | null
