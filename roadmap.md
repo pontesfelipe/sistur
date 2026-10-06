@@ -1,4 +1,5 @@
 # Roadmap — Idiomas (PT / EN / ES)
+- [ ] Revisar roteiro e vídeo explicativo apenas em Files: logo verdadeiro, painéis fiéis e entregas do diagnóstico em linguagem simples; preservar primeira versão.
 - [x] Criar vídeo do Professor Beni com identidade SISTUR e disponibilizar em Ajuda › Tutorial do Professor Beni. Arquivo e entrega verificados; reprodução automatizada não confirmada (Chromium de teste sem suporte H.264).
 - [x] Retirar as imagens ilustrativas dos passos do tutorial do Professor Beni, que ficaram sem sentido com o vídeo no ar; tópico com vídeo não mostra mais imagens dos passos.
 - [x] Fase 1: base de tradução, seletor (login + topo), login, menus, títulos das páginas, Professor Beni no idioma
