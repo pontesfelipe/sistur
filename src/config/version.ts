@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 32,
+  minor: 33,
   patch: 0,
 
   get full() {
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.33.0",
+    date: "2026-10-06",
+    type: "minor" as const,
+    changes: [
+      "CAGED: automação no GitHub agora tenta de novo sozinha (até 3 vezes, com 5 min de espera) quando a execução falha ou é cancelada",
+      "CAGED: agendamento em três horários (dia 5 às 12h e 18h UTC, dia 6 às 12h UTC); o script confere antes se o mês já está no SISTUR e não baixa de novo à toa",
+      "CAGED: downloads do Ministério do Trabalho e do IBGE e o envio ao SISTUR têm até 3 tentativas com pausas progressivas",
+      "Cão de guarda do CAGED: todo dia 6 às 21h UTC o SISTUR confere se o mês chegou; se não, aciona o GitHub e registra alerta em Saúde das Ingestões",
+    ],
+  },
   {
     version: "2.32.0",
     date: "2026-10-05",
