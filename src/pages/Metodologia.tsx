@@ -1196,11 +1196,12 @@ export default function Metodologia() {
                   <h4 className="font-semibold">{tx("Referências Globais")}</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {tx("Documentos de referência nacional injetados em todos os relatórios: PNT (Plano Nacional de Turismo), legislação federal, diretrizes do Ministério do Turismo. Gerenciados exclusivamente por administradores.")}
+                  {tx("Documentos de referência nacional (PNT, legislação federal, diretrizes do Ministério do Turismo) usados pelo Professor Beni e pelos relatórios. Cada documento tem um resumo executivo e é fatiado em trechos por página: ao responder ou gerar um relatório, a IA busca apenas os trechos mais relevantes (mínimo de 45% de relevância) e cita documento e página. Gerenciados exclusivamente por administradores no menu Inteligência › Referências.")}
                 </p>
                 <ul className="text-sm space-y-1">
                   <li className="flex items-center gap-2"><span className="text-purple-600">🏛️</span> {tx("PNT 2024-2027 como referência padrão")}</li>
                   <li className="flex items-center gap-2"><span className="text-purple-600">📋</span> {tx("Contextualiza indicadores com metas nacionais")}</li>
+                  <li className="flex items-center gap-2"><span className="text-purple-600">🔎</span> {tx("Busca por trechos com citação de documento e página")}</li>
                   <li className="flex items-center gap-2"><span className="text-purple-600">🔒</span> {tx("Somente admins podem adicionar/remover")}</li>
                 </ul>
               </div>
