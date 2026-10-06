@@ -188,6 +188,30 @@ export function BeniContextPanel() {
 
       {(['persona', 'output_format', 'base_theory', 'dynamic_context', 'scope_guardrails'] as SectionKey[]).map(renderSection)}
 
+      <Card className="border-dashed">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ShieldAlert className="h-4 w-4 text-primary" />
+            {tx("Regras permanentes (somente leitura)")}
+          </CardTitle>
+          <CardDescription>
+            {tx("Sempre aplicadas, mesmo quando as seções acima são editadas. Prevalecem sobre qualquer personalização.")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
+            <li>{tx("Data de referência: o Beni recebe a data de hoje (horário de Brasília) a cada conversa.")}</li>
+            <li>{tx("Formato de voz: sem markdown, texto corrido pronto para narração.")}</li>
+            <li>{tx("Números: scores sempre falados em porcentagem (ex.: \"67 por cento\"), nunca em decimais.")}</li>
+            <li>{tx("Limites de responsabilidade: orientação metodológica, sem garantia de resultado nem parecer jurídico, contábil ou técnico.")}</li>
+            <li>{tx("Desambiguação: confirma o nome exato do diagnóstico ou relatório antes de analisar.")}</li>
+            <li>{tx("Personalização pelo nome: usa o primeiro nome cadastrado com moderação e respeita o tratamento preferido.")}</li>
+            <li>{tx("Escopo: só turismo e metodologia SISTUR; recusa educada para outros temas.")}</li>
+            <li>{tx("Contexto enxuto: em perguntas gerais, envia só os nomes dos diagnósticos e relatórios; detalhes, scores e trechos entram quando a pergunta trata deles.")}</li>
+          </ul>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{tx("Modelo & Infraestrutura")}</CardTitle>

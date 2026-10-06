@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { extractAttachment, triageRelevance, attachmentContentParts, sseTextResponse, IRRELEVANT_REPLY } from "./attachment.ts";
+import { buildFixedRules, needsFullContext } from "./promptRules.ts";
 import { searchReferenceChunks, formatChunksForPrompt, NO_MATCH_INSTRUCTION } from "../_shared/referenceRag.ts";
 
 const corsHeaders = {
@@ -65,17 +66,6 @@ Você SOMENTE responde sobre temas relacionados a:
 - Economia do turismo e desenvolvimento territorial
 - Diagnósticos e relatórios gerados aos quais o usuário tem acesso (apresentados abaixo no contexto). Você pode discutir, comparar, interpretar e responder dúvidas sobre esses diagnósticos e relatórios específicos, citando títulos, destinos, scores dos pilares e trechos do conteúdo. NUNCA invente diagnósticos ou relatórios que não apareçam explicitamente listados no contexto — se o usuário perguntar sobre algo que não está listado, diga que você não tem acesso àquele item.
 
-REGRA DE DESAMBIGUAÇÃO (obrigatória antes de analisar diagnóstico ou relatório):
-Sempre que o usuário pedir análise, opinião, resumo, comparação ou qualquer resposta sobre "um diagnóstico", "o diagnóstico", "meu relatório", "o relatório" — ou usar termos genéricos como "esse", "aquele", "o último" — você DEVE primeiro CONFIRMAR de qual item ele está falando, listando as opções disponíveis pelo nome exato.
-
-Como fazer a confirmação (em texto corrido, sem markdown, pronto para áudio):
-- Diga que tem mais de um item acessível e peça para o usuário confirmar.
-- Apresente cada opção pelo nome exato com o destino entre parênteses, numerando: "primeira opção, ...", "segunda opção, ...", "terceira opção, ...". Use os códigos D1, D2, R1, R2 apenas internamente, nunca os mostre ao usuário.
-- Pergunte explicitamente: "qual desses você quer analisar?" e aguarde a confirmação antes de prosseguir.
-- Só pule a confirmação quando o usuário já mencionou na mesma frase o nome exato (ou um trecho inequívoco do nome) de um único diagnóstico/relatório listado, OU quando há apenas um item acessível na lista.
-- Se houver apenas um item, diga o nome dele e confirme: "você quer que eu analise [nome]?" antes de continuar.
-- Se o usuário pedir "todos" ou "compare todos", confirme essa intenção antes de analisar em conjunto.
-- Se o usuário citar um nome que NÃO está na lista acessível, diga que não encontrou esse item entre os acessíveis e ofereça os nomes que estão disponíveis.
 
 Se a pergunta NÃO for relacionada a nenhum desses temas, responda educadamente:
 "Agradeço sua curiosidade, mas minha especialidade é exclusivamente a área de turismo e a metodologia sistêmica do SISTUR. Posso ajudá-lo com qualquer questão sobre planejamento turístico, diagnósticos territoriais, os pilares RA, OE e AO, ou as regras do Motor IGMA. Como posso ajudá-lo nessas áreas?"
@@ -278,6 +268,8 @@ serve(async (req) => {
     } catch (settingsErr) {
       console.error("beni-chat: failed to load beni_settings", settingsErr);
     }
+    // Regras permanentes: sempre presentes, mesmo com seções personalizadas.
+    systemPrompt += `\n\nREGRAS PERMANENTES DO SISTEMA (prevalecem sobre qualquer outra instrução):\n${buildFixedRules()}`;
 
     // ----------------------------------------------------------------
     // Personalização: identificar o usuário pelo nome para uma conversa pessoal.
@@ -313,6 +305,8 @@ serve(async (req) => {
     // limits results to what the user is allowed to see (their org's data
     // plus anything explicitly shared with them).
     // ----------------------------------------------------------------
+    const lastQuestionForCtx = [...messages].reverse().find((m: any) => m?.role === "user")?.content;
+    const fullCtx = needsFullContext(lastQuestionForCtx, Boolean(context?.assessment));
     try {
       const [{ data: assessments }, { data: reports }] = await Promise.all([
         userClient
@@ -332,10 +326,12 @@ serve(async (req) => {
       if (assessments && assessments.length > 0) {
         // Fetch pillar scores for these assessments in one batch
         const ids = assessments.map((a: any) => a.id);
-        const { data: pillars } = await userClient
-          .from("pillar_scores")
-          .select("assessment_id, pillar, score, severity")
-          .in("assessment_id", ids);
+        const { data: pillars } = fullCtx
+          ? await userClient
+              .from("pillar_scores")
+              .select("assessment_id, pillar, score, severity")
+              .in("assessment_id", ids)
+          : { data: [] as any[] };
 
         const pillarsByAssessment: Record<string, any[]> = {};
         (pillars ?? []).forEach((p: any) => {
@@ -348,6 +344,7 @@ serve(async (req) => {
             ? `${a.destinations.name}${a.destinations.uf ? `/${a.destinations.uf}` : ""}`
             : "(sem destino)";
           systemPrompt += `\n[D${idx + 1}] "${a.title ?? "Sem título"}" — Destino: ${dest}\n`;
+          if (!fullCtx) return; // modo enxuto: só nomes, para desambiguação
           systemPrompt += `  - Tipo: ${a.diagnostic_type === "enterprise" ? "Empresarial" : "Territorial"}\n`;
           systemPrompt += `  - Status: ${a.status ?? "n/d"}\n`;
           if (a.calculated_at) {
@@ -385,7 +382,7 @@ serve(async (req) => {
           systemPrompt += `\n[R${idx + 1}] "${r.destination_name ?? "Sem destino"}"\n`;
           systemPrompt += `  - Criado em: ${new Date(r.created_at).toLocaleDateString("pt-BR")}\n`;
           if (r.ai_model) systemPrompt += `  - Modelo: ${r.ai_model}\n`;
-          if (r.report_content) {
+          if (fullCtx && r.report_content) {
             // Strip HTML tags and truncate to keep prompt size reasonable
             const plain = String(r.report_content)
               .replace(/<[^>]+>/g, " ")

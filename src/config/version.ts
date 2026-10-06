@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 36,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,17 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.36.2",
+    date: "2026-10-06",
+    type: "patch" as const,
+    changes: [
+      "Professor Beni: regras permanentes (desambiguação, formato de voz, escopo) não se perdem mais ao editar seções no painel",
+      "Professor Beni agora sabe a data de hoje, fala scores em porcentagem e informa limites de responsabilidade",
+      "Painel Regras de Conversa mostra as regras permanentes e a personalização pelo nome (somente leitura)",
+      "Perguntas gerais enviam contexto enxuto ao Beni, reduzindo custo e ruído; detalhes entram quando a pergunta trata de diagnósticos ou relatórios",
+    ],
+  },
   {
     version: "2.36.1",
     date: "2026-10-06",
