@@ -3,7 +3,7 @@ import { Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bot, ScrollText, ListOrdered, Sparkles, Plug } from 'lucide-react';
+import { Bot, ScrollText, ListOrdered, Sparkles, Plug, BookOpen } from 'lucide-react';
 import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
 
 const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
@@ -16,8 +16,11 @@ const ReportContextPanel = lazy(() =>
 const McpGuidePanel = lazy(() =>
   import('@/components/admin/McpGuidePanel').then(m => ({ default: m.McpGuidePanel }))
 );
+const GlobalReferencesPanel = lazy(() =>
+  import('@/components/admin/GlobalReferencesPanel').then(m => ({ default: m.GlobalReferencesPanel }))
+);
 
-const VALID_TABS = ['beni', 'contexto', 'semantica', 'estrutura', 'mcp'];
+const VALID_TABS = ['beni', 'contexto', 'semantica', 'estrutura', 'referencias', 'mcp'];
 
 export default function AdminInteligencia() {
   const [searchParams] = useSearchParams();
