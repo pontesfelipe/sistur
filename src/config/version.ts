@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 34,
-  patch: 3,
+  minor: 35,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.35.0",
+    date: "2026-10-06",
+    type: "minor" as const,
+    changes: [
+      "Ajuda: vídeo animado de 27 segundos no tutorial do Professor Beni, com a identidade visual SISTUR e controles de reprodução.",
+      "Tutorial escrito preservado abaixo do vídeo; mídia hospedada fora do código da aplicação.",
+    ],
+  },
   {
     version: "2.34.3",
     date: "2026-10-06",
