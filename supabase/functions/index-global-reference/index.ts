@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
 
   if (typeof body.query === "string") {
     const k = Math.min(Math.max(Number(body.k) || 3, 1), 10);
-    const results = await searchReferenceChunks(admin, body.query, k, 0.2);
+    const results = await searchReferenceChunks(admin, body.query, k);
     return json({ results });
   }
 

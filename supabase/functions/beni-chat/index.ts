@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { extractAttachment, triageRelevance, attachmentContentParts, sseTextResponse, IRRELEVANT_REPLY } from "./attachment.ts";
-import { searchReferenceChunks, formatChunksForPrompt } from "../_shared/referenceRag.ts";
+import { searchReferenceChunks, formatChunksForPrompt, NO_MATCH_INSTRUCTION } from "../_shared/referenceRag.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -431,6 +431,8 @@ serve(async (req) => {
         const chunks = await searchReferenceChunks(ragClient, lastQ, 3);
         if (chunks.length > 0) {
           systemPrompt += `\n\nTRECHOS ORIGINAIS DOS DOCUMENTOS DE REFERÊNCIA (selecionados para a pergunta atual):\n${formatChunksForPrompt(chunks)}\n\nQuando usar esses trechos, cite a fonte de forma falada, por exemplo: segundo o documento tal, página tal. Não invente conteúdo além do que está nos trechos. Não use markdown.\n`;
+        } else if (lastQ.trim().length >= 8) {
+          systemPrompt += `\n\n${NO_MATCH_INSTRUCTION}\n`;
         }
       } catch (ragErr) {
         console.error("beni-chat: reference chunk search failed", ragErr);

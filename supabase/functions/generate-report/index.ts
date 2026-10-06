@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { searchReferenceChunks, formatChunksForPrompt, formatSourcesList } from "../_shared/referenceRag.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -3179,24 +3180,43 @@ serve(async (req) => {
     // Busca por trechos (RAG): para cada pilar, procura trechos dos documentos
     // de referência ligados aos indicadores mais fracos (Atenção/Crítico).
     let ragReferenceText = '';
+    let ragSourcesSection = '';
     try {
       const weak = (indicatorScores as any[]).filter((s) => Number(s.score ?? 1) < 0.67 && s.indicators?.name);
       const seen = new Set<string>();
       const blocks: string[] = [];
+      const sourceLines: string[] = [];
+      const noMatch: string[] = [];
       for (const pillar of ['RA', 'OE', 'AO']) {
         const names = weak.filter((s) => s.indicators?.pillar === pillar).slice(0, 4).map((s) => s.indicators.name);
         if (!names.length) continue;
         const chunks = (await searchReferenceChunks(supabaseAdmin, `Diretrizes e políticas públicas de turismo sobre: ${names.join('; ')}`, 3))
           .filter((c) => !seen.has(c.id));
         chunks.forEach((c) => seen.add(c.id));
-        if (chunks.length) blocks.push(`Pilar ${pillar} (indicadores: ${names.join(', ')}):\n${formatChunksForPrompt(chunks)}`);
+        if (chunks.length) {
+          blocks.push(`Pilar ${pillar} (indicadores: ${names.join(', ')}):\n${formatChunksForPrompt(chunks)}`);
+          sourceLines.push(`**Pilar ${pillar}** — indicadores: ${names.join(', ')}\n${formatSourcesList(chunks).map((l) => `- ${l}`).join('\n')}`);
+        } else {
+          noMatch.push(pillar);
+        }
       }
       if (blocks.length) {
         ragReferenceText = `=== TRECHOS ORIGINAIS DOS DOCUMENTOS DE REFERÊNCIA ===
 Trechos literais selecionados por relevância para os indicadores em Atenção/Crítico. Ao usá-los, cite documento e página. Não extrapole além do texto.
-
+${noMatch.length ? `Para o(s) pilar(es) ${noMatch.join(', ')} NÃO há trecho relevante: não atribua citações de documentos a esses pilares; use apenas os resumos gerais.\n` : ''}
 ${blocks.join('\n\n')}
 `;
+      } else if (weak.length) {
+        ragReferenceText = `=== TRECHOS ORIGINAIS DOS DOCUMENTOS DE REFERÊNCIA ===
+Nenhum trecho dos documentos de referência é suficientemente relacionado aos indicadores em Atenção/Crítico. Não cite páginas nem trechos de documentos; fundamente-se apenas nos resumos gerais e nos dados do diagnóstico.
+`;
+      }
+      if (sourceLines.length || noMatch.length) {
+        ragSourcesSection = `## Fontes dos trechos de referência
+
+Documentos e páginas consultados para fundamentar a análise de cada pilar (selecionados automaticamente por relevância aos indicadores em Atenção/Crítico).
+
+${sourceLines.join('\n\n')}${noMatch.length ? `\n\n${noMatch.map((p) => `**Pilar ${p}** — nenhum trecho suficientemente relacionado foi encontrado; a análise usa apenas os resumos gerais dos documentos.`).join('\n\n')}` : ''}`;
       }
     } catch (ragErr) {
       console.error('generate-report: reference chunk search failed', ragErr);
@@ -4126,6 +4146,10 @@ ${kbFiles.length > 0 ? `11. Referencie documentos da base de conhecimento do des
           if (hasAny) logger.stage('validation_issues_summary', { autoCorrections: autoCorrections.length, allIssues: allIssues.length, status: validationStatus });
         } catch (cohErr) {
           logger.error('validation_failed_nonblocking', cohErr);
+        }
+        // Seção determinística: documentos e páginas usados como fonte em cada análise por trechos.
+        if (ragSourcesSection) {
+          finalContent = finalContent.replace(/\s*$/, '') + '\n\n' + ragSourcesSection + '\n';
         }
 
         logger.stage('persist_lookup_existing');
