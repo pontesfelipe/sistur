@@ -132,6 +132,15 @@ export function GlobalReferencesPanel() {
 
         {files.length > 0 && <SearchTester />}
 
+        <div className="rounded-lg border bg-muted/40 p-4 space-y-2 text-sm">
+          <p className="font-semibold">{tx("Como funcionam as Referências Globais")}</p>
+          <p className="text-muted-foreground">{tx("Cada documento é usado de duas formas, que trabalham juntas:")}</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">{tx("1. Resumo (visão geral):")}</span> {tx("no envio, a IA lê o documento inteiro e sugere um resumo para você revisar. Os resumos de todos os documentos ativos acompanham sempre o Professor Beni e os relatórios como diretrizes oficiais.")}</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">{tx("2. Busca por trechos (precisão):")}</span> {tx("o documento é dividido em pequenos trechos por página. A cada pergunta ao Beni, o sistema busca os 3 trechos mais relevantes e o Beni cita documento e página. Nos relatórios, a busca é feita por pilar a partir dos indicadores em Atenção ou Crítico, e o relatório termina com a lista de fontes usadas.")}</p>
+          <p className="text-muted-foreground"><span className="font-medium text-foreground">{tx("Quando nada é relevante:")}</span> {tx("trechos com menos de 45% de relevância são descartados. Nesse caso o Beni avisa que as referências não tratam do tema, em vez de citar fontes pouco relacionadas.")}</p>
+          <p className="text-muted-foreground">{tx("Desativar um documento o tira dos resumos e da busca. Use Reindexar se trocar o arquivo, e Melhorar com IA para revisar o resumo.")}</p>
+        </div>
+
         <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} />
         {editFile && <EditDialog file={editFile} open={!!editFile} onOpenChange={(v) => !v && setEditFile(null)} />}
       </CardContent>
