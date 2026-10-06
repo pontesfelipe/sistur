@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { extractAttachment, triageRelevance, attachmentContentParts, sseTextResponse, IRRELEVANT_REPLY } from "./attachment.ts";
+import { buildFixedRules, needsFullContext } from "./promptRules.ts";
 import { searchReferenceChunks, formatChunksForPrompt, NO_MATCH_INSTRUCTION } from "../_shared/referenceRag.ts";
 
 const corsHeaders = {
@@ -267,6 +268,8 @@ serve(async (req) => {
     } catch (settingsErr) {
       console.error("beni-chat: failed to load beni_settings", settingsErr);
     }
+    // Regras permanentes: sempre presentes, mesmo com seções personalizadas.
+    systemPrompt += `\n\nREGRAS PERMANENTES DO SISTEMA (prevalecem sobre qualquer outra instrução):\n${buildFixedRules()}`;
 
     // ----------------------------------------------------------------
     // Personalização: identificar o usuário pelo nome para uma conversa pessoal.
@@ -302,6 +305,8 @@ serve(async (req) => {
     // limits results to what the user is allowed to see (their org's data
     // plus anything explicitly shared with them).
     // ----------------------------------------------------------------
+    const lastQuestionForCtx = [...messages].reverse().find((m: any) => m?.role === "user")?.content;
+    const fullCtx = needsFullContext(lastQuestionForCtx, Boolean(context?.assessment));
     try {
       const [{ data: assessments }, { data: reports }] = await Promise.all([
         userClient
@@ -321,10 +326,12 @@ serve(async (req) => {
       if (assessments && assessments.length > 0) {
         // Fetch pillar scores for these assessments in one batch
         const ids = assessments.map((a: any) => a.id);
-        const { data: pillars } = await userClient
-          .from("pillar_scores")
-          .select("assessment_id, pillar, score, severity")
-          .in("assessment_id", ids);
+        const { data: pillars } = fullCtx
+          ? await userClient
+              .from("pillar_scores")
+              .select("assessment_id, pillar, score, severity")
+              .in("assessment_id", ids)
+          : { data: [] as any[] };
 
         const pillarsByAssessment: Record<string, any[]> = {};
         (pillars ?? []).forEach((p: any) => {
@@ -337,6 +344,7 @@ serve(async (req) => {
             ? `${a.destinations.name}${a.destinations.uf ? `/${a.destinations.uf}` : ""}`
             : "(sem destino)";
           systemPrompt += `\n[D${idx + 1}] "${a.title ?? "Sem título"}" — Destino: ${dest}\n`;
+          if (!fullCtx) return; // modo enxuto: só nomes, para desambiguação
           systemPrompt += `  - Tipo: ${a.diagnostic_type === "enterprise" ? "Empresarial" : "Territorial"}\n`;
           systemPrompt += `  - Status: ${a.status ?? "n/d"}\n`;
           if (a.calculated_at) {
@@ -374,7 +382,7 @@ serve(async (req) => {
           systemPrompt += `\n[R${idx + 1}] "${r.destination_name ?? "Sem destino"}"\n`;
           systemPrompt += `  - Criado em: ${new Date(r.created_at).toLocaleDateString("pt-BR")}\n`;
           if (r.ai_model) systemPrompt += `  - Modelo: ${r.ai_model}\n`;
-          if (r.report_content) {
+          if (fullCtx && r.report_content) {
             // Strip HTML tags and truncate to keep prompt size reasonable
             const plain = String(r.report_content)
               .replace(/<[^>]+>/g, " ")
