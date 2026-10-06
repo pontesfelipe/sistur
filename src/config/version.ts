@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 36,
-  patch: 5,
+  minor: 37,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.37.0",
+    date: "2026-10-06",
+    type: "minor" as const,
+    changes: [
+      "Geomarketing: botão para mostrar atrativos, restaurantes, transporte e saúde no entorno (dados abertos de mapa) com contagem no raio",
+      "Geomarketing: novo quadro 'O que o entorno indica' com leituras automáticas e botão 'Virar projeto'",
+      "Geomarketing: campo para informar a diária média de cada concorrente, liberando a comparação de preço",
+    ],
+  },
   {
     version: "2.36.5",
     date: "2026-10-06",
