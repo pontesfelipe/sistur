@@ -169,6 +169,13 @@
       "when": 1791406650577,
       "tag": "0023_project_methodology_advice",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791412712162,
+      "tag": "0024_project_task_checklist",
+      "breakpoints": true
     }
   ]
 }
