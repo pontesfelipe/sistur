@@ -882,25 +882,32 @@ const DiagnosticoDetalhe = () => {
       />
 
       {/* Stale banner: dados oficiais atualizados após o último cálculo */}
-      {isCalculated && (assessment as any).needs_recalculation && (
-        <div className="my-6 p-4 rounded-xl border border-amber-500/40 bg-amber-50/50 dark:bg-amber-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
-            <div>
-              <p className="font-medium text-amber-700 dark:text-amber-300">
-                {tx('Dados oficiais atualizados após o último cálculo')}
-              </p>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {tx("Novos valores de fontes oficiais (IBGE, CADASTUR, STN, MTur) chegaram para este município. Recalcule para incorporá-los.")}
-              </p>
+      {(() => {
+        const st = getStaleness(assessment as any);
+        if (st.level === 'ok') return null;
+        const outdated = st.level === 'outdated';
+        return (
+          <div className={`my-6 p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${outdated ? 'border-destructive/50 bg-destructive/10' : 'border-amber-500/40 bg-amber-50/50 dark:bg-amber-950/20'}`}>
+            <div className="flex items-start gap-3">
+              <AlertTriangle className={`h-5 w-5 mt-0.5 shrink-0 ${outdated ? 'text-destructive' : 'text-amber-600'}`} />
+              <div>
+                <p className={`font-medium ${outdated ? 'text-destructive' : 'text-amber-700 dark:text-amber-300'}`}>
+                  {st.missed.length ? tx('Este diagnóstico precisa ser rodado novamente: as regras de cálculo mudaram') : tx('Dados oficiais atualizados após o último cálculo')}
+                </p>
+                <ul className="text-sm text-muted-foreground mt-1 list-disc pl-5 space-y-0.5">
+                  {st.missed.map(c => <li key={c.version}>{tx(c.summary)} <span className="text-xs">(v{c.version}, {new Date(c.date).toLocaleDateString(getIntlLocale())})</span></li>)}
+                  {st.dataChanged && <li>{tx('Novos valores de fontes oficiais (IBGE, CADASTUR, STN, MTur) chegaram para este município.')}</li>}
+                </ul>
+                {outdated && <p className="text-sm mt-1">{tx('Como o cálculo é antigo, revise os dados do diagnóstico antes de recalcular. Os números exibidos abaixo seguem as regras antigas.')}</p>}
+              </div>
             </div>
+            <Button onClick={handleCalculate} disabled={calculating} className="shrink-0" variant={outdated ? 'destructive' : 'default'}>
+              {calculating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+              {tx('Recalcular agora')}
+            </Button>
           </div>
-          <Button onClick={handleCalculate} disabled={calculating} className="shrink-0">
-            {calculating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-            {tx('Recalcular agora')}
-          </Button>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Header Card */}
       <div className="bg-card rounded-xl border p-6 mb-6">
