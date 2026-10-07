@@ -1361,7 +1361,7 @@ const DiagnosticoDetalhe = () => {
             <RevenueIntelligenceGate title={tx('O Gêmeo Digital')}>
               <DigitalTwinPanel pillarScores={pillarScores as any} assessmentId={assessment.id} orgId={(assessment as any).org_id} destinationId={assessment.destination_id} />
             </RevenueIntelligenceGate>
-            {assessment.destination_id && <RevenueIntelligenceGate title={tx('O Geomarketing')}><GeomarketingPanel destinationId={assessment.destination_id} /></RevenueIntelligenceGate>}
+            {assessment.destination_id && <RevenueIntelligenceGate title={tx('O Geomarketing')}><GeomarketingPanel destinationId={assessment.destination_id} mode={(assessment as any).diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial'} /></RevenueIntelligenceGate>}
           </TabsContent>
         </Tabs>
         )) : ( /* Pre-calculation state */
