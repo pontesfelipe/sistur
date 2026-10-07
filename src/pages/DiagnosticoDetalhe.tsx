@@ -25,6 +25,7 @@ import { CycleComparisonPanel } from '@/components/diagnostics/CycleComparisonPa
 import { WhatIfSimulatorPanel } from '@/components/diagnostics/WhatIfSimulatorPanel';
 import { DigitalTwinPanel } from '@/components/diagnostics/DigitalTwinPanel';
 import { GeomarketingPanel } from '@/components/diagnostics/GeomarketingPanel';
+import { TerritorialInfraPanel } from '@/components/diagnostics/TerritorialInfraPanel';
 import { RevenueIntelligenceGate } from '@/components/layout/RevenueIntelligenceGate';
 import { DiagnosticProgressDashboard } from '@/components/diagnostics/DiagnosticProgressDashboard';
 import { RoundComparisonView } from '@/components/diagnostics/RoundComparisonView';
@@ -1361,7 +1362,9 @@ const DiagnosticoDetalhe = () => {
             <RevenueIntelligenceGate title={tx('O Gêmeo Digital')}>
               <DigitalTwinPanel pillarScores={pillarScores as any} assessmentId={assessment.id} orgId={(assessment as any).org_id} destinationId={assessment.destination_id} />
             </RevenueIntelligenceGate>
-            {assessment.destination_id && <RevenueIntelligenceGate title={tx('O Geomarketing')}><GeomarketingPanel destinationId={assessment.destination_id} mode={(assessment as any).diagnostic_type === 'enterprise' ? 'enterprise' : 'territorial'} /></RevenueIntelligenceGate>}
+            {assessment.destination_id && ((assessment as any).diagnostic_type === 'enterprise'
+              ? <RevenueIntelligenceGate title={tx('O Geomarketing')}><GeomarketingPanel destinationId={assessment.destination_id} mode="enterprise" /></RevenueIntelligenceGate>
+              : <TerritorialInfraPanel destinationId={assessment.destination_id} />)}
           </TabsContent>
         </Tabs>
         )) : ( /* Pre-calculation state */
