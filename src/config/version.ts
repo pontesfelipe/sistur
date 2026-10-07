@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 38,
-  patch: 1,
+  minor: 39,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.39.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico territorial: Geomarketing substituído pelo Mapeamento de Infraestrutura do Destino, só com dados oficiais (Mapa do Turismo, CADASTUR, IPHAN, ANAC, DATASUS, IBGE, Observatório), sem concorrência ou diárias",
+      "Geomarketing (concorrentes, notas, diárias e raio de captação) fica exclusivo do diagnóstico empresarial",
+    ],
+  },
   {
     version: "2.38.1",
     date: "2026-10-07",
