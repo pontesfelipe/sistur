@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 45,
-  patch: 1,
+  minor: 46,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.46.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Projetos: botão \"COMTUR\" gera o Relatório de Prestação de Contas ao Conselho em Word (padrão ABNT), com identificação, execução física e financeira por fonte, destaque do FUMTUR, indicadores antes x agora, pendências, parecer com votos e assinaturas",
+      "Projetos: nova aba FUMTUR por destino e ano — cadastro do fundo, receitas, Plano de Aplicação Anual com aprovação do COMTUR, despesas com nº de empenho e etapa, saldo e alertas de gasto fora do plano ou acima do saldo",
+      "FUMTUR: relatório anual para o COMTUR em Word",
+    ],
+  },
   {
     version: "2.45.1",
     date: "2026-10-07",
