@@ -40,6 +40,32 @@ export const BUDGET_STATUS = [
   { value: "cancelled", label: "Cancelado" },
 ];
 
+/** Fontes de financiamento padronizadas (realidade do turismo brasileiro). */
+export const FUNDING_SOURCES = [
+  "Recurso próprio",
+  "Convênio MTur",
+  "Emenda parlamentar",
+  "FUNGETUR",
+  "Fundo municipal (FUMTUR)",
+  "ICMS Turístico",
+  "Iniciativa privada",
+  "Consórcio",
+  "Outra",
+];
+
+/** Agrupa valores planejados/realizados por fonte; linhas sem fonte vão para "Não informada". */
+export function summarizeByFundingSource(lines: Pick<BudgetLine, "funding_source" | "planned_amount" | "actual_amount">[]) {
+  const map = new Map<string, { planned: number; actual: number }>();
+  for (const l of lines) {
+    const key = l.funding_source?.trim() || "Não informada";
+    const cur = map.get(key) ?? { planned: 0, actual: 0 };
+    cur.planned += Number(l.planned_amount || 0);
+    cur.actual += Number(l.actual_amount || 0);
+    map.set(key, cur);
+  }
+  return [...map.entries()].map(([source, v]) => ({ source, ...v })).sort((a, b) => b.planned - a.planned);
+}
+
 export function useProjectBudget(projectId: string | undefined) {
   return useQuery({
     queryKey: ["project-budget", projectId],
