@@ -344,6 +344,7 @@ export function TaskFormDialog({
                 value={plannedEndDate}
                 onChange={(e) => setPlannedEndDate(e.target.value)}
               />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -372,6 +373,7 @@ export function TaskFormDialog({
             </Button>
           </DialogFooter>
         </form>
-    );
-  }
+      </DialogContent>
+    </Dialog>
+  );
 }
