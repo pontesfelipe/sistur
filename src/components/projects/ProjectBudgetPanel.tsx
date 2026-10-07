@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Plus, Pencil, Trash2, Wallet, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { computeRoi } from "@/lib/revenueIntelligence";
+import { ConvenioImportDialog } from "./ConvenioImportDialog";
 
 const BRL = (n: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n || 0);
 
@@ -107,7 +108,10 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
             <CardTitle className="text-lg flex items-center gap-2"><Wallet className="h-5 w-5" /> {tx("Linhas de Orçamento")}</CardTitle>
             <CardDescription>{tx('Planejamento e execução financeira por categoria e fase')}</CardDescription>
           </div>
-          <Button onClick={openNew} size="sm"><Plus className="h-4 w-4 mr-1" /> {tx("Nova linha")}</Button>
+          <div className="flex flex-wrap gap-2">
+            <ConvenioImportDialog projectId={projectId} lines={lines} />
+            <Button onClick={openNew} size="sm"><Plus className="h-4 w-4 mr-1" /> {tx("Nova linha")}</Button>
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (

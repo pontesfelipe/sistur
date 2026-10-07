@@ -16,6 +16,7 @@ import type { Project } from '@/hooks/useProjects';
 import { buildFumturLedger, FUMTUR_REVENUE_ORIGINS } from '@/lib/fumturLedger';
 import { FUMTUR_SOURCE } from '@/lib/comturReport';
 import { exportFumturAnnualReport } from '@/lib/exportFumturDocx';
+import { BalanceteReconcile } from './BalanceteReconcile';
 
 const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const db = supabase as any;
@@ -161,6 +162,7 @@ export function FumturPanel({ projects }: { projects: Project[] }) {
                   </div>
                 ))}
             </CardContent></Card>
+          <BalanceteReconcile expenses={expenses.filter((e: any) => e.status !== 'cancelled')} />
         </>
       )}
     </div>

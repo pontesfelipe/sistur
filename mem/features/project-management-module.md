@@ -34,3 +34,4 @@ Introduzido nas versões 1.66.16 (Frente 1) → 1.66.20 (Frente 5).
 ## COMTUR e FUMTUR (v2.46.0)
 - Botão "COMTUR" no projeto: prestação de contas em Word ABNT (regras fixas, sem IA), com parecer/votos e assinaturas. O relatório executivo segue como status técnico.
 - Aba FUMTUR em /projetos: fundo por destino+ano, receitas, Plano de Aplicação (proposto→aprovado pelo COMTUR), despesas = linhas de orçamento com fonte "Fundo municipal (FUMTUR)" (nº empenho, etapa). Alertas: gasto fora do plano aprovado, acima do saldo ou do plano. Sem integração com Transferegov/TCE.
+- v2.47.0: convênios MTur via Portal da Transparência (função fetch-mtur-convenios, secret PORTAL_TRANSPARENCIA_API_KEY; Transferegov bloqueia acesso automatizado). Prazo prestação de contas = vigência + 60 dias. Conciliação de balancete CSV no FUMTUR por nº de empenho, sem gravar.
