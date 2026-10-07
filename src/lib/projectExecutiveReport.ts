@@ -108,7 +108,7 @@ ${s.risks.length ? `<ul>${s.risks.map((r) => `<li>${esc(r)}</li>`).join("")}</ul
 ${s.overdueTasks.length ? `<p><b>Tarefas vencidas:</b> ${s.overdueTasks.slice(0, 8).map((t) => esc(t.title) + " (" + date(t.planned_end_date) + ")").join("; ")}${s.overdueTasks.length > 8 ? "…" : ""}</p>` : ""}
 <h2>Marcos</h2>
 ${msRows ? `<table><tr><th>Marco</th><th>Data prevista</th><th>Situação</th></tr>${msRows}</table>` : "<p>Nenhum marco cadastrado.</p>"}
-<h2>Indicadores do diagnóstico (antes x agora)</h2>
+<h2>Indicadores do diagnóstico (antes x agora)</h2>${indicators[0]?.is_newer_round ? `<p>“Agora” = rodada mais recente do destino: ${esc(indicators[0].current_assessment_title)} (${date(indicators[0].current_assessment_date)}).</p>` : indicators.length ? "<p>Ainda não há rodada mais nova; “agora” = diagnóstico de origem.</p>" : ""}
 ${indRows ? `<table><tr><th>Indicador</th><th>Antes</th><th>Agora</th><th>Meta</th><th>Leitura</th></tr>${indRows}</table>` : "<p>Nenhum indicador vinculado a este projeto.</p>"}
 <p class="foot">Gerado pelo SISTUR a partir das tarefas, marcos, orçamento e indicadores cadastrados no projeto. Os números refletem o que foi registrado pela equipe.</p>
 <script>setTimeout(function(){window.print()},400)</script>
