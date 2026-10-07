@@ -76,7 +76,7 @@ export interface ProjectTask {
   linked_prescription_id: string | null;
   linked_action_plan_id: string | null;
   tags: string[];
-  checklist?: ChecklistItem[];
+  checklist?: ChecklistItem[] | any;
   created_at: string;
   updated_at: string;
 }
