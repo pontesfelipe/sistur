@@ -11,3 +11,8 @@
 - [x] Fase 5: e-mails no idioma do usuário (salvar idioma no perfil), datas/números por idioma
 - [x] Revisão 2.23.2: varredura das 40 páginas em inglês + tradução de segurança na tela + datas por idioma
 - [ ] Conteúdo cadastrado (nomes de cursos, indicadores, trilhas, posts) segue em português — exige tradução de dados, decidir com o usuário
+- [x] Projetos Etapa 1: assistente de escolha de metodologia (v2.41.0)
+- [ ] Projetos Etapa 2: relatório executivo PDF para Prefeito/COMTUR
+- [ ] Projetos Etapa 3: comparar indicadores com a rodada de diagnóstico mais recente
+- [ ] Projetos Etapa 4: fontes de financiamento no Orçamento
+- [ ] Projetos Etapa 5: checklists, tarefas vencidas em destaque, filtro "minhas tarefas"
