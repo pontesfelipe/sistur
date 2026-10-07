@@ -14,9 +14,17 @@ import { MapPin, Crosshair, Search, Lightbulb, FolderPlus, Landmark } from 'luci
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { getIntlLocale } from '@/i18n/dateLocale';
-import { effectiveDistance, radiusMetrics, positionVsArea, buildGeoInsights, type PoiCounts, type GeoInsight } from '@/lib/geomarketing';
+import { effectiveDistance, radiusMetrics, positionVsArea, buildGeoInsights, buildTerritorialInsights, type PoiCounts, type GeoInsight } from '@/lib/geomarketing';
 
-interface Props { destinationId: string }
+interface Props { destinationId: string; mode?: 'territorial' | 'enterprise' }
+
+const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+async function overpass(q: string) {
+  for (const u of OVERPASS) {
+    try { const r = await fetch(u, { method: 'POST', body: 'data=' + encodeURIComponent(q) }); if (r.ok) return await r.json(); } catch { /* tenta o próximo */ }
+  }
+  throw new Error('Serviço de mapa indisponível');
+}
 
 const UF_CAPITALS: Record<string, [number, number]> = {
   AC:[-9.97,-67.81],AL:[-9.66,-35.73],AP:[0.03,-51.07],AM:[-3.12,-60.02],BA:[-12.97,-38.5],CE:[-3.73,-38.52],
@@ -51,9 +59,7 @@ async function fetchPois(lat: number, lng: number, km: number): Promise<Poi[]> {
     nwr(around:${r},${lat},${lng})[aeroway=aerodrome];
     nwr(around:${r},${lat},${lng})[amenity~"^(hospital|clinic|pharmacy)$"];
   );out center 400;`;
-  const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(q) });
-  if (!res.ok) throw new Error('Serviço de mapa indisponível');
-  const j = await res.json();
+  const j = await overpass(q);
   return (j.elements ?? []).map((e: any) => {
     const t = e.tags ?? {};
     const cat: keyof PoiCounts = t.tourism || t.natural ? 'atrativos'
@@ -66,9 +72,7 @@ async function fetchPois(lat: number, lng: number, km: number): Promise<Poi[]> {
 async function fetchLodging(lat: number, lng: number, km: number) {
   const r = Math.min(km, 30) * 1000;
   const q = `[out:json][timeout:25];nwr(around:${r},${lat},${lng})[tourism~"^(hotel|guest_house|hostel|motel|chalet|apartment|camp_site)$"][name];out center 80;`;
-  const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(q) });
-  if (!res.ok) throw new Error('Serviço de mapa indisponível');
-  const j = await res.json();
+  const j = await overpass(q);
   const T: Record<string, string> = { hotel: 'Hotel', guest_house: 'Pousada', hostel: 'Hostel', motel: 'Motel', chalet: 'Chalé', apartment: 'Apartamento', camp_site: 'Camping' };
   return (j.elements ?? []).map((e: any) => ({ name: String(e.tags.name).slice(0, 120), type: T[e.tags.tourism] ?? 'Hospedagem', lat: e.lat ?? e.center?.lat, lng: e.lon ?? e.center?.lon }))
     .filter((x: any) => x.lat != null);
@@ -76,7 +80,8 @@ async function fetchLodging(lat: number, lng: number, km: number) {
 
 const brl = (v: number | null) => v == null ? '—' : v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 
-export function GeomarketingPanel({ destinationId }: Props) {
+export function GeomarketingPanel({ destinationId, mode = 'enterprise' }: Props) {
+  const terr = mode === 'territorial';
   const qc = useQueryClient();
   const mapEl = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -142,9 +147,12 @@ export function GeomarketingPanel({ destinationId }: Props) {
     pois.forEach(p => { if (effectiveDistance({ latitude: p.lat, longitude: p.lng }, center)! <= radius) c[p.cat]++; });
     return c;
   }, [pois, radius, center?.[0], center?.[1]]);
-  const insights = useMemo(() => m ? buildGeoInsights({
+  const insights = useMemo(() => !m ? [] : terr ? buildTerritorialInsights({
+    radiusKm: radius, lodging: m.count, pois: poiInRadius, hasAirport: !!data?.anac,
+    origins: (data?.origins ?? []).map((o: any) => ({ uf: o.uf, share_pct: Number(o.share_pct) })), nextEvent: data?.events?.[0] ?? null,
+  }) : buildGeoInsights({
     count: m.count, avgRating: m.avgRating, rateDiff, radiusKm: radius, pois: poiInRadius, nextEvent: data?.events?.[0] ?? null,
-  }) : [], [m, rateDiff, radius, poiInRadius, data]);
+  }), [m, rateDiff, radius, poiInRadius, data, terr]);
   const unlocated = (data?.comps ?? []).filter((c: any) => c.latitude == null);
 
   const savePos = async (id: string, lat: number, lng: number, source: string) => {
@@ -186,7 +194,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
         position_source: 'osm', source_name: 'OpenStreetMap', is_manual: true, created_by: user.id,
       }));
       if (rows.length) { const { error } = await supabase.from('enterprise_competitors').insert(rows as any); if (error) throw error; }
-      toast.success(rows.length ? tx('{{v0}} hospedagens adicionadas como concorrentes.', { v0: rows.length }) : tx('Nenhuma hospedagem nova encontrada no mapa aberto para este raio.'));
+      toast.success(rows.length ? (terr ? tx('{{v0}} meios de hospedagem mapeados.', { v0: rows.length }) : tx('{{v0}} hospedagens adicionadas como concorrentes.', { v0: rows.length })) : tx('Nenhuma hospedagem nova encontrada no mapa aberto para este raio.'));
       qc.invalidateQueries({ queryKey: key });
     } catch (e: any) { toast.error(tx('Não foi possível buscar hospedagens agora. Tente de novo em instantes.')); }
     setFindingLodging(false);
@@ -286,7 +294,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" /> {tx("Geomarketing")}</CardTitle>
-        <CardDescription>{tx('Oferta e demanda no entorno do seu empreendimento. Sem comparação entre municípios.')}</CardDescription>
+        <CardDescription>{terr ? tx('Estrutura turística do destino: hospedagem, atrativos, serviços, acesso e origem dos visitantes. Sem comparação entre municípios.') : tx('Oferta e demanda no entorno do seu empreendimento. Sem comparação entre municípios.')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {!center ? (
@@ -298,9 +306,9 @@ export function GeomarketingPanel({ destinationId }: Props) {
                 <Label>{tx("Raio de influência: {{v0}} km", { v0: radius })}</Label>
                 <Slider min={1} max={100} step={1} value={[radius]} onValueChange={v => setRadius(v[0])} />
               </div>
-              <div className="flex items-center gap-2"><Switch checked={showComp} onCheckedChange={setShowComp} /><Label>{tx('Concorrentes')}</Label></div>
+              <div className="flex items-center gap-2"><Switch checked={showComp} onCheckedChange={setShowComp} /><Label>{terr ? tx('Meios de hospedagem') : tx('Concorrentes')}</Label></div>
               <div className="flex items-center gap-2"><Switch checked={showHeat} onCheckedChange={setShowHeat} /><Label>{tx('Mancha de concentração')}</Label></div>
-              <div className="flex items-center gap-2"><Switch checked={showBrand} onCheckedChange={setShowBrand} /><Label>{tx('Unidades da rede')} ({Math.max(0, (data?.units?.length ?? 0) - 1)})</Label></div>
+              {!terr && <div className="flex items-center gap-2"><Switch checked={showBrand} onCheckedChange={setShowBrand} /><Label>{tx('Unidades da rede')} ({Math.max(0, (data?.units?.length ?? 0) - 1)})</Label></div>}
               <div className="flex items-center gap-2"><Switch checked={showOrigin} onCheckedChange={setShowOrigin} /><Label>{tx('Origem dos visitantes')}</Label></div>
               <div className="flex items-center gap-2">
                 {pois ? <><Switch checked={showPoi} onCheckedChange={setShowPoi} /><Label>{tx('Atrativos e serviços')} ({pois.length})</Label></>
@@ -311,22 +319,28 @@ export function GeomarketingPanel({ destinationId }: Props) {
             <details className="rounded-md border bg-muted/30 p-3 text-sm" open={(data?.comps?.length ?? 0) === 0}>
               <summary className="cursor-pointer font-medium">{tx('Como funciona o Geomarketing')}</summary>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+                {terr ? <>
+                <li>{tx('Mostra se o destino tem estrutura para receber o visitante: onde ficam hospedagens, atrativos, alimentação, saúde e transporte, e de onde vem a demanda.')}</li>
+                <li>{tx('Use o botão abaixo para mapear os meios de hospedagem do município a partir do mapa aberto (OpenStreetMap).')}</li>
+                </> : <>
                 <li>{tx('Mostra, num raio ao redor do destino, quem disputa o mesmo hóspede (concorrentes), o que atrai visitantes (atrativos e serviços) e de onde eles vêm.')}</li>
                 <li>{tx('Concorrentes: use o botão abaixo para trazer as hospedagens do mapa aberto, ou a busca de concorrentes do diagnóstico empresarial.')}</li>
+                </>}
                 <li>{tx('Origem dos visitantes: informe a porcentagem por estado; as linhas no mapa mostram de onde vem a demanda.')}</li>
                 <li>{tx('Com esses dados, os números abaixo do mapa e o quadro "O que o entorno indica" sugerem ações que podem virar projeto.')}</li>
               </ul>
             </details>
 
             <div className="flex flex-wrap items-center gap-2 rounded-md border p-3 text-sm">
-              <p className="flex-1 min-w-[200px]">{(data?.comps?.length ?? 0) === 0 ? tx('Nenhum concorrente cadastrado ainda.') : tx('{{v0}} concorrentes cadastrados.', { v0: data!.comps.length })}</p>
+              <p className="flex-1 min-w-[200px]">{terr ? ((data?.comps?.length ?? 0) === 0 ? tx('Nenhum meio de hospedagem mapeado ainda.') : tx('{{v0}} meios de hospedagem mapeados.', { v0: data!.comps.length }))
+                : (data?.comps?.length ?? 0) === 0 ? tx('Nenhum concorrente cadastrado ainda.') : tx('{{v0}} concorrentes cadastrados.', { v0: data!.comps.length })}</p>
               <Button size="sm" disabled={findingLodging || !orgId} onClick={findLodging}><Search className="h-4 w-4 mr-1" />{findingLodging ? tx('Buscando...') : tx('Buscar hospedagens no raio')}</Button>
             </div>
 
             {(data?.comps?.length ?? 0) > 0 && (
               <div className="rounded-md border p-3 space-y-2 text-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-medium">{tx('Posição dos concorrentes')}: {(data!.comps.length - unlocated.length)} {tx('de')} {data!.comps.length} {tx('no lugar real')}</p>
+                  <p className="font-medium">{terr ? tx('Posição das hospedagens') : tx('Posição dos concorrentes')}: {(data!.comps.length - unlocated.length)} {tx('de')} {data!.comps.length} {tx('no lugar real')}</p>
                   {unlocated.length > 0 && <Button size="sm" variant="outline" disabled={locating} onClick={locateAll}><Search className="h-4 w-4 mr-1" />{locating ? tx('Localizando...') : tx('Localizar pelo endereço')}</Button>}
                 </div>
                 {placing && <p className="text-primary">{tx('Clique no mapa onde fica o concorrente.')} <button className="underline" onClick={() => setPlacing(null)}>{tx('Cancelar')}</button></p>}
@@ -337,7 +351,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
                     </Badge>
                   ))}
                 </div>
-                <details className="text-xs">
+                {!terr && <details className="text-xs">
                   <summary className="cursor-pointer text-muted-foreground">{tx('Informar a diária média dos concorrentes')}</summary>
                   <div className="mt-2 grid gap-1 sm:grid-cols-2">
                     {data!.comps.map((c: any) => (
@@ -348,7 +362,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
                       </label>
                     ))}
                   </div>
-                </details>
+                </details>}
                 <p className="text-xs text-muted-foreground">{tx('Pontos tracejados estão em posição aproximada. Clique num nome e depois no mapa para ajustar.')}</p>
               </div>
             )}
@@ -372,13 +386,13 @@ export function GeomarketingPanel({ destinationId }: Props) {
 
             <div ref={mapEl} className="h-[420px] w-full rounded-md border z-0" />
 
-            <div className="grid gap-3 md:grid-cols-4 text-sm">
+            <div className={`grid gap-3 text-sm ${terr ? 'md:grid-cols-2' : 'md:grid-cols-4'}`}>
               <div className="rounded-md border p-3">
-                <p className="text-muted-foreground">{tx('Concorrentes no raio')}</p>
+                <p className="text-muted-foreground">{terr ? tx('Meios de hospedagem no raio') : tx('Concorrentes no raio')}</p>
                 <p className="text-2xl font-semibold">{m?.count ?? 0}</p>
                 <p className="text-xs text-muted-foreground">{(m?.densityPer100Km2 ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} {tx('a cada 100 km²')}</p>
               </div>
-              <div className="rounded-md border p-3">
+              {!terr && <><div className="rounded-md border p-3">
                 <p className="text-muted-foreground">{tx('Nota média no raio')}</p>
                 <p className="text-2xl font-semibold">{m?.avgRating != null ? m.avgRating.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) : '—'}</p>
                 <p className="text-xs text-muted-foreground">{tx('das avaliações online dos concorrentes')}</p>
@@ -391,7 +405,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
                     : rateDiff === 0 ? tx('Sua diária está na média do entorno.')
                     : tx('Sua diária ({{v0}}) está {{v1}}% {{v2}} da média.', { v0: brl(ownRate), v1: Math.abs(rateDiff), v2: rateDiff > 0 ? tx('acima') : tx('abaixo') })}
                 </p>
-              </div>
+              </div></>}
               <div className="rounded-md border p-3">
                 <p className="text-muted-foreground">{tx("Demanda aérea (ANAC, 12 meses)")}</p>
                 <p className="text-2xl font-semibold">{data?.anac ? Number(data.anac.total_passengers_12m ?? 0).toLocaleString('pt-BR') : '—'}</p>
@@ -408,9 +422,9 @@ export function GeomarketingPanel({ destinationId }: Props) {
             )}
 
             <div className="rounded-md border p-3 space-y-3 text-sm">
-              <p className="font-medium flex items-center gap-2"><Lightbulb className="h-4 w-4 text-primary" />{tx('O que o entorno indica')}</p>
+              <p className="font-medium flex items-center gap-2"><Lightbulb className="h-4 w-4 text-primary" />{terr ? tx('O que a estrutura do destino indica') : tx('O que o entorno indica')}</p>
               {insights.length === 0 ? (
-                <p className="text-xs text-muted-foreground">{tx('Nenhum ponto de atenção com os dados atuais. Mostre os atrativos e informe as diárias para leituras mais completas.')}</p>
+                <p className="text-xs text-muted-foreground">{loadingPoi ? tx('Buscando atrativos e serviços no mapa aberto...') : !pois ? tx('Não foi possível carregar atrativos e serviços. Clique em "Mostrar atrativos e serviços" para tentar de novo.') : terr ? tx('Nenhum ponto de atenção com os dados atuais. Mapeie as hospedagens e informe a origem dos visitantes para leituras mais completas.') : tx('Nenhum ponto de atenção com os dados atuais. Mostre os atrativos e informe as diárias para leituras mais completas.')}</p>
               ) : insights.map(ins => (
                 <div key={ins.id} className="flex flex-col gap-2 rounded-md bg-muted/50 p-3 sm:flex-row sm:items-start sm:justify-between">
                   <div><p className="font-medium">{tx(ins.title)}</p><p className="text-muted-foreground">{ins.text}</p></div>
