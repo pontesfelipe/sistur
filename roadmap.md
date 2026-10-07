@@ -17,3 +17,4 @@
 - [x] Projetos Etapa 4: fontes de financiamento no Orçamento (v2.44.0)
 - [x] Projetos Etapa 5: checklists, tarefas vencidas, filtros no Kanban (v2.45.0)
 - [x] Fechamento: tutorial de Projetos e base do Guia (v2.45.1)
+- [x] COMTUR (prestação de contas Word) e controle do FUMTUR (v2.46.0)

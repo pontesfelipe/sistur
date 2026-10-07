@@ -31,3 +31,6 @@ Visão Geral, Fases, Tarefas, Kanban (drag-and-drop nativo), Timeline (Gantt sim
 - Sugestões de IA devem evitar duplicar tarefas existentes (verificado por título no prompt).
 
 Introduzido nas versões 1.66.16 (Frente 1) → 1.66.20 (Frente 5).
+## COMTUR e FUMTUR (v2.46.0)
+- Botão "COMTUR" no projeto: prestação de contas em Word ABNT (regras fixas, sem IA), com parecer/votos e assinaturas. O relatório executivo segue como status técnico.
+- Aba FUMTUR em /projetos: fundo por destino+ano, receitas, Plano de Aplicação (proposto→aprovado pelo COMTUR), despesas = linhas de orçamento com fonte "Fundo municipal (FUMTUR)" (nº empenho, etapa). Alertas: gasto fora do plano aprovado, acima do saldo ou do plano. Sem integração com Transferegov/TCE.
