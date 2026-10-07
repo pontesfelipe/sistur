@@ -70,7 +70,9 @@ import { ProjectBudgetPanel } from './ProjectBudgetPanel';
 import { ProjectLinksPanel } from './ProjectLinksPanel';
 import { AISuggestTasksDialog } from './AISuggestTasksDialog';
 import { exportProjectCalendar } from '@/lib/projectExports';
-import { Sparkles, Download } from 'lucide-react';
+import { Sparkles, Download, FileText } from 'lucide-react';
+import { useProjectBudget } from '@/hooks/useProjectBudget';
+import { openExecutiveReport } from '@/lib/projectExecutiveReport';
 import { toast } from 'sonner';
 
 interface ProjectDetailViewProps {
@@ -83,6 +85,8 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
   const { data: phases } = useProjectPhases(projectId);
   const { data: tasks } = useProjectTasks(projectId);
   const { data: milestones } = useProjectMilestones(projectId);
+  const { data: budgetLines } = useProjectBudget(projectId);
+  const { data: indicatorImpact } = useProjectIndicatorImpact(projectId, project?.assessment_id);
   const updateProject = useUpdateProject();
   const updatePhase = useUpdatePhase();
   const updateTask = useUpdateTask();
@@ -273,6 +277,19 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
           >
             <Sparkles className="h-4 w-4" />
             <span className="hidden sm:inline">{tx('Inteligência SISTUR')}</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            title={tx('Relatório executivo (PDF) para Prefeito/COMTUR')}
+            onClick={() => {
+              const ok = openExecutiveReport(project, tasks || [], milestones || [], budgetLines || [], indicatorImpact || []);
+              if (!ok) toast.error(tx('Permita janelas pop-up para abrir o relatório.'));
+            }}
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">{tx('Relatório executivo')}</span>
           </Button>
           <Button
             variant="outline"
