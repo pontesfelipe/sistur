@@ -76,8 +76,18 @@ export interface ProjectTask {
   linked_prescription_id: string | null;
   linked_action_plan_id: string | null;
   tags: string[];
+  checklist?: ChecklistItem[] | any;
   created_at: string;
   updated_at: string;
+}
+
+export interface ChecklistItem { text: string; done: boolean }
+
+/** Tarefa vencida: tem prazo anterior a hoje e não está concluída. */
+export function isTaskOverdue(t: Pick<ProjectTask, 'planned_end_date' | 'status'>, today = new Date()): boolean {
+  if (!t.planned_end_date || t.status === 'done') return false;
+  const todayStr = today.toISOString().slice(0, 10);
+  return t.planned_end_date.slice(0, 10) < todayStr;
 }
 
 export interface ProjectMilestone {

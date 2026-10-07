@@ -29,6 +29,7 @@ import {
   TaskPriority,
   TASK_STATUS_INFO,
   PRIORITY_INFO,
+  type ChecklistItem,
 } from '@/hooks/useProjects';
 import { Loader2 } from 'lucide-react';
 import { TaskAssigneeCombobox } from './TaskAssigneeCombobox';
@@ -78,6 +79,7 @@ export function TaskFormDialog({
   const [storyPoints, setStoryPoints] = useState<string>('');
   const [plannedStartDate, setPlannedStartDate] = useState('');
   const [plannedEndDate, setPlannedEndDate] = useState('');
+  const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
 
   useEffect(() => {
     if (task) {
@@ -93,6 +95,7 @@ export function TaskFormDialog({
       setStoryPoints(task.story_points?.toString() || '');
       setPlannedStartDate(task.planned_start_date?.split('T')[0] || '');
       setPlannedEndDate(task.planned_end_date?.split('T')[0] || '');
+      setChecklist(Array.isArray(task.checklist) ? task.checklist : []);
     } else {
       setTitle('');
       setDescription('');
@@ -106,6 +109,7 @@ export function TaskFormDialog({
       setStoryPoints('');
       setPlannedStartDate('');
       setPlannedEndDate('');
+      setChecklist([]);
     }
   }, [task, defaultPhaseId, open]);
 
@@ -125,6 +129,7 @@ export function TaskFormDialog({
       story_points: storyPoints ? parseInt(storyPoints) : null,
       planned_start_date: plannedStartDate || null,
       planned_end_date: plannedEndDate || null,
+      checklist: checklist.filter((c) => c.text.trim()),
     };
 
     if (isEditing && task) {
@@ -341,6 +346,22 @@ export function TaskFormDialog({
               />
             </div>
           </div>
+
+          <div className="space-y-2">
+            <Label>{tx('Checklist')}</Label>
+            {checklist.map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input type="checkbox" className="h-4 w-4 accent-primary" checked={item.done}
+                  onChange={(e) => setChecklist(checklist.map((c, j) => j === i ? { ...c, done: e.target.checked } : c))} />
+                <Input value={item.text} onChange={(e) => setChecklist(checklist.map((c, j) => j === i ? { ...c, text: e.target.value } : c))} />
+                <Button type="button" size="sm" variant="ghost" onClick={() => setChecklist(checklist.filter((_, j) => j !== i))}>✕</Button>
+              </div>
+            ))}
+            <Button type="button" size="sm" variant="outline" onClick={() => setChecklist([...checklist, { text: '', done: false }])}>
+              {tx('+ Item')}
+            </Button>
+          </div>
+
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

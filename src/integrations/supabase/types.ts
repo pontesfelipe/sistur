@@ -10321,6 +10321,7 @@ export type Database = {
           actual_start_date: string | null
           assignee_id: string | null
           assignee_name: string | null
+          checklist: Json
           created_at: string
           description: string | null
           estimated_hours: number | null
@@ -10347,6 +10348,7 @@ export type Database = {
           actual_start_date?: string | null
           assignee_id?: string | null
           assignee_name?: string | null
+          checklist?: Json
           created_at?: string
           description?: string | null
           estimated_hours?: number | null
@@ -10373,6 +10375,7 @@ export type Database = {
           actual_start_date?: string | null
           assignee_id?: string | null
           assignee_name?: string | null
+          checklist?: Json
           created_at?: string
           description?: string | null
           estimated_hours?: number | null
