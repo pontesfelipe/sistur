@@ -11603,6 +11603,191 @@ export type Database = {
           },
         ]
       }
+      support_conversations: {
+        Row: {
+          created_at: string
+          escalated: boolean
+          id: string
+          route: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          escalated?: boolean
+          id?: string
+          route?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          escalated?: boolean
+          id?: string
+          route?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_guardrails: {
+        Row: {
+          content: string
+          id: string
+          is_active: boolean
+          rule_key: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          id?: string
+          is_active?: boolean
+          rule_key: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          id?: string
+          is_active?: boolean
+          rule_key?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_kb_articles: {
+        Row: {
+          action_label: string | null
+          action_route: string | null
+          category: string
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          keywords: string[]
+          roles: string[]
+          routes: string[]
+          source: string
+          steps: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_label?: string | null
+          action_route?: string | null
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          keywords?: string[]
+          roles?: string[]
+          routes?: string[]
+          source?: string
+          steps?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_label?: string | null
+          action_route?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          keywords?: string[]
+          roles?: string[]
+          routes?: string[]
+          source?: string
+          steps?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_learned_qa: {
+        Row: {
+          answer: string | null
+          conversation_id: string | null
+          created_at: string
+          helpful: boolean | null
+          id: string
+          occurrences: number
+          question: string
+          route: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answer?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          helpful?: boolean | null
+          id?: string
+          occurrences?: number
+          question: string
+          route?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          helpful?: boolean | null
+          id?: string
+          occurrences?: number
+          question?: string
+          route?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_messages: {
+        Row: {
+          answered_from: string | null
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          answered_from?: string | null
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          answered_from?: string | null
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "support_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string

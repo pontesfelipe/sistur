@@ -7,3 +7,4 @@
 
 - Any change that alters diagnostic results must add an entry to CALC_RULE_CHANGES in src/lib/calcRulesChanges.ts. Why: that registry drives the "recalculate" banner on diagnostics calculated before the change.
 - Territorial diagnostics show TerritorialInfraPanel (official ingested data only); GeomarketingPanel is enterprise-only. Why: a municipality has no competitors or daily rates.
+- Support bot "Guia" (support-chat edge function) answers only platform-usage questions from support_kb_articles + approved support_learned_qa; permanent rules live in the function, admin guardrails in support_guardrails, managed in Inteligência > Suporte. Why: keep it separate from Professor Beni's methodology role and learn only from admin-approved answers.
