@@ -35,7 +35,7 @@ export function adviseMethodology(a: MethodologyAnswers, ctx: AdvisorContext = {
 
   if (a.fixedStages) add('waterfall', 3, 'depende de convênio ou licitação com etapas fixas');
 
-  if (a.teamSize === 'large') add('safe', 3, 'envolve equipe grande ou vários órgãos e parceiros');
+  if (a.teamSize === 'large') add('safe', 6, 'envolve equipe grande ou vários órgãos e parceiros');
   else if (a.teamSize === 'medium') { add('scrum', 1); add('safe', 1); }
   else { add('kanban', 1); add('scrum', 1, 'a equipe é pequena'); }
 
