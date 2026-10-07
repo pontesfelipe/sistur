@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 41,
+  minor: 42,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.42.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Projetos: botão \"Relatório executivo\" gera documento de 1–2 páginas para Prefeito/COMTUR (imprimir ou salvar em PDF) com % concluído, orçamento previsto x realizado, pontos de atenção, marcos e indicadores antes x agora",
+      "Pontos de atenção calculados por regras fixas (tarefas vencidas, bloqueadas, marcos atrasados, gasto acima do previsto), com testes automáticos",
+    ],
+  },
   {
     version: "2.41.0",
     date: "2026-10-07",

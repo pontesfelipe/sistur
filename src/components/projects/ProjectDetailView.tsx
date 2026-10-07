@@ -70,7 +70,7 @@ import { ProjectBudgetPanel } from './ProjectBudgetPanel';
 import { ProjectLinksPanel } from './ProjectLinksPanel';
 import { AISuggestTasksDialog } from './AISuggestTasksDialog';
 import { exportProjectCalendar } from '@/lib/projectExports';
-import { Sparkles, Download, FileText } from 'lucide-react';
+import { Sparkles, Download } from 'lucide-react';
 import { useProjectBudget } from '@/hooks/useProjectBudget';
 import { openExecutiveReport } from '@/lib/projectExecutiveReport';
 import { toast } from 'sonner';
