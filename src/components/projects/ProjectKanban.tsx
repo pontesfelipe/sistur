@@ -9,9 +9,12 @@ import {
   TASK_STATUS_INFO,
   PRIORITY_INFO,
   useUpdateTask,
+  isTaskOverdue,
 } from '@/hooks/useProjects';
-import { GripVertical, AlertTriangle, User } from 'lucide-react';
+import { GripVertical, AlertTriangle, User, CalendarX, ListChecks } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
 
 const COLUMNS: TaskStatus[] = ['backlog', 'todo', 'in_progress', 'review', 'done', 'blocked'];
 
@@ -21,11 +24,19 @@ const COLUMNS: TaskStatus[] = ['backlog', 'todo', 'in_progress', 'review', 'done
  * On drop we patch status via useUpdateTask — the query invalidation in the
  * hook auto-refreshes the board.
  */
-export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?: (task: ProjectTask) => void }) {
+export function ProjectKanban({ tasks: allTasks, onEdit }: { tasks: ProjectTask[]; onEdit?: (task: ProjectTask) => void }) {
   const updateTask = useUpdateTask();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [hoverCol, setHoverCol] = useState<TaskStatus | null>(null);
+  const [mineOnly, setMineOnly] = useState(false);
+  const [overdueOnly, setOverdueOnly] = useState(false);
+
+  const tasks = useMemo(() => allTasks.filter((t) =>
+    (!mineOnly || t.assignee_id === user?.id) && (!overdueOnly || isTaskOverdue(t))
+  ), [allTasks, mineOnly, overdueOnly, user?.id]);
+  const overdueCount = useMemo(() => allTasks.filter((t) => isTaskOverdue(t)).length, [allTasks]);
 
   const byStatus = useMemo(() => {
     const map = new Map<TaskStatus, ProjectTask[]>();
@@ -56,6 +67,15 @@ export function ProjectKanban({ tasks, onEdit }: { tasks: ProjectTask[]; onEdit?
   };
 
   return (
+    <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-2">
+      <Button size="sm" variant={mineOnly ? 'default' : 'outline'} onClick={() => setMineOnly((v) => !v)}>
+        <User className="h-4 w-4 mr-1" /> {tx('Minhas tarefas')}
+      </Button>
+      <Button size="sm" variant={overdueOnly ? 'destructive' : 'outline'} onClick={() => setOverdueOnly((v) => !v)}>
+        <CalendarX className="h-4 w-4 mr-1" /> {tx('Vencidas')} ({overdueCount})
+      </Button>
+    </div>
     <div className="overflow-x-auto pb-2">
       <div className="flex gap-3 min-w-max">
         {COLUMNS.map((status) => {

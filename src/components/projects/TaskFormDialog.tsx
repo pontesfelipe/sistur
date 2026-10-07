@@ -29,6 +29,7 @@ import {
   TaskPriority,
   TASK_STATUS_INFO,
   PRIORITY_INFO,
+  type ChecklistItem,
 } from '@/hooks/useProjects';
 import { Loader2 } from 'lucide-react';
 import { TaskAssigneeCombobox } from './TaskAssigneeCombobox';
