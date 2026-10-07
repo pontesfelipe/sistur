@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 44,
+  minor: 45,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.45.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Projetos: checklist de itens dentro de cada tarefa, com progresso (ex.: 2/5) no cartão do Kanban",
+      "Kanban: tarefas vencidas destacadas em vermelho e filtros \"Minhas tarefas\" e \"Vencidas\"",
+    ],
+  },
   {
     version: "2.44.0",
     date: "2026-10-07",

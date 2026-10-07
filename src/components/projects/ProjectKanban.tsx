@@ -125,6 +125,7 @@ export function ProjectKanban({ tasks: allTasks, onEdit }: { tasks: ProjectTask[
                         onClick={() => onEdit?.(task)}
                         className={cn(
                           'cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow',
+                          isTaskOverdue(task) && 'border-destructive border-l-4',
                           draggingId === task.id && 'opacity-50',
                         )}
                       >
@@ -150,6 +151,16 @@ export function ProjectKanban({ tasks: allTasks, onEdit }: { tasks: ProjectTask[
                                 <AlertTriangle className="h-2.5 w-2.5" /> {tx("gargalo")}
                               </Badge>
                             )}
+                            {isTaskOverdue(task) && (
+                              <Badge variant="destructive" className="text-[10px] gap-0.5">
+                                <CalendarX className="h-2.5 w-2.5" /> {tx('vencida')}
+                              </Badge>
+                            )}
+                            {!!task.checklist?.length && (
+                              <Badge variant="outline" className="text-[10px] gap-0.5">
+                                <ListChecks className="h-2.5 w-2.5" /> {task.checklist.filter((c) => c.done).length}/{task.checklist.length}
+                              </Badge>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
@@ -161,6 +172,7 @@ export function ProjectKanban({ tasks: allTasks, onEdit }: { tasks: ProjectTask[
           );
         })}
       </div>
+    </div>
     </div>
   );
 }
