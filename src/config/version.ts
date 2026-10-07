@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 38,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.38.1",
+    date: "2026-10-07",
+    type: "patch" as const,
+    changes: [
+      "Geomarketing territorial deixa de falar em concorrentes: mostra a estrutura turística do destino (hospedagem, atrativos, alimentação, saúde, transporte, acesso aéreo e origem dos visitantes) com leituras próprias, como atrativos sem hospedagem suficiente e demanda concentrada em um estado",
+      "Geomarketing empresarial mantém concorrentes, notas e diárias",
+      "Busca de atrativos e hospedagens tenta um segundo servidor do mapa aberto quando o primeiro falha",
+    ],
+  },
   {
     version: "2.38.0",
     date: "2026-10-07",

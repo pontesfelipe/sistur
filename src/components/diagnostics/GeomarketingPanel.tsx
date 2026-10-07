@@ -343,7 +343,7 @@ export function GeomarketingPanel({ destinationId, mode = 'enterprise' }: Props)
                   <p className="font-medium">{terr ? tx('Posição das hospedagens') : tx('Posição dos concorrentes')}: {(data!.comps.length - unlocated.length)} {tx('de')} {data!.comps.length} {tx('no lugar real')}</p>
                   {unlocated.length > 0 && <Button size="sm" variant="outline" disabled={locating} onClick={locateAll}><Search className="h-4 w-4 mr-1" />{locating ? tx('Localizando...') : tx('Localizar pelo endereço')}</Button>}
                 </div>
-                {placing && <p className="text-primary">{tx('Clique no mapa onde fica o concorrente.')} <button className="underline" onClick={() => setPlacing(null)}>{tx('Cancelar')}</button></p>}
+                {placing && <p className="text-primary">{terr ? tx('Clique no mapa onde fica a hospedagem.') : tx('Clique no mapa onde fica o concorrente.')} <button className="underline" onClick={() => setPlacing(null)}>{tx('Cancelar')}</button></p>}
                 <div className="flex flex-wrap gap-1">
                   {data!.comps.map((c: any) => (
                     <Badge key={c.id} variant={c.latitude != null ? 'secondary' : 'outline'} className="cursor-pointer" onClick={() => setPlacing(c.id)} title={tx('Marcar no mapa')}>
