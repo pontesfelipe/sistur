@@ -1,0 +1,1 @@
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS methodology_answers jsonb, ADD COLUMN IF NOT EXISTS methodology_recommended text;
