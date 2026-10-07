@@ -6,6 +6,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { TrialBanner } from '@/components/TrialBanner';
 import { useTrialNotifications } from '@/hooks/useTrialNotifications';
 import { cn } from '@/lib/utils';
+import { SupportWidget } from '@/components/support/SupportWidget';
 import { SubNav, type SubNavItem } from './SubNav';
 
 import { tx } from "@/i18n/t";
@@ -54,6 +55,7 @@ export function AppLayout({ children, title, subtitle, actions, subNav }: AppLay
       
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav onMenuClick={() => setMobileOpen(true)} />
+      <SupportWidget />
     </div>
   );
 }

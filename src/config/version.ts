@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 39,
+  minor: 40,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.40.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Novo Guia, bot de suporte operacional: botão flutuante em todas as telas, sugestões por tela, atalhos diretos e abertura de chamado",
+      "Inteligência > Suporte: base de conhecimento (importa os tutoriais da Ajuda), guardrails editáveis, aprendizado com perguntas reais e métricas de resolução",
+    ],
+  },
   {
     version: "2.39.0",
     date: "2026-10-07",
