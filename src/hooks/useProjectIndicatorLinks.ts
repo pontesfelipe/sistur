@@ -20,6 +20,13 @@ export interface ProjectIndicatorImpact extends ProjectIndicatorLink {
   current_score: number | null;
   current_status: string | null;
   delta: number | null;
+  /** Rodada usada como "agora" (mais recente calculada do mesmo destino). */
+  current_assessment_id: string | null;
+  current_assessment_title: string | null;
+  current_assessment_date: string | null;
+  /** true quando a medição "agora" vem de uma rodada mais nova que a de origem. */
+  is_newer_round: boolean;
+  reached_target: boolean;
 }
 
 function statusOf(score: number | null | undefined): string | null {
@@ -30,9 +37,9 @@ function statusOf(score: number | null | undefined): string | null {
 }
 
 /**
- * Returns the indicators a project pledged to improve, plus the current score
- * pulled from the same assessment_id, so the UI can render baseline → current
- * deltas (impact evidence trail for Frente 1).
+ * Indicadores que o projeto se comprometeu a melhorar, comparados com a rodada
+ * de diagnóstico CALCULADA mais recente do mesmo destino (Etapa 3). Se não houver
+ * rodada mais nova, usa a rodada de origem do projeto.
  */
 export function useProjectIndicatorImpact(projectId: string | undefined, assessmentId: string | undefined) {
   return useQuery({
@@ -46,29 +53,57 @@ export function useProjectIndicatorImpact(projectId: string | undefined, assessm
       if (error) throw error;
       if (!links || links.length === 0) return [];
 
-      let currentByCode = new Map<string, number>();
+      let current: { id: string; title: string | null; calculated_at: string | null } | null = null;
       if (assessmentId) {
+        const { data: origin } = await supabase
+          .from("assessments")
+          .select("id, title, calculated_at, destination_id")
+          .eq("id", assessmentId)
+          .maybeSingle();
+        current = origin ? { id: origin.id, title: origin.title, calculated_at: origin.calculated_at } : null;
+        if (origin?.destination_id) {
+          const { data: latest } = await supabase
+            .from("assessments")
+            .select("id, title, calculated_at")
+            .eq("destination_id", origin.destination_id)
+            .eq("status", "CALCULATED")
+            .not("calculated_at", "is", null)
+            .order("calculated_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (latest && (!origin.calculated_at || latest.calculated_at > origin.calculated_at)) current = latest;
+        }
+      }
+
+      const currentByCode = new Map<string, number>();
+      if (current) {
         const { data: scores } = await supabase
           .from("indicator_scores")
           .select("score, indicator:indicators(code)")
-          .eq("assessment_id", assessmentId);
+          .eq("assessment_id", current.id);
         (scores || []).forEach((s: any) => {
           const code = s.indicator?.code;
           if (code && typeof s.score === "number") currentByCode.set(code, s.score);
         });
       }
+      const isNewer = !!current && current.id !== assessmentId;
 
       return (links as ProjectIndicatorLink[]).map((l) => {
-        const current = currentByCode.get(l.indicator_code) ?? null;
+        const score = currentByCode.get(l.indicator_code) ?? null;
         const delta =
-          current !== null && l.baseline_score !== null
-            ? Number((current - Number(l.baseline_score)).toFixed(4))
+          score !== null && l.baseline_score !== null
+            ? Number((score - Number(l.baseline_score)).toFixed(4))
             : null;
         return {
           ...l,
-          current_score: current,
-          current_status: statusOf(current),
+          current_score: score,
+          current_status: statusOf(score),
           delta,
+          current_assessment_id: current?.id ?? null,
+          current_assessment_title: current?.title ?? null,
+          current_assessment_date: current?.calculated_at ?? null,
+          is_newer_round: isNewer,
+          reached_target: score !== null && l.target_score !== null && score >= Number(l.target_score),
         };
       });
     },

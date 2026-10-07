@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 42,
+  minor: 43,
   patch: 0,
 
   get full() {
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.43.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Projetos: a Trilha de Impacto e o relatório executivo comparam os indicadores com a rodada de diagnóstico calculada mais recente do mesmo destino (antes era só o diagnóstico de origem), indicando qual rodada foi usada e quantos atingiram a meta",
+    ],
+  },
   {
     version: "2.42.0",
     date: "2026-10-07",

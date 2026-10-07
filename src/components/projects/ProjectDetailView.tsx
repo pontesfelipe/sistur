@@ -891,7 +891,11 @@ function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; 
 
   const improved = data.filter((d) => (d.delta ?? 0) > 0.01).length;
   const regressed = data.filter((d) => (d.delta ?? 0) < -0.01).length;
-  const reachedTarget = data.filter((d) => (d.current_score ?? 0) >= (d.target_score ?? 0.67)).length;
+  const reachedTarget = data.filter((d) => d.reached_target).length;
+  const ref = data[0];
+  const refDate = ref?.current_assessment_date
+    ? format(new Date(ref.current_assessment_date), 'dd/MM/yyyy', { locale: getDateLocale() })
+    : null;
 
   return (
     <div className="space-y-4">
@@ -906,7 +910,9 @@ function IndicatorImpactPanel({ projectId, assessmentId }: { projectId: string; 
         <CardHeader>
           <CardTitle className="text-base">{tx('Trilha de Impacto')}</CardTitle>
           <CardDescription>
-            {tx('Baseline registrado na criação do projeto vs score atual do diagnóstico vinculado.')}
+            {ref?.is_newer_round
+              ? `${tx('Comparando o baseline da criação do projeto com a rodada mais recente do destino')}: ${ref.current_assessment_title ?? ''}${refDate ? ` (${refDate})` : ''}.`
+              : tx('Ainda não há rodada de diagnóstico mais nova para este destino; o "atual" é o diagnóstico de origem. Quando uma nova rodada for calculada, a comparação será atualizada automaticamente.')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
