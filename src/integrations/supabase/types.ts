@@ -10452,6 +10452,8 @@ export type Database = {
           generated_structure: Json | null
           id: string
           methodology: string
+          methodology_answers: Json | null
+          methodology_recommended: string | null
           name: string
           org_id: string
           owner_id: string | null
@@ -10475,6 +10477,8 @@ export type Database = {
           generated_structure?: Json | null
           id?: string
           methodology: string
+          methodology_answers?: Json | null
+          methodology_recommended?: string | null
           name: string
           org_id: string
           owner_id?: string | null
@@ -10498,6 +10502,8 @@ export type Database = {
           generated_structure?: Json | null
           id?: string
           methodology?: string
+          methodology_answers?: Json | null
+          methodology_recommended?: string | null
           name?: string
           org_id?: string
           owner_id?: string | null

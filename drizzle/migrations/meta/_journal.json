@@ -162,6 +162,13 @@
       "when": 1791385353347,
       "tag": "0022_support_bot",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791406650577,
+      "tag": "0023_project_methodology_advice",
+      "breakpoints": true
     }
   ]
 }

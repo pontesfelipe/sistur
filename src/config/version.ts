@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 40,
+  minor: 41,
   patch: 0,
 
   get full() {
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.41.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Projetos: assistente 'Me ajude a escolher' recomenda a metodologia (Cascata, Scrum, Kanban ou SAFe) com 6 perguntas e regras fixas, explicando o motivo e uma segunda opção",
+      "Projetos: cada metodologia mostra quando usar, quando evitar e um exemplo do turismo",
+      "Projetos: respostas e recomendação ficam guardadas no projeto",
+    ],
+  },
   {
     version: "2.40.0",
     date: "2026-10-07",
