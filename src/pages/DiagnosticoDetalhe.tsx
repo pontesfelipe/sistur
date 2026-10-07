@@ -1,4 +1,5 @@
 import { tx } from '@/i18n/t';
+import { getStaleness } from '@/lib/calcRulesChanges';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PillarGauge } from '@/components/dashboard/PillarGauge';
