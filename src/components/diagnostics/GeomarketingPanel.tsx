@@ -63,6 +63,17 @@ async function fetchPois(lat: number, lng: number, km: number): Promise<Poi[]> {
   }).filter((p: Poi) => p.lat != null);
 }
 
+async function fetchLodging(lat: number, lng: number, km: number) {
+  const r = Math.min(km, 30) * 1000;
+  const q = `[out:json][timeout:25];nwr(around:${r},${lat},${lng})[tourism~"^(hotel|guest_house|hostel|motel|chalet|apartment|camp_site)$"][name];out center 80;`;
+  const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(q) });
+  if (!res.ok) throw new Error('Serviço de mapa indisponível');
+  const j = await res.json();
+  const T: Record<string, string> = { hotel: 'Hotel', guest_house: 'Pousada', hostel: 'Hostel', motel: 'Motel', chalet: 'Chalé', apartment: 'Apartamento', camp_site: 'Camping' };
+  return (j.elements ?? []).map((e: any) => ({ name: String(e.tags.name).slice(0, 120), type: T[e.tags.tourism] ?? 'Hospedagem', lat: e.lat ?? e.center?.lat, lng: e.lon ?? e.center?.lon }))
+    .filter((x: any) => x.lat != null);
+}
+
 const brl = (v: number | null) => v == null ? '—' : v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 
 export function GeomarketingPanel({ destinationId }: Props) {
@@ -84,6 +95,7 @@ export function GeomarketingPanel({ destinationId }: Props) {
   const [loadingPoi, setLoadingPoi] = useState(false);
   const [showPoi, setShowPoi] = useState(true);
   const [creating, setCreating] = useState<string | null>(null);
+  const [findingLodging, setFindingLodging] = useState(false);
   const { user } = useAuth();
   const key = ['geomarketing', destinationId];
 
@@ -162,6 +174,26 @@ export function GeomarketingPanel({ destinationId }: Props) {
     catch { toast.error(tx('Não foi possível buscar os atrativos agora. Tente de novo em instantes.')); }
     setLoadingPoi(false);
   };
+
+  const findLodging = async () => {
+    if (!center || !orgId || !user) return;
+    setFindingLodging(true);
+    try {
+      const found = await fetchLodging(center[0], center[1], radius);
+      const have = new Set((data?.comps ?? []).map((c: any) => c.name.toLowerCase()));
+      const rows = found.filter((f: any) => !have.has(f.name.toLowerCase())).map((f: any) => ({
+        org_id: orgId, destination_id: destinationId, name: f.name, property_type: f.type, latitude: f.lat, longitude: f.lng,
+        position_source: 'osm', source_name: 'OpenStreetMap', is_manual: true, created_by: user.id,
+      }));
+      if (rows.length) { const { error } = await supabase.from('enterprise_competitors').insert(rows as any); if (error) throw error; }
+      toast.success(rows.length ? tx('{{v0}} hospedagens adicionadas como concorrentes.', { v0: rows.length }) : tx('Nenhuma hospedagem nova encontrada no mapa aberto para este raio.'));
+      qc.invalidateQueries({ queryKey: key });
+    } catch (e: any) { toast.error(tx('Não foi possível buscar hospedagens agora. Tente de novo em instantes.')); }
+    setFindingLodging(false);
+  };
+
+  useEffect(() => { if (center && !pois && !loadingPoi) loadPois(); /* carrega atrativos automaticamente */ // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center?.[0], center?.[1]]);
 
   const saveRate = async (id: string, v: string) => {
     const n = v === '' ? null : Number(v);
@@ -274,6 +306,21 @@ export function GeomarketingPanel({ destinationId }: Props) {
                 {pois ? <><Switch checked={showPoi} onCheckedChange={setShowPoi} /><Label>{tx('Atrativos e serviços')} ({pois.length})</Label></>
                   : <Button size="sm" variant="outline" disabled={loadingPoi} onClick={loadPois}><Landmark className="h-4 w-4 mr-1" />{loadingPoi ? tx('Buscando...') : tx('Mostrar atrativos e serviços')}</Button>}
               </div>
+            </div>
+
+            <details className="rounded-md border bg-muted/30 p-3 text-sm" open={(data?.comps?.length ?? 0) === 0}>
+              <summary className="cursor-pointer font-medium">{tx('Como funciona o Geomarketing')}</summary>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+                <li>{tx('Mostra, num raio ao redor do destino, quem disputa o mesmo hóspede (concorrentes), o que atrai visitantes (atrativos e serviços) e de onde eles vêm.')}</li>
+                <li>{tx('Concorrentes: use o botão abaixo para trazer as hospedagens do mapa aberto, ou a busca de concorrentes do diagnóstico empresarial.')}</li>
+                <li>{tx('Origem dos visitantes: informe a porcentagem por estado; as linhas no mapa mostram de onde vem a demanda.')}</li>
+                <li>{tx('Com esses dados, os números abaixo do mapa e o quadro "O que o entorno indica" sugerem ações que podem virar projeto.')}</li>
+              </ul>
+            </details>
+
+            <div className="flex flex-wrap items-center gap-2 rounded-md border p-3 text-sm">
+              <p className="flex-1 min-w-[200px]">{(data?.comps?.length ?? 0) === 0 ? tx('Nenhum concorrente cadastrado ainda.') : tx('{{v0}} concorrentes cadastrados.', { v0: data!.comps.length })}</p>
+              <Button size="sm" disabled={findingLodging || !orgId} onClick={findLodging}><Search className="h-4 w-4 mr-1" />{findingLodging ? tx('Buscando...') : tx('Buscar hospedagens no raio')}</Button>
             </div>
 
             {(data?.comps?.length ?? 0) > 0 && (
