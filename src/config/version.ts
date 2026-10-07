@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 43,
+  minor: 44,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.44.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Projetos › Orçamento: fontes de financiamento padronizadas (recurso próprio, convênio MTur, emenda parlamentar, FUNGETUR, FUMTUR, ICMS Turístico, iniciativa privada, consórcio ou outra)",
+      "Resumo por fonte de financiamento (previsto x realizado e % do previsto) e prazo de prestação de contas que vira marco do projeto automaticamente",
+    ],
+  },
   {
     version: "2.43.0",
     date: "2026-10-07",

@@ -6,9 +6,11 @@ import {
   useDeleteBudgetLine,
   BUDGET_CATEGORIES,
   BUDGET_STATUS,
+  FUNDING_SOURCES,
+  summarizeByFundingSource,
   type BudgetLine,
 } from "@/hooks/useProjectBudget";
-import { useProjectPhases } from "@/hooks/useProjects";
+import { useProjectPhases, useCreateMilestone } from "@/hooks/useProjects";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,21 +30,25 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
   const { data: phases = [] } = useProjectPhases(projectId);
   const upsert = useUpsertBudgetLine();
   const remove = useDeleteBudgetLine();
+  const createMilestone = useCreateMilestone();
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<BudgetLine> | null>(null);
+  const [deadline, setDeadline] = useState("");
 
   const totals = useMemo(() => {
     const planned = lines.reduce((s, l) => s + Number(l.planned_amount || 0), 0);
     const actual = lines.reduce((s, l) => s + Number(l.actual_amount || 0), 0);
     return { planned, actual, variance: planned - actual, executionPct: planned > 0 ? (actual / planned) * 100 : 0 };
   }, [lines]);
+  const bySource = useMemo(() => summarizeByFundingSource(lines), [lines]);
 
   const openNew = () => {
     setEditing({ project_id: projectId, category: BUDGET_CATEGORIES[0], status: "planned", planned_amount: 0, actual_amount: 0, currency: "BRL" });
+    setDeadline("");
     setOpen(true);
   };
-  const openEdit = (l: BudgetLine) => { setEditing(l); setOpen(true); };
+  const openEdit = (l: BudgetLine) => { setEditing(l); setDeadline(""); setOpen(true); };
 
   const submit = async () => {
     if (!editing?.description) return;
@@ -52,7 +58,17 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
       planned_amount: Number(editing.planned_amount ?? 0),
       actual_amount: Number(editing.actual_amount ?? 0),
     } as any);
-    setOpen(false); setEditing(null);
+    if (deadline) {
+      await createMilestone.mutateAsync({
+        project_id: projectId,
+        name: `Prestação de contas: ${editing.description}`,
+        description: editing.funding_source ? `Fonte: ${editing.funding_source}` : null,
+        target_date: deadline,
+        completed_date: null,
+        status: "pending",
+      } as any);
+    }
+    setOpen(false); setEditing(null); setDeadline("");
   };
 
   return (
@@ -64,6 +80,25 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
         <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">{tx('Execução')}</p><p className="text-xl font-bold">{totals.executionPct.toFixed(1)}%</p></CardContent></Card>
       </div>
       <ProjectRoiCard projectId={projectId} investment={totals.actual || totals.planned} />
+      {bySource.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{tx('Por fonte de financiamento')}</CardTitle>
+            <CardDescription>{tx('Quanto cada fonte cobre do previsto e quanto já foi gasto')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {bySource.map((s) => (
+              <div key={s.source} className="flex items-center justify-between gap-3 border rounded-lg p-2">
+                <span className="text-sm font-medium">{tx(s.source)}</span>
+                <span className="text-xs text-muted-foreground">
+                  {totals.planned > 0 ? Math.round((s.planned / totals.planned) * 100) : 0}% {tx('do previsto')}
+                </span>
+                <span className="text-sm font-semibold">{BRL(s.planned)} <span className="text-muted-foreground">/</span> {BRL(s.actual)}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
 
       <Card>
@@ -159,8 +194,25 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
                 </div>
                 <div>
                   <Label>{tx('Fonte de financiamento')}</Label>
-                  <Input value={editing.funding_source ?? ""} placeholder={tx('Ex.: Tesouro, FUNGETUR...')} onChange={(e) => setEditing({ ...editing, funding_source: e.target.value })} />
+                  <Select
+                    value={!editing.funding_source ? "_none" : FUNDING_SOURCES.includes(editing.funding_source) ? editing.funding_source : "Outra"}
+                    onValueChange={(v) => setEditing({ ...editing, funding_source: v === "_none" ? null : v })}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="_none">{tx('Não informada')}</SelectItem>
+                      {FUNDING_SOURCES.map((f) => <SelectItem key={f} value={f}>{tx(f)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  {editing.funding_source && !FUNDING_SOURCES.slice(0, -1).includes(editing.funding_source) && (
+                    <Input className="mt-2" value={editing.funding_source === "Outra" ? "" : editing.funding_source} placeholder={tx('Qual fonte?')} onChange={(e) => setEditing({ ...editing, funding_source: e.target.value || "Outra" })} />
+                  )}
                 </div>
+              </div>
+              <div>
+                <Label>{tx('Prazo de prestação de contas (opcional)')}</Label>
+                <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+                <p className="text-xs text-muted-foreground mt-1">{tx('Ao salvar, vira um marco do projeto para não perder o prazo.')}</p>
               </div>
               <div>
                 <Label>{tx('Notas')}</Label>
