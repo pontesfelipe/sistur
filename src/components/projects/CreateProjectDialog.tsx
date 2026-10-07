@@ -45,6 +45,8 @@ import { cn } from '@/lib/utils';
 import { MAX_AI_ITEMS } from '@/lib/projectGeneration';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateIndicatorLinks } from '@/hooks/useProjectIndicatorLinks';
+import { MethodologyAdvisor } from './MethodologyAdvisor';
+import { METHODOLOGY_GUIDE } from '@/lib/methodologyAdvisor';
 
 interface CreateProjectDialogProps {
   open: boolean;
@@ -74,6 +76,7 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
   const [methodology, setMethodology] = useState<ProjectMethodology>('waterfall');
+  const [methodologyAdvice, setMethodologyAdvice] = useState<{ answers: any; recommended: string } | null>(null);
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [plannedStartDate, setPlannedStartDate] = useState('');
   const [plannedEndDate, setPlannedEndDate] = useState('');
@@ -209,7 +212,8 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
         planned_start_date: plannedStartDate || undefined,
         planned_end_date: plannedEndDate || undefined,
         generated_structure: structure,
-      });
+        ...(methodologyAdvice ? { methodology_answers: methodologyAdvice.answers, methodology_recommended: methodologyAdvice.recommended } : {}),
+      } as any);
 
       setGenerationProgress('Criando fases...');
 
@@ -567,7 +571,15 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
 
             {/* Methodology Selection */}
             <div className="space-y-3">
-              <Label>{tx('Metodologia de Gestão *')}</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label>{tx('Metodologia de Gestão *')}</Label>
+              </div>
+              <MethodologyAdvisor
+                onApply={(m, answers, advice) => {
+                  setMethodology(m);
+                  setMethodologyAdvice({ answers: { ...answers, reasons: advice.reasons }, recommended: m });
+                }}
+              />
               <div className="grid md:grid-cols-2 gap-3">
                 {(Object.keys(METHODOLOGY_INFO) as ProjectMethodology[]).map((key) => {
                   const info = METHODOLOGY_INFO[key];
@@ -593,6 +605,9 @@ export function CreateProjectDialog({ open, onOpenChange, prefilledIndicatorCode
                       </CardHeader>
                       <CardContent>
                         <p className="text-xs text-muted-foreground">{tx(info.description)}</p>
+                        <p className="text-xs mt-2"><strong>{tx('Quando usar')}:</strong> {tx(METHODOLOGY_GUIDE[key].whenToUse)}</p>
+                        <p className="text-xs"><strong>{tx('Evite quando')}:</strong> {tx(METHODOLOGY_GUIDE[key].whenToAvoid)}</p>
+                        <p className="text-xs text-muted-foreground italic">{tx('Exemplo')}: {tx(METHODOLOGY_GUIDE[key].example)}</p>
                       </CardContent>
                     </Card>
                   );
