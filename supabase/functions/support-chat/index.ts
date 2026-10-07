@@ -110,42 +110,59 @@ ${kbText}
 Respostas já validadas:
 ${learnedText}`;
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const schema = {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        answer: { type: "string" },
+        resolved: { type: "boolean" },
+        action_label: { type: ["string", "null"] },
+        action_route: { type: ["string", "null"] },
+        redirect_beni: { type: "boolean" },
+      },
+      required: ["answer", "resolved", "action_label", "action_route", "redirect_beni"],
+    };
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
-      headers: { Authorization: `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`, "Content-Type": "application/json" },
+      headers: { "Lovable-API-Key": Deno.env.get("LOVABLE_API_KEY")!, "Content-Type": "application/json", "X-Lovable-AIG-SDK": "fetch" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: system },
+        model: "openai/gpt-6-astra",
+        stream: true,
+        store: false,
+        reasoning: { effort: "low" },
+        instructions: system + "\n\nResponda no formato JSON pedido. resolved=true só se a base cobre a dúvida com segurança. action_route só se for uma Rota listada na base.",
+        input: [
           ...history.map((h: { role: string; content: string }) => ({ role: h.role === "assistant" ? "assistant" : "user", content: String(h.content).slice(0, 2000) })),
           { role: "user", content: message },
         ],
-        tools: [{
-          type: "function",
-          function: {
-            name: "reply",
-            description: "Resposta ao usuário",
-            parameters: {
-              type: "object",
-              properties: {
-                answer: { type: "string" },
-                resolved: { type: "boolean", description: "true se a base cobre a dúvida com segurança" },
-                action_label: { type: "string" },
-                action_route: { type: "string", description: "rota interna começando com / existente na base, ou vazio" },
-                redirect_beni: { type: "boolean" },
-              },
-              required: ["answer", "resolved"],
-            },
-          },
-        }],
-        tool_choice: { type: "function", function: { name: "reply" } },
+        text: { format: { type: "json_schema", name: "reply", strict: true, schema } },
       }),
     });
     if (res.status === 429) return json({ error: "Muitas perguntas seguidas. Tente em instantes." }, 429);
     if (res.status === 402) return json({ error: "Créditos de IA esgotados." }, 402);
-    if (!res.ok) throw new Error(`gateway ${res.status}`);
-    const data = await res.json();
-    const args = JSON.parse(data.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments ?? "{}");
+    if (!res.ok || !res.body) throw new Error(`gateway ${res.status} ${await res.text()}`);
+    let outText = "";
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split("\n");
+      buf = lines.pop() ?? "";
+      for (const line of lines) {
+        if (!line.startsWith("data:")) continue;
+        const d = line.slice(5).trim();
+        if (!d || d === "[DONE]") continue;
+        try {
+          const ev = JSON.parse(d);
+          if (ev.type === "response.output_text.delta") outText += ev.delta;
+        } catch { /* ignore */ }
+      }
+    }
+    let args: any = {};
+    try { args = JSON.parse(outText); } catch { args = { answer: outText, resolved: false }; }
     const answer = String(args.answer ?? "Não consegui responder agora.");
     const resolved = !!args.resolved;
     const validRoutes = new Set((kb ?? []).map((a) => a.action_route).filter(Boolean));
