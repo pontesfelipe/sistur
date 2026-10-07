@@ -373,7 +373,6 @@ export function TaskFormDialog({
             </Button>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
-  );
+    );
+  }
 }
