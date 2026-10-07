@@ -6,3 +6,4 @@
 - Professor Beni's permanent rules (date, voice format, percentages, liability, disambiguation, scope) live in supabase/functions/beni-chat/promptRules.ts and are always appended after admin-editable beni_settings sections. Why: panel edits must personalize, never drop safety rules.
 
 - Any change that alters diagnostic results must add an entry to CALC_RULE_CHANGES in src/lib/calcRulesChanges.ts. Why: that registry drives the "recalculate" banner on diagnostics calculated before the change.
+- Territorial diagnostics show TerritorialInfraPanel (official ingested data only); GeomarketingPanel is enterprise-only. Why: a municipality has no competitors or daily rates.
