@@ -17,8 +17,8 @@ export const CALC_RULE_CHANGES: CalcRuleChange[] = [
     summary: 'O cálculo territorial passou a usar todos os dados oficiais disponíveis do município (só ficam de fora os recusados).' },
 ];
 
-/** Diagnósticos com mais de N dias ou que perderam 2+ mudanças precisam de revisão manual. */
-export const OUTDATED_DAYS = 120;
+/** Diagnósticos calculados há mais de N dias precisam de revisão manual. */
+export const OUTDATED_DAYS = 90;
 
 export type Staleness =
   | { level: 'ok'; missed: [] }
@@ -35,6 +35,6 @@ export function getStaleness(
   const dataChanged = !!a.needs_recalculation;
   if (!missed.length && !dataChanged) return { level: 'ok', missed: [] };
   const ageDays = (now.getTime() - calc) / 86_400_000;
-  const outdated = missed.length >= 2 || ageDays > OUTDATED_DAYS;
+  const outdated = ageDays > OUTDATED_DAYS;
   return { level: outdated ? 'outdated' : 'updatable', missed, dataChanged };
 }

@@ -11,11 +11,11 @@ describe('aviso de diagnóstico desatualizado', () => {
   it('recente com uma mudança perdida pode ser atualizado', () => {
     expect(getStaleness({ ...base, calculated_at: '2026-09-25T10:00:00Z' }, now).level).toBe('updatable');
   });
-  it('perdeu duas mudanças fica com a tarja de muito defasado', () => {
-    expect(getStaleness({ ...base, calculated_at: '2026-09-01T10:00:00Z' }, now).level).toBe('outdated');
+  it('até 90 dias pode ser atualizado mesmo perdendo duas mudanças', () => {
+    expect(getStaleness({ ...base, calculated_at: '2026-08-10T10:00:00Z' }, now).level).toBe('updatable');
   });
-  it('mais de 120 dias fica com a tarja mesmo com só dados novos', () => {
-    expect(getStaleness({ ...base, calculated_at: '2026-05-01T10:00:00Z', diagnostic_type: 'enterprise', needs_recalculation: true }, now).level).toBe('outdated');
+  it('mais de 90 dias fica com a tarja mesmo com só dados novos', () => {
+    expect(getStaleness({ ...base, calculated_at: '2026-07-01T10:00:00Z', diagnostic_type: 'enterprise', needs_recalculation: true }, now).level).toBe('outdated');
   });
   it('mudança só territorial não afeta empresarial', () => {
     expect(getStaleness({ ...base, diagnostic_type: 'enterprise', calculated_at: '2026-09-25T10:00:00Z' }, now).level).toBe('ok');
