@@ -74,6 +74,8 @@ import { Sparkles, Download } from 'lucide-react';
 import { useProjectBudget } from '@/hooks/useProjectBudget';
 import { openExecutiveReport } from '@/lib/projectExecutiveReport';
 import { toast } from 'sonner';
+import { ComturReportDialog } from './ComturReportDialog';
+import { exportComturReport } from '@/lib/exportComturDocx';
 
 interface ProjectDetailViewProps {
   projectId: string;
@@ -98,6 +100,7 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [aiSuggestOpen, setAiSuggestOpen] = useState(false);
+  const [comturOpen, setComturOpen] = useState(false);
 
   // Phase dialogs
   const [phaseFormOpen, setPhaseFormOpen] = useState(false);
@@ -291,6 +294,22 @@ export function ProjectDetailView({ projectId, onBack }: ProjectDetailViewProps)
             <FileText className="h-4 w-4" />
             <span className="hidden sm:inline">{tx('Relatório executivo')}</span>
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            title={tx('Prestação de contas ao COMTUR (Word, padrão ABNT)')}
+            onClick={() => setComturOpen(true)}
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">{tx('COMTUR')}</span>
+          </Button>
+          <ComturReportDialog
+            open={comturOpen}
+            onOpenChange={setComturOpen}
+            defaultPeriod={{ start: project.planned_start_date?.slice(0, 10) || '', end: new Date().toISOString().slice(0, 10) }}
+            onGenerate={(meta) => exportComturReport(project, tasks || [], milestones || [], budgetLines || [], indicatorImpact || [], meta)}
+          />
           <Button
             variant="outline"
             size="sm"

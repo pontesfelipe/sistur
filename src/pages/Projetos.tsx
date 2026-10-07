@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { useProjectsPortfolioImpact } from '@/hooks/useProjectsPortfolio';
 import { TrendingUp, TrendingDown, Target as TargetIcon, Download } from 'lucide-react';
 import { exportPortfolioCSV } from '@/lib/projectExports';
+import { FumturPanel } from '@/components/projects/FumturPanel';
 
 export default function Projetos() {
   const { data: projects, isLoading } = useProjects();
@@ -212,7 +213,12 @@ export default function Projetos() {
             <TabsTrigger value="active">{tx("Em Andamento ({{v0}})", { v0: activeProjects.length })}</TabsTrigger>
             <TabsTrigger value="planning">{tx("Planejamento ({{v0}})", { v0: planningProjects.length })}</TabsTrigger>
             <TabsTrigger value="completed">{tx("Concluídos ({{v0}})", { v0: completedProjects.length })}</TabsTrigger>
+            <TabsTrigger value="fumtur">{tx('FUMTUR')}</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="fumtur" className="space-y-4">
+            <FumturPanel projects={projects || []} />
+          </TabsContent>
 
           {isLoading ? (
             <div className="flex items-center justify-center py-12">

@@ -209,6 +209,26 @@ export function ProjectBudgetPanel({ projectId }: { projectId: string }) {
                   )}
                 </div>
               </div>
+              {editing.funding_source === "Fundo municipal (FUMTUR)" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>{tx('Nº do empenho')}</Label>
+                    <Input value={(editing as any).commitment_number ?? ""} onChange={(e) => setEditing({ ...editing, commitment_number: e.target.value || null } as any)} />
+                  </div>
+                  <div>
+                    <Label>{tx('Etapa da despesa')}</Label>
+                    <Select value={(editing as any).execution_stage ?? "_none"} onValueChange={(v) => setEditing({ ...editing, execution_stage: v === "_none" ? null : v } as any)}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_none">—</SelectItem>
+                        <SelectItem value="empenhado">{tx('Empenhado')}</SelectItem>
+                        <SelectItem value="liquidado">{tx('Liquidado')}</SelectItem>
+                        <SelectItem value="pago">{tx('Pago')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
               <div>
                 <Label>{tx('Prazo de prestação de contas (opcional)')}</Label>
                 <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />

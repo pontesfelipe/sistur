@@ -6342,6 +6342,164 @@ export type Database = {
           },
         ]
       }
+      fumtur_application_plan: {
+        Row: {
+          action: string
+          approved_at: string | null
+          approved_meeting: string | null
+          created_at: string
+          created_by: string | null
+          fund_id: string
+          id: string
+          org_id: string
+          planned_amount: number
+          project_id: string | null
+          status: string
+        }
+        Insert: {
+          action: string
+          approved_at?: string | null
+          approved_meeting?: string | null
+          created_at?: string
+          created_by?: string | null
+          fund_id: string
+          id?: string
+          org_id: string
+          planned_amount?: number
+          project_id?: string | null
+          status?: string
+        }
+        Update: {
+          action?: string
+          approved_at?: string | null
+          approved_meeting?: string | null
+          created_at?: string
+          created_by?: string | null
+          fund_id?: string
+          id?: string
+          org_id?: string
+          planned_amount?: number
+          project_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fumtur_application_plan_fund_id_fkey"
+            columns: ["fund_id"]
+            isOneToOne: false
+            referencedRelation: "fumtur_funds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fumtur_application_plan_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fumtur_funds: {
+        Row: {
+          bank_account: string | null
+          created_at: string
+          created_by: string | null
+          destination_id: string
+          fiscal_year: number
+          fund_cnpj: string | null
+          id: string
+          law_reference: string | null
+          opening_balance: number
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          bank_account?: string | null
+          created_at?: string
+          created_by?: string | null
+          destination_id: string
+          fiscal_year: number
+          fund_cnpj?: string | null
+          id?: string
+          law_reference?: string | null
+          opening_balance?: number
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          bank_account?: string | null
+          created_at?: string
+          created_by?: string | null
+          destination_id?: string
+          fiscal_year?: number
+          fund_cnpj?: string | null
+          id?: string
+          law_reference?: string | null
+          opening_balance?: number
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fumtur_funds_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fumtur_funds_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "public_destination_summary"
+            referencedColumns: ["destination_id"]
+          },
+        ]
+      }
+      fumtur_revenues: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          fund_id: string
+          id: string
+          org_id: string
+          origin: string
+          revenue_date: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          fund_id: string
+          id?: string
+          org_id: string
+          origin: string
+          revenue_date?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          fund_id?: string
+          id?: string
+          org_id?: string
+          origin?: string
+          revenue_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fumtur_revenues_fund_id_fkey"
+            columns: ["fund_id"]
+            isOneToOne: false
+            referencedRelation: "fumtur_funds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_sessions: {
         Row: {
           avatar: Json
@@ -9701,10 +9859,12 @@ export type Database = {
         Row: {
           actual_amount: number
           category: string
+          commitment_number: string | null
           created_at: string
           created_by: string
           currency: string
           description: string
+          execution_stage: string | null
           funding_source: string | null
           id: string
           notes: string | null
@@ -9717,10 +9877,12 @@ export type Database = {
         Insert: {
           actual_amount?: number
           category: string
+          commitment_number?: string | null
           created_at?: string
           created_by: string
           currency?: string
           description: string
+          execution_stage?: string | null
           funding_source?: string | null
           id?: string
           notes?: string | null
@@ -9733,10 +9895,12 @@ export type Database = {
         Update: {
           actual_amount?: number
           category?: string
+          commitment_number?: string | null
           created_at?: string
           created_by?: string
           currency?: string
           description?: string
+          execution_stage?: string | null
           funding_source?: string | null
           id?: string
           notes?: string | null
