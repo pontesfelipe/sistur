@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 37,
-  patch: 1,
+  patch: 2,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.37.2",
+    date: "2026-10-07",
+    type: "patch" as const,
+    changes: [
+      "Geomarketing: botão 'Buscar hospedagens no raio' traz hotéis e pousadas do OpenStreetMap com posição real como concorrentes",
+      "Geomarketing: atrativos e serviços carregam automaticamente e há um quadro 'Como funciona' explicando cada camada",
+    ],
+  },
   {
     version: "2.37.1",
     date: "2026-10-06",
