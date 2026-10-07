@@ -11,8 +11,8 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 37,
-  patch: 2,
+  minor: 38,
+  patch: 0,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.38.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Diagnósticos: tarja no topo avisa quando o diagnóstico foi calculado antes de uma mudança nas regras de cálculo, listando o que mudou e com botão 'Recalcular agora'",
+      "Diagnósticos calculados há mais de 90 dias recebem tarja vermelha de 'muito defasado', pedindo revisão dos dados antes de recalcular",
+      "Recalculados com as regras atuais os 8 diagnósticos recentes (agosto e setembro): Gramado, Vinhedo, Cananéia, Suzano, Itatiba, Casa Branca, Cabo Frio e Armação dos Búzios",
+    ],
+  },
   {
     version: "2.37.2",
     date: "2026-10-07",
