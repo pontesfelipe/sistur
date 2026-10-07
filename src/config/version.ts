@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 46,
+  minor: 47,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.47.0",
+    date: "2026-10-07",
+    type: "minor" as const,
+    changes: [
+      "Orçamento do projeto: botão \"Buscar convênios do MTur\" traz os convênios do município pelo Portal da Transparência; cada um vira linha de orçamento e o prazo de prestação de contas (60 dias após a vigência) vira marco",
+      "FUMTUR: conferência com o balancete da prefeitura (CSV) pelo número de empenho — mostra o que confere, valores diferentes e lançamentos que faltam de cada lado",
+    ],
+  },
   {
     version: "2.46.0",
     date: "2026-10-07",
