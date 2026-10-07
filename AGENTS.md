@@ -4,3 +4,5 @@
 - Global References RAG lives in supabase/functions/_shared/referenceRag.ts (page-by-page extraction, chunking, embeddings, hybrid search via service_role-only RPC match_reference_chunks). Why: single module shared by beni-chat, generate-report and index-global-reference.
 - Tutorial videos use CDN asset pointers and a standalone native-controls player outside EDU tracking. Why: keep large MP4s out of source and avoid recording course progress for help content.
 - Professor Beni's permanent rules (date, voice format, percentages, liability, disambiguation, scope) live in supabase/functions/beni-chat/promptRules.ts and are always appended after admin-editable beni_settings sections. Why: panel edits must personalize, never drop safety rules.
+
+- Any change that alters diagnostic results must add an entry to CALC_RULE_CHANGES in src/lib/calcRulesChanges.ts. Why: that registry drives the "recalculate" banner on diagnostics calculated before the change.
