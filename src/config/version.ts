@@ -12,7 +12,7 @@
 export const APP_VERSION = {
   major: 2,
   minor: 45,
-  patch: 0,
+  patch: 1,
 
   get full() {
     return `${this.major}.${this.minor}.${this.patch}`;
@@ -23,6 +23,14 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.45.1",
+    date: "2026-10-07",
+    type: "patch" as const,
+    changes: [
+      "Ajuda e Guia de suporte: tutorial de Projetos e base de conhecimento atualizados com metodologia recomendada, checklists, tarefas vencidas, fontes de financiamento e relatório executivo",
+    ],
+  },
   {
     version: "2.45.0",
     date: "2026-10-07",

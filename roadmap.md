@@ -14,5 +14,6 @@
 - [x] Projetos Etapa 1: assistente de escolha de metodologia (v2.41.0)
 - [x] Projetos Etapa 2: relatório executivo PDF para Prefeito/COMTUR (v2.42.0)
 - [x] Projetos Etapa 3: comparar indicadores com a rodada de diagnóstico mais recente (v2.43.0)
-- [ ] Projetos Etapa 4: fontes de financiamento no Orçamento
-- [ ] Projetos Etapa 5: checklists, tarefas vencidas em destaque, filtro "minhas tarefas"
+- [x] Projetos Etapa 4: fontes de financiamento no Orçamento (v2.44.0)
+- [x] Projetos Etapa 5: checklists, tarefas vencidas, filtros no Kanban (v2.45.0)
+- [x] Fechamento: tutorial de Projetos e base do Guia (v2.45.1)

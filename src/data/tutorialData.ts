@@ -94,7 +94,7 @@ export const tutorialCategories: TutorialCategory[] = [
       {
         id: 'erp-projetos',
         title: 'Gestão de Projetos',
-        description: 'Crie projetos vinculados a planos de ação. Organize em fases, milestones e tarefas. Acompanhe o progresso e associe a diagnósticos específicos.',
+        description: 'Crie projetos vinculados a diagnósticos. Use "Me ajude a escolher" para receber a metodologia recomendada (Cascata, Scrum, Kanban ou SAFe). Organize fases, marcos e tarefas com checklist; no Kanban, filtre "Minhas tarefas" e "Vencidas" (em vermelho). No Orçamento, informe a fonte de financiamento e o prazo de prestação de contas, que vira marco. Gere o Relatório executivo para Prefeito/COMTUR e compare os indicadores com a rodada mais recente do destino.',
         icon: FolderKanban,
         route: '/projetos',
         roles: ['ERP', 'ADMIN'],
