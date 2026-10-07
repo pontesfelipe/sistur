@@ -66,3 +66,36 @@ export function buildGeoInsights(i: GeoInsightInput): GeoInsight[] {
     out.push({ id: 'evento', title: 'Evento próximo no destino', text: `"${i.nextEvent.name}" começa em ${new Date(i.nextEvent.start_date).toLocaleDateString('pt-BR')}${i.nextEvent.estimated_attendance ? `, com público estimado de ${i.nextEvent.estimated_attendance.toLocaleString('pt-BR')} pessoas` : ''}. Prepare tarifas e divulgação com antecedência.` });
   return out;
 }
+
+// ---------- Leitura territorial (o destino como um todo, sem "concorrentes") ----------
+export interface TerritorialInput {
+  radiusKm: number; lodging: number; pois: PoiCounts | null;
+  hasAirport: boolean; origins: { uf: string; share_pct: number }[]; ownUf?: string | null;
+  nextEvent?: { name: string; start_date: string; estimated_attendance?: number | null } | null;
+}
+
+/** Leituras sobre a estrutura turística do destino; cada uma pode virar projeto. */
+export function buildTerritorialInsights(i: TerritorialInput): GeoInsight[] {
+  const out: GeoInsight[] = [];
+  const r = `${i.radiusKm} km`;
+  const p = i.pois;
+  if (p && p.atrativos >= 5 && i.lodging <= 2)
+    out.push({ id: 't-hospedagem-insuficiente', title: 'Atrativos sem hospedagem suficiente', text: `Há ${p.atrativos} atrativos mapeados e só ${i.lodging} meio(s) de hospedagem a menos de ${r}. O visitante tende a ir e voltar no mesmo dia, gastando pouco no destino. Vale atrair investimento em hospedagem ou incentivar hospedagem familiar.` });
+  if (p && p.atrativos <= 1 && i.lodging >= 3)
+    out.push({ id: 't-atrativos-pouco-estruturados', title: 'Poucos atrativos estruturados e divulgados', text: `Há ${i.lodging} hospedagens mas só ${p.atrativos} atrativo(s) mapeado(s) a menos de ${r}. Inventariar, sinalizar e divulgar os atrativos ajuda a aumentar a permanência do visitante.` });
+  if (p && p.restaurantes < 3)
+    out.push({ id: 't-alimentacao', title: 'Pouca oferta de alimentação', text: `Só ${p.restaurantes} restaurante(s), café(s) ou bar(es) mapeado(s) a menos de ${r}. Apoiar empreendedores locais de alimentação melhora a experiência e mantém a renda no município.` });
+  if (p && p.saude === 0)
+    out.push({ id: 't-saude', title: 'Sem serviços de saúde mapeados', text: `Não há hospital, clínica ou farmácia mapeados a menos de ${r}. Isso afeta a segurança do visitante; vale articular atendimento de referência e informar os contatos de emergência.` });
+  if (p && p.transporte === 0 && !i.hasAirport)
+    out.push({ id: 't-acesso', title: 'Acesso e transporte limitados', text: `Não há rodoviária, táxi ou aeroporto mapeados a menos de ${r}. Melhorar a ligação com os polos emissores (linhas de ônibus, traslados, sinalização) é condição para crescer.` });
+  const total = i.origins.reduce((s, o) => s + Number(o.share_pct), 0);
+  const top = [...i.origins].sort((a, b) => b.share_pct - a.share_pct)[0];
+  if (!i.origins.length)
+    out.push({ id: 't-sem-origem', title: 'Origem dos visitantes desconhecida', text: 'Ainda não há dados de origem dos visitantes. Uma pesquisa simples de demanda (nos atrativos ou hospedagens) orienta para onde direcionar a promoção.' });
+  else if (top && total > 0 && top.share_pct / total >= 0.6)
+    out.push({ id: 't-demanda-concentrada', title: 'Demanda concentrada em um estado', text: `${top.uf} responde por ${Math.round((top.share_pct / total) * 100)}% dos visitantes informados. Depender de um só mercado é arriscado; vale testar promoção em estados vizinhos.` });
+  if (i.nextEvent)
+    out.push({ id: 't-evento', title: 'Evento próximo no destino', text: `"${i.nextEvent.name}" começa em ${new Date(i.nextEvent.start_date).toLocaleDateString('pt-BR')}${i.nextEvent.estimated_attendance ? `, com público estimado de ${i.nextEvent.estimated_attendance.toLocaleString('pt-BR')} pessoas` : ''}. Prepare informação turística, limpeza e trânsito com antecedência.` });
+  return out;
+}
