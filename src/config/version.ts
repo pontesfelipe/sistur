@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 50,
+  minor: 51,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.51.0",
+    date: "2026-10-08",
+    type: "minor" as const,
+    changes: [
+      "Pressão Turística e Capacidade de Carga (igma_iptl) passa ao pilar RA no nível Estratégico, com régua própria de visitantes por habitante/ano: até 5 adequado, de 5 a 15 atenção, acima de 15 crítico. Saturação crítica gera alerta no motor IGMA e bloqueia ações de promoção (território antes do marketing).",
+      "Matriz de Intersetorialidade: gargalos e planos de ação mostram as secretarias municipais corresponsáveis (Meio Ambiente, Saneamento, Saúde, Educação, Cultura, Obras, Mobilidade, Segurança, Fazenda, Assistência Social, Desenvolvimento Econômico, Comunicação).",
+    ],
+  },
   {
     version: "2.50.0",
     date: "2026-10-08",

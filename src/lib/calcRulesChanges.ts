@@ -19,6 +19,8 @@ export const CALC_RULE_CHANGES: CalcRuleChange[] = [
     summary: 'Novo indicador de Maturidade Digital e Distribuição do Destino (pilar AO) no nível Estratégico, com nota de 0 a 100%. Indicadores com campo vazio deixam de contar como nota zero e ficam fora do cálculo.' },
   { version: '2.50.0', date: '2026-10-08', appliesTo: ['territorial'],
     summary: 'Cobertura de Saúde passa a ser medida por 10 mil habitantes (ajustada ao porte do município) e Conectividade Aérea passa a somar os voos de todos os aeroportos a até 100 km, com peso menor para os mais distantes.' },
+  { version: '2.51.0', date: '2026-10-08', appliesTo: ['territorial'],
+    summary: 'Pressão Turística e Capacidade de Carga passa ao pilar RA no nível Estratégico, com régua de visitantes por habitante/ano (até 5 adequado, 5 a 15 atenção, acima de 15 crítico). Saturação crítica bloqueia ações de promoção.' },
 ];
 
 /** Diagnósticos calculados há mais de N dias precisam de revisão manual. */
