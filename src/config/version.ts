@@ -29,6 +29,7 @@ export const VERSION_HISTORY = [
     type: "minor" as const,
     changes: [
       "Diagnóstico territorial: o antigo indicador Promoção Digital do Destino virou Maturidade Digital e Distribuição do Destino (pilar AO), com 5 componentes, nota de 0 a 100% e presença a partir do nível Estratégico; notas antigas de 0 a 4 foram convertidas",
+      "Cálculo: indicador com campo vazio não conta mais como nota zero; fica fora da média, como dado não coletado",
       "Referências Globais: corrigido o erro de indexação de PDFs (leitor de PDF não era incluído na publicação da função)",
     ],
   },
