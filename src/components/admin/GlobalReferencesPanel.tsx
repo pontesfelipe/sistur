@@ -159,7 +159,8 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
   const reindex = async () => {
     setIndexing(true);
     try {
-      const r = await indexGlobalReference(file.id, (p, t) => setProgress(`${p}/${t}`));
+      const r = await indexGlobalReference(file.id, (p, t) =>
+        setProgress(t ? tx('Lidas {{v0}} de {{v1}} páginas…', { v0: p, v1: t }) : tx('Lendo as primeiras páginas…')));
       toast.success(tx('Documento dividido em {{v0}} trechos.', { v0: r.chunks }));
     } catch (e: any) {
       toast.error(e.message);

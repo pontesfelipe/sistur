@@ -204,8 +204,9 @@ async function callIndexFn(body: Record<string, unknown>) {
 
 /** Divide o documento em trechos e gera os vetores, em etapas de páginas (livros grandes). */
 export async function indexGlobalReference(
-  id: string, onProgress?: (page: number, total: number) => void,
+  id: string, onProgress?: (page: number, total: number | null) => void,
 ): Promise<{ chunks: number; pages: number }> {
+  onProgress?.(0, null);
   let r = await callIndexFn({ id });
   while (r && r.done === false && r.nextPage) {
     onProgress?.(r.nextPage - 1, r.totalPages);

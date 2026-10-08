@@ -27,7 +27,7 @@ export async function extractPages(
         page.cleanup();
       }
     } finally {
-      await pdf.destroy().catch(() => {});
+      try { await (pdf as any).destroy?.(); } catch { /* versão do leitor sem destroy */ }
     }
     return out;
   }
