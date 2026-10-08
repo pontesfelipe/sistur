@@ -1,3 +1,4 @@
+import { BENI_RULE_SUMMARIES } from "../../../supabase/functions/beni-chat/promptRules";
 import { tx } from '@/i18n/t';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -200,14 +201,7 @@ export function BeniContextPanel() {
         </CardHeader>
         <CardContent>
           <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
-            <li>{tx("Data de referência: o Beni recebe a data de hoje (horário de Brasília) a cada conversa.")}</li>
-            <li>{tx("Formato de voz: sem markdown, texto corrido pronto para narração.")}</li>
-            <li>{tx("Números: scores sempre falados em porcentagem (ex.: \"67 por cento\"), nunca em decimais.")}</li>
-            <li>{tx("Limites de responsabilidade: orientação metodológica, sem garantia de resultado nem parecer jurídico, contábil ou técnico.")}</li>
-            <li>{tx("Desambiguação: confirma o nome exato do diagnóstico ou relatório antes de analisar.")}</li>
-            <li>{tx("Personalização pelo nome: usa o primeiro nome cadastrado com moderação e respeita o tratamento preferido.")}</li>
-            <li>{tx("Escopo: só turismo e metodologia SISTUR; recusa educada para outros temas.")}</li>
-            <li>{tx("Contexto enxuto: em perguntas gerais, envia só os nomes dos diagnósticos e relatórios; detalhes, scores e trechos entram quando a pergunta trata deles.")}</li>
+            {BENI_RULE_SUMMARIES.map((r) => <li key={r}>{tx(r)}</li>)}
           </ul>
         </CardContent>
       </Card>

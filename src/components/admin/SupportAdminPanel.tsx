@@ -1,3 +1,4 @@
+import { SUPPORT_RULE_SUMMARIES } from '../../../supabase/functions/support-chat/rules';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -107,7 +108,7 @@ export function SupportAdminPanel() {
         </TabsContent>
 
         <TabsContent value="guardrails" className="space-y-3">
-          <p className="text-sm text-muted-foreground">{tx('Além destas diretrizes editáveis, o Guia sempre segue regras fixas: só fala do uso da plataforma, encaminha teoria ao Professor Beni, não inventa telas e não expõe dados de outros usuários.')}</p>
+          <div className="text-sm text-muted-foreground"><p>{tx('Além destas diretrizes editáveis, o Guia sempre segue estas regras fixas:')}</p><ul className="list-disc pl-5 mt-1 space-y-1">{SUPPORT_RULE_SUMMARIES.map((r) => <li key={r}>{tx(r)}</li>)}</ul></div>
           {!guards.data?.length && <Button variant="outline" onClick={loadDefaultGuards}>{tx('Carregar diretrizes padrão')}</Button>}
           {(guards.data ?? []).map(g => <GuardItem key={g.id} item={g} onDone={refresh} />)}
         </TabsContent>

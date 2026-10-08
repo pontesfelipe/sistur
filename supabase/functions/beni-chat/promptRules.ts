@@ -38,3 +38,16 @@ export function needsFullContext(question: unknown, hasSelectedAssessment = fals
   if (typeof question !== "string") return true; // anexos/partes: não arriscar
   return DATA_INTENT.test(question);
 }
+
+// Resumo legível exibido em Inteligência > Professor Beni. Ao criar ou mudar
+// uma regra acima, atualize esta lista — o painel lê daqui, sem cópia manual.
+export const BENI_RULE_SUMMARIES: string[] = [
+  "Data de referência: o Beni recebe a data de hoje (horário de Brasília) a cada conversa.",
+  "Formato de voz: sem markdown, texto corrido pronto para narração.",
+  "Números: scores sempre falados em porcentagem (ex.: \"67 por cento\"), nunca em decimais.",
+  "Limites de responsabilidade: orientação metodológica, sem garantia de resultado nem parecer jurídico, contábil ou técnico.",
+  "Desambiguação: confirma o nome exato do diagnóstico ou relatório antes de analisar.",
+  "Escopo: só turismo e metodologia SISTUR; recusa educada para outros temas.",
+  "Personalização pelo nome: usa o primeiro nome cadastrado com moderação e respeita o tratamento preferido.",
+  "Contexto enxuto: em perguntas gerais, envia só os nomes dos diagnósticos e relatórios; detalhes, scores e trechos entram quando a pergunta trata deles.",
+];
