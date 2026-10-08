@@ -26,8 +26,8 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { ptBR } from 'date-fns/locale';
 
-function IndexBadge({ file }: { file: GlobalReferenceFile }) {
-  const s = file.index_status || 'pending';
+function IndexBadge({ file, busy }: { file: GlobalReferenceFile; busy?: boolean }) {
+  const s = busy ? 'indexing' : (file.index_status || 'pending');
   if (s === 'ready') return <Badge variant="outline" className="text-xs shrink-0">{tx('{{v0}} trechos', { v0: file.chunk_count ?? 0 })}</Badge>;
   if (s === 'indexing') return <Badge variant="outline" className="text-xs shrink-0">{tx('Indexando…')}</Badge>;
   if (s === 'error') return <Badge variant="outline" className="text-xs shrink-0 text-destructive">{tx('Erro na indexação')}</Badge>;
