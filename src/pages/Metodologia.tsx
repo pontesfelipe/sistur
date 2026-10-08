@@ -280,7 +280,7 @@ const rules = [
     flag: 'INTERSECTORAL_DEPENDENCY',
     color: 'bg-indigo-500 dark:bg-indigo-600',
     description: tx('Identifica indicadores que dependem de múltiplos setores'),
-    detail: 'Alguns indicadores (saúde, educação, saneamento) dependem de ações coordenadas entre secretarias. O sistema sinaliza quando a melhoria requer articulação intersetorial, não apenas ações isoladas do turismo.',
+    detail: 'Alguns indicadores (saúde, educação, saneamento) dependem de ações coordenadas entre secretarias. O sistema sinaliza quando a melhoria requer articulação intersetorial, não apenas ações isoladas do turismo. Gargalos e planos de ação exibem as secretarias municipais corresponsáveis (Matriz de Intersetorialidade), com o Turismo como articulador.',
     trigger: 'Indicador intersetorial presente',
     effect: 'Sinalização de dependência',
     example: tx('IDEB baixo → Requer articulação com Educação')

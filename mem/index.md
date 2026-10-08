@@ -10,3 +10,4 @@
 - [Enterprise Brand Network Model](mem://features/enterprise/brand-network-model) — Marca/rede agrupando unidades em múltiplos municípios; diagnóstico segue por unidade- [CAGED self-healing](mem://features/caged-self-healing) — 3 cron slots, auto re-run ≤3, idempotent check, Python retries, day-6 watchdog
 - [Maturidade Digital](mem://features/maturidade-digital-destino) — Indicador AO 0–100%, 5 componentes, nível Estratégico
 - [Saúde e aeroportos por porte](mem://calculations/porte-municipio-saude-aereo) — Saúde por 10 mil hab.; aeroportos até 100 km ponderados
+- [Capacidade de carga e intersetorialidade](mem://calculations/capacidade-carga-intersetorial) — RA Estratégico ≤5/5–15/>15 visitantes por hab.; secretarias corresponsáveis nos gargalos

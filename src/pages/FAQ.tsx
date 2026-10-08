@@ -183,7 +183,12 @@ export const faqItems: FAQItem[] = [
   },
   {
     question: 'O que significa "Dependência Intersetorial"?',
-    answer: 'Alguns indicadores dependem de ações de múltiplos setores (saúde, educação, meio ambiente, etc.). O sistema identifica esses indicadores e sinaliza que a melhoria requer articulação intersetorial, não apenas ações isoladas do turismo.',
+    answer: 'Alguns indicadores dependem de ações de múltiplos setores (saúde, educação, meio ambiente, etc.). O sistema identifica esses indicadores e sinaliza que a melhoria requer articulação intersetorial, não apenas ações isoladas do turismo. Nos gargalos e planos de ação, o SISTUR mostra quais secretarias municipais são corresponsáveis (por exemplo Meio Ambiente, Saneamento, Saúde, Obras ou Mobilidade), com o Turismo como articulador.',
+    category: 'erp',
+  },
+  {
+    question: 'Como o SISTUR mede a pressão turística e a capacidade de carga?',
+    answer: 'No pilar RA, a partir do nível Estratégico, o indicador Pressão Turística e Capacidade de Carga compara o número de visitantes por ano com a população residente. Até 5 visitantes por habitante/ano é Adequado, de 5 a 15 é Atenção e acima de 15 é Crítico. Quando a saturação é crítica, ações de promoção turística ficam bloqueadas até o território se reorganizar.',
     category: 'erp',
   },
 
