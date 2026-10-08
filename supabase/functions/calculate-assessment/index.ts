@@ -1210,6 +1210,8 @@ async function runCalculationCore(
     for (const iv of filteredIndicatorValues as unknown as IndicatorValue[]) {
       const indicator = iv.indicator;
       if (!indicator) continue;
+      // Campo vazio = dado não coletado: fica fora do cálculo (antes virava nota 0).
+      if (iv.value_raw === null || iv.value_raw === undefined || (iv.value_raw as unknown) === '' || !Number.isFinite(Number(iv.value_raw))) continue;
 
       // Count intersectoral dependencies
       if (indicator.intersectoral_dependency) {
