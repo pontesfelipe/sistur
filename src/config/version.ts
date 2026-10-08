@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 49,
+  minor: 50,
   patch: 0,
 
   get full() {
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.50.0",
+    date: "2026-10-08",
+    type: "minor" as const,
+    changes: [
+      "Cobertura de Saúde (igma_cobertura_saude) agora é calculada em estabelecimentos de saúde por 10 mil habitantes, com régua de 0 a 10, em vez do número absoluto com régua 30–100 que zerava municípios pequenos.",
+      "Conectividade Aérea (OE003) passa a considerar todos os aeroportos com voo comercial num raio de 100 km do município: voos semanais ponderados pela distância (100% até 30 km, caindo até 50% em 100 km). Nova tabela anac_airports com 141 aeroportos e coordenadas oficiais da ANAC (últimos 12 meses).",
+      "Importação ANAC corrigida: o arquivo de aeródromos deixou de trazer código IBGE e a planilha de estatísticas ganhou uma linha de data antes do cabeçalho, o que travava a importação mensal desde maio.",
+    ],
+  },
   {
     version: "2.49.0",
     date: "2026-10-08",

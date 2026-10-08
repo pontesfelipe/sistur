@@ -103,7 +103,7 @@ export function TerritorialInfraPanel({ destinationId }: { destinationId: string
             <Stat label="Agências de turismo" value={fmt(v.igma_agencias_turismo?.value)} src={cad('igma_agencias_turismo')} />
             <Stat label="Bens protegidos" value={String(data?.iphan.length ?? 0)} src="IPHAN" />
             <Stat label="Demanda aérea (12 meses)" value={data?.anac ? Number(data.anac.total_passengers_12m ?? 0).toLocaleString('pt-BR') : '—'} src={data?.anac ? `ANAC · ${data.anac.flights_per_week ?? 0} voos/semana` : tx('Sem aeroporto no município')} />
-            <Stat label="Cobertura de saúde" value={v.igma_cobertura_saude ? `${fmt(v.igma_cobertura_saude.value)}%` : '—'} src="DATASUS" />
+            <Stat label="Cobertura de saúde" value={v.igma_cobertura_saude ? `${fmt(v.igma_cobertura_saude.value)} /10 mil hab.` : "—"} src="DATASUS" />
             <Stat label="População" value={fmt(v.igma_populacao?.value)} src="IBGE" />
           </div>
 
