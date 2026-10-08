@@ -206,7 +206,7 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           onCheckedChange={(checked) => updateFile.mutate({ id: file.id, is_active: checked })}
           title={file.is_active ? tx('Ativo (usado nos relatórios)') : 'Inativo'}
         />
-        {progress && <span className="text-xs text-muted-foreground">{tx("pág.")} {progress}</span>}
+        {progress && <span className="text-xs text-primary font-medium whitespace-nowrap">{progress}</span>}
         <Button size="icon" variant="ghost" onClick={reindex} disabled={indexing} title={tx("Reindexar trechos")}>
           {indexing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>
