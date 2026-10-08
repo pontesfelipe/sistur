@@ -15,6 +15,8 @@ export const CALC_RULE_CHANGES: CalcRuleChange[] = [
     summary: 'Quórum mínimo de indicadores por pilar e reaproveitamento do último dado oficial válido quando a fonte não responde.' },
   { version: '2.31.6', date: '2026-10-03', appliesTo: ['territorial'],
     summary: 'O cálculo territorial passou a usar todos os dados oficiais disponíveis do município (só ficam de fora os recusados).' },
+  { version: '2.49.0', date: '2026-10-08', appliesTo: ['territorial'],
+    summary: 'Novo indicador de Maturidade Digital e Distribuição do Destino (pilar AO) no nível Estratégico, com nota de 0 a 100%.' },
 ];
 
 /** Diagnósticos calculados há mais de N dias precisam de revisão manual. */

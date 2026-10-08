@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 48,
+  minor: 49,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.49.0",
+    date: "2026-10-08",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico territorial: o antigo indicador Promoção Digital do Destino virou Maturidade Digital e Distribuição do Destino (pilar AO), com 5 componentes, nota de 0 a 100% e presença a partir do nível Estratégico; notas antigas de 0 a 4 foram convertidas",
+      "Referências Globais: corrigido o erro de indexação de PDFs (leitor de PDF não era incluído na publicação da função)",
+    ],
+  },
   {
     version: "2.48.0",
     date: "2026-10-08",

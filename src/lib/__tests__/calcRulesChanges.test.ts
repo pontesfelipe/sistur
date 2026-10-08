@@ -6,7 +6,7 @@ const base = { status: 'CALCULATED', diagnostic_type: 'territorial', needs_recal
 
 describe('aviso de diagnóstico desatualizado', () => {
   it('não avisa quem foi calculado depois da última mudança', () => {
-    expect(getStaleness({ ...base, calculated_at: '2026-10-05T10:00:00Z' }, now).level).toBe('ok');
+    expect(getStaleness({ ...base, calculated_at: '2026-10-09T10:00:00Z' }, now).level).toBe('ok');
   });
   it('recente com uma mudança perdida pode ser atualizado', () => {
     expect(getStaleness({ ...base, calculated_at: '2026-09-25T10:00:00Z' }, now).level).toBe('updatable');
