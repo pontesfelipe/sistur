@@ -202,9 +202,16 @@ async function callIndexFn(body: Record<string, unknown>) {
   return data as any;
 }
 
-/** Divide o documento em trechos e gera os vetores para a busca por trechos. */
-export function indexGlobalReference(id: string): Promise<{ chunks: number; pages: number }> {
-  return callIndexFn({ id });
+/** Divide o documento em trechos e gera os vetores, em etapas de páginas (livros grandes). */
+export async function indexGlobalReference(
+  id: string, onProgress?: (page: number, total: number) => void,
+): Promise<{ chunks: number; pages: number }> {
+  let r = await callIndexFn({ id });
+  while (r && r.done === false && r.nextPage) {
+    onProgress?.(r.nextPage - 1, r.totalPages);
+    r = await callIndexFn({ id, fromPage: r.nextPage });
+  }
+  return r;
 }
 
 export interface ReferenceChunkHit { id: string; file_name: string; page: number | null; content: string; similarity: number; score: number }

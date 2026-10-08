@@ -154,11 +154,12 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
   const updateFile = useUpdateGlobalReference();
   const queryClient = useQueryClient();
   const [indexing, setIndexing] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
   const catLabel = REFERENCE_CATEGORIES.find(c => c.value === file.category)?.label || file.category;
   const reindex = async () => {
     setIndexing(true);
     try {
-      const r = await indexGlobalReference(file.id);
+      const r = await indexGlobalReference(file.id, (p, t) => setProgress(`${p}/${t}`));
       toast.success(tx('Documento dividido em {{v0}} trechos.', { v0: r.chunks }));
     } catch (e: any) {
       toast.error(e.message);

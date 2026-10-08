@@ -4,15 +4,21 @@
 import type { PageText } from "./referenceRag.ts";
 
 /** Lê o documento em partes (PDF página a página) para não estourar memória. */
-export async function extractPages(bytes: Uint8Array, fileName: string, mime: string, maxChars = 2_000_000): Promise<PageText[]> {
+export async function extractPages(
+  bytes: Uint8Array, fileName: string, mime: string, maxChars = 2_000_000,
+  range?: { from: number; count: number },
+): Promise<PageText[] & { totalPages?: number }> {
   const lower = fileName.toLowerCase();
   if (mime === "application/pdf" || lower.endsWith(".pdf")) {
     const { getDocumentProxy } = await import("npm:unpdf@1.8.1");
     const pdf = await getDocumentProxy(bytes, { disableFontFace: true, isEvalSupported: false } as any);
-    const out: PageText[] = [];
+    const out: PageText[] & { totalPages?: number } = [];
+    out.totalPages = pdf.numPages;
     let total = 0;
+    const first = range ? Math.max(1, range.from) : 1;
+    const last = range ? Math.min(pdf.numPages, first + range.count - 1) : pdf.numPages;
     try {
-      for (let i = 1; i <= pdf.numPages && total < maxChars; i++) {
+      for (let i = first; i <= last && total < maxChars; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
         const t = content.items.map((it: any) => it.str ?? "").join(" ").replace(/\s+/g, " ").trim();

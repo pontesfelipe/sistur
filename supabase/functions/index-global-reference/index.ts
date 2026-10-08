@@ -25,6 +25,9 @@ Deno.serve(async (req) => {
 
   const id = typeof body.id === "string" ? body.id : "";
   if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: "id inválido" }, 400);
+  // Livros grandes: processa em etapas de PAGES páginas; o painel chama de novo com fromPage.
+  const fromPage = Math.max(1, Math.floor(Number(body.fromPage) || 1));
+  const PAGES = 40;
   const { data: ref } = await admin.from("global_reference_files").select("*").eq("id", id).maybeSingle();
   if (!ref) return json({ error: "Referência não encontrada" }, 404);
 
@@ -36,23 +39,33 @@ Deno.serve(async (req) => {
     const { data: blob, error: dlErr } = await admin.storage.from("global-references").download(ref.storage_path);
     if (dlErr || !blob) throw new Error("Não foi possível baixar o arquivo");
     let bytes: Uint8Array | null = new Uint8Array(await blob.arrayBuffer());
-    const pages = await extractPages(bytes, ref.file_name, ref.file_type || "");
+    const pages = await extractPages(bytes, ref.file_name, ref.file_type || "", 2_000_000, { from: fromPage, count: PAGES });
     bytes = null;
+    const totalPages = pages.totalPages ?? null;
     const chunks = chunkPages(pages);
-    if (chunks.length === 0) throw new Error("Não consegui ler texto do documento (PDF escaneado?).");
 
-    await admin.from("global_reference_chunks").delete().eq("reference_id", id);
+    if (fromPage === 1) await admin.from("global_reference_chunks").delete().eq("reference_id", id);
+    const { count: existing } = await admin.from("global_reference_chunks")
+      .select("id", { count: "exact", head: true }).eq("reference_id", id);
+    const offset = existing ?? 0;
     for (let i = 0; i < chunks.length; i += BATCH) {
       const slice = chunks.slice(i, i + BATCH);
       const vecs = await embed(slice.map((c) => c.content));
       const rows = slice.map((c, j) => ({
-        reference_id: id, page: c.page, chunk_index: i + j, content: c.content, embedding: JSON.stringify(vecs[j]),
+        reference_id: id, page: c.page, chunk_index: offset + i + j, content: c.content, embedding: JSON.stringify(vecs[j]),
       }));
       const { error } = await admin.from("global_reference_chunks").insert(rows);
       if (error) throw new Error(error.message);
     }
-    await setStatus({ index_status: "ready", chunk_count: chunks.length, indexed_at: new Date().toISOString(), index_error: null });
-    return json({ ok: true, chunks: chunks.length, pages: pages.length });
+    const total = offset + chunks.length;
+    const nextPage = totalPages && fromPage + PAGES <= totalPages ? fromPage + PAGES : null;
+    if (nextPage) {
+      await setStatus({ chunk_count: total });
+      return json({ ok: true, done: false, nextPage, totalPages, chunks: total });
+    }
+    if (total === 0) throw new Error("Não consegui ler texto do documento (PDF escaneado?).");
+    await setStatus({ index_status: "ready", chunk_count: total, indexed_at: new Date().toISOString(), index_error: null });
+    return json({ ok: true, done: true, chunks: total, pages: totalPages ?? pages.length });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erro inesperado";
     console.error("index-global-reference", msg);
