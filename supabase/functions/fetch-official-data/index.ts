@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { requireUser, forbidden } from "../_shared/auth.ts";
+import { regionalAirAccess, healthUnitsPer10k } from "../_shared/airAccess.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -169,6 +170,11 @@ async function fetchIBGEPesquisas(ibgeCode: string, populacao?: number): Promise
         source,
         real: true,
       };
+    } else if (key === 'igma_cobertura_saude') {
+      // Estabelecimentos de saúde por 10 mil habitantes (ajustado ao porte)
+      const per10k = populacao ? healthUnitsPer10k(extracted.value, populacao) : null;
+      if (per10k == null) continue;
+      results[key] = { value: per10k, year: extracted.year, source, real: true };
     } else if (key === 'igma_receita_propria' && populacao && populacao > 0) {
       // Convert to receita per capita (R$)
       results[key] = {
@@ -306,46 +312,36 @@ async function fetchANACFromCache(
   supabase: any,
   ibgeCode: string,
 ): Promise<Record<string, IndicatorResult>> {
+  // OE003 — Acessibilidade aérea regional: voos/semana ponderados de todos os
+  // aeroportos com voo comercial a até 100 km do município (tabela anac_airports).
   const results: Record<string, IndicatorResult> = {};
   try {
-    const code7 = ibgeCode.length === 7 ? ibgeCode : ibgeCode.padStart(7, '0');
-    const code6 = ibgeCode.slice(0, 6);
-    const { data, error } = await supabase
-      .from('anac_air_connectivity')
-      .select('flights_per_week, total_flights_12m, airport_count, reference_period_end')
-      .or(`ibge_code.eq.${code7},ibge_code.eq.${code6}`)
-      .order('fetched_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (error) {
-      console.warn('[ANAC cache] read error:', error.message);
+    const { data: dest } = await supabase.from('destinations')
+      .select('latitude, longitude').eq('ibge_code', ibgeCode)
+      .not('latitude', 'is', null).limit(1).maybeSingle();
+    if (!dest?.latitude || !dest?.longitude) {
+      console.log(`[ANAC] sem coordenadas para IBGE ${ibgeCode}`);
       return results;
     }
-    if (!data) {
-      console.log(`[ANAC cache] sem registro para IBGE ${ibgeCode} (município sem aeroporto comercial)`);
-      // Município sem aeroporto: gravamos 0 voos/semana como dado real (oficialmente
-      // não há conectividade aérea direta). Isso evita marcar como MANUAL.
-      results['OE003'] = {
-        value: 0,
-        year: new Date().getFullYear(),
-        source: 'ANAC',
-        real: true,
-      };
-      return results;
-    }
-    const fpw = Number(data.flights_per_week) || 0;
-    const refYear = data.reference_period_end
-      ? new Date(data.reference_period_end).getFullYear()
-      : new Date().getFullYear();
+    const lat = Number(dest.latitude), lon = Number(dest.longitude);
+    const box = 1.0; // ~110 km
+    const { data: airports, error } = await supabase.from('anac_airports')
+      .select('icao, name, latitude, longitude, flights_per_week, reference_period_end')
+      .gt('departures_12m', 0)
+      .gte('latitude', lat - box).lte('latitude', lat + box)
+      .gte('longitude', lon - box * 1.2).lte('longitude', lon + box * 1.2);
+    if (error) { console.warn('[ANAC] read error:', error.message); return results; }
+    const r = regionalAirAccess(lat, lon, (airports || []).map((a: any) => ({ ...a, flights_per_week: Number(a.flights_per_week) })));
+    const refEnd = airports?.[0]?.reference_period_end;
     results['OE003'] = {
-      value: Math.round(fpw * 10) / 10,
-      year: refYear,
+      value: r.value,
+      year: refEnd ? new Date(refEnd).getFullYear() : new Date().getFullYear(),
       source: 'ANAC',
       real: true,
     };
-    console.log(`[ANAC cache] OE003 = ${fpw} voos/semana (${data.airport_count} aeroportos)`);
+    console.log(`[ANAC] OE003 = ${r.value} voos/sem ponderados (${r.airports.map((a) => `${a.icao}@${a.km}km`).join(', ')})`);
   } catch (e) {
-    console.warn('[ANAC cache] exception:', e instanceof Error ? e.message : e);
+    console.warn('[ANAC] exception:', e instanceof Error ? e.message : e);
   }
   return results;
 }
