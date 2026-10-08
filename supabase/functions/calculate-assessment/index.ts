@@ -412,7 +412,7 @@ function normalizeSpecific(code: string, value: number | null): number | null {
   // Até 5: carga equilibrada (Adequado) · 5–15: pressão moderada (Atenção) · >15: saturação (Crítico)
   if (c === "igma_iptl") {
     if (value <= 0) return 1.0;
-    if (value <= 5) return 1.0 - (value / 5) * 0.33;            // 0→1.00, 5→0.67
+    if (value <= 5) return 1.0 - (value / 5) * 0.32;            // 0→1.00, 5→0.68
     if (value <= 15) return 0.66 - ((value - 5) / 10) * 0.32;   // 5→0.66, 15→0.34
     return Math.max(0, 0.33 - ((value - 15) / 15) * 0.33);      // 15→0.33, 30→0
   }

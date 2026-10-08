@@ -26,7 +26,7 @@ describe('Matriz de Intersetorialidade', () => {
 
 describe('Régua de capacidade de carga (IPTL)', () => {
   // espelho da régua em calculate-assessment/normalizeSpecific
-  const iptl = (v: number) => v <= 0 ? 1 : v <= 5 ? 1 - (v / 5) * 0.33 : v <= 15 ? 0.66 - ((v - 5) / 10) * 0.32 : Math.max(0, 0.33 - ((v - 15) / 15) * 0.33);
+  const iptl = (v: number) => v <= 0 ? 1 : v <= 5 ? 1 - (v / 5) * 0.32 : v <= 15 ? 0.66 - ((v - 5) / 10) * 0.32 : Math.max(0, 0.33 - ((v - 15) / 15) * 0.33);
   it('até 5 visitantes/hab = Adequado (≥67%)', () => { expect(iptl(5)).toBeGreaterThanOrEqual(0.67); });
   it('10 visitantes/hab = Atenção', () => { expect(iptl(10)).toBeGreaterThan(0.33); expect(iptl(10)).toBeLessThan(0.67); });
   it('acima de 15 visitantes/hab = Crítico (≤33%)', () => { expect(iptl(16)).toBeLessThanOrEqual(0.33); });
