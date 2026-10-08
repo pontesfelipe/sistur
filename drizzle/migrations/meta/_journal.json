@@ -183,6 +183,13 @@
       "when": 1791413477799,
       "tag": "0025_fumtur_control",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1791475183294,
+      "tag": "0026_edu_mapping_suggestions",
+      "breakpoints": true
     }
   ]
 }
