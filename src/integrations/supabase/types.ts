@@ -251,6 +251,57 @@ export type Database = {
         }
         Relationships: []
       }
+      anac_airports: {
+        Row: {
+          departures_12m: number
+          fetched_at: string
+          flights_per_week: number | null
+          iata: string | null
+          icao: string
+          international_departures_12m: number
+          latitude: number
+          longitude: number
+          municipality: string | null
+          name: string | null
+          passengers_12m: number
+          reference_period_end: string | null
+          reference_period_start: string | null
+          uf: string | null
+        }
+        Insert: {
+          departures_12m?: number
+          fetched_at?: string
+          flights_per_week?: number | null
+          iata?: string | null
+          icao: string
+          international_departures_12m?: number
+          latitude: number
+          longitude: number
+          municipality?: string | null
+          name?: string | null
+          passengers_12m?: number
+          reference_period_end?: string | null
+          reference_period_start?: string | null
+          uf?: string | null
+        }
+        Update: {
+          departures_12m?: number
+          fetched_at?: string
+          flights_per_week?: number | null
+          iata?: string | null
+          icao?: string
+          international_departures_12m?: number
+          latitude?: number
+          longitude?: number
+          municipality?: string | null
+          name?: string | null
+          passengers_12m?: number
+          reference_period_end?: string | null
+          reference_period_start?: string | null
+          uf?: string | null
+        }
+        Relationships: []
+      }
       anac_ingestion_runs: {
         Row: {
           bytes_downloaded: number | null
