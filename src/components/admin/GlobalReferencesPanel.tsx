@@ -159,7 +159,8 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
   const reindex = async () => {
     setIndexing(true);
     try {
-      const r = await indexGlobalReference(file.id, (p, t) => setProgress(`${p}/${t}`));
+      const r = await indexGlobalReference(file.id, (p, t) =>
+        setProgress(t ? tx('Lidas {{v0}} de {{v1}} páginas…', { v0: p, v1: t }) : tx('Lendo as primeiras páginas…')));
       toast.success(tx('Documento dividido em {{v0}} trechos.', { v0: r.chunks }));
     } catch (e: any) {
       toast.error(e.message);
@@ -205,7 +206,7 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           onCheckedChange={(checked) => updateFile.mutate({ id: file.id, is_active: checked })}
           title={file.is_active ? tx('Ativo (usado nos relatórios)') : 'Inativo'}
         />
-        {progress && <span className="text-xs text-muted-foreground">{tx("pág.")} {progress}</span>}
+        {progress && <span className="text-xs text-primary font-medium whitespace-nowrap">{progress}</span>}
         <Button size="icon" variant="ghost" onClick={reindex} disabled={indexing} title={tx("Reindexar trechos")}>
           {indexing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>

@@ -32,7 +32,7 @@ async function extractText(bytes: Uint8Array, fileName: string, mime: string): P
         page.cleanup();
       }
     } finally {
-      await pdf.destroy().catch(() => {});
+      try { await (pdf as any).destroy?.(); } catch { /* versão do leitor sem destroy */ }
     }
     console.log(`pdf pages=${n} read=${parts.length} step=${step} ms=${Math.round(performance.now() - t0)}`);
     return parts.join("\n");
