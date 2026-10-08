@@ -165,6 +165,7 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
       toast.error(e.message);
     } finally {
       setIndexing(false);
+      setProgress(null);
       queryClient.invalidateQueries({ queryKey: ['global-reference-files'] });
     }
   };
@@ -204,8 +205,9 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           onCheckedChange={(checked) => updateFile.mutate({ id: file.id, is_active: checked })}
           title={file.is_active ? tx('Ativo (usado nos relatórios)') : 'Inativo'}
         />
-        <Button size="icon" variant="ghost" onClick={reindex} disabled={indexing || file.index_status === 'indexing'} title={tx("Reindexar trechos")}>
-          {indexing || file.index_status === 'indexing' ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+        {progress && <span className="text-xs text-muted-foreground">{tx("pág.")} {progress}</span>}
+        <Button size="icon" variant="ghost" onClick={reindex} disabled={indexing} title={tx("Reindexar trechos")}>
+          {indexing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>
         <Button size="icon" variant="ghost" onClick={onEdit} title={tx("Editar resumo")}>
           <Edit className="h-4 w-4" />
