@@ -62,7 +62,7 @@ async function streamCSVLines(
     throw new Error(`Failed to fetch ${url}: HTTP ${resp.status}`);
   }
   const reader = resp.body.getReader();
-  const decoder = new TextDecoder("latin1");
+  const decoder = new TextDecoder("utf-8");
   let buffer = "";
   let lineNo = 0;
   let totalBytes = 0;
