@@ -21,7 +21,7 @@ export type Secretaria =
 const RULES: { secretaria: Secretaria; keywords: string[] }[] = [
   { secretaria: 'Meio Ambiente', keywords: ['ambient', 'ecológ', 'ecolog', 'sustentab', 'protegid', 'conserva', 'clima', 'capacidade de carga', 'pressão turística', 'iptl'] },
   { secretaria: 'Saneamento', keywords: ['água', 'agua', 'iqa', 'saneamento', 'esgoto', 'resíduo', 'residuo', 'lixo', 'snis'] },
-  { secretaria: 'Saúde', keywords: ['saúde', 'saude', 'hospital', 'sus', 'mortalidade', 'bem-estar'] },
+  { secretaria: 'Saúde', keywords: ['saúde', 'saude', 'hospital', 'datasus', 'leitos sus', 'mortalidade', 'bem-estar'] },
   { secretaria: 'Educação', keywords: ['educa', 'ideb', 'escola', 'ensino', 'capacitação', 'capacitacao'] },
   { secretaria: 'Cultura', keywords: ['cultur', 'patrimônio', 'patrimonio', 'tombad', 'manifesta'] },
   { secretaria: 'Obras e Infraestrutura', keywords: ['infraestrutura', 'obra', 'urban', 'acessibil', 'inclusiv'] },
