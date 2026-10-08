@@ -96,9 +96,10 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
   });
 
   // Use prescriptions as primary source, fall back to dynamic recommendations
-  const recommendations: DisplayRecommendation[] = prescriptionRecommendations.length > 0 
-    ? prescriptionRecommendations 
-    : (dynamicRecommendations || []).map(r => ({
+  // Prescriptions saved at calculation time + live mappings approved afterwards
+  // (curadoria EDU), so new trainings reach every diagnostic without recalculating.
+  const savedKeys = new Set(prescriptionRecommendations.map(p => `${p.training.training_id}|${p.indicatorCode}`));
+  const dynamicMapped: DisplayRecommendation[] = (dynamicRecommendations || []).map(r => ({
         training: {
           training_id: r.training.training_id,
           title: r.training.title,
@@ -118,6 +119,10 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
         reasonTemplate: r.reasonTemplate,
         status: r.status,
       }));
+  const recommendations: DisplayRecommendation[] = [
+    ...prescriptionRecommendations,
+    ...dynamicMapped.filter(r => !savedKeys.has(`${r.training.training_id}|${r.indicatorCode}`)),
+  ];
 
   // Filter recommendations by pillar
   const filteredRecommendations = recommendations.filter(rec => 
@@ -251,7 +256,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
           <CardContent>
             <div className="space-y-3">
               {courses.slice(0, 5).map((rec, index) => (
-                <RecommendationItem key={rec.training.training_id} rec={rec} index={index} />
+                <RecommendationItem key={`${rec.training.training_id}-${rec.indicatorCode}`} rec={rec} index={index} />
               ))}
               {courses.length > 5 && (
                 <div className="text-center pt-2">
@@ -285,7 +290,7 @@ export function EduRecommendationsPanel({ indicatorScores, assessmentId }: EduRe
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {lives.slice(0, 6).map((rec) => (
                 <Link
-                  key={rec.training.training_id}
+                  key={`${rec.training.training_id}-${rec.indicatorCode}`}
                   to={`/edu/training/${rec.training.training_id}`}
                   className="p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors group"
                 >

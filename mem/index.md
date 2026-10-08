@@ -1,6 +1,7 @@
 # Project Memory Index
 
 ## Memories
+- [Curadoria EDU com IA](mem://features/edu-mapping-curator) — IA sugere, admin aprova, vale para todos os diagnósticos
 - [Vídeo explicativo SISTUR](mem://preferences/explainer-video) — Marca real, painéis fiéis e roteiro em linguagem comum sobre decisões e entregas
 - [Vídeo tutorial do Professor Beni](mem://features/beni-tutorial-video) — Vídeo na Ajuda em português com cores e identidade SISTUR
 - [Preço do plano Empresarial](mem://features/assinatura/preco-plano-empresarial) — R$ 129 por usuário/mês, mínimo 5, anual com 15% de desconto

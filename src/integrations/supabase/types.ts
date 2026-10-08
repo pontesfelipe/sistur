@@ -3498,6 +3498,79 @@ export type Database = {
           },
         ]
       }
+      edu_mapping_analysis_log: {
+        Row: {
+          analyzed_at: string
+          suggestions_count: number
+          training_id: string
+        }
+        Insert: {
+          analyzed_at?: string
+          suggestions_count?: number
+          training_id: string
+        }
+        Update: {
+          analyzed_at?: string
+          suggestions_count?: number
+          training_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_mapping_analysis_log_training_id_fkey"
+            columns: ["training_id"]
+            isOneToOne: true
+            referencedRelation: "edu_trainings"
+            referencedColumns: ["training_id"]
+          },
+        ]
+      }
+      edu_mapping_suggestions: {
+        Row: {
+          confidence: number
+          created_at: string
+          id: string
+          indicator_code: string
+          pillar: string
+          rationale: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          training_id: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          indicator_code: string
+          pillar: string
+          rationale?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          training_id: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          indicator_code?: string
+          pillar?: string
+          rationale?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          training_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edu_mapping_suggestions_training_id_fkey"
+            columns: ["training_id"]
+            isOneToOne: false
+            referencedRelation: "edu_trainings"
+            referencedColumns: ["training_id"]
+          },
+        ]
+      }
       edu_messages: {
         Row: {
           body: string
