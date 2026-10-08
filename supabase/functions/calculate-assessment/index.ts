@@ -408,6 +408,15 @@ function normalizeSpecific(code: string, value: number | null): number | null {
     return 0.10;
   }
 
+  // ── IPTL — Pressão turística / capacidade de carga (visitantes por habitante/ano) ──
+  // Até 5: carga equilibrada (Adequado) · 5–15: pressão moderada (Atenção) · >15: saturação (Crítico)
+  if (c === "igma_iptl") {
+    if (value <= 0) return 1.0;
+    if (value <= 5) return 1.0 - (value / 5) * 0.33;            // 0→1.00, 5→0.67
+    if (value <= 15) return 0.66 - ((value - 5) / 10) * 0.32;   // 5→0.66, 15→0.34
+    return Math.max(0, 0.33 - ((value - 15) / 15) * 0.33);      // 15→0.33, 30→0
+  }
+
   return null; // Sem regra específica
 }
 
@@ -1206,6 +1215,8 @@ async function runCalculationCore(
 
     // Count intersectoral indicators (REGRA 6)
     let intersectoralCount = 0;
+    // Capacidade de carga (IPTL) — usada no alerta de saturação turística
+    let iptlScore: number | null = null;
 
     for (const iv of filteredIndicatorValues as unknown as IndicatorValue[]) {
       const indicator = iv.indicator;
@@ -1220,6 +1231,7 @@ async function runCalculationCore(
 
       // Fase 5 — Etapa 2: normalizações específicas têm precedência sobre MIN_MAX/BANDS
       const specificScore = normalizeSpecific(indicator.code, iv.value_raw);
+      if (indicator.code === "igma_iptl" && specificScore !== null) iptlScore = specificScore;
       const score = specificScore !== null
         ? specificScore
         : normalizeValue(
@@ -1597,6 +1609,20 @@ async function runCalculationCore(
       intersectoralCount,
       isEnterprise
     );
+
+    // Saturação turística (capacidade de carga) — território antes do marketing
+    if (!isEnterprise && iptlScore !== null && iptlScore < 0.34) {
+      igmaResult.flags.MARKETING_BLOCKED = true;
+      igmaResult.allowedActions.MARKETING = false;
+      if (!igmaResult.blockedActions.includes("MARKETING")) igmaResult.blockedActions.push("MARKETING");
+      igmaResult.uiMessages.push({
+        type: "critical",
+        flag: "MARKETING_BLOCKED",
+        title: "Saturação Turística (Capacidade de Carga)",
+        message: "O fluxo de visitantes está acima da capacidade de suporte do território (mais de 15 visitantes por habitante/ano). Priorize ordenamento e contenção do fluxo antes de novas ações de promoção.",
+        icon: "Users",
+      });
+    }
 
     console.log("IGMA Result:", JSON.stringify(igmaResult, null, 2));
 
