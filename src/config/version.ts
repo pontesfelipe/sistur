@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 47,
+  minor: 48,
   patch: 0,
 
   get full() {
@@ -23,6 +23,16 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.48.0",
+    date: "2026-10-08",
+    type: "minor" as const,
+    changes: [
+      "Inteligência > Prescrições EDU: a IA lê cada treinamento do catálogo e sugere a quais indicadores do mesmo pilar ele responde, com nível de confiança e justificativa; só vale após aprovação do administrador",
+      "Análise contínua: botão para analisar apenas treinamentos novos ou alterados desde a última leitura, ou reanalisar o catálogo inteiro",
+      "Atualização geral: vínculos aprovados aparecem imediatamente nas prescrições de todos os diagnósticos com o gargalo correspondente, inclusive os já calculados, sem precisar recalcular",
+    ],
+  },
   {
     version: "2.47.0",
     date: "2026-10-07",

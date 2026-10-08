@@ -3,7 +3,7 @@ import { Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bot, ScrollText, ListOrdered, Sparkles, Plug, BookOpen, LifeBuoy } from 'lucide-react';
+import { Bot, ScrollText, ListOrdered, Sparkles, Plug, BookOpen, LifeBuoy, GraduationCap } from 'lucide-react';
 import { BeniContextPanel } from '@/components/settings/BeniContextPanel';
 
 const AdminSemanticLayer = lazy(() => import('@/pages/AdminSemanticLayer'));
@@ -24,7 +24,11 @@ const SupportAdminPanel = lazy(() =>
   import('@/components/admin/SupportAdminPanel').then(m => ({ default: m.SupportAdminPanel }))
 );
 
-const VALID_TABS = ['beni', 'contexto', 'semantica', 'estrutura', 'referencias', 'suporte', 'mcp'];
+const EduMappingCuratorPanel = lazy(() =>
+  import('@/components/admin/EduMappingCuratorPanel').then(m => ({ default: m.EduMappingCuratorPanel }))
+);
+
+const VALID_TABS = ['prescricoes', 'beni', 'contexto', 'semantica', 'estrutura', 'referencias', 'suporte', 'mcp'];
 
 export default function AdminInteligencia() {
   const [searchParams] = useSearchParams();
@@ -61,6 +65,10 @@ export default function AdminInteligencia() {
           <TabsTrigger value="suporte" className="flex items-center gap-2 shrink-0">
             <LifeBuoy className="h-4 w-4" />
             {tx("Suporte")}
+          </TabsTrigger>
+          <TabsTrigger value="prescricoes" className="flex items-center gap-2 shrink-0">
+            <GraduationCap className="h-4 w-4" />
+            {tx("Prescrições EDU")}
           </TabsTrigger>
           <TabsTrigger value="mcp" className="flex items-center gap-2 shrink-0">
             <Plug className="h-4 w-4" />
@@ -99,6 +107,12 @@ export default function AdminInteligencia() {
         <TabsContent value="suporte" className="space-y-6">
           <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">{tx("Carregando suporte…")}</div>}>
             <SupportAdminPanel />
+          </Suspense>
+        </TabsContent>
+
+        <TabsContent value="prescricoes" className="space-y-6">
+          <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">{tx("Carregando…")}</div>}>
+            <EduMappingCuratorPanel />
           </Suspense>
         </TabsContent>
 
