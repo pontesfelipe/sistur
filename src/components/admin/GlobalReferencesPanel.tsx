@@ -189,14 +189,15 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
               {tx("Resumo ✓")}
             </Badge>
           )}
-          <IndexBadge file={file} />
+          <IndexBadge file={file} busy={indexing} />
         </div>
         {file.description && <p className="text-sm text-muted-foreground truncate mt-0.5">{file.description}</p>}
         <p className="text-xs text-muted-foreground mt-1">
           {formatSize(file.file_size_bytes)} • {format(new Date(file.created_at), "dd MMM yyyy", { locale: getDateLocale() })}
           {file.indexed_at && ` • ${tx("indexado em")} ${format(new Date(file.indexed_at), "dd MMM yyyy HH:mm", { locale: getDateLocale() })}`}
         </p>
-        {file.index_status === 'error' && file.index_error && (
+        {progress && <p className="text-xs text-primary font-medium mt-1">{progress}</p>}
+        {!indexing && file.index_status === 'error' && file.index_error && (
           <p className="text-xs text-destructive mt-1">{file.index_error}</p>
         )}
       </div>
@@ -206,7 +207,6 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           onCheckedChange={(checked) => updateFile.mutate({ id: file.id, is_active: checked })}
           title={file.is_active ? tx('Ativo (usado nos relatórios)') : 'Inativo'}
         />
-        {progress && <span className="text-xs text-primary font-medium whitespace-nowrap">{progress}</span>}
         <Button size="icon" variant="ghost" onClick={reindex} disabled={indexing} title={tx("Reindexar trechos")}>
           {indexing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>
