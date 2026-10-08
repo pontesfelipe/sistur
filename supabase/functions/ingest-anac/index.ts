@@ -83,34 +83,19 @@ async function streamCSVLines(
   return { totalBytes };
 }
 
-// Build ICAO → {ibge, name, uf} map from the small aerodromes CSV
-async function loadAerodromeMap(): Promise<Map<string, { ibge: string; name: string; uf: string }>> {
-  const map = new Map<string, { ibge: string; name: string; uf: string }>();
-  let header: string[] | null = null;
-  let icaoIdx = -1, ibgeIdx = -1, munIdx = -1, ufIdx = -1;
+function parseCoord(v: string): number { return parseFloat((v || "").replace(",", ".")); }
+
+// ICAO → aeroporto brasileiro com coordenadas (aerodromos.csv, sem código IBGE)
+async function loadAerodromeMap(): Promise<Map<string, { iata: string; name: string; municipality: string; uf: string; lat: number; lon: number }>> {
+  const map = new Map();
+  let first = true;
   await streamCSVLines(AERODROMOS_URL, (raw) => {
-    if (!raw.trim()) return;
-    const cols = parseCSVLine(raw, ";");
-    if (!header) {
-      header = cols.map((h) => h.toLowerCase());
-      icaoIdx = header.findIndex((h) => h.includes("cod") && (h.includes("oaci") || h.includes("icao")));
-      ibgeIdx = header.findIndex((h) => h.includes("ibge"));
-      munIdx = header.findIndex((h) => h.includes("munic"));
-      ufIdx = header.findIndex((h) => h === "uf" || h.includes("estado") || h.includes("sigla_uf"));
-      if (icaoIdx < 0 || ibgeIdx < 0) {
-        // Fallback common headers
-        icaoIdx = icaoIdx >= 0 ? icaoIdx : header.findIndex((h) => h.includes("oaci"));
-      }
-      return;
-    }
-    const icao = (cols[icaoIdx] || "").toUpperCase().trim();
-    const ibge = (cols[ibgeIdx] || "").trim();
-    if (!icao || !ibge) return;
-    map.set(icao, {
-      ibge: ibge.length === 7 ? ibge : ibge.padStart(7, "0"),
-      name: munIdx >= 0 ? cols[munIdx] : "",
-      uf: ufIdx >= 0 ? cols[ufIdx] : "",
-    });
+    if (first) { first = false; return; }
+    const c = parseCSVLine(raw.replace(/^\uFEFF/, ""), ";");
+    if (c.length < 9 || c[5] !== "BRASIL") return;
+    const lat = parseCoord(c[7]), lon = parseCoord(c[8]);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+    map.set(c[0].toUpperCase(), { iata: c[1], name: c[2], municipality: c[3], uf: c[4], lat, lon });
   });
   return map;
 }
@@ -149,123 +134,49 @@ Deno.serve(async (req) => {
       const icaoMap = await loadAerodromeMap();
       console.log(`[ingest-anac] Loaded ${icaoMap.size} aerodromes`);
 
-      // Determine cutoff: last 12 months
       const now = new Date();
       const cutoff = new Date(now.getFullYear(), now.getMonth() - 12, 1);
-      const cutoffYear = cutoff.getFullYear();
-      const cutoffMonth = cutoff.getMonth() + 1;
-
-      const agg = new Map<string, MunAgg>();
+      const cutoffKey = cutoff.getFullYear() * 100 + cutoff.getMonth() + 1;
+      const agg = new Map<string, { dep: number; pax: number; intl: number }>();
       let header: string[] | null = null;
-      let idxAirport = -1, idxYear = -1, idxMonth = -1;
-      let idxFlights = -1, idxPax = -1, idxNature = -1;
-      let rowsProcessed = 0;
-      let totalBytes = 0;
+      let iYear = -1, iMonth = -1, iOrig = -1, iDep = -1, iPax = -1, iNat = -1, iGrp = -1;
+      let rowsProcessed = 0, totalBytes = 0;
+      await streamCSVLines(ANAC_STATS_URL, (raw) => {
+        if (!header) {
+          if (!raw.includes("ANO") || !raw.includes("DECOLAGENS")) return; // pula "Atualizado em"
+          header = parseCSVLine(raw.replace(/^\uFEFF/, ""), ";");
+          iYear = header.indexOf("ANO"); iMonth = header.indexOf("MES");
+          iOrig = header.indexOf("AEROPORTO_DE_ORIGEM_SIGLA"); iDep = header.indexOf("DECOLAGENS");
+          iPax = header.indexOf("PASSAGEIROS_PAGOS"); iNat = header.indexOf("NATUREZA"); iGrp = header.indexOf("GRUPO_DE_VOO");
+          return;
+        }
+        // filtro rápido por ano antes de parsear a linha toda
+        const m = raw.match(/;"(\d{4})";"(\d{1,2})";/);
+        if (!m || Number(m[1]) * 100 + Number(m[2]) < cutoffKey) return;
+        rowsProcessed++;
+        const c = parseCSVLine(raw, ";");
+        if (c[iGrp] === "IMPRODUTIVO") return;
+        const icao = (c[iOrig] || "").toUpperCase();
+        if (!icaoMap.has(icao)) return;
+        const dep = parseInt(c[iDep] || "0", 10) || 0;
+        const pax = parseInt(c[iPax] || "0", 10) || 0;
+        const e = agg.get(icao) || { dep: 0, pax: 0, intl: 0 };
+        e.dep += dep; e.pax += pax; if ((c[iNat] || "").includes("INTERNACIONAL")) e.intl += dep;
+        agg.set(icao, e);
+      }, (bytes) => { totalBytes = bytes; });
 
-      await streamCSVLines(
-        ANAC_STATS_URL,
-        (raw) => {
-          if (!raw.trim()) return;
-          const cols = parseCSVLine(raw, ";");
-          if (!header) {
-            header = cols.map((h) => h.toLowerCase());
-            // Heuristic header detection — ANAC schema may evolve
-            idxAirport = header.findIndex((h) =>
-              h.includes("aeroporto") && (h.includes("origem") || h.includes("partida") || h.includes("oaci"))
-            );
-            if (idxAirport < 0) idxAirport = header.findIndex((h) => h.includes("oaci"));
-            idxYear = header.findIndex((h) => h.includes("ano"));
-            idxMonth = header.findIndex((h) => h.includes("mes"));
-            idxFlights = header.findIndex((h) => h.includes("decolagens") || h.includes("voo"));
-            idxPax = header.findIndex((h) => h.includes("passageiros") && h.includes("pagos"));
-            if (idxPax < 0) idxPax = header.findIndex((h) => h.includes("passageiros"));
-            idxNature = header.findIndex((h) => h.includes("natureza") || h.includes("grupo"));
-            return;
-          }
-          rowsProcessed++;
-          const year = parseInt(cols[idxYear] || "0", 10);
-          const month = parseInt(cols[idxMonth] || "0", 10);
-          if (!year || !month) return;
-          // Filter last 12 months
-          if (year < cutoffYear || (year === cutoffYear && month < cutoffMonth)) return;
-
-          const icao = (cols[idxAirport] || "").toUpperCase().trim();
-          if (!icao) return;
-          const aero = icaoMap.get(icao);
-          if (!aero) return;
-
-          const flights = parseInt(cols[idxFlights] || "0", 10) || 0;
-          const pax = parseInt(cols[idxPax] || "0", 10) || 0;
-          const nature = (cols[idxNature] || "").toUpperCase();
-          const isIntl = nature.includes("INTERNACIONAL");
-
-          let entry = agg.get(aero.ibge);
-          if (!entry) {
-            entry = {
-              ibge_code: aero.ibge,
-              municipality_name: aero.name,
-              uf: aero.uf,
-              airports: new Set(),
-              total_flights: 0,
-              domestic_flights: 0,
-              international_flights: 0,
-              total_passengers: 0,
-              domestic_passengers: 0,
-              international_passengers: 0,
-            };
-            agg.set(aero.ibge, entry);
-          }
-          entry.airports.add(icao);
-          entry.total_flights += flights;
-          entry.total_passengers += pax;
-          if (isIntl) {
-            entry.international_flights += flights;
-            entry.international_passengers += pax;
-          } else {
-            entry.domestic_flights += flights;
-            entry.domestic_passengers += pax;
-          }
-        },
-        (bytes) => {
-          totalBytes = bytes;
-          if (rowsProcessed % 200000 === 0) {
-            console.log(`[ingest-anac] ${rowsProcessed} rows | ${(bytes / 1e6).toFixed(1)} MB | ${agg.size} municípios`);
-          }
-        },
-      );
-
-      console.log(`[ingest-anac] Done parsing. ${rowsProcessed} rows, ${agg.size} municípios`);
-
-      // Upsert in batches
       const periodStart = `${cutoff.getFullYear()}-${String(cutoff.getMonth() + 1).padStart(2, "0")}-01`;
       const periodEnd = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
-      const rows = Array.from(agg.values()).map((e) => ({
-        ibge_code: e.ibge_code,
-        municipality_name: e.municipality_name,
-        uf: e.uf,
-        airport_icao_codes: Array.from(e.airports),
-        airport_count: e.airports.size,
-        total_flights_12m: e.total_flights,
-        domestic_flights_12m: e.domestic_flights,
-        international_flights_12m: e.international_flights,
-        total_passengers_12m: e.total_passengers,
-        domestic_passengers_12m: e.domestic_passengers,
-        international_passengers_12m: e.international_passengers,
-        reference_period_start: periodStart,
-        reference_period_end: periodEnd,
-        data_source_url: ANAC_STATS_URL,
-        fetched_at: new Date().toISOString(),
-      }));
-
-      const BATCH = 500;
-      for (let i = 0; i < rows.length; i += BATCH) {
-        const slice = rows.slice(i, i + BATCH);
-        const { error } = await supabase
-          .from("anac_air_connectivity")
-          .upsert(slice, { onConflict: "ibge_code" });
+      const rows = Array.from(agg.entries()).filter(([, e]) => e.dep > 0).map(([icao, e]) => {
+        const a = icaoMap.get(icao)!;
+        return { icao, iata: a.iata, name: a.name, municipality: a.municipality, uf: a.uf, latitude: a.lat, longitude: a.lon,
+          departures_12m: e.dep, passengers_12m: e.pax, international_departures_12m: e.intl,
+          reference_period_start: periodStart, reference_period_end: periodEnd, fetched_at: new Date().toISOString() };
+      });
+      for (let i = 0; i < rows.length; i += 500) {
+        const { error } = await supabase.from("anac_airports").upsert(rows.slice(i, i + 500), { onConflict: "icao" });
         if (error) throw new Error(`upsert batch ${i}: ${error.message}`);
       }
-
       await finishRun({
         status: "success",
         rows_processed: rowsProcessed,
