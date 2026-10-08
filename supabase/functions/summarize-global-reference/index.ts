@@ -10,7 +10,7 @@ async function extractText(bytes: Uint8Array, fileName: string, mime: string): P
   if (mime === "application/pdf" || lower.endsWith(".pdf")) {
     // Leitura em partes: página a página, liberando cada página após extrair o texto
     // e parando ao atingir MAX_DOC_CHARS. Evita estourar a memória em PDFs grandes (ex.: PNT 7 MB).
-    const { getDocumentProxy } = await import("npm:unpdf@0.12.1");
+    const { getDocumentProxy } = await import("npm:unpdf@1.8.1");
     const pdf = await getDocumentProxy(bytes, { disableFontFace: true, useSystemFonts: false, isEvalSupported: false } as any);
     // Limite de processamento da função: em PDFs longos, lê no máximo MAX_PAGES páginas
     // espalhadas pelo documento inteiro e para ao atingir o orçamento de tempo.

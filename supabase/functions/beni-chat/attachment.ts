@@ -24,7 +24,7 @@ export async function extractAttachment(bytes: Uint8Array, fileName: string, mim
       return { fileName, mime, imageDataUrl: `data:${mime};base64,${toBase64(bytes)}` };
     }
     if (mime === "application/pdf" || lower.endsWith(".pdf")) {
-      const { extractText, getDocumentProxy } = await import("npm:unpdf@0.12.1");
+      const { extractText, getDocumentProxy } = await import("npm:unpdf@1.8.1");
       const pdf = await getDocumentProxy(bytes);
       const { text } = await extractText(pdf, { mergePages: true });
       return { fileName, mime, text: String(text).slice(0, MAX_TEXT) };
