@@ -23,6 +23,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getCoResponsibleSecretarias } from "@/lib/intersectoralMatrix";
 
 interface CreateProjectFromDiagnosticViewProps {
   assessmentId: string;
@@ -71,6 +72,7 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
       priority: issue.severity === 'CRITICO' ? 1 : issue.severity === 'MODERADO' ? 3 : 5,
       linkedIssueId: issue.id,
       linkedPrescriptionId: null as string | null,
+      secretarias: getCoResponsibleSecretarias(issue.theme, issue.title),
     }));
   }, [issues]);
 
@@ -264,6 +266,11 @@ export function CreateProjectFromDiagnosticView({ assessmentId, destinationId }:
                     </div>
                     {item.description && (
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{tx(item.description)}</p>
+                    )}
+                    {item.secretarias.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {tx('Secretarias corresponsáveis:')} {item.secretarias.join(', ')}
+                      </p>
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">

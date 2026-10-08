@@ -24,6 +24,7 @@ import {
   Target
 } from "lucide-react";
 import { format } from "date-fns";
+import { getCoResponsibleSecretarias } from "@/lib/intersectoralMatrix";
 import { ptBR } from "date-fns/locale";
 
 interface ActionPlansViewProps {
@@ -169,6 +170,15 @@ export function ActionPlansView({ assessmentId }: ActionPlansViewProps) {
                       <CardTitle className="text-base">{tx(plan.title)}</CardTitle>
                     </div>
                     <CardDescription>{tx(plan.description)}</CardDescription>
+                    {(() => {
+                      const secs = getCoResponsibleSecretarias(plan.title, plan.description);
+                      return secs.length > 0 ? (
+                        <div className="flex flex-wrap gap-1 pt-1">
+                          <span className="text-xs text-muted-foreground">{tx('Secretarias corresponsáveis:')}</span>
+                          {secs.map(s => <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>)}
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                   <div className="flex items-center gap-2">
                     {pillarConfig && (
