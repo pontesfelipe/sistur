@@ -11,7 +11,7 @@ export interface PageText { page: number | null; text: string }
 export async function extractPages(bytes: Uint8Array, fileName: string, mime: string, maxChars = 2_000_000): Promise<PageText[]> {
   const lower = fileName.toLowerCase();
   if (mime === "application/pdf" || lower.endsWith(".pdf")) {
-    const { getDocumentProxy } = await load("npm:unpdf@0.12.1");
+    const { getDocumentProxy } = await load("npm:unpdf@1.8.1");
     const pdf = await getDocumentProxy(bytes, { disableFontFace: true, isEvalSupported: false } as any);
     const out: PageText[] = [];
     let total = 0;
