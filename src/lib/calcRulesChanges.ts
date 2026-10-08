@@ -17,6 +17,8 @@ export const CALC_RULE_CHANGES: CalcRuleChange[] = [
     summary: 'O cálculo territorial passou a usar todos os dados oficiais disponíveis do município (só ficam de fora os recusados).' },
   { version: '2.49.0', date: '2026-10-08', appliesTo: ['territorial'],
     summary: 'Novo indicador de Maturidade Digital e Distribuição do Destino (pilar AO) no nível Estratégico, com nota de 0 a 100%. Indicadores com campo vazio deixam de contar como nota zero e ficam fora do cálculo.' },
+  { version: '2.50.0', date: '2026-10-08', appliesTo: ['territorial'],
+    summary: 'Cobertura de Saúde passa a ser medida por 10 mil habitantes (ajustada ao porte do município) e Conectividade Aérea passa a somar os voos de todos os aeroportos a até 100 km, com peso menor para os mais distantes.' },
 ];
 
 /** Diagnósticos calculados há mais de N dias precisam de revisão manual. */
