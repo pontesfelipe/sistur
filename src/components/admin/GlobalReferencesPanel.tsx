@@ -154,16 +154,18 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
   const updateFile = useUpdateGlobalReference();
   const queryClient = useQueryClient();
   const [indexing, setIndexing] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
   const catLabel = REFERENCE_CATEGORIES.find(c => c.value === file.category)?.label || file.category;
   const reindex = async () => {
     setIndexing(true);
     try {
-      const r = await indexGlobalReference(file.id);
+      const r = await indexGlobalReference(file.id, (p, t) => setProgress(`${p}/${t}`));
       toast.success(tx('Documento dividido em {{v0}} trechos.', { v0: r.chunks }));
     } catch (e: any) {
       toast.error(e.message);
     } finally {
       setIndexing(false);
+      setProgress(null);
       queryClient.invalidateQueries({ queryKey: ['global-reference-files'] });
     }
   };
@@ -203,8 +205,9 @@ function ReferenceFileCard({ file, onEdit }: { file: GlobalReferenceFile; onEdit
           onCheckedChange={(checked) => updateFile.mutate({ id: file.id, is_active: checked })}
           title={file.is_active ? tx('Ativo (usado nos relatórios)') : 'Inativo'}
         />
-        <Button size="icon" variant="ghost" onClick={reindex} disabled={indexing || file.index_status === 'indexing'} title={tx("Reindexar trechos")}>
-          {indexing || file.index_status === 'indexing' ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+        {progress && <span className="text-xs text-muted-foreground">{tx("pág.")} {progress}</span>}
+        <Button size="icon" variant="ghost" onClick={reindex} disabled={indexing} title={tx("Reindexar trechos")}>
+          {indexing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>
         <Button size="icon" variant="ghost" onClick={onEdit} title={tx("Editar resumo")}>
           <Edit className="h-4 w-4" />
