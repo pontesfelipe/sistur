@@ -1,47 +1,10 @@
 // Busca por trechos (RAG) nas Referências Globais: extração página a página,
 // fatiamento, embeddings e busca híbrida (semântica + palavras-chave).
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/embeddings";
-// Import dinâmico por variável: mantém o módulo testável fora do Deno.
-const load = (spec: string) => import(spec);
+// Extração de arquivos fica em referenceExtract.ts (imports literais exigidos pelo deploy).
 const EMB_MODEL = "openai/text-embedding-3-small"; // 1536 dimensões
 
 export interface PageText { page: number | null; text: string }
-
-/** Lê o documento em partes (PDF página a página) para não estourar memória. */
-export async function extractPages(bytes: Uint8Array, fileName: string, mime: string, maxChars = 2_000_000): Promise<PageText[]> {
-  const lower = fileName.toLowerCase();
-  if (mime === "application/pdf" || lower.endsWith(".pdf")) {
-    const { getDocumentProxy } = await load("npm:unpdf@1.8.1");
-    const pdf = await getDocumentProxy(bytes, { disableFontFace: true, isEvalSupported: false } as any);
-    const out: PageText[] = [];
-    let total = 0;
-    try {
-      for (let i = 1; i <= pdf.numPages && total < maxChars; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const t = content.items.map((it: any) => it.str ?? "").join(" ").replace(/\s+/g, " ").trim();
-        if (t) out.push({ page: i, text: t });
-        total += t.length;
-        page.cleanup();
-      }
-    } finally {
-      await pdf.destroy().catch(() => {});
-    }
-    return out;
-  }
-  let text = "";
-  if (lower.endsWith(".docx")) {
-    const mammoth = await load("npm:mammoth@1.8.0");
-    text = (await (mammoth.default ?? mammoth).extractRawText({ buffer: bytes })).value;
-  } else if (lower.endsWith(".xlsx") || lower.endsWith(".xls")) {
-    const XLSX = await load("npm:xlsx@0.18.5");
-    const wb = XLSX.read(bytes, { type: "array" });
-    text = wb.SheetNames.slice(0, 10).map((n: string) => `Planilha ${n}:\n` + XLSX.utils.sheet_to_csv(wb.Sheets[n])).join("\n\n");
-  } else {
-    text = new TextDecoder().decode(bytes);
-  }
-  return [{ page: null, text: text.slice(0, maxChars) }];
-}
 
 /** Corta em trechos de ~size caracteres com sobreposição, respeitando fim de frase. */
 export function chunkPages(pages: PageText[], size = 1000, overlap = 150): { page: number | null; content: string }[] {

@@ -2,7 +2,8 @@
 // Também oferece um modo de teste de busca. Só ADMIN.
 // Body: { id } para indexar | { query, k? } para testar a busca.
 import { requireAdmin, corsHeaders } from "../_shared/auth.ts";
-import { extractPages, chunkPages, embed, searchReferenceChunks } from "../_shared/referenceRag.ts";
+import { chunkPages, embed, searchReferenceChunks } from "../_shared/referenceRag.ts";
+import { extractPages } from "../_shared/referenceExtract.ts";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
