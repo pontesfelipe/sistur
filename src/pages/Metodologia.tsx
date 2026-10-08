@@ -408,7 +408,7 @@ export default function Metodologia() {
               {tx("A partir da v1.28.0, o SISTUR oferece a")} <strong>{tx("Mandala da Sustentabilidade no Turismo (MST)")}</strong>{' '}
               como expansão opcional. A MST representa visualmente os 3 conjuntos de Beni (RA / OE / AO) e seus
               subsistemas, e adiciona 4 dimensões contemporâneas (Tecnologia, Inclusão, TBC e Sensibilização) com
-              9 indicadores complementares automatizáveis (TSE, Anatel, CADASTUR PNQT, NBR 9050).
+              8 indicadores complementares automatizáveis (TSE, Anatel, CADASTUR PNQT, NBR 9050).
             </p>
           </CardContent>
         </Card>
