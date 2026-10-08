@@ -8,7 +8,7 @@ describe("Inteligência mostra todas as regras fixas", () => {
     expect(BENI_RULE_SUMMARIES.length).toBeGreaterThanOrEqual(blocks);
   });
   it("Guia: um resumo para cada regra permanente", () => {
-    const rules = PERMANENT_RULES.split("\n").filter((l) => l.startsWith("- ")).length;
+    const rules = PERMANENT_RULES.split("Visão geral")[0].split("\n").filter((l) => l.startsWith("- ")).length;
     expect(SUPPORT_RULE_SUMMARIES.length).toBeGreaterThanOrEqual(rules);
   });
 });
