@@ -451,7 +451,7 @@ export default function Metodologia() {
                 </ul>
               </div>
               <div className="rounded-lg border border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/20 p-3">
-                <p className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400">{tx("AO — 2 indicadores")}</p>
+                <p className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400">{tx("AO — 1 indicador")}</p>
                 <ul className="text-xs mt-1 space-y-0.5 text-muted-foreground">
                                     <li>{tx("• MST_TBC — Turismo de Base Comunitária")}</li>
                 </ul>
