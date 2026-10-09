@@ -8,8 +8,16 @@ import { Landmark, Loader2 } from 'lucide-react';
 import { useDestinations } from '@/hooks/useDestinations';
 import { BR_STATES } from '@/lib/brStates';
 
+interface Props {
+  /** Chamado após criar o destino estadual (ex.: para selecioná-lo no assistente). */
+  onCreated?: (dest: { id: string; name: string }) => void;
+  visibility?: string;
+  triggerClassName?: string;
+  triggerVariant?: 'default' | 'outline';
+}
+
 /** Cria um "destino" na escala estadual (UF inteira) para o diagnóstico estadual. */
-export function StateDestinationDialog() {
+export function StateDestinationDialog({ onCreated, visibility, triggerClassName, triggerVariant = 'outline' }: Props = {}) {
   const { createDestination } = useDestinations();
   const [open, setOpen] = useState(false);
   const [uf, setUf] = useState('');
@@ -18,8 +26,8 @@ export function StateDestinationDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Landmark className="h-4 w-4" /> {tx('Novo Estado')}
+        <Button variant={triggerVariant} className={triggerClassName ?? 'gap-2'}>
+          <Landmark className="h-4 w-4 mr-2" /> {tx('Novo Estado')}
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -46,14 +54,16 @@ export function StateDestinationDialog() {
             disabled={!state || createDestination.isPending}
             onClick={async () => {
               if (!state) return;
-              await createDestination.mutateAsync({
+              const result: any = await createDestination.mutateAsync({
                 name: `Estado ${state.prep} ${state.name}`,
                 uf: state.uf,
                 ibge_code: state.ibge,
                 territory_scale: 'state',
-              });
+                ...(visibility ? { visibility } : {}),
+              } as any);
               setOpen(false);
               setUf('');
+              if (result?.id) onCreated?.({ id: result.id, name: result.name });
             }}
           >
             {createDestination.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
