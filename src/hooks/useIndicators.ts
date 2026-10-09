@@ -17,14 +17,17 @@ interface UseIndicatorsOptions {
    * - true: includes MST indicators — for diagnostics that opted-in
    */
   includeMandala?: boolean;
+  /** Territorial scale. Territorial scope defaults to 'municipal'. */
+  scale?: 'municipal' | 'state';
 }
 
 export function useIndicators(options: UseIndicatorsOptions = {}) {
   const { scope = 'all', tier, includeMandala } = options;
+  const scale = options.scale ?? (scope === 'territorial' ? 'municipal' : undefined);
   const queryClient = useQueryClient();
 
   const { data: indicators = [], isLoading, error } = useQuery({
-    queryKey: ['indicators', scope, tier, includeMandala],
+    queryKey: ['indicators', scope, tier, includeMandala, scale],
     queryFn: async () => {
       let query = supabase
         .from('indicators')
@@ -36,6 +39,10 @@ export function useIndicators(options: UseIndicatorsOptions = {}) {
       // Filter by scope if specified
       if (scope !== 'all') {
         query = query.or(`indicator_scope.eq.${scope},indicator_scope.eq.both`);
+      }
+
+      if (scale) {
+        query = query.in('territory_scale', [scale, 'both']);
       }
 
       // Filter by tier if specified

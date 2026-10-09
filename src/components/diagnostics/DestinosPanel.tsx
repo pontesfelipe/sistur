@@ -21,6 +21,7 @@ import { useEnterpriseProfiles } from '@/hooks/useEnterpriseProfiles';
 import { useProfile } from '@/hooks/useProfile';
 import { useProfileContext } from '@/contexts/ProfileContext';
 import { DestinationFormDialog } from '@/components/destinations/DestinationFormDialog';
+import { StateDestinationDialog } from '@/components/destinations/StateDestinationDialog';
 import { EnterpriseProfilePanel } from '@/components/enterprise/EnterpriseProfilePanel';
 import { EnterpriseRevenuePanel } from '@/components/enterprise/EnterpriseRevenuePanel';
 import { EnterpriseReputationPanel } from '@/components/enterprise/EnterpriseReputationPanel';
@@ -129,10 +130,13 @@ export function DestinosPanel() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {tx('Novo Destino')}
-        </Button>
+        <div className="flex gap-2">
+          <StateDestinationDialog />
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {tx('Novo Destino')}
+          </Button>
+        </div>
       </div>
 
       {/* Loading State */}

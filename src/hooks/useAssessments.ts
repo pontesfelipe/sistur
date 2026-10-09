@@ -11,7 +11,7 @@ export function useAssessments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('assessments')
-        .select('*, destinations(name)')
+        .select('*, destinations(name, territory_scale)')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -89,7 +89,7 @@ export function useAssessments() {
           expand_with_mandala: assessment.expand_with_mandala ?? false,
           brand_id: assessment.brand_id ?? null,
         })
-        .select('*, destinations(name)')
+        .select('*, destinations(name, territory_scale)')
         .single();
 
       if (error) throw error;
@@ -147,7 +147,7 @@ export function useAssessments() {
         .from('assessments')
         .update(assessment)
         .eq('id', id)
-        .select('*, destinations(name)')
+        .select('*, destinations(name, territory_scale)')
         .single();
 
       if (error) throw error;

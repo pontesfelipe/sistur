@@ -1904,8 +1904,10 @@ export type Database = {
           id: string
           lead_org_id: string
           name: string
+          scope: string
           slug: string
           status: string
+          uf: string | null
           updated_at: string
         }
         Insert: {
@@ -1915,8 +1917,10 @@ export type Database = {
           id?: string
           lead_org_id: string
           name: string
+          scope?: string
           slug: string
           status?: string
+          uf?: string | null
           updated_at?: string
         }
         Update: {
@@ -1926,8 +1930,10 @@ export type Database = {
           id?: string
           lead_org_id?: string
           name?: string
+          scope?: string
           slug?: string
           status?: string
+          uf?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2650,6 +2656,7 @@ export type Database = {
           municipality_type: string | null
           name: string
           org_id: string
+          territory_scale: string
           tourism_region: string | null
           uf: string | null
           updated_at: string
@@ -2666,6 +2673,7 @@ export type Database = {
           municipality_type?: string | null
           name: string
           org_id: string
+          territory_scale?: string
           tourism_region?: string | null
           uf?: string | null
           updated_at?: string
@@ -2682,6 +2690,7 @@ export type Database = {
           municipality_type?: string | null
           name?: string
           org_id?: string
+          territory_scale?: string
           tourism_region?: string | null
           uf?: string | null
           updated_at?: string
@@ -7306,6 +7315,7 @@ export type Database = {
           reliability_score: number | null
           replaced_by_code: string | null
           source: string | null
+          territory_scale: string
           theme: string
           unit: string | null
           value_format: Database["public"]["Enums"]["value_format_type"]
@@ -7358,6 +7368,7 @@ export type Database = {
           reliability_score?: number | null
           replaced_by_code?: string | null
           source?: string | null
+          territory_scale?: string
           theme: string
           unit?: string | null
           value_format?: Database["public"]["Enums"]["value_format_type"]
@@ -7410,6 +7421,7 @@ export type Database = {
           reliability_score?: number | null
           replaced_by_code?: string | null
           source?: string | null
+          territory_scale?: string
           theme?: string
           unit?: string | null
           value_format?: Database["public"]["Enums"]["value_format_type"]
@@ -13474,6 +13486,20 @@ export type Database = {
           org_id: string
           org_name: string
           title: string
+        }[]
+      }
+      get_state_panorama: {
+        Args: { _uf: string }
+        Returns: {
+          ao_score: number
+          destination_name: string
+          final_score: number
+          last_calculated_at: string
+          oe_score: number
+          org_id: string
+          org_name: string
+          ra_score: number
+          tourism_region: string
         }[]
       }
       get_student_transcript: {

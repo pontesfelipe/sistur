@@ -983,7 +983,8 @@ async function runCalculationCore(
             max_ref,
             weight,
             intersectoral_dependency,
-            minimum_tier
+            minimum_tier,
+            territory_scale
           )
         `)
         .eq("assessment_id", assessment_id)
@@ -1002,6 +1003,10 @@ async function runCalculationCore(
         const indicator = iv.indicator;
         if (!indicator) return false;
         const indicatorTier = indicator.minimum_tier || 'COMPLETE';
+        // Escala territorial: diagnóstico estadual usa só indicadores estaduais e vice-versa.
+        const destScale = (assessment as any).destination?.territory_scale === 'state' ? 'state' : 'municipal';
+        const indScale = indicator.territory_scale || 'municipal';
+        if (indScale !== 'both' && indScale !== destScale) return false;
         return allowedTiers.includes(indicatorTier);
       });
 

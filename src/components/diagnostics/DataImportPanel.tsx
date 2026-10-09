@@ -129,6 +129,7 @@ export function DataImportPanel({ preSelectedAssessmentId }: DataImportPanelProp
     scope: isEnterpriseAssessment ? 'enterprise' : 'territorial',
     tier: assessmentTier,
     includeMandala: Boolean((selectedAssessmentData as any)?.expand_with_mandala),
+    scale: (selectedAssessmentData as any)?.destinations?.territory_scale === 'state' ? 'state' : 'municipal',
   });
 
   const { profile } = useProfile();

@@ -32,6 +32,7 @@ export function useDestinations() {
       latitude?: number | null;
       longitude?: number | null;
       visibility?: 'organization' | 'personal' | 'demo';
+      territory_scale?: 'municipal' | 'state';
     }) => {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
@@ -96,6 +97,7 @@ export function useDestinations() {
           org_id: targetOrgId,
           visibility: dbVisibility,
           creator_user_id: user.id,
+          territory_scale: destination.territory_scale || 'municipal',
         })
         .select()
         .single();
