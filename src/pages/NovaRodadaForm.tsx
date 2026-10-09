@@ -36,6 +36,7 @@ import {
 import { useMemo, useState } from 'react';
 import { BrandSelector } from '@/components/enterprise/BrandSelector';
 import { AssessmentUnitsManager, type DraftUnit } from '@/components/enterprise/AssessmentUnitsManager';
+import { StateDestinationDialog } from '@/components/destinations/StateDestinationDialog';
 
 import { tx } from "@/i18n/t";
 function DestinationCombobox({
@@ -106,6 +107,9 @@ function DestinationCombobox({
                       {dest.uf ? ` - ${dest.uf}` : ''}
                       {dest.ibge_code ? ` (IBGE: ${dest.ibge_code})` : ''}
                     </span>
+                    {dest.territory_scale === 'state' && (
+                      <Badge variant="secondary" className="ml-2 shrink-0">{tx('Estado')}</Badge>
+                    )}
                   </CommandItem>
                 );
               })}
@@ -467,8 +471,16 @@ export function NovaRodadaForm({
                 className="flex-1"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                {tx("Criar novo")}
+                {tx("Novo Município")}
               </Button>
+              <StateDestinationDialog
+                triggerClassName="flex-1"
+                visibility={visibility}
+                onCreated={(d) => {
+                  onSelectedDestinationChange(d.id);
+                  onDestinationModeChange('select');
+                }}
+              />
             </div>
 
             {destinationMode === 'select' ? (
