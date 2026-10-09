@@ -30,6 +30,7 @@ export const VERSION_HISTORY = [
     changes: [
       "Diagnóstico Estadual (de cima para baixo): botão \"Novo Estado\" em Destinos cria um território de escala estadual, com catálogo próprio de 9 indicadores (UF_RA001–UF_RA003, UF_OE001–UF_OE003, UF_AO001–UF_AO003) e as mesmas réguas, motor IGMA e níveis. Diagnósticos municipais continuam usando só indicadores municipais.",
       "Panorama do Estado (de baixo para cima) em Consórcios: média RA/OE/AO e contagem Adequado/Atenção/Crítico dos municípios da UF que aceitaram participar dos consórcios do usuário. Privado, sem ranking público.",
+      "Correção na comparação dos consórcios: as notas dos pilares (guardadas de 0 a 1) eram comparadas com as faixas 67/34 como se já fossem percentuais, marcando quase tudo como Crítico e exibindo 0–1%. Agora status e percentuais seguem as faixas canônicas.",
     ],
   },
   {
