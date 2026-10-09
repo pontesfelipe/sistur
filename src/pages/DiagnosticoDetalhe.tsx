@@ -176,7 +176,7 @@ const DiagnosticoDetalhe = () => {
   // the user can't actually see/fill in their tier. Otherwise the completeness
   // bar gets stuck below 100% with no visible field to fill.
   const assessmentTier = ((assessment as any)?.tier || 'COMPLETE') as 'SMALL' | 'MEDIUM' | 'COMPLETE';
-  const { indicators } = useIndicators({ scope: 'territorial', tier: assessmentTier, includeMandala });
+  const { indicators } = useIndicators({ scope: 'territorial', tier: assessmentTier, includeMandala, scale: ((assessment as any)?.destination?.territory_scale === 'state' ? 'state' : 'municipal') });
   const { indicators: enterpriseIndicators = [] } = useIndicators({ scope: 'enterprise', tier: assessmentTier, includeMandala });
   const { user } = useAuth();
   const [isPreFillOpen, setIsPreFillOpen] = useState(false);
