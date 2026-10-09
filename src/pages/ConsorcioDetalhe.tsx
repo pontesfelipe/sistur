@@ -37,7 +37,8 @@ function statusLabel(s: string | null) {
   return "Sem dados";
 }
 function pct(n: number | null) {
-  return n == null ? "—" : `${Math.round(n)}%`;
+  // Pillar scores are stored 0–1; display as percentage.
+  return n == null ? "—" : `${Math.round(Number(n) * 100)}%`;
 }
 
 function InviteOrgDialog({ consortiumId }: { consortiumId: string }) {
