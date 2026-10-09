@@ -11,7 +11,7 @@
 
 export const APP_VERSION = {
   major: 2,
-  minor: 51,
+  minor: 52,
   patch: 0,
 
   get full() {
@@ -23,6 +23,15 @@ export const APP_VERSION = {
 };
 
 export const VERSION_HISTORY = [
+  {
+    version: "2.52.0",
+    date: "2026-10-09",
+    type: "minor" as const,
+    changes: [
+      "Diagnóstico Estadual (de cima para baixo): botão \"Novo Estado\" em Destinos cria um território de escala estadual, com catálogo próprio de 9 indicadores (UF_RA001–UF_RA003, UF_OE001–UF_OE003, UF_AO001–UF_AO003) e as mesmas réguas, motor IGMA e níveis. Diagnósticos municipais continuam usando só indicadores municipais.",
+      "Panorama do Estado (de baixo para cima) em Consórcios: média RA/OE/AO e contagem Adequado/Atenção/Crítico dos municípios da UF que aceitaram participar dos consórcios do usuário. Privado, sem ranking público.",
+    ],
+  },
   {
     version: "2.51.0",
     date: "2026-10-08",
