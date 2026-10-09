@@ -1,5 +1,7 @@
 const MAP: { prefix: string; items: string[] }[] = [
-  { prefix: '/diagnosticos', items: ['Como criar uma nova rodada de diagnóstico?', 'Como recalcular um diagnóstico?', 'Por que aparece a tarja de diagnóstico desatualizado?'] },
+  { prefix: '/diagnosticos', items: ['Como criar uma nova rodada de diagnóstico?', 'Como fazer o diagnóstico de um estado?', 'Como recalcular um diagnóstico?', 'Por que aparece a tarja de diagnóstico desatualizado?'] },
+  { prefix: '/nova-rodada', items: ['Como fazer o diagnóstico de um estado?', 'Qual nível de diagnóstico escolher?', 'Como os dados oficiais são preenchidos?'] },
+  { prefix: '/consorcios', items: ['O que é o Panorama do Estado?', 'Como convidar municípios para um consórcio?'] },
   { prefix: '/projetos', items: ['Como criar um projeto a partir do diagnóstico?', 'Como exportar tarefas para CSV ou calendário?', 'Como adicionar membros ao projeto?'] },
   { prefix: '/relatorios', items: ['Como gerar um relatório?', 'Onde vejo as fontes usadas no relatório?', 'Como baixar o relatório?'] },
   { prefix: '/edu', items: ['Como me inscrever em um curso?', 'Onde vejo meu certificado?', 'Como funcionam as trilhas?'] },
